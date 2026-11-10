@@ -1,3 +1,7 @@
+## v1.5.16
+- Sincroniza indicadores y pendientes al agregar filas, pegar desde Excel y cambiar datos generales.
+- Actualiza los recursos CSS y JavaScript con una nueva versión de caché para que el navegador reciba los colores y mensajes nuevos.
+
 ## v1.5.15
 - Añade panel de avance general con porcentaje y lista dinámica de pendientes.
 - Distingue estados por ensayo: sin datos, en curso, lista para revisar y completada.

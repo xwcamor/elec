@@ -310,7 +310,7 @@
   $('#planTestPicker').addEventListener('click',e=>{const b=e.target.closest('[data-pick-test]');if(b)toggle(b.dataset.pickTest);});
   $('#planTestCards').addEventListener('click',e=>{
     const del=e.target.closest('[data-remove-test]');if(del){items.splice(Number(del.dataset.removeTest),1);render();return;}
-    const add=e.target.closest('[data-add-row]');if(add){items[Number(add.dataset.addRow)]?.rows.push({});renderCards();}
+    const add=e.target.closest('[data-add-row]');if(add){items[Number(add.dataset.addRow)]?.rows.push({});renderCards();refreshPlanFeedback();}
   });
   $('#planTestCards').addEventListener('input',e=>{
     const card=e.target.closest('[data-test-index]');if(!card)return;const item=items[Number(card.dataset.testIndex)];if(!item)return;
@@ -336,13 +336,13 @@
     refreshPlanFeedback();
   });
   $('#planPage').addEventListener('input',e=>{
-    if(['planDate','planOperator'].includes(e.target.id))renderPlanFeedback();
+    if(['planDate','planOperator'].includes(e.target.id))refreshPlanFeedback();
   });
   $('#planTestCards').addEventListener('paste',e=>{
     const cell=e.target.closest('.plan-cell');if(!cell||cell.readOnly)return;
     const text=(e.clipboardData||window.clipboardData).getData('text');if(!text.includes('\t')&&!text.includes('\n'))return;
     e.preventDefault();const card=cell.closest('[data-test-index]'),item=items[Number(card.dataset.testIndex)],fields=columns(item.code),r0=Number(cell.dataset.row),c0=fields.findIndex(c=>c[0]===cell.dataset.col);
     text.replace(/\r/g,'').split('\n').filter((v,i,a)=>!(i===a.length-1&&v==='')).forEach((line,ri)=>{while(item.rows.length<=r0+ri)item.rows.push({});line.split('\t').forEach((v,ci)=>{const f=fields[c0+ci];if(f&&!['absorption_index','theoretical','errU','errV','errW'].includes(f[0]))item.rows[r0+ri][f[0]]=v.trim();});item.rows[r0+ri]=normalize(item.code,item.rows[r0+ri]);});
-    renderCards();renderPlanFeedback();toast('Bloque pegado desde Excel.');
+    renderCards();refreshPlanFeedback();toast('Bloque pegado desde Excel.');
   });
 })();
