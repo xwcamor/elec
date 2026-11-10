@@ -1,0 +1,3 @@
+Vistas previas del piloto TR Health.
+01-03 muestran configuración eléctrica; 04 muestra panorama de pruebas; 05 muestra el formulario de ejecución con fecha/hora.
+Son composiciones ilustrativas para revisar diseño y flujo, no capturas de una base de datos productiva. Los registros del panorama (si se muestran) son datos demostrativos.
