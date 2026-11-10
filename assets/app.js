@@ -445,7 +445,7 @@
   let testExecutions = [];
   let testCatalogLoaded = false;
   const testPage=$('#testPage'), executionPage=$('#executionPage');
-  function showOnlyMain(which){['overviewPage','configPage','testPage','executionPage'].forEach(id=>$('#'+id).classList.toggle('hidden',id!==which));}
+  function showOnlyMain(which){['overviewPage','configPage','testPage','executionPage','planPage'].forEach(id=>$('#'+id).classList.toggle('hidden',id!==which));}
   function openTests(){showOnlyMain('testPage');loadTestHistory();}
   $('#openElectricalTests').addEventListener('click',e=>{e.preventDefault();openTests();});
   $('#backFromTests').addEventListener('click',()=>showOnlyMain('overviewPage'));
@@ -456,11 +456,11 @@
   function testStats(){
     const total=testExecutions.length, completed=testExecutions.filter(x=>x.status==='COMPLETADA').length;
     const last=testExecutions[0]?.executed_at;
-    $('#testStats').innerHTML=`<div class="test-stat"><small>Ejecuciones registradas</small><strong>${total}</strong><span>Historial de este transformador</span></div><div class="test-stat"><small>Completadas</small><strong>${completed}</strong><span>Con estado completado</span></div><div class="test-stat"><small>Tipos con registros</small><strong>${new Set(testExecutions.map(x=>x.test_code)).size}</strong><span>De ${testCatalog.length} pruebas disponibles</span></div><div class="test-stat"><small>Última ejecución</small><strong class="test-stat-date">${last?esc(formatExecutionDate(last)):'Sin registros'}</strong><span>Fecha de realización</span></div>`;
+    $('#testStats').innerHTML=`<div class="test-stat"><small>Ejecuciones registradas</small><strong>${total}</strong><span>Historial de este transformador</span></div><div class="test-stat"><small>Completadas</small><strong>${completed}</strong><span>Con estado completado</span></div><div class="test-stat"><small>Tipos con registros</small><strong>${new Set(testExecutions.flatMap(x=>(x.plan_tests||[]).map(t=>t.code).concat(x.test_code==='PLAN'?[]:[x.test_code]))).size}</strong><span>De ${testCatalog.length} pruebas disponibles</span></div><div class="test-stat"><small>Última ejecución</small><strong class="test-stat-date">${last?esc(formatExecutionDate(last)):'Sin registros'}</strong><span>Fecha de realización</span></div>`;
   }
   function renderTestTypes(){
     $('#testTypeGrid').innerHTML=testCatalog.map(t=>{
-      const items=testExecutions.filter(x=>x.test_code===t[0]);
+      const items=testExecutions.filter(x=>x.test_code===t[0]||(x.plan_tests||[]).some(p=>p.code===t[0]));
       const last=items[0]?.executed_at;
       return `<button class="test-type-card" type="button" data-new-test="${t[0]}"><span class="test-type-icon"><svg><use href="#i-zap"/></svg></span><span class="test-type-copy"><b>${esc(t[1])}</b><small>${esc(t[2])}</small><em>${items.length?items.length+' registro(s) · último '+esc(formatExecutionDate(last)):'Sin registros todavía'}</em></span><span class="test-type-arrow">＋</span></button>`;
     }).join('');
@@ -472,7 +472,8 @@
     testExecutions.forEach(x=>{
       const d=new Date(String(x.executed_at||'').replace(' ','T'));
       if(!Number.isNaN(d.getTime())){const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');monthly.set(k,(monthly.get(k)||0)+1);}
-      const name=x.test_name||typeName(x.test_code);types.set(name,(types.get(name)||0)+1);
+      const names=x.plan_tests?.length?x.plan_tests:[{name:x.test_name||typeName(x.test_code),code:x.test_code}];
+      names.forEach(t=>{const name=t.name||typeName(t.code);types.set(name,(types.get(name)||0)+1);});
     });
     const keys=[...monthly.keys()].sort().slice(-8),max=Math.max(1,...keys.map(k=>monthly.get(k)));
     $('#analyticsPeriod').textContent=keys.length?keys[0]+' — '+keys[keys.length-1]:'Sin datos';
@@ -490,8 +491,8 @@
   function renderTestHistory(){
     testStats();renderTestTypes();renderHistoricalAnalytics();
     const q=($('#testHistoryFilter')?.value||'').trim().toLocaleLowerCase();
-    const filtered=testExecutions.filter(x=>(x.test_name||typeName(x.test_code)).toLocaleLowerCase().includes(q)||(x.operator_name||'').toLocaleLowerCase().includes(q));
-    $('#testHistoryBody').innerHTML=filtered.length?filtered.map(x=>`<tr><td><b>${esc(formatExecutionDate(x.executed_at))}</b><small>ID #${esc(x.id)}</small></td><td>${esc(x.test_name||typeName(x.test_code))}</td><td>${esc(x.operator_name||'—')}</td><td>${Number(x.measurement_count||0)} fila(s)</td><td><span class="execution-status ${x.status==='COMPLETADA'?'done':'draft'}">${x.status==='COMPLETADA'?'Completada':'Borrador'}</span></td><td><button class="btn small" data-open-execution="${x.id}" title="Editar esta ejecución">Editar</button></td></tr>`).join(''):'<tr><td colspan="6" class="test-empty">'+(testExecutions.length?'No hay registros que coincidan con el filtro.':'Aún no hay registros. Selecciona una prueba para registrar la primera ejecución.')+'</td></tr>';
+    const filtered=testExecutions.filter(x=>((x.plan_tests||[]).map(t=>t.name||typeName(t.code)).join(' ')||(x.test_name||typeName(x.test_code))).toLocaleLowerCase().includes(q)||(x.operator_name||'').toLocaleLowerCase().includes(q));
+    $('#testHistoryBody').innerHTML=filtered.length?filtered.map(x=>`<tr><td><b>${esc(formatExecutionDate(x.executed_at))}</b><small>ID #${esc(x.id)}</small></td><td>${esc(x.plan_tests?.length?x.plan_tests.map(t=>t.name||typeName(t.code)).join(' · '):(x.test_name||typeName(x.test_code)))}</td><td>${esc(x.operator_name||'—')}</td><td>${x.plan_tests?.length?x.plan_tests.length+' prueba(s)':Number(x.measurement_count||0)+' fila(s)'}</td><td><span class="execution-status ${x.status==='COMPLETADA'?'done':'draft'}">${x.status==='COMPLETADA'?'Completada':'Borrador'}</span></td><td><button class="btn small" data-open-execution="${x.id}" title="Editar esta ejecución">Editar</button></td></tr>`).join(''):'<tr><td colspan="6" class="test-empty">'+(testExecutions.length?'No hay registros que coincidan con el filtro.':'Aún no hay registros. Selecciona una prueba para registrar la primera ejecución.')+'</td></tr>';
     $$('[data-open-execution]').forEach(b=>b.addEventListener('click',()=>openExistingExecution(Number(b.dataset.openExecution))));
   }
   $('#testHistoryFilter').addEventListener('input',renderTestHistory);
@@ -778,6 +779,8 @@
   window.addEventListener('error', function(ev){ const msg='Error de interfaz: '+(ev.message||'JavaScript'); const s=$('#pilotStatus'); if(s){s.className='pilot-status warning';s.querySelector('strong').textContent='Error al iniciar la interfaz';s.querySelector('span').textContent=msg;} });
   window.ELEC_PLAN_BRIDGE = {
     getTransformer: function(){ return transformer; },
+    getElectricalConfig: function(){ return state; },
+    reloadTestHistory: function(){ return loadTestHistory(); },
     api: function(query){ return api(query); },
     readApiResponse: function(response){ return readApiResponse(response); },
     showPage: function(pageId){

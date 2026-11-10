@@ -45,7 +45,11 @@
     if(code==='INSULATION_RESISTANCE')return ['AT-BT','AT-Masa','BT-Masa'].map(point=>({point}));
     if(code==='WINDING_RESISTANCE')return [{section:'AT',phase:'U-0',test_current_a:'5'},{section:'AT',phase:'V-0',test_current_a:'5'},{section:'AT',phase:'W-0',test_current_a:'5'},{section:'BT',phase:'u-v',test_current_a:'16'},{section:'BT',phase:'v-w',test_current_a:'16'},{section:'BT',phase:'w-u',test_current_a:'16'}];
     if(code==='EXCITATION')return [1,14,27].flatMap(tap=>['U-0','V-0','W-0'].map(phase=>({tap:String(tap),phase})));
-    if(code==='BUSHING')return ['1U','1V','1W','1N'].map(terminal=>({terminal}));
+    if(code==='BUSHING'){
+      const config=bridge.getElectricalConfig();
+      const terminals=(config?.windings||[]).flatMap(w=>w.terminals||[]).filter(t=>t.has_capacitive_bushing).map(t=>({terminal:t.code||'',serial:t.bushing?.serial_number||''}));
+      return terminals.length?terminals:['1U','1V','1W','1N'].map(terminal=>({terminal}));
+    }
     if(code==='SFRA')return [{connection:'AT vs BT (abierto)',tap:'1'},{connection:'BT vs AT (abierto)',tap:'1'},{connection:'AT vs BT (cortocircuito)',tap:'1'}];
     if(code==='ARRESTER')return [...['1U','1V','1W'].map(phase=>({section:'AT',phase,test_mode:'GST'})),...['2U','2V','2W','2N'].map(phase=>({section:'MT',phase,test_mode:'GST'}))];
     if(code==='PROTECTIONS')return [
@@ -140,6 +144,7 @@
       const res=await fetch(api('action=test-save'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}),d=await json(res);
       toast((editingId?'Plan actualizado':'Plan guardado')+' · '+tests.length+' prueba(s) · ID #'+d.result.id);
       bridge.showPage('testPage');
+      await bridge.reloadTestHistory();
     }catch(e){toast(e.message,true);}
     finally{btn.disabled=false;btn.textContent=editingId?'Actualizar plan':'Guardar plan';}
   }

@@ -1,3 +1,10 @@
+## v1.5.13
+- El historial vuelve a cargar los planes después de guardar o actualizar uno.
+- Las filas de resumen, filtros, tarjetas por tipo y estadísticas cuentan las pruebas contenidas en cada plan.
+- El formulario de bushings toma los bornes marcados como capacitivos en la configuración eléctrica del transformador.
+- La navegación antigua también oculta correctamente la nueva página de plan.
+- Actualiza la caché de app.js y plan.js.
+
 ## v1.5.12
 - Incorpora un plan por visita: fecha, responsable, supervisor y condiciones ambientales se ingresan una sola vez.
 - Permite elegir varias pruebas y genera un formulario independiente por ensayo.
