@@ -1,3 +1,13 @@
+## v1.5.8
+- Amplía el catálogo a los protocolos presentes en el Excel LAP: FP del transformador, excitación, TTR, resistencia de devanados, aislamiento, bushings, SFRA, pararrayos y protecciones propias.
+- Añade al aislamiento las tres configuraciones del protocolo y las lecturas a 15 s, 30 s, 45 s y 1 min.
+- Calcula el índice de absorción como R(1 min) / R(30 s), tal como está en la hoja LAP.
+- Añade campos LAP de resistencia de devanados AT/BT, corriente de excitación por fase, factor de potencia, bushings, pararrayos y SFRA.
+- El historial muestra «Editar» de forma explícita; editar conserva el ID y actualiza esa ejecución en vez de crear otra.
+- Retira el panel lateral duplicado del transformador en el formulario de ejecución y libera el ancho de trabajo.
+- Sin cambios en la estructura de las tablas de ejecución: las plantillas siguen almacenadas en el payload de mediciones.
+- El catálogo se sincroniza al abrir Pruebas eléctricas para bases de datos existentes, sin tener que reimportar el SQL.
+
 ## v1.5.7
 - Elimina mensajes internos de conexión y referencias visibles a tablas de base de datos dentro de Configuración eléctrica.
 - Cambia el menú lateral de cuatro pasos por una barra horizontal compacta y fija durante el desplazamiento.

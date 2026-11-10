@@ -198,3 +198,13 @@
  .config-panel .panel-heading{flex-wrap:wrap}
  .config-panel .panel-heading>div:first-child{flex-basis:100%}
 }
+
+/* v1.5.8 · Formularios de ejecución a ancho completo y plantillas LAP */
+.execution-layout{display:block;width:100%}
+.execution-main{width:100%;max-width:none;min-width:0}
+.execution-main>.execution-card{width:100%}
+.execution-side{display:none!important}
+.execution-date-card{width:100%}
+.test-history-table td:last-child{white-space:nowrap}
+.specific-cell[readonly]{background:#eef4f8!important;color:#39536a;font-weight:700;cursor:default}
+@media(max-width:760px){.execution-layout{display:block}.execution-main{width:100%}.execution-date-card{align-items:flex-start}.execution-date-field{margin-left:0}}

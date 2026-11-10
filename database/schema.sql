@@ -158,12 +158,14 @@ CREATE TABLE IF NOT EXISTS eh_test_types (
 INSERT IGNORE INTO eh_test_types (code, name, display_order) VALUES
 ('TTR', 'Relación de transformación', 1),
 ('CAPACITANCE', 'Capacitancia', 2),
-('POWER_FACTOR', 'Factor de potencia', 3),
+('POWER_FACTOR', 'Factor de potencia del transformador', 3),
 ('EXCITATION', 'Corriente de excitación', 4),
 ('WINDING_RESISTANCE', 'Resistencia de devanados', 5),
 ('INSULATION_RESISTANCE', 'Resistencia de aislamiento', 6),
 ('SFRA', 'SFRA', 7),
-('BUSHING', 'Bushings capacitivos', 8);
+('BUSHING', 'Bushings capacitivos', 8),
+('ARRESTER', 'Pararrayos AT / MT', 9),
+('PROTECTIONS', 'Protecciones propias', 10);
 
 CREATE TABLE IF NOT EXISTS eh_test_executions (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,

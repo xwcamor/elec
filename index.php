@@ -54,7 +54,7 @@ $initialConfig = $config ?: [
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.7">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.8">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -229,7 +229,7 @@ $initialConfig = $config ?: [
 <div id="specificTestEditor" class="ttr-editor hidden">
   <div class="ttr-editor-head"><div><b id="specificTestTitle">Plantilla de prueba</b><small id="specificTestHint">Registra los resultados según el procedimiento aplicado.</small></div><button type="button" class="btn small" id="specificAddRows">＋ Agregar 5 filas</button></div>
   <div class="measurement-sheet-wrap"><table class="measurement-sheet ttr-sheet"><thead id="specificTestHead"></thead><tbody id="specificTestRows"></tbody></table></div>
-  <div class="sheet-hint">Pegado desde Excel · Navegación con Tab y flechas. Los datos se conservan en la ejecución sin aplicar fórmulas o límites no validados.</div>
+  <div class="sheet-hint">Plantilla basada en el protocolo LAP. Los campos calculados se identifican en la propia tabla; los demás valores se registran tal como los entrega el instrumento.</div>
 </div>
 <div class="measurement-sheet-wrap" id="measurementGenericWrap"><table class="measurement-sheet"><thead><tr><th>#</th><th>Parámetro / punto</th><th>Valor medido</th><th>Unidad</th><th>Observación</th><th></th></tr></thead><tbody id="measurementRows"></tbody></table></div>
           <div class="sheet-hint">Atajos: Ctrl+V para pegar una tabla desde Excel · Flechas para moverte entre celdas · Tab para avanzar.</div>
@@ -237,7 +237,7 @@ $initialConfig = $config ?: [
         </section>
         <section class="execution-card"><div class="execution-card-title"><span class="eyebrow">04 · TRAZABILIDAD</span><h3>Observaciones</h3></div><textarea id="executionObservations" rows="3" placeholder="Condiciones de prueba, conexiones utilizadas, incidencias..." class="execution-observations"></textarea></section>
       </div>
-      <aside class="execution-side"><div class="execution-side-card"><span class="eyebrow">TRANSFORMADOR</span><h3 id="executionTrafoCode">—</h3><p id="executionTrafoCompany">—</p><div class="side-divider"></div><div class="execution-side-note"><b>Historial independiente</b><span>Al guardar se crea o actualiza un registro con su ID propio. La configuración eléctrica vigente se guarda como referencia de esta ejecución.</span></div><div class="execution-side-note"><b>Fecha de registro</b><span id="systemSavedAt">Se asignará automáticamente al guardar.</span></div></div></aside>
+
     </div>
   </section>
 
@@ -357,5 +357,5 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.7"></script>
+<script src="./assets/app.js?v=1.5.8"></script>
 </body></html>

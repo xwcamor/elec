@@ -35,9 +35,23 @@ class ElectricalTestRepository
 
     public function types(): array
     {
+        // Sincroniza el catálogo al abrir Pruebas eléctricas para instalaciones que ya tenían el esquema anterior.
+        $defaults = [
+            ['TTR', 'Relación de transformación', 1],
+            ['CAPACITANCE', 'Capacitancia', 2],
+            ['POWER_FACTOR', 'Factor de potencia del transformador', 3],
+            ['EXCITATION', 'Corriente de excitación', 4],
+            ['WINDING_RESISTANCE', 'Resistencia de devanados', 5],
+            ['INSULATION_RESISTANCE', 'Resistencia de aislamiento', 6],
+            ['SFRA', 'SFRA', 7],
+            ['BUSHING', 'Bushings capacitivos', 8],
+            ['ARRESTER', 'Pararrayos AT / MT', 9],
+            ['PROTECTIONS', 'Protecciones propias', 10],
+        ];
+        $sync = $this->pdo->prepare('INSERT INTO eh_test_types (code, name, display_order) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), display_order=VALUES(display_order)');
+        foreach ($defaults as $row) $sync->execute($row);
         return $this->pdo->query('SELECT code,name,display_order FROM eh_test_types ORDER BY display_order')->fetchAll();
     }
-
     public function save(array $p): array
     {
         $key=trim((string)($p['transformer_key']??''));

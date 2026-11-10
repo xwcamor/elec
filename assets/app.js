@@ -11,14 +11,29 @@
   var activeExecutionMode = 'new';
   var activeSpecificCode = '';
   const specificTemplates={
-    WINDING_RESISTANCE:{title:'Resistencia de devanados',hint:'Registra cada punto medido; no se aplica compensación automática.',prefix:'WR',cols:[['winding','Devanado'],['phase','Fase / borne'],['tap','Tap'],['current','Corriente'],['resistance','Resistencia'],['unit','Unidad'],['temperature','Temperatura °C'],['notes','Observación']]},
-    INSULATION_RESISTANCE:{title:'Resistencia de aislamiento',hint:'Registra combinación de terminales, tensión aplicada y lecturas por tiempo.',prefix:'IR',cols:[['from','Terminal energizado'],['to','Terminal de referencia'],['voltage','Tensión de prueba'],['unit','Unidad tensión'],['time','Tiempo'],['reading','Resistencia medida'],['reading_unit','Unidad resistencia'],['temperature','Temperatura °C'],['notes','Observación']]},
+    WINDING_RESISTANCE:{title:'Resistencia de devanados',hint:'Una fila por toma y fase. Incluye corriente, tensión y tiempo DC, resistencia medida, desviación y resistencia referida a 75 °C, como en LAP.',prefix:'WR',cols:[['winding','Bobinado (AT/BT)'],['tap','Tap'],['terminal_pair','Bornes / conexión'],['phase','Fase'],['current','I DC (A)'],['dc_voltage_v','V DC (V)'],['time_s','Tiempo (s)'],['resistance','R medida (Ω)'],['resistance_deviation_percent','Desviación R (%)'],['resistance_referred_75c','R referida 75 °C (Ω)'],['fluctuation_percent','Fluctuación (%)'],['slope_a_s','Pendiente (A/s)'],['temperature','Temperatura (°C)'],['unit','Unidad'],['notes','Observación']]},
+    INSULATION_RESISTANCE:{title:'Resistencia de aislamiento',hint:'Registra las tres configuraciones LAP y las lecturas a 15 s, 30 s, 45 s y 1 min. El índice de absorción se calcula como R(1 min) / R(30 s).',prefix:'IR',cols:[['point','Punto de aplicación'],['applied_voltage_kv','Voltaje aplicado (kV)'],['reading_15s','Resistencia a 15 s'],['reading_30s','Resistencia a 30 s'],['reading_45s','Resistencia a 45 s'],['reading_1min','Resistencia a 1 min'],['absorption_index','Índice de absorción'],['reading_unit','Unidad de lectura'],['notes','Observación']]},
     CAPACITANCE:{title:'Capacitancia',hint:'Registra punto de prueba, configuración y capacitancia medida.',prefix:'CAP',cols:[['point','Punto / borne'],['connection','Conexión de prueba'],['test_voltage','Tensión de prueba'],['capacitance','Capacitancia'],['unit','Unidad'],['frequency','Frecuencia'],['temperature','Temperatura °C'],['notes','Observación']]},
-    POWER_FACTOR:{title:'Factor de potencia',hint:'Registra modo de prueba, tensión, capacitancia y factor indicado por el instrumento.',prefix:'PF',cols:[['point','Punto / borne'],['mode','Modo / conexión'],['test_voltage','Tensión de prueba'],['capacitance','Capacitancia'],['cap_unit','Unidad C'],['power_factor','Factor de potencia'],['dissipation','Factor de disipación'],['current','Corriente'],['temperature','Temperatura °C'],['notes','Observación']]},
-    EXCITATION:{title:'Corriente de excitación',hint:'Registra fase, tap, tensión aplicada y valores leídos.',prefix:'EXC',cols:[['winding','Devanado'],['phase','Fase'],['tap','Tap'],['voltage','Tensión aplicada'],['current','Corriente'],['power','Potencia'],['unit','Unidad'],['notes','Observación']]},
-    BUSHING:{title:'Prueba de bushings capacitivos',hint:'Identifica cada bushing y registra sus parámetros medidos.',prefix:'BUSH',cols:[['terminal','Borne / fase'],['serial','Número de serie'],['test_mode','Modo de prueba'],['capacitance','Capacitancia'],['cap_unit','Unidad C'],['power_factor','Factor de potencia'],['dissipation','Factor de disipación'],['test_voltage','Tensión de prueba'],['notes','Observación']]},
-    SFRA:{title:'Registro SFRA',hint:'Registra barrido, conexión y referencia del archivo exportado por el equipo.',prefix:'SFRA',cols:[['winding','Devanado'],['phase','Fase'],['connection','Conexión'],['start_frequency','Frecuencia inicial'],['stop_frequency','Frecuencia final'],['points','Puntos de barrido'],['instrument','Equipo'],['file_reference','Archivo / referencia'],['notes','Observación']]}
+    POWER_FACTOR:{title:'Factor de potencia del transformador',hint:'Campos LAP: bloque, modo de prueba, tensión y frecuencia, tensión/corriente de salida, pérdidas, FP medido, FP corregido a 20 °C y capacitancia.',prefix:'PF',cols:[['block','Bloque / sección'],['measurement','Medición (CH+CHL, CH, CHL, CL+CLH...)'],['test_mode','Modo (GST, GSTg-A, UST-A)'],['sweep','Barrido'],['test_voltage_v','Tensión de prueba (V)'],['frequency_hz','Frecuencia (Hz)'],['output_voltage_v','V de salida (V)'],['output_current_a','I de salida (A)'],['power_loss_w','Pérdidas (W)'],['power_factor_measured','FP medido'],['power_factor_corrected_20c','FP corregido a 20 °C'],['capacitance_nf','Capacitancia (nF)'],['global_correction_enabled','Usar factor global de corrección'],['global_correction_factor','Factor de corrección'],['evaluation','Evaluación'],['notes','Observación']]},
+    EXCITATION:{title:'Corriente de excitación',hint:'Una fila por tap y fase. LAP registra tensión de salida, corriente, ángulo de fase, pérdidas y reactancia; la hoja de protocolo resume corriente de excitación y pérdidas.',prefix:'EXC',cols:[['tap','Tap'],['phase','Fase (U-0 / V-0 / W-0)'],['test_voltage_kv','Tensión aplicada (kV)'],['frequency_hz','Frecuencia (Hz)'],['voltage','V de salida (V)'],['current','I de salida (A)'],['current_phase_degrees','Ángulo de corriente (°)'],['power','Pérdidas (W)'],['reactance_ohm','Reactancia (Ω)'],['unit','Unidad / referencia'],['notes','Observación']]},
+    BUSHING:{title:'Factor de potencia y capacitancia de bushings',hint:'Una fila por borne. Registra serie, tensión, FP de placa y medido, capacitancia de placa y medida, y variación.',prefix:'BUSH',cols:[['terminal','Borne'],['serial','Serie'],['test_voltage','Tensión de prueba (kV)'],['power_factor_plate','FP de placa'],['power_factor','FP medido'],['capacitance_plate','Capacitancia de placa (pF)'],['capacitance','Capacitancia medida (pF)'],['variation_percent','Variación (%)'],['test_mode','Modo de prueba'],['dissipation','Factor de disipación'],['cap_unit','Unidad C'],['notes','Observación']]},
+    SFRA:{title:'Análisis de respuesta al barrido de frecuencia (SFRA)',hint:'El protocolo LAP identifica tres conexiones: AT–BT abierto, BT–AT abierto y AT–BT en cortocircuito. Adjunta o referencia la curva exportada y documenta la comparación campo/planta.',prefix:'SFRA',cols:[['connection','Conexión / configuración'],['tap','Tap'],['file_reference','Archivo de curva / referencia'],['comparison_reference','Curva de referencia (fábrica)'],['comparison_result','Resultado de comparación'],['evaluation','Evaluación'],['instrument','Equipo'],['notes','Observación']]},
+    ARRESTER:{title:'Prueba de pararrayos (AT / MT)',hint:'LAP separa pararrayos AT y MT. Registra fase, tensión y corriente de salida, modo GST, pérdidas y capacitancia medida.',prefix:'ARR',cols:[['section','Sección (AT/MT)'],['phase','Fase / borne'],['output_voltage_v','V de salida (V)'],['output_current_a','I de salida (A)'],['test_mode','Modo de prueba (GST)'],['losses_measured_w','Pérdidas medidas (W)'],['capacitance_measured_pf','Capacitancia medida (pF)'],['evaluation','Evaluación'],['notes','Observación']]},
+    PROTECTIONS:{title:'Verificación de protecciones propias',hint:'Registra cada accesorio y contacto probado, condición (alarma/disparo/ventilación), ajuste, resultado y observación, según el protocolo LAP.',prefix:'PROT',cols:[['accessory','Accesorio'],['terminals','Bornes'],['contact','Contacto'],['condition','Condición'],['setpoint','Ajuste'],['result','Resultado'],['notes','Observación']]}
   };
+
+  var testCatalog = [
+    ['TTR','Relación de transformación','Taps, relación teórica/medida y error por fase'],
+    ['CAPACITANCE','Capacitancia','Registro de capacitancia por punto de prueba'],
+    ['POWER_FACTOR','Factor de potencia del transformador','FP medido/corregido, pérdidas y capacitancia'],
+    ['EXCITATION','Corriente de excitación','Corriente, ángulo, pérdidas y reactancia por fase'],
+    ['WINDING_RESISTANCE','Resistencia de devanados','Medición DC y resistencia referida a 75 °C'],
+    ['INSULATION_RESISTANCE','Resistencia de aislamiento','Lecturas por tiempo e índice de absorción'],
+    ['SFRA','SFRA','Tres configuraciones de barrido y comparación de curvas'],
+    ['BUSHING','Bushings capacitivos','FP y capacitancia de placa/medidos por borne'],
+    ['ARRESTER','Pararrayos AT / MT','Pérdidas y capacitancia por fase'],
+    ['PROTECTIONS','Protecciones propias','Accesorios, contactos, ajustes y resultados']
+  ];
   var testCatalog = [
     ['TTR','Relación de transformación','Relaciones teóricas, medidas y desviación'],
     ['CAPACITANCE','Capacitancia','Capacitancia medida por configuración'],
@@ -450,7 +465,7 @@
   function testStats(){
     const total=testExecutions.length, completed=testExecutions.filter(x=>x.status==='COMPLETADA').length;
     const last=testExecutions[0]?.executed_at;
-    $('#testStats').innerHTML=`<div class="test-stat"><small>Ejecuciones registradas</small><strong>${total}</strong><span>Historial de este transformador</span></div><div class="test-stat"><small>Completadas</small><strong>${completed}</strong><span>Con estado completado</span></div><div class="test-stat"><small>Tipos con registros</small><strong>${new Set(testExecutions.map(x=>x.test_code)).size}</strong><span>De 8 pruebas disponibles</span></div><div class="test-stat"><small>Última ejecución</small><strong class="test-stat-date">${last?esc(formatExecutionDate(last)):'Sin registros'}</strong><span>Fecha de realización</span></div>`;
+    $('#testStats').innerHTML=`<div class="test-stat"><small>Ejecuciones registradas</small><strong>${total}</strong><span>Historial de este transformador</span></div><div class="test-stat"><small>Completadas</small><strong>${completed}</strong><span>Con estado completado</span></div><div class="test-stat"><small>Tipos con registros</small><strong>${new Set(testExecutions.map(x=>x.test_code)).size}</strong><span>De ${testCatalog.length} pruebas disponibles</span></div><div class="test-stat"><small>Última ejecución</small><strong class="test-stat-date">${last?esc(formatExecutionDate(last)):'Sin registros'}</strong><span>Fecha de realización</span></div>`;
   }
   function renderTestTypes(){
     $('#testTypeGrid').innerHTML=testCatalog.map(t=>{
@@ -485,7 +500,7 @@
     testStats();renderTestTypes();renderHistoricalAnalytics();
     const q=($('#testHistoryFilter')?.value||'').trim().toLocaleLowerCase();
     const filtered=testExecutions.filter(x=>(x.test_name||typeName(x.test_code)).toLocaleLowerCase().includes(q)||(x.operator_name||'').toLocaleLowerCase().includes(q));
-    $('#testHistoryBody').innerHTML=filtered.length?filtered.map(x=>`<tr><td><b>${esc(formatExecutionDate(x.executed_at))}</b><small>ID #${esc(x.id)}</small></td><td>${esc(x.test_name||typeName(x.test_code))}</td><td>${esc(x.operator_name||'—')}</td><td>${Number(x.measurement_count||0)} fila(s)</td><td><span class="execution-status ${x.status==='COMPLETADA'?'done':'draft'}">${x.status==='COMPLETADA'?'Completada':'Borrador'}</span></td><td><button class="btn small" data-open-execution="${x.id}">Abrir</button></td></tr>`).join(''):'<tr><td colspan="6" class="test-empty">'+(testExecutions.length?'No hay registros que coincidan con el filtro.':'Aún no hay registros. Selecciona una prueba para registrar la primera ejecución.')+'</td></tr>';
+    $('#testHistoryBody').innerHTML=filtered.length?filtered.map(x=>`<tr><td><b>${esc(formatExecutionDate(x.executed_at))}</b><small>ID #${esc(x.id)}</small></td><td>${esc(x.test_name||typeName(x.test_code))}</td><td>${esc(x.operator_name||'—')}</td><td>${Number(x.measurement_count||0)} fila(s)</td><td><span class="execution-status ${x.status==='COMPLETADA'?'done':'draft'}">${x.status==='COMPLETADA'?'Completada':'Borrador'}</span></td><td><button class="btn small" data-open-execution="${x.id}" title="Editar esta ejecución">Editar</button></td></tr>`).join(''):'<tr><td colspan="6" class="test-empty">'+(testExecutions.length?'No hay registros que coincidan con el filtro.':'Aún no hay registros. Selecciona una prueba para registrar la primera ejecución.')+'</td></tr>';
     $$('[data-open-execution]').forEach(b=>b.addEventListener('click',()=>openExistingExecution(Number(b.dataset.openExecution))));
   }
   $('#testHistoryFilter').addEventListener('input',renderTestHistory);
@@ -504,10 +519,15 @@
     ['executionOperator','executionSupervisor','executionStandard','executionEquipment','executionEquipmentBrand','executionEquipmentModel','executionEquipmentSerial','executionOilTemp','executionAmbientTemp','executionHumidity','executionObservations'].forEach(id=>$('#'+id).value='');
     $('#executionStatus').value='BORRADOR';$('#executionDate').value=localDateTime();
     renderMeasurementRows([{parameter:'',value:'',unit:'',notes:''},{parameter:'',value:'',unit:'',notes:''},{parameter:'',value:'',unit:'',notes:''}]);renderTtrRows([]);
-    $('#executionTitle').textContent='Nueva ejecución de prueba';$('#systemSavedAt').textContent='Se asignará automáticamente al guardar.';
+    $('#executionTitle').textContent='Nueva ejecución de prueba';
+    const saveButton=$('#saveExecution');if(saveButton)saveButton.innerHTML='<svg><use href="#i-check"/></svg>Guardar registro';
   }
-  function fillTypeOptions(selected){$('#executionType').innerHTML=testCatalog.map(t=>`<option value="${esc(t[0])}" ${t[0]===selected?'selected':''}>${esc(t[1])}</option>`).join('');}
-  function startExecution(code){clearExecutionForm();fillTypeOptions(code);toggleTestTemplate();$('#executionTrafoCode').textContent=transformer.code;$('#executionTrafoCompany').textContent=transformer.company;showOnlyMain('executionPage');}
+  function fillTypeOptions(selected){$('#executionType').innerHTML=testCatalog.map(t=>'<option value="'+esc(t[0])+'" '+(t[0]===selected?'selected':'')+'>'+esc(t[1])+'</option>').join('');}
+  function startExecution(code){
+    clearExecutionForm();fillTypeOptions(code);toggleTestTemplate();
+    $('#executionTitle').textContent='Nueva ejecución · '+typeName(code);
+    showOnlyMain('executionPage');
+  }
   function renderMeasurementRows(rows){
     $('#measurementRows').innerHTML=(rows||[]).map((r,i)=>`<tr><td class="measurement-row-number">${i+1}</td><td><input class="measurement-cell" data-r="${i}" data-c="0" value="${esc(r.parameter||'')}" placeholder="Ej. Tap 1 / U-N"></td><td><input class="measurement-cell numeric" data-r="${i}" data-c="1" value="${esc(r.value??'')}" placeholder="Valor"></td><td><input class="measurement-cell" data-r="${i}" data-c="2" value="${esc(r.unit||'')}" placeholder="Unidad"></td><td><input class="measurement-cell" data-r="${i}" data-c="3" value="${esc(r.notes||'')}" placeholder="Observación"></td><td><button type="button" class="measurement-delete" data-delete-row="${i}" title="Eliminar fila">×</button></td></tr>`).join('');
     $$('#measurementRows [data-delete-row]').forEach(b=>b.addEventListener('click',()=>{const a=collectMeasurementRows();a.splice(Number(b.dataset.deleteRow),1);renderMeasurementRows(a);}));
@@ -529,11 +549,29 @@
     const rows=collectMeasurementRows();while(nr>=rows.length)rows.push({parameter:'',value:'',unit:'',notes:''});if(nr<0)nr=0;if(nc<0)nc=0;if(nc>3)nc=3;renderMeasurementRows(rows);$('#measurementRows [data-r="'+nr+'"][data-c="'+nc+'"]')?.focus();
   });
   async function openExistingExecution(id){
-    if(PILOT.demo){toast('Los registros de demostración no están disponibles; conecta la base de datos para abrir historiales.',true);return;}
-    try{const r=await fetch(api('action=test-get&key='+encodeURIComponent(transformer.key)+'&id='+id)),d=await readApiResponse(r);const x=d.item;clearExecutionForm();activeExecutionId=id;activeExecutionMode='edit';fillTypeOptions(x.test_code);toggleTestTemplate();if(x.test_code==='TTR')renderTtrRows(ttrRowsFromMeasurements(x.measurements||[]));if(specificTemplates[x.test_code])renderSpecificRows(specificRowsFromMeasurements(x.measurements||[],x.test_code),x.test_code);$('#executionDate').value=String(x.executed_at).replace(' ','T').slice(0,16);$('#executionStatus').value=x.status;$('#executionOperator').value=x.operator_name||'';$('#executionSupervisor').value=x.supervisor_name||'';$('#executionStandard').value=x.standard_reference||'';$('#executionEquipment').value=x.equipment_name||'';$('#executionEquipmentBrand').value=x.equipment_brand||'';$('#executionEquipmentModel').value=x.equipment_model||'';$('#executionEquipmentSerial').value=x.equipment_serial||'';$('#executionOilTemp').value=x.oil_temperature_c??'';$('#executionAmbientTemp').value=x.ambient_temperature_c??'';$('#executionHumidity').value=x.relative_humidity_percent??'';$('#executionObservations').value=x.observations||'';if(x.test_code!=='TTR')renderMeasurementRows(x.measurements||[]);$('#executionTitle').textContent='Editar ejecución #'+id;$('#systemSavedAt').textContent='Registro existente · '+formatExecutionDate(x.created_at);$('#executionTrafoCode').textContent=transformer.code;$('#executionTrafoCompany').textContent=transformer.company;showOnlyMain('executionPage');}
-    catch(e){toast(e.message,true);}
+    if(PILOT.demo){toast('El historial no está disponible en modo demostración.',true);return;}
+    try{
+      const r=await fetch(api('action=test-get&key='+encodeURIComponent(transformer.key)+'&id='+id));
+      const d=await readApiResponse(r),x=d.item;
+      clearExecutionForm();
+      activeExecutionId=Number(x.id||id);activeExecutionMode='edit';
+      fillTypeOptions(x.test_code);$('#executionType').value=x.test_code;toggleTestTemplate();
+      if(x.test_code==='TTR')renderTtrRows(ttrRowsFromMeasurements(x.measurements||[]));
+      else if(specificTemplates[x.test_code])renderSpecificRows(specificRowsFromMeasurements(x.measurements||[],x.test_code),x.test_code);
+      else renderMeasurementRows(x.measurements||[]);
+      $('#executionDate').value=String(x.executed_at||'').replace(' ','T').slice(0,16);
+      $('#executionStatus').value=x.status||'BORRADOR';
+      $('#executionOperator').value=x.operator_name||'';$('#executionSupervisor').value=x.supervisor_name||'';
+      $('#executionStandard').value=x.standard_reference||'';$('#executionEquipment').value=x.equipment_name||'';
+      $('#executionEquipmentBrand').value=x.equipment_brand||'';$('#executionEquipmentModel').value=x.equipment_model||'';
+      $('#executionEquipmentSerial').value=x.equipment_serial||'';$('#executionOilTemp').value=x.oil_temperature_c??'';
+      $('#executionAmbientTemp').value=x.ambient_temperature_c??'';$('#executionHumidity').value=x.relative_humidity_percent??'';
+      $('#executionObservations').value=x.observations||'';
+      $('#executionTitle').textContent='Editar ejecución #'+activeExecutionId+' · '+(x.test_name||typeName(x.test_code));
+      $('#saveExecution').innerHTML='<svg><use href="#i-check"/></svg>Actualizar registro';
+      showOnlyMain('executionPage');
+    }catch(e){toast(e.message,true);}
   }
-
   // TTR: fórmulas reproducidas del protocolo LAP, hoja protocolos.
   // Rt = V_AT(kV) / (V_BT(kV) * sqrt(3)); Error fase = (Rmed - Rt) * 100 / Rmed.
   function ttrRowsFromMeasurements(measurements){
@@ -575,10 +613,60 @@
   function ttrToMeasurements(){
     const out=[];collectTtrRows().map(ttrCalc).forEach(r=>['at','bt','theoretical','U','errU','V','errV','W','errW','notes'].forEach(k=>{const value=r[k]||'';if(value!=='')out.push({parameter:`TTR|${r.tap}|${k}`,value,unit:k.startsWith('err')?'%':(k==='notes'?'':(k==='at'||k==='bt'?'kV':'ratio')),notes:''});}));return out;
   }
-  function specificRowsFromMeasurements(ms,code){const cfg=specificTemplates[code],rows={};(ms||[]).forEach(m=>{const z=String(m.parameter||'').match(new RegExp('^'+cfg.prefix+'\\|(\\d+)\\|(.+)$'));if(z){rows[z[1]]=rows[z[1]]||{};rows[z[1]][z[2]]=m.value||m.notes||'';}});return Object.keys(rows).sort((a,b)=>+a-+b).map(k=>rows[k]);}
-  function renderSpecificRows(rows,code){const cfg=specificTemplates[code];if(!cfg)return;$('#specificTestHead').innerHTML='<tr>'+cfg.cols.map(c=>'<th>'+esc(c[1])+'</th>').join('')+'</tr>';$('#specificTestRows').innerHTML=(rows||[]).map((row,i)=>'<tr>'+cfg.cols.map(([key],c)=>'<td><input class="specific-cell" data-r="'+i+'" data-c="'+c+'" value="'+esc(row[key]||'')+'"></td>').join('')+'</tr>').join('');}
-  function collectSpecificRows(){const cfg=specificTemplates[activeSpecificCode];if(!cfg)return[];return $$('#specificTestRows tr').map(tr=>{const o={};$$('.specific-cell',tr).forEach((e,i)=>o[cfg.cols[i][0]]=e.value);return o;}).filter(r=>Object.values(r).some(v=>String(v).trim()!==''));}
-  function specificToMeasurements(){const cfg=specificTemplates[activeSpecificCode],out=[];collectSpecificRows().forEach((r,i)=>cfg.cols.forEach(([k])=>{if(r[k]!=='')out.push({parameter:cfg.prefix+'|'+(i+1)+'|'+k,value:r[k],unit:'',notes:''});}));return out;}
+  function normalizeSpecificRow(code,row){
+    const out={...(row||{})};
+    if(code==='INSULATION_RESISTANCE'){
+      const n30=Number(String(out.reading_30s??'').trim().replace(',','.'));
+      const n1=Number(String(out.reading_1min??'').trim().replace(',','.'));
+      out.absorption_index=Number.isFinite(n30)&&n30!==0&&Number.isFinite(n1)?String(n1/n30):'';
+    }
+    return out;
+  }
+  function specificRowsFromMeasurements(ms,code){
+    const cfg=specificTemplates[code];if(!cfg)return[];
+    const rows={};
+    (ms||[]).forEach(m=>{
+      const z=String(m.parameter||'').match(new RegExp('^'+cfg.prefix+'\\\\|(\\\\d+)\\\\|(.+)$'));
+      if(z){rows[z[1]]=rows[z[1]]||{};rows[z[1]][z[2]]=m.value??m.notes??'';}
+    });
+    let list=Object.keys(rows).sort((a,b)=>Number(a)-Number(b)).map(k=>rows[k]);
+    if(code==='INSULATION_RESISTANCE'&&list.some(r=>r.from||r.to||r.time||r.reading)){
+      const grouped={};
+      list.forEach(r=>{
+        const key=[r.from||'',r.to||'',r.voltage||'',r.unit||'',r.reading_unit||'',r.temperature||''].join('|');
+        const target=grouped[key]||(grouped[key]={point:[r.from,r.to].filter(Boolean).join(' - '),applied_voltage_kv:r.voltage||'',reading_unit:r.reading_unit||r.unit||'',notes:r.notes||''});
+        const time=String(r.time||'').trim().toLowerCase().replace(/['’]/g,'');
+        if(time==='15'||time==='15s')target.reading_15s=r.reading||'';
+        else if(time==='30'||time==='30s')target.reading_30s=r.reading||'';
+        else if(time==='45'||time==='45s')target.reading_45s=r.reading||'';
+        else if(time==='1'||time==='1m'||time==='60'||time==='60s')target.reading_1min=r.reading||'';
+      });
+      list=Object.values(grouped);
+    }
+    if(code==='POWER_FACTOR')list=list.map(r=>({...r,measurement:r.measurement||r.point||'',test_mode:r.test_mode||r.mode||'',test_voltage_v:r.test_voltage_v||r.test_voltage||'',capacitance_nf:r.capacitance_nf||r.capacitance||'',power_factor_measured:r.power_factor_measured||r.power_factor||'',output_current_a:r.output_current_a||r.current||'',notes:r.notes||''}));
+    if(code==='BUSHING')list=list.map(r=>({...r,power_factor:r.power_factor||r.power_factor_measured||'',capacitance:r.capacitance||r.capacitance_measured||'',test_voltage:r.test_voltage||r.test_voltage_kv||'',serial:r.serial||r.serial_number||''}));
+    return list.map(r=>normalizeSpecificRow(code,r));
+  }
+  function renderSpecificRows(rows,code){
+    const cfg=specificTemplates[code];if(!cfg)return;
+    $('#specificTestHead').innerHTML='<tr>'+cfg.cols.map(c=>'<th>'+esc(c[1])+'</th>').join('')+'</tr>';
+    $('#specificTestRows').innerHTML=(rows||[]).map((raw,i)=>{
+      const row=normalizeSpecificRow(code,raw);
+      return '<tr>'+cfg.cols.map(([key],c)=>{
+        const readonly=key==='absorption_index'?' readonly title="R a 1 min / R a 30 s"':'';
+        return '<td><input class="specific-cell" data-r="'+i+'" data-c="'+c+'" value="'+esc(row[key]??'')+'"'+readonly+'></td>';
+      }).join('')+'</tr>';
+    }).join('');
+  }
+  function collectSpecificRows(){
+    const cfg=specificTemplates[activeSpecificCode];if(!cfg)return[];
+    return $$('#specificTestRows tr').map(tr=>{const o={};$$('.specific-cell',tr).forEach((e,i)=>o[cfg.cols[i][0]]=e.value);return normalizeSpecificRow(activeSpecificCode,o);}).filter(r=>Object.entries(r).some(([k,v])=>k!=='absorption_index'&&String(v).trim()!==''));
+  }
+  function specificToMeasurements(){
+    const cfg=specificTemplates[activeSpecificCode],out=[];if(!cfg)return out;
+    collectSpecificRows().forEach((r,i)=>cfg.cols.forEach(([k])=>{if(r[k]!==''&&r[k]!==null&&r[k]!==undefined)out.push({parameter:cfg.prefix+'|'+(i+1)+'|'+k,value:String(r[k]),unit:'',notes:''});}));
+    return out;
+  }
   function toggleTestTemplate(){
     const code=$('#executionType')?.value,isTtr=code==='TTR',isSpecific=!!specificTemplates[code];
     $('#ttrEditor')?.classList.toggle('hidden',!isTtr);
@@ -595,6 +683,14 @@
   }
 
   $('#specificAddRows')?.addEventListener('click',()=>renderSpecificRows([...collectSpecificRows(),{},{},{},{},{}],activeSpecificCode));
+  $('#specificTestRows')?.addEventListener('input',e=>{
+    if(activeSpecificCode!=='INSULATION_RESISTANCE'||!e.target.matches('.specific-cell'))return;
+    const tr=e.target.closest('tr');if(!tr)return;
+    const r30=Number(String(tr.querySelector('[data-c="3"]')?.value||'').trim().replace(',','.'));
+    const r1=Number(String(tr.querySelector('[data-c="5"]')?.value||'').trim().replace(',','.'));
+    const target=tr.querySelector('[data-c="6"]');
+    if(target)target.value=Number.isFinite(r30)&&r30!==0&&Number.isFinite(r1)?String(r1/r30):'';
+  });
   $('#specificTestRows')?.addEventListener('paste',e=>{
     const cell=e.target.closest('.specific-cell');if(!cell||!activeSpecificCode)return;
     const text=(e.clipboardData||window.clipboardData).getData('text');if(!text.includes('\t')&&!text.includes('\n'))return;
@@ -636,14 +732,20 @@
 
   async function saveExecution(){
     const date=$('#executionDate').value;if(!date){toast('Selecciona la fecha y hora en que se realizó la prueba.',true);$('#executionDate').focus();return;}
-    const payload={id:activeExecutionId,transformer_key:transformer.key,test_code:$('#executionType').value,executed_at:date,status:$('#executionStatus').value,operator_name:$('#executionOperator').value,supervisor_name:$('#executionSupervisor').value,standard_reference:$('#executionStandard').value,equipment_name:$('#executionEquipment').value,equipment_brand:$('#executionEquipmentBrand').value,equipment_model:$('#executionEquipmentModel').value,equipment_serial:$('#executionEquipmentSerial').value,oil_temperature_c:$('#executionOilTemp').value,ambient_temperature_c:$('#executionAmbientTemp').value,relative_humidity_percent:$('#executionHumidity').value,observations:$('#executionObservations').value,measurements:($('#executionType').value==='TTR'?ttrToMeasurements():(specificTemplates[$('#executionType').value]?specificToMeasurements():collectMeasurementRows()))};
-    const btn=$('#saveExecution');btn.disabled=true;btn.textContent='Guardando...';
+    const isEditing=activeExecutionId!==null;
+    const code=$('#executionType').value;
+    const measurements=code==='TTR'?ttrToMeasurements():(specificTemplates[code]?specificToMeasurements():collectMeasurementRows());
+    const payload={id:activeExecutionId,transformer_key:transformer.key,test_code:code,executed_at:date,status:$('#executionStatus').value,operator_name:$('#executionOperator').value,supervisor_name:$('#executionSupervisor').value,standard_reference:$('#executionStandard').value,equipment_name:$('#executionEquipment').value,equipment_brand:$('#executionEquipmentBrand').value,equipment_model:$('#executionEquipmentModel').value,equipment_serial:$('#executionEquipmentSerial').value,oil_temperature_c:$('#executionOilTemp').value,ambient_temperature_c:$('#executionAmbientTemp').value,relative_humidity_percent:$('#executionHumidity').value,observations:$('#executionObservations').value,measurements};
+    const btn=$('#saveExecution');btn.disabled=true;btn.textContent=isEditing?'Actualizando...':'Guardando...';
     try{
-      if(PILOT.demo)throw new Error('Modo demostración: conecta MySQL y selecciona un transformador real para guardar el registro.');
-      if(!PILOT.testsSchemaReady)throw new Error('Importa database/schema.sql en la base de datos antes de guardar ejecuciones.');
-      const r=await fetch(api('action=test-save'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const d=await readApiResponse(r);
-      toast('Prueba guardada · Registro #'+d.result.id+' · '+formatExecutionDate(d.result.executed_at));showOnlyMain('testPage');await loadTestHistory();
-    }catch(e){toast(e.message,true);}finally{btn.disabled=false;btn.innerHTML='<svg><use href="#i-check"/></svg>Guardar registro';}
+      if(PILOT.demo)throw new Error('Selecciona un transformador real antes de guardar.');
+      if(!PILOT.testsSchemaReady)throw new Error('Prepara las tablas de pruebas eléctricas antes de guardar ejecuciones.');
+      const r=await fetch(api('action=test-save'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      const d=await readApiResponse(r);
+      toast((isEditing?'Ejecución actualizada':'Prueba guardada')+' · Registro #'+d.result.id+' · '+formatExecutionDate(d.result.executed_at));
+      showOnlyMain('testPage');await loadTestHistory();
+    }catch(e){toast(e.message,true);}
+    finally{btn.disabled=false;btn.innerHTML=activeExecutionMode==='edit'?'<svg><use href="#i-check"/></svg>Actualizar registro':'<svg><use href="#i-check"/></svg>Guardar registro';}
   }
   $('#saveExecution').addEventListener('click',saveExecution);
 
