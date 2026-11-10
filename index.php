@@ -54,7 +54,7 @@ $initialConfig = $config ?: [
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.0">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.7">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -246,16 +246,14 @@ $initialConfig = $config ?: [
       <div><div class="breadcrumbs">Transformador <span>/</span> Configuración eléctrica</div><h2>Configuración eléctrica</h2><p>Define la estructura física y eléctrica que utilizarán las pruebas del transformador.</p></div>
       <div class="toolbar-actions"><span class="save-status" id="saveStatus"><i></i>Sin guardar</span><button class="btn" id="backOverview">Volver a detalles</button><button class="btn primary" id="saveConfig"><svg><use href="#i-check"/></svg>Guardar configuración</button></div>
     </div>
-    <div class="config-alert" id="dbAlert"><svg><use href="#i-info"/></svg><span><?=h($dbMessage ?: ($schemaReady ? 'Conectado a MySQL. La configuración se guarda en tablas nuevas del piloto.' : 'Vista demostrativa.'))?></span></div>
+    <div class="config-alert <?= $dbMessage === '' ? 'hidden' : '' ?>" id="dbAlert" role="status"><svg><use href="#i-info"/></svg><span><?=h($dbMessage)?></span></div>
     <div class="config-layout">
-      <aside class="config-sidebar">
-        <div class="side-summary"><div class="small-transformer"><svg><use href="#i-zap"/></svg></div><div><strong id="configTrafoCode"><?=h($displayCode)?></strong><small id="configCompany"><?=h($transformer['company'])?></small></div></div>
+      <nav class="config-sidebar" aria-label="Pasos de configuración">
         <button class="config-tab active" data-tab="general"><span class="tab-number">01</span><span><b>Datos generales</b><small>Fases y grupo vectorial</small></span></button>
         <button class="config-tab" data-tab="windings"><span class="tab-number">02</span><span><b>Bobinados y bornes</b><small><em id="windingCount">0</em> bobinados configurados</small></span></button>
         <button class="config-tab" data-tab="taps"><span class="tab-number">03</span><span><b>Conmutadores y taps</b><small><em id="tapCount">0</em> posiciones registradas</small></span></button>
         <button class="config-tab" data-tab="review"><span class="tab-number">04</span><span><b>Resumen y versiones</b><small>Revisión antes de guardar</small></span></button>
-        <div class="config-sidebar-note"><svg><use href="#i-info"/></svg><span>La configuración es la referencia de las futuras pruebas. Los resultados históricos conservarán una copia de la configuración utilizada.</span></div>
-      </aside>
+      </nav>
       <div class="config-main">
         <section class="config-panel" data-panel="general">
           <div class="panel-heading"><div><span class="eyebrow">PASO 01</span><h3>Datos eléctricos generales</h3><p>Información común del sistema de bobinados.</p></div><span class="step-state"><i></i>Configuración base</span></div>
@@ -266,7 +264,7 @@ $initialConfig = $config ?: [
             <label>Observaciones generales<input id="generalNotes" placeholder="Notas de configuración, placa o diseño..."><small>Información de referencia.</small></label>
           </div>
           <div class="callout"><svg><use href="#i-info"/></svg><div><b>Importante: conexiones por bobinado y grupo vectorial son datos distintos.</b><p>Se registran por separado. El grupo vectorial no se utilizará para inventar conexiones de medición: las combinaciones se definirán y validarán al desarrollar cada prueba.</p></div></div>
-          <div class="panel-footer"><span>Los datos de placa del transformador provienen de <b>transformers</b>.</span><button class="btn primary" data-next="windings">Continuar a bobinados <span>→</span></button></div>
+          <div class="panel-footer"><button class="btn primary" data-next="windings">Continuar a bobinados <span>→</span></button></div>
         </section>
 
         <section class="config-panel hidden" data-panel="windings">
@@ -279,8 +277,6 @@ $initialConfig = $config ?: [
         <section class="config-panel hidden" data-panel="taps">
           <div class="panel-heading"><div><span class="eyebrow">PASO 03</span><h3>Conmutadores y posiciones de tap</h3><p>Asocia cada conmutador al bobinado correspondiente y registra las posiciones de placa.</p></div><button class="btn primary" id="addTapChanger"><svg><use href="#i-plus"/></svg>Agregar conmutador</button></div>
           <div id="tapChangersContainer" class="tap-changers-container"></div>
-          <div class="tap-legacy-info" id="tapLegacyInfo">Se conserva el dato original de num_taps.</div>
-          <div class="callout compact"><svg><use href="#i-info"/></svg><div><b>Compatibilidad con <code>transformers.num_taps</code></b><p>Se conserva la columna original sin modificarla. El detalle de posiciones se guarda en una tabla independiente y puede tener 27, 33 o más filas. La cantidad declarada sirve como referencia; no reemplaza los valores de placa.</p></div></div>
           <div class="panel-footer"><button class="btn" data-prev="windings">← Anterior</button><span>Las posiciones pueden pegarse directamente desde Excel.</span><button class="btn primary" data-next="review">Revisar configuración <span>→</span></button></div>
         </section>
 
@@ -288,7 +284,7 @@ $initialConfig = $config ?: [
           <div class="panel-heading"><div><span class="eyebrow">PASO 04</span><h3>Resumen de configuración</h3><p>Comprueba los datos antes de guardar la versión actual.</p></div><span class="review-badge">Previsualización</span></div>
           <div id="reviewSummary" class="review-summary"></div>
           <div class="version-history"><div class="history-heading"><div><h4>Versiones guardadas</h4><p>La configuración previa se conserva como fotografía histórica.</p></div><span id="versionBadge" class="version-badge">Versión 0</span></div><div id="versionList"><div class="empty-history">Todavía no hay versiones guardadas.</div></div></div>
-          <div class="callout"><svg><use href="#i-info"/></svg><div><b>Qué se guarda</b><p>Bobinados, bornes, marca de bushing cuando aplique, conmutadores, taps y los datos eléctricos generales. No se modifica ningún campo de la tabla <code>transformers</code>.</p></div></div>
+          <div class="callout"><svg><use href="#i-info"/></svg><div><b>Qué se guarda</b><p>Datos eléctricos generales, bobinados, bornes, bushings y posiciones de los conmutadores.</p></div></div>
           <div class="panel-footer"><button class="btn" data-prev="taps">← Anterior</button><span>Al guardar se crea una nueva versión de configuración.</span><button class="btn primary" id="saveConfigBottom"><svg><use href="#i-check"/></svg>Guardar configuración</button></div>
         </section>
       </div>
@@ -299,7 +295,7 @@ $initialConfig = $config ?: [
   <div class="modal-card">
     <div class="modal-card-head"><div><span class="eyebrow">CONMUTADOR</span><h3 id="tapRowsTitle">Generar posiciones de tap</h3><p>Conserva los datos existentes dentro de la cantidad seleccionada.</p></div><button class="modal-close" type="button" id="cancelTapRows" aria-label="Cerrar">×</button></div>
     <label class="modal-field">Cantidad de posiciones<input id="tapRowsCount" type="number" min="1" max="1000" step="1" value="27"></label>
-    <div class="modal-hint"><svg><use href="#i-info"/></svg><span>La cantidad sugerida toma como referencia <code>transformers.num_taps</code>. Puedes cambiarla según la placa del conmutador.</span></div>
+    <div class="modal-hint"><svg><use href="#i-info"/></svg><span>Indica la cantidad de posiciones que necesitas registrar. Ajusta el valor según la placa del conmutador.</span></div>
     <div class="modal-actions"><button class="btn" type="button" id="cancelTapRowsAlt">Cancelar</button><button class="btn primary" type="button" id="confirmTapRows"><svg><use href="#i-check"/></svg>Generar filas</button></div>
   </div>
 </div>
@@ -361,5 +357,5 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.6"></script>
+<script src="./assets/app.js?v=1.5.7"></script>
 </body></html>

@@ -1,3 +1,11 @@
+## v1.5.7
+- Elimina mensajes internos de conexión y referencias visibles a tablas de base de datos dentro de Configuración eléctrica.
+- Cambia el menú lateral de cuatro pasos por una barra horizontal compacta y fija durante el desplazamiento.
+- Amplía el área de trabajo y mantiene el desplazamiento horizontal dentro de las grillas de datos.
+- Compacta y reorganiza los campos de bobinados para aprovechar el ancho disponible.
+- Al agregar un bobinado, desplaza la vista hasta la nueva tarjeta y enfoca su nombre.
+- Mantiene las advertencias visibles cuando realmente falta conexión o preparación del esquema.
+
 ## v1.5.6
 - Corrige el mapeo del arreglo de conmutadores en `normalizeConfig`; el nombre de la propiedad de salida ahora apunta a la variable correcta.
 - Evita que un `ReferenceError` durante la carga deje sin inicializar el estado y desactive los controles de configuración y nueva ejecución.

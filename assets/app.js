@@ -157,7 +157,14 @@
     const phases = Number(state.phase_count) === 1 ? [['A'+suffix,'A','Fase']] : [['U'+suffix,'U','Fase'],['V'+suffix,'V','Fase'],['W'+suffix,'W','Fase']];
     if (data.has_neutral) phases.push(['N'+suffix,'N','Neutro']);
     state.windings.push({name:data.name || ('Bobinado '+suffix),code:prefix,voltage_kv:data.voltage_kv || '',connection_type:data.connection_type || '',has_neutral:!!data.has_neutral,conductor_material:data.conductor_material || '',notes:data.notes || '',terminals:data.terminals || phases.map(p=>blankTerminal(...p))});
+    const newIndex=state.windings.length-1;
     markDirty(); renderWindings(); updateCounts();
+    requestAnimationFrame(()=>{
+      const card=$('#windingsContainer [data-winding="'+newIndex+'"]');
+      if(!card)return;
+      card.scrollIntoView({behavior:'smooth',block:'start'});
+      card.querySelector('[data-wfield="name"]')?.focus({preventScroll:true});
+    });
   }
   $('#addWinding').addEventListener('click', () => addWinding());
   $('#copyWindings')?.addEventListener('click',()=>copyGrid([
@@ -348,14 +355,7 @@
     $('#windingCount').textContent=state.windings.length;
     refreshWindingCounters();
     $('#tapCount').textContent=state.tap_changers.reduce((sum,c)=>sum+c.positions.length,0);
-    const declared=Number(transformer.num_taps||0);
-    const recorded=state.tap_changers.reduce((sum,c)=>sum+c.positions.length,0);
-    const note=$('#tapLegacyInfo');
-    if(note){
-      if(declared>0&&state.tap_changers.length){const matches=state.tap_changers.every(c=>c.positions.length===declared);note.className='tap-legacy-info '+(matches?'ok':'warn');note.textContent=matches?`Coincide con transformers.num_taps (${declared}).`:`transformers.num_taps indica ${declared}; hay ${recorded} posiciones detalladas en total. Revisa cada conmutador.`;}
-      else note.className='tap-legacy-info';
-      if(!(declared>0&&state.tap_changers.length))note.textContent=declared>0?`transformers.num_taps = ${declared}. Se usa como sugerencia, no se modifica.`:'No se encontró num_taps o está vacío en transformers.';
-    }
+
   }
   function renderReview(){
     const terminals=state.windings.reduce((n,w)=>n+w.terminals.length,0),bushings=state.windings.reduce((n,w)=>n+w.terminals.filter(t=>t.has_capacitive_bushing).length,0),taps=state.tap_changers.reduce((n,c)=>n+c.positions.length,0);
@@ -420,11 +420,11 @@
     catch(e){toast(e.message,true);}
   }
   async function selectTransformer(key){
-    try{const r=await fetch(api('action=load&key='+encodeURIComponent(key)));const d=await readApiResponse(r);Object.assign(transformer,d.transformer);state=normalizeConfig(d.config||{});PILOT.demo=false;PILOT.transformerFound=true;PILOT.schemaReady=!!d.schemaReady;PILOT.testsSchemaReady=!!d.testsSchemaReady;updateTransformerDisplay();const status=$('#pilotStatus');if(status){status.className='pilot-status '+(PILOT.schemaReady&&PILOT.testsSchemaReady?'ready':'warning');status.querySelector('strong').textContent=PILOT.schemaReady&&PILOT.testsSchemaReady?'Base de datos conectada':'Faltan tablas del piloto';status.querySelector('span').textContent='BD: '+(PILOT.dbName||'configurada')+' · Transformador: '+transformer.code;}$('#globalSearch').value='';$('#searchResults').classList.remove('open');renderWindings();renderTapChangers();updateCounts();$('#dbAlert').innerHTML='<svg><use href="#i-info"/></svg><span>'+(PILOT.schemaReady?'Transformador seleccionado desde la tabla transformers. La configuración se guarda en las tablas del piloto.':'Transformador seleccionado desde transformers. Importa database/schema.sql para guardar la configuración.')+'</span>';markDirty();toast('Transformador '+transformer.code+' seleccionado.');backOverview();}
+    try{const r=await fetch(api('action=load&key='+encodeURIComponent(key)));const d=await readApiResponse(r);Object.assign(transformer,d.transformer);state=normalizeConfig(d.config||{});PILOT.demo=false;PILOT.transformerFound=true;PILOT.schemaReady=!!d.schemaReady;PILOT.testsSchemaReady=!!d.testsSchemaReady;updateTransformerDisplay();const status=$('#pilotStatus');if(status){status.className='pilot-status '+(PILOT.schemaReady&&PILOT.testsSchemaReady?'ready':'warning');status.querySelector('strong').textContent=PILOT.schemaReady&&PILOT.testsSchemaReady?'Base de datos conectada':'Faltan tablas del piloto';status.querySelector('span').textContent='BD: '+(PILOT.dbName||'configurada')+' · Transformador: '+transformer.code;}$('#globalSearch').value='';$('#searchResults').classList.remove('open');renderWindings();renderTapChangers();updateCounts();const dbAlert=$('#dbAlert');if(dbAlert){const message=!PILOT.dbConnected?'No hay conexión con la base de datos. Revisa la configuración de conexión.':(!PILOT.schemaReady?'Falta preparar el almacenamiento de la configuración eléctrica.':'');dbAlert.querySelector('span').textContent=message;dbAlert.classList.toggle('hidden',!message);}markDirty();toast('Transformador '+transformer.code+' seleccionado.');backOverview();}
     catch(e){toast(e.message,true);}
   }
   function updateTransformerDisplay(){
-    $('#transformerCode').textContent=transformer.code;$('#summaryCode').textContent=transformer.code;$('#companyName').textContent=transformer.company;$('#summaryCompany').textContent=transformer.company;$('#configTrafoCode').textContent=transformer.code;$('#configCompany').textContent=transformer.company;
+    $('#transformerCode').textContent=transformer.code;$('#summaryCode').textContent=transformer.code;$('#companyName').textContent=transformer.company;$('#summaryCompany').textContent=transformer.company;
     $('#summaryTag').textContent='TAG '+(transformer.tag||'—');$('#summaryVoltage').textContent=transformer.voltage||'—';$('#summaryPower').textContent=transformer.power||'—';$('#summaryYear').textContent=transformer.year||'—';$('#summaryBrand').textContent=transformer.brand||'—';$('#summaryTapType').textContent=transformer.tap_type||'—';$('#summaryVector').textContent=transformer.vector_group||'—';$('#summaryLocation').textContent=transformer.location||'—';$('#summaryTechnicalDetails').textContent=[transformer.phase_count?transformer.phase_count+' fases':'',transformer.frequency_hz?transformer.frequency_hz+' Hz':'',transformer.insulation_type||'',transformer.cooling_type||''].filter(Boolean).join(' · ');
   }
   document.addEventListener('click',e=>{if(!e.target.closest('.global-search'))$('#searchResults').classList.remove('open');});
