@@ -1,3 +1,8 @@
+## v1.5.4
+- Corrige el acceso prematuro a `localDateTime` al crear una nueva ejecución.
+- Inicializa el estado compartido antes de registrar eventos para evitar el error de zona temporal muerta en Configuración eléctrica.
+- Actualiza la guía de instalación, alcance y verificación del README.
+
 ## v1.4.0
 - Copiar bobinados completos a portapapeles en formato TSV compatible con Excel.
 - Copiar bornes y ficha de bushing con encabezados de columnas.

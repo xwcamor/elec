@@ -2,6 +2,9 @@
   const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
   const clone = value => JSON.parse(JSON.stringify(value));
+  // Variables de estado declaradas al inicio para evitar accesos durante la TDZ.
+  var state = null;
+  var localDateTime = function () { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16); };
   // Estado de ejecución inicializado antes de registrar eventos globales.
   // var evita la zona temporal muerta si un clic ocurre durante la inicialización.
   var activeExecutionId = null;
@@ -93,7 +96,7 @@
   });
 
   let dirty = false;
-  let state = normalizeConfig(PILOT.config || {});
+  state = normalizeConfig(PILOT.config || {});
 
   function normalizeConfig(config) {
     const windings = (config.windings || []).map(w => ({
@@ -450,7 +453,6 @@
   ];
   let testExecutions = [];
   let testCatalogLoaded = false;
-  const localDateTime = () => {const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16);};
   const testPage=$('#testPage'), executionPage=$('#executionPage');
   function showOnlyMain(which){['overviewPage','configPage','testPage','executionPage'].forEach(id=>$('#'+id).classList.toggle('hidden',id!==which));}
   function openTests(){showOnlyMain('testPage');loadTestHistory();}
