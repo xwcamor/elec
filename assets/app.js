@@ -10,6 +10,16 @@
   var activeExecutionId = null;
   var activeExecutionMode = 'new';
   var activeSpecificCode = '';
+  var testCatalog = [
+    ['TTR','Relación de transformación','Relaciones teóricas, medidas y desviación'],
+    ['CAPACITANCE','Capacitancia','Capacitancia medida por configuración'],
+    ['POWER_FACTOR','Factor de potencia','FP medido y corregido'],
+    ['EXCITATION','Corriente de excitación','Corriente y pérdidas por fase'],
+    ['WINDING_RESISTANCE','Resistencia de devanados','Resistencia por fase, tap y temperatura'],
+    ['INSULATION_RESISTANCE','Resistencia de aislamiento','Lecturas por tiempo y configuración'],
+    ['SFRA','SFRA','Curvas y archivos de respuesta'],
+    ['BUSHING','Bushings capacitivos','Resultados por bushing / borne']
+  ];
   const blankTerminal = (code, phase = '', type = 'Fase') => ({code, phase, type, has_capacitive_bushing: false, bushing: {serial_number:'',manufacturer:'',model:'',rated_voltage_kv:'',capacitance_pf:'',power_factor_percent:'',notes:''}});
   const API_URL = PILOT.apiUrl || 'api.php';
   const api = (query = '') => API_URL + (query ? '?' + query : '');
@@ -99,6 +109,9 @@
   state = normalizeConfig(PILOT.config || {});
 
   function normalizeConfig(config) {
+    // La API puede devolver config=null cuando el transformador aún no tiene configuración.
+    // Normalizar siempre contra un objeto evita acceder a null.windings.
+    config = config && typeof config === 'object' ? config : {};
     const windings = (config.windings || []).map(w => ({
       id: w.id || null,
       name: w.winding_name || w.name || '',
@@ -441,16 +454,8 @@
   
 
   // ---------------- Fechas e historial de ejecuciones de pruebas eléctricas ----------------
-  const testCatalog = [
-    ['TTR','Relación de transformación','Relaciones teóricas, medidas y desviación'],
-    ['CAPACITANCE','Capacitancia','Capacitancia medida por configuración'],
-    ['POWER_FACTOR','Factor de potencia','FP medido y corregido'],
-    ['EXCITATION','Corriente de excitación','Corriente y pérdidas por fase'],
-    ['WINDING_RESISTANCE','Resistencia de devanados','Resistencia por fase, tap y temperatura'],
-    ['INSULATION_RESISTANCE','Resistencia de aislamiento','Lecturas por tiempo y configuración'],
-    ['SFRA','SFRA','Curvas y archivos de respuesta'],
-    ['BUSHING','Bushings capacitivos','Resultados por bushing / borne']
-  ];
+  // testCatalog se declara al inicio para que el manejador de clics temprano pueda usarlo.
+
   let testExecutions = [];
   let testCatalogLoaded = false;
   const testPage=$('#testPage'), executionPage=$('#executionPage');
