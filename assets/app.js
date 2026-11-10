@@ -113,7 +113,7 @@
       min_position:c.min_position ?? '', max_position:c.max_position ?? '', neutral_position:c.neutral_position ?? '', current_position:c.current_position ?? '', notes:c.notes || '',
       positions:(c.positions || []).map(p => ({position_no:p.position_no,label:p.label || '',voltage_kv:p.voltage_kv ?? '',percent_change:p.percent_change ?? '',is_neutral:Number(p.is_neutral || 0)===1,notes:p.notes || ''}))
     }));
-    return {phase_count:Number(config.phase_count || 3),vector_group:config.vector_group || transformer.vector_group || 'Yd11',frequency_hz:config.frequency_hz ?? 60,notes:config.notes || '',version_no:Number(config.version_no || 0),windings,tap_changers,versions:Array.isArray(config.versions) ? config.versions : []};
+    return {phase_count:Number(config.phase_count || 3),vector_group:config.vector_group || transformer.vector_group || 'Yd11',frequency_hz:config.frequency_hz ?? 60,notes:config.notes || '',version_no:Number(config.version_no || 0),windings,tap_changers:tapChangers,versions:Array.isArray(config.versions) ? config.versions : []};
   }
 
 

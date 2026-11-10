@@ -1,3 +1,7 @@
+## v1.5.6
+- Corrige el mapeo del arreglo de conmutadores en `normalizeConfig`; el nombre de la propiedad de salida ahora apunta a la variable correcta.
+- Evita que un `ReferenceError` durante la carga deje sin inicializar el estado y desactive los controles de configuración y nueva ejecución.
+
 ## v1.5.5
 - Inicializa el estado eléctrico antes de registrar controles de navegación.
 - Mueve las plantillas de pruebas específicas al bloque de inicialización para evitar accesos durante la TDZ.
