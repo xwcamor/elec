@@ -1,3 +1,10 @@
+## v1.5.5
+- Inicializa el estado eléctrico antes de registrar controles de navegación.
+- Mueve las plantillas de pruebas específicas al bloque de inicialización para evitar accesos durante la TDZ.
+- Registra la navegación delegada después de inicializar el módulo completo.
+- Normaliza configuraciones nulas o con colecciones incompletas sin interrumpir la interfaz.
+- Actualiza la versión del recurso JavaScript para invalidar la caché del navegador.
+
 ## v1.5.4
 - Corrige el acceso prematuro a `localDateTime` al crear una nueva ejecución.
 - Inicializa el estado compartido antes de registrar eventos para evitar el error de zona temporal muerta en Configuración eléctrica.
