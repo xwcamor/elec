@@ -165,7 +165,8 @@ INSERT IGNORE INTO eh_test_types (code, name, display_order) VALUES
 ('SFRA', 'SFRA', 7),
 ('BUSHING', 'Bushings capacitivos', 8),
 ('ARRESTER', 'Pararrayos AT / MT', 9),
-('PROTECTIONS', 'Protecciones propias', 10);
+('PROTECTIONS', 'Protecciones propias', 10),
+('PLAN', 'Plan de pruebas', 11);
 
 CREATE TABLE IF NOT EXISTS eh_test_executions (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,

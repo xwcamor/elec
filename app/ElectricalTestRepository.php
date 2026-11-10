@@ -8,14 +8,25 @@ class ElectricalTestRepository
     {
         $sql = "SELECT e.id, e.executed_at, e.status, e.operator_name, e.equipment_name,
                        e.standard_reference, t.code AS test_code, t.name AS test_name,
-                       COALESCE(d.measurement_count,0) AS measurement_count
+                       COALESCE(d.measurement_count,0) AS measurement_count, d.payload_json
                 FROM eh_test_executions e
                 INNER JOIN eh_test_types t ON t.id=e.test_type_id
                 LEFT JOIN eh_test_execution_data d ON d.execution_id=e.id
                 WHERE e.transformer_key=:k
                 ORDER BY e.executed_at DESC, e.id DESC";
         $st = $this->pdo->prepare($sql); $st->execute(['k'=>$key]);
-        return $st->fetchAll();
+        $items = $st->fetchAll();
+        foreach ($items as &$item) {
+            $stored = json_decode($item['payload_json'] ?? '{}', true) ?: [];
+            $tests = $stored['plan']['tests'] ?? [];
+            $item['plan_tests'] = array_map(static function($test) {
+                return ['code'=>$test['code'] ?? '', 'name'=>$test['name'] ?? '', 'status'=>$test['status'] ?? 'BORRADOR'];
+            }, is_array($tests) ? $tests : []);
+            $item['plan_count'] = count($item['plan_tests']);
+            unset($item['payload_json']);
+        }
+        unset($item);
+        return $items;
     }
 
     public function get(int $id, string $key): ?array
@@ -28,7 +39,9 @@ class ElectricalTestRepository
                 WHERE e.id=:id AND e.transformer_key=:k LIMIT 1";
         $st=$this->pdo->prepare($sql); $st->execute(['id'=>$id,'k'=>$key]);
         $row=$st->fetch(); if(!$row) return null;
-        $row['measurements'] = json_decode($row['payload_json'] ?: '{"measurements":[]}', true)['measurements'] ?? [];
+        $stored = json_decode($row['payload_json'] ?: '{"measurements":[]}', true) ?: [];
+        $row['measurements'] = $stored['measurements'] ?? [];
+        $row['plan'] = $stored['plan'] ?? null;
         unset($row['payload_json']);
         return $row;
     }
@@ -47,6 +60,7 @@ class ElectricalTestRepository
             ['BUSHING', 'Bushings capacitivos', 8],
             ['ARRESTER', 'Pararrayos AT / MT', 9],
             ['PROTECTIONS', 'Protecciones propias', 10],
+            ['PLAN', 'Plan de pruebas', 11],
         ];
         $sync = $this->pdo->prepare('INSERT INTO eh_test_types (code, name, display_order) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), display_order=VALUES(display_order)');
         foreach ($defaults as $row) $sync->execute($row);
@@ -81,7 +95,36 @@ class ElectricalTestRepository
             if($parameter==='' && $value==='' && $unit==='' && $notes==='') continue;
             $clean[]=['parameter'=>$parameter,'value'=>$value,'unit'=>$unit,'notes'=>$notes];
         }
-        $payload=json_encode(['measurements'=>$clean],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+        $storedPayload = ['measurements'=>$clean];
+        $plan = $p['plan'] ?? null;
+        if (is_array($plan)) {
+            $tests = $plan['tests'] ?? [];
+            if (!is_array($tests) || count($tests) > 20) throw new InvalidArgumentException('Un plan admite hasta 20 pruebas.');
+            $safeTests = [];
+            foreach ($tests as $test) {
+                if (!is_array($test)) continue;
+                $testCode = trim((string)($test['code'] ?? ''));
+                if ($testCode === '' || $testCode === 'PLAN') continue;
+                $testMeasurements = $test['measurements'] ?? [];
+                if (!is_array($testMeasurements) || count($testMeasurements) > 2000) throw new InvalidArgumentException('Una prueba supera el límite de 2,000 valores.');
+                $safeTests[] = [
+                    'id'=>(int)($test['id'] ?? 0) ?: null,
+                    'code'=>substr($testCode,0,40),
+                    'name'=>substr(trim((string)($test['name'] ?? '')),0,120),
+                    'status'=>in_array(strtoupper((string)($test['status'] ?? 'BORRADOR')),['BORRADOR','COMPLETADA'],true)?strtoupper((string)($test['status'] ?? 'BORRADOR')):'BORRADOR',
+                    'standard_reference'=>substr(trim((string)($test['standard_reference'] ?? '')),0,120),
+                    'equipment_name'=>substr(trim((string)($test['equipment_name'] ?? '')),0,150),
+                    'equipment_brand'=>substr(trim((string)($test['equipment_brand'] ?? '')),0,100),
+                    'equipment_model'=>substr(trim((string)($test['equipment_model'] ?? '')),0,100),
+                    'equipment_serial'=>substr(trim((string)($test['equipment_serial'] ?? '')),0,100),
+                    'observations'=>substr(trim((string)($test['observations'] ?? '')),0,4000),
+                    'measurements'=>$testMeasurements
+                ];
+            }
+            if (!$safeTests) throw new InvalidArgumentException('El plan debe incluir por lo menos una prueba.');
+            $storedPayload['plan'] = ['version'=>1,'session_id'=>substr(trim((string)($plan['session_id'] ?? '')),0,80) ?: null,'tests'=>$safeTests];
+        }
+        $payload=json_encode($storedPayload,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
         $this->pdo->beginTransaction();
         try {
             $configVersion=null; $snapshot=null;
@@ -123,7 +166,12 @@ class ElectricalTestRepository
                 $ins->execute($values); $id=(int)$this->pdo->lastInsertId();
             }
             $ds=$this->pdo->prepare('INSERT INTO eh_test_execution_data (execution_id,payload_json,measurement_count) VALUES (?,?,?) ON DUPLICATE KEY UPDATE payload_json=VALUES(payload_json),measurement_count=VALUES(measurement_count)');
-            $ds->execute([$id,$payload,count($clean)]);
+            $savedCount = count($clean);
+            if (isset($storedPayload['plan']['tests'])) {
+                $savedCount = 0;
+                foreach ($storedPayload['plan']['tests'] as $test) $savedCount += count($test['measurements'] ?? []);
+            }
+            $ds->execute([$id,$payload,$savedCount]);
             $this->pdo->commit();
             return ['id'=>$id,'executed_at'=>$executedAt,'measurement_count'=>count($clean),'status'=>$status];
         } catch(Throwable $e){if($this->pdo->inTransaction())$this->pdo->rollBack();throw $e;}

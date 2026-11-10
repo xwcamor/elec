@@ -501,7 +501,7 @@
     try{
       const [r,ct]=await Promise.all([fetch(api('action=test-list&key='+encodeURIComponent(transformer.key))),fetch(api('action=test-types'))]);
       const d=await readApiResponse(r), c=await readApiResponse(ct);
-      testExecutions=d.items||[];if(ct.ok&&c.ok&&c.items?.length){testCatalog.splice(0,testCatalog.length,...c.items.map(x=>[x.code,x.name,'Registro de protocolo']));}
+      testExecutions=d.items||[];if(ct.ok&&c.ok&&c.items?.length){testCatalog.splice(0,testCatalog.length,...c.items.filter(x=>x.code!=='PLAN').map(x=>[x.code,x.name,'Formato LAP']));}
       renderTestHistory();
     }catch(e){testExecutions=[];renderTestHistory();toast(e.message,true);}
   }
@@ -776,4 +776,18 @@
     renderWindings();renderTapChangers();updateCounts();
   if(state.version_no>0){$('#saveStatus').classList.add('saved');$('#saveStatus').innerHTML='<i></i>Guardado';}
   window.addEventListener('error', function(ev){ const msg='Error de interfaz: '+(ev.message||'JavaScript'); const s=$('#pilotStatus'); if(s){s.className='pilot-status warning';s.querySelector('strong').textContent='Error al iniciar la interfaz';s.querySelector('span').textContent=msg;} });
+  window.ELEC_PLAN_BRIDGE = {
+    getTransformer: function(){ return transformer; },
+    api: function(query){ return api(query); },
+    readApiResponse: function(response){ return readApiResponse(response); },
+    showPage: function(pageId){
+      ['overviewPage','configPage','testPage','executionPage','planPage'].forEach(function(id){
+        const node=document.getElementById(id);if(node)node.classList.toggle('hidden',id!==pageId);
+      });
+    },
+    notify: function(message,isError){ toast(message,!!isError); },
+    demo: function(){ return !!PILOT.demo; },
+    testsReady: function(){ return !!PILOT.testsSchemaReady; }
+  };
+
 })()

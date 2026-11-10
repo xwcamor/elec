@@ -241,6 +241,33 @@ $initialConfig = $config ?: [
     </div>
   </section>
 
+  <section class="execution-page hidden" id="planPage">
+    <div class="config-toolbar">
+      <div><div class="breadcrumbs">Transformador <span>/</span> Pruebas eléctricas <span>/</span> Plan</div><h2 id="planTitle">Nuevo plan de pruebas</h2><p>Una visita puede incluir varios ensayos. Los datos compartidos se ingresan una vez y cada prueba conserva su propio equipo.</p></div>
+      <div class="toolbar-actions"><button class="btn" id="cancelPlan">Cancelar</button><button class="btn primary" id="saveTestPlan"><svg><use href="#i-check"/></svg>Guardar plan</button></div>
+    </div>
+    <section class="execution-card plan-shared-card">
+      <div class="execution-card-title"><span class="eyebrow">01 · DATOS COMPARTIDOS</span><h3>Datos de la visita y condiciones ambientales</h3><p>Se ingresan una sola vez y se comparten con todos los ensayos del plan.</p></div>
+      <div class="execution-date-card plan-date-inline"><div class="date-emblem"><svg><use href="#i-calendar"/></svg></div><div class="date-copy"><strong>Fecha y hora de las pruebas</strong><small>Fecha real de realización de los ensayos.</small></div><label class="execution-date-field"><span>Realizada el *</span><input id="planDate" type="datetime-local" required></label></div>
+      <div class="form-grid execution-meta-grid plan-shared-grid">
+        <label>Responsable / técnico<input id="planOperator" placeholder="Nombre del técnico"></label>
+        <label>Supervisor<input id="planSupervisor" placeholder="Nombre del supervisor"></label>
+        <label>Temperatura del aceite (°C)<input id="planOilTemp" inputmode="decimal" placeholder="Ej. 35.5"></label>
+        <label>Temperatura ambiente (°C)<input id="planAmbientTemp" inputmode="decimal" placeholder="Ej. 22"></label>
+        <label>Humedad relativa (%)<input id="planHumidity" inputmode="decimal" placeholder="Ej. 74"></label>
+      </div>
+      <label class="plan-shared-notes">Observaciones generales de la visita<textarea id="planObservations" rows="2" placeholder="Condiciones del servicio, ubicación e incidencias generales..."></textarea></label>
+    </section>
+    <section class="execution-card">
+      <div class="execution-card-title"><span class="eyebrow">02 · SELECCIÓN DE ENSAYOS</span><h3>¿Qué pruebas vas a registrar?</h3><p>Selecciona una o varias. Cada prueba genera su propio formulario con los campos del protocolo LAP.</p></div>
+      <div class="plan-test-picker" id="planTestPicker"></div><div class="plan-selection-status" id="planSelectionStatus">Aún no has añadido pruebas al plan.</div>
+    </section>
+    <section class="execution-card plan-tests-section">
+      <div class="execution-card-title"><span class="eyebrow">03 · FORMULARIOS DE PRUEBA</span><h3>Resultados por ensayo</h3><p>Marca, modelo, serie, norma y estado se registran por prueba, ya que el instrumento puede cambiar entre ensayos.</p></div>
+      <div id="planTestCards"><div class="empty-state">Selecciona los ensayos para que aparezcan aquí sus formularios.</div></div>
+    </section>
+  </section>
+
   <section class="config-page hidden" id="configPage">
     <div class="config-toolbar">
       <div><div class="breadcrumbs">Transformador <span>/</span> Configuración eléctrica</div><h2>Configuración eléctrica</h2><p>Define la estructura física y eléctrica que utilizarán las pruebas del transformador.</p></div>
@@ -357,5 +384,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.11"></script>
+<script src="./assets/app.js?v=1.5.12"></script>
+<script src="./assets/plan.js?v=1.5.12"></script>
 </body></html>

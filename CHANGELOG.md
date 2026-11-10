@@ -1,3 +1,13 @@
+## v1.5.12
+- Incorpora un plan por visita: fecha, responsable, supervisor y condiciones ambientales se ingresan una sola vez.
+- Permite elegir varias pruebas y genera un formulario independiente por ensayo.
+- Equipo, marca, modelo, serie, norma, estado y observaciones se registran por prueba.
+- Ajusta los formularios al protocolo LAP: FP/capacitancia, aislamiento, devanados AT/BT, excitación, bushings, SFRA, pararrayos y protecciones.
+- Precarga seis modos de FP, tres configuraciones de aislamiento, fases/taps de excitación, secciones AT/MT de pararrayos y contactos LAP de protecciones.
+- Calcula relación TTR e índice de absorción; no calcula FP corregido ni variación de bushings donde el Excel no define fórmula.
+- Guarda el plan dentro del JSON de la ejecución existente; no requiere tablas nuevas ni reimportar el esquema.
+- Permite editar el plan completo y conserva apertura de registros históricos individuales.
+- Añade pegado desde Excel por grilla.
 ## v1.5.11
 - Elimina un bloque duplicado que había quedado después del cierre del módulo JavaScript.
 - Retira la segunda declaración antigua del catálogo para conservar las 10 pruebas LAP desde el inicio.
