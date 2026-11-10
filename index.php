@@ -357,5 +357,5 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.10"></script>
+<script src="./assets/app.js?v=1.5.11"></script>
 </body></html>

@@ -1,3 +1,8 @@
+## v1.5.11
+- Elimina un bloque duplicado que había quedado después del cierre del módulo JavaScript.
+- Retira la segunda declaración antigua del catálogo para conservar las 10 pruebas LAP desde el inicio.
+- Valida la sintaxis del archivo JavaScript completo antes de publicar.
+
 ## v1.5.10
 - Repara la expresión regular de reconstrucción de filas del protocolo; el archivo JavaScript vuelve a ser sintácticamente válido y puede abrir/editar ejecuciones específicas.
 
