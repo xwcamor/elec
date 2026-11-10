@@ -1,3 +1,6 @@
+## v1.5.17
+- Ajusta el porcentaje de avance: un plan sin pruebas seleccionadas ya no puede mostrar 100% solo por tener completos los datos generales.
+
 ## v1.5.16
 - Sincroniza indicadores y pendientes al agregar filas, pegar desde Excel y cambiar datos generales.
 - Actualiza los recursos CSS y JavaScript con una nueva versión de caché para que el navegador reciba los colores y mensajes nuevos.

@@ -139,7 +139,7 @@
   }
   function planMetrics(){
     const general=generalMissing(),perItem=items.map(item=>({item,metrics:itemMetrics(item)}));
-    const total=2+perItem.reduce((n,x)=>n+x.metrics.total,0);
+    const total=2+(items.length?0:1)+perItem.reduce((n,x)=>n+x.metrics.total,0);
     const filled=2-general.length+perItem.reduce((n,x)=>n+x.metrics.filled,0);
     const percent=total?Math.round(filled/total*100):0;
     const ready=perItem.filter(x=>x.metrics.complete).length;
