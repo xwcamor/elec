@@ -53,18 +53,24 @@
     if(code==='SFRA')return [{connection:'AT vs BT (abierto)',tap:'1'},{connection:'BT vs AT (abierto)',tap:'1'},{connection:'AT vs BT (cortocircuito)',tap:'1'}];
     if(code==='ARRESTER')return [...['1U','1V','1W'].map(phase=>({section:'AT',phase,test_mode:'GST'})),...['2U','2V','2W','2N'].map(phase=>({section:'MT',phase,test_mode:'GST'}))];
     if(code==='PROTECTIONS')return [
-      {item:'1',accessory:'RELÉ BUCHHOLZ DEL TRANSFORMADOR',terminals:'D',contact:'1 - 22',condition:'N.C. - ALARMA'},
-      {item:'1',accessory:'RELÉ BUCHHOLZ DEL TRANSFORMADOR',terminals:'D',contact:'11 - 12',condition:'N.C. - DISPARO'},
-      {item:'2',accessory:'VÁLVULA DE SEGURIDAD DEL TRANSFORMADOR',terminals:'D',contact:'17 - 18',condition:'N.C. - DISPARO'},
-      {item:'3',accessory:'INDICADOR NIVEL DE ACEITE DEL TRANSFORMADOR',terminals:'D',contact:'7 - 8',condition:'N.C. - ALARMA',setpoint:'BAJO'},
-      {item:'4',accessory:'RELÉ DE FLUJO DEL OLTC',terminals:'D',contact:'13 - 14',condition:'N.C. - DISPARO'},
-      {item:'4',accessory:'RELÉ DE FLUJO DEL OLTC',terminals:'D',contact:'23 - 24',condition:'N.C. - DISPARO'},
-      {item:'5',accessory:'INDICADOR NIVEL DE ACEITE OLTC',terminals:'D',contact:'9 - 10',condition:'N.C. - ALARMA',setpoint:'BAJO'},
-      {item:'6',accessory:'VÁLVULA DE SEGURIDAD DE OLTC',terminals:'D',contact:'15 - 16',condition:'N.C. - DISPARO'},
-      {item:'7',accessory:'INDICADOR DE TEMPERATURA DE ACEITE QUALITROL',terminals:'D',contact:'3 - 4',condition:'N.C. - ALARMA',setpoint:'90 °C'},
-      {item:'7',accessory:'INDICADOR DE TEMPERATURA DE ACEITE QUALITROL',terminals:'D',contact:'19 - 20',condition:'DISPARO',setpoint:'100 °C'},
-      {item:'8',accessory:'INDICADOR DE TEMPERATURA DE DEVANADO QUALITROL',terminals:'D',contact:'5 - 6',condition:'N.C. - ALARMA',setpoint:'95 °C'},
-      {item:'8',accessory:'INDICADOR DE TEMPERATURA DE DEVANADO QUALITROL',terminals:'D',contact:'21 - 22',condition:'DISPARO',setpoint:'105 °C'}
+      {item:'1',accessory:'RELÉ BUCHHOLZ',terminals:'D:1 - D:2',contact:'3 - 4',condition:'ALARMA'},
+      {item:'1',accessory:'RELÉ BUCHHOLZ',terminals:'D:13 - D:14',contact:'1 - 2',condition:'DISPARO'},
+      {item:'2',accessory:'VÁLVULA DE SEGURIDAD DEL TRANSFORMADOR',terminals:'D:15 - D:16',contact:'11 - 14',condition:'DISPARO'},
+      {item:'3',accessory:'VÁLVULA DE SEGURIDAD DEL CONMUTADOR',terminals:'D:41 - D:42',contact:'6 - 4',condition:'DISPARO'},
+      {item:'4',accessory:'RELÉ DE PROTECCIÓN DEL CONMUTADOR BAJO CARGA',terminals:'D:43 - D:44',contact:'1 - 2',condition:'DISPARO'},
+      {item:'5',accessory:'INDICADOR DE TEMPERATURA DEL ACEITE',terminals:'D:23 - D:24',contact:'11 - 14',condition:'VENTILACIÓN FORZADA'},
+      {item:'5',accessory:'INDICADOR DE TEMPERATURA DEL ACEITE',terminals:'D:7 - D:8',contact:'21 - 24',condition:'ALARMA',setpoint:'70 °C'},
+      {item:'5',accessory:'INDICADOR DE TEMPERATURA DEL ACEITE',terminals:'D:17 - D:18',contact:'31 - 34',condition:'DISPARO',setpoint:'75 °C'},
+      {item:'6',accessory:'INDICADOR DE TEMPERATURA DEL DEVANADO AT',terminals:'D:27 - D:28',contact:'11 - 14',condition:'VENTILACIÓN FORZADA'},
+      {item:'6',accessory:'INDICADOR DE TEMPERATURA DEL DEVANADO AT',terminals:'D:11 - D:12',contact:'21 - 24',condition:'ALARMA'},
+      {item:'6',accessory:'INDICADOR DE TEMPERATURA DEL DEVANADO AT',terminals:'D:21 - D:22',contact:'31 - 34',condition:'DISPARO'},
+      {item:'7',accessory:'INDICADOR DE TEMPERATURA DEL DEVANADO BT',terminals:'D:25 - D:26',contact:'11 - 14',condition:'VENTILACIÓN FORZADA'},
+      {item:'7',accessory:'INDICADOR DE TEMPERATURA DEL DEVANADO BT',terminals:'D:9 - D:10',contact:'21 - 24',condition:'ALARMA',setpoint:'75 °C'},
+      {item:'7',accessory:'INDICADOR DE TEMPERATURA DEL DEVANADO BT',terminals:'D:17 - D:18',contact:'31 - 34',condition:'DISPARO',setpoint:'80 °C'},
+      {item:'8',accessory:'INDICADOR DE NIVEL DE ACEITE DEL TRANSFORMADOR',terminals:'D:5 - D:6',contact:'8 - 9',condition:'ALARMA',setpoint:'MÍNIMO'},
+      {item:'8',accessory:'INDICADOR DE NIVEL DE ACEITE DEL TRANSFORMADOR',terminals:'D:3 - D:4',contact:'5 - 6',condition:'ALARMA',setpoint:'MÁXIMO'},
+      {item:'9',accessory:'INDICADOR DE NIVEL DE ACEITE DEL CONMUTADOR',terminals:'D:39 - D:40',contact:'8 - 9',condition:'ALARMA',setpoint:'MÍNIMO'},
+      {item:'9',accessory:'INDICADOR DE NIVEL DE ACEITE DEL CONMUTADOR',terminals:'D:37 - D:38',contact:'5 - 6',condition:'ALARMA',setpoint:'MÁXIMO'}
     ];
     return [{},{},{}];
   }

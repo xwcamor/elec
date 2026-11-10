@@ -1,3 +1,7 @@
+## v1.5.14
+- Corrige la precarga de Protecciones propias según la hoja LAP: 18 verificaciones con accesorios, bornes, contactos, condición y ajustes de temperatura/nivel que aparecen en el Excel.
+- Actualiza la caché del formulario de planes.
+
 ## v1.5.13
 - El historial vuelve a cargar los planes después de guardar o actualizar uno.
 - Las filas de resumen, filtros, tarjetas por tipo y estadísticas cuentan las pruebas contenidas en cada plan.
