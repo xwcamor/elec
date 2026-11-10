@@ -628,7 +628,7 @@
     const cfg=specificTemplates[code];if(!cfg)return[];
     const rows={};
     (ms||[]).forEach(m=>{
-      const z=String(m.parameter||'').match(new RegExp('^'+cfg.prefix+'\\|(\\d+)\\|(.+));
+      const z=String(m.parameter||'').match(new RegExp('^'+cfg.prefix+'\\|(\\d+)\\|(.+)$'));
       if(z){rows[z[1]]=rows[z[1]]||{};rows[z[1]][z[2]]=m.value??m.notes??'';}
     });
     let list=Object.keys(rows).sort((a,b)=>Number(a)-Number(b)).map(k=>rows[k]);

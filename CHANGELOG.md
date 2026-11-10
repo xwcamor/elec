@@ -1,3 +1,6 @@
+## v1.5.10
+- Repara la expresión regular de reconstrucción de filas del protocolo; el archivo JavaScript vuelve a ser sintácticamente válido y puede abrir/editar ejecuciones específicas.
+
 ## v1.5.9
 - Corrige el patrón de lectura del historial para reconstruir filas de plantillas específicas al editar una ejecución.
 - El índice de absorción queda vacío mientras falte la lectura a 30 s o a 1 min; solo se calcula con ambas lecturas válidas.
