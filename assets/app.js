@@ -616,9 +616,11 @@
   function normalizeSpecificRow(code,row){
     const out={...(row||{})};
     if(code==='INSULATION_RESISTANCE'){
-      const n30=Number(String(out.reading_30s??'').trim().replace(',','.'));
-      const n1=Number(String(out.reading_1min??'').trim().replace(',','.'));
-      out.absorption_index=Number.isFinite(n30)&&n30!==0&&Number.isFinite(n1)?String(n1/n30):'';
+      const raw30=String(out.reading_30s??'').trim().replace(',','.');
+      const raw1=String(out.reading_1min??'').trim().replace(',','.');
+      const n30=raw30===''?NaN:Number(raw30);
+      const n1=raw1===''?NaN:Number(raw1);
+      out.absorption_index=raw30!==''&&raw1!==''&&Number.isFinite(n30)&&n30!==0&&Number.isFinite(n1)?String(n1/n30):'';
     }
     return out;
   }
@@ -626,7 +628,165 @@
     const cfg=specificTemplates[code];if(!cfg)return[];
     const rows={};
     (ms||[]).forEach(m=>{
-      const z=String(m.parameter||'').match(new RegExp('^'+cfg.prefix+'\\\\|(\\\\d+)\\\\|(.+)$'));
+      const z=String(m.parameter||'').match(new RegExp('^'+cfg.prefix+'\\|(\\d+)\\|(.+));
+      if(z){rows[z[1]]=rows[z[1]]||{};rows[z[1]][z[2]]=m.value??m.notes??'';}
+    });
+    let list=Object.keys(rows).sort((a,b)=>Number(a)-Number(b)).map(k=>rows[k]);
+    if(code==='INSULATION_RESISTANCE'&&list.some(r=>r.from||r.to||r.time||r.reading)){
+      const grouped={};
+      list.forEach(r=>{
+        const key=[r.from||'',r.to||'',r.voltage||'',r.unit||'',r.reading_unit||'',r.temperature||''].join('|');
+        const target=grouped[key]||(grouped[key]={point:[r.from,r.to].filter(Boolean).join(' - '),applied_voltage_kv:r.voltage||'',reading_unit:r.reading_unit||r.unit||'',notes:r.notes||''});
+        const time=String(r.time||'').trim().toLowerCase().replace(/['’]/g,'');
+        if(time==='15'||time==='15s')target.reading_15s=r.reading||'';
+        else if(time==='30'||time==='30s')target.reading_30s=r.reading||'';
+        else if(time==='45'||time==='45s')target.reading_45s=r.reading||'';
+        else if(time==='1'||time==='1m'||time==='60'||time==='60s')target.reading_1min=r.reading||'';
+      });
+      list=Object.values(grouped);
+    }
+    if(code==='POWER_FACTOR')list=list.map(r=>({...r,measurement:r.measurement||r.point||'',test_mode:r.test_mode||r.mode||'',test_voltage_v:r.test_voltage_v||r.test_voltage||'',capacitance_nf:r.capacitance_nf||r.capacitance||'',power_factor_measured:r.power_factor_measured||r.power_factor||'',output_current_a:r.output_current_a||r.current||'',notes:r.notes||''}));
+    if(code==='BUSHING')list=list.map(r=>({...r,power_factor:r.power_factor||r.power_factor_measured||'',capacitance:r.capacitance||r.capacitance_measured||'',test_voltage:r.test_voltage||r.test_voltage_kv||'',serial:r.serial||r.serial_number||''}));
+    return list.map(r=>normalizeSpecificRow(code,r));
+  }
+  function renderSpecificRows(rows,code){
+    const cfg=specificTemplates[code];if(!cfg)return;
+    $('#specificTestHead').innerHTML='<tr>'+cfg.cols.map(c=>'<th>'+esc(c[1])+'</th>').join('')+'</tr>';
+    $('#specificTestRows').innerHTML=(rows||[]).map((raw,i)=>{
+      const row=normalizeSpecificRow(code,raw);
+      return '<tr>'+cfg.cols.map(([key],c)=>{
+        const readonly=key==='absorption_index'?' readonly title="R a 1 min / R a 30 s"':'';
+        return '<td><input class="specific-cell" data-r="'+i+'" data-c="'+c+'" value="'+esc(row[key]??'')+'"'+readonly+'></td>';
+      }).join('')+'</tr>';
+    }).join('');
+  }
+  function collectSpecificRows(){
+    const cfg=specificTemplates[activeSpecificCode];if(!cfg)return[];
+    return $$('#specificTestRows tr').map(tr=>{const o={};$$('.specific-cell',tr).forEach((e,i)=>o[cfg.cols[i][0]]=e.value);return normalizeSpecificRow(activeSpecificCode,o);}).filter(r=>Object.entries(r).some(([k,v])=>k!=='absorption_index'&&String(v).trim()!==''));
+  }
+  function specificToMeasurements(){
+    const cfg=specificTemplates[activeSpecificCode],out=[];if(!cfg)return out;
+    collectSpecificRows().forEach((r,i)=>cfg.cols.forEach(([k])=>{if(r[k]!==''&&r[k]!==null&&r[k]!==undefined)out.push({parameter:cfg.prefix+'|'+(i+1)+'|'+k,value:String(r[k]),unit:'',notes:''});}));
+    return out;
+  }
+  function toggleTestTemplate(){
+    const code=$('#executionType')?.value,isTtr=code==='TTR',isSpecific=!!specificTemplates[code];
+    $('#ttrEditor')?.classList.toggle('hidden',!isTtr);
+    $('#specificTestEditor')?.classList.toggle('hidden',!isSpecific);
+    $('#measurementGenericCard')?.classList.toggle('hidden',isTtr||isSpecific);
+    if(activeSpecificCode!==code && $('#specificTestRows'))$('#specificTestRows').innerHTML='';
+    activeSpecificCode=isSpecific?code:'';
+    if(isSpecific){const cfg=specificTemplates[code];$('#specificTestTitle').textContent=cfg.title;$('#specificTestHint').textContent=cfg.hint;if(!$('#specificTestRows').children.length)renderSpecificRows(Array.from({length:Math.max(3,(state.windings||[]).length)},()=>({})),code);}
+
+    if(isTtr && !$('#ttrRows').children.length){
+      const configured=(state.tap_changers||[]).reduce((n,c)=>Math.max(n,(c.positions||[]).length),0);const count=Math.max(5,configured,Number(transformer.num_taps||0));
+      renderTtrRows(Array.from({length:Math.min(count,100)},(_,i)=>({tap:i+1})));
+    }
+  }
+
+  $('#specificAddRows')?.addEventListener('click',()=>renderSpecificRows([...collectSpecificRows(),{},{},{},{},{}],activeSpecificCode));
+  $('#specificTestRows')?.addEventListener('input',e=>{
+    if(activeSpecificCode!=='INSULATION_RESISTANCE'||!e.target.matches('.specific-cell'))return;
+    const tr=e.target.closest('tr');if(!tr)return;
+    const raw30=String(tr.querySelector('[data-c="3"]')?.value||'').trim().replace(',','.');
+    const raw1=String(tr.querySelector('[data-c="5"]')?.value||'').trim().replace(',','.');
+    const r30=raw30===''?NaN:Number(raw30),r1=raw1===''?NaN:Number(raw1);
+    const target=tr.querySelector('[data-c="6"]');
+    if(target)target.value=raw30!==''&&raw1!==''&&Number.isFinite(r30)&&r30!==0&&Number.isFinite(r1)?String(r1/r30):'';
+  });
+  $('#specificTestRows')?.addEventListener('paste',e=>{
+    const cell=e.target.closest('.specific-cell');if(!cell||!activeSpecificCode)return;
+    const text=(e.clipboardData||window.clipboardData).getData('text');if(!text.includes('\t')&&!text.includes('\n'))return;
+    e.preventDefault();const cfg=specificTemplates[activeSpecificCode],rows=collectSpecificRows(),r0=+cell.dataset.r,c0=+cell.dataset.c;
+    text.replace(/\r/g,'').split('\n').filter((x,i,a)=>!(i===a.length-1&&x==='')).forEach((line,ri)=>{while(rows.length<=r0+ri)rows.push({});line.split('\t').forEach((v,ci)=>{if(c0+ci<cfg.cols.length)rows[r0+ri][cfg.cols[c0+ci][0]]=v.trim();});});
+    renderSpecificRows(rows,activeSpecificCode);
+  });
+  $('#specificTestRows')?.addEventListener('keydown',e=>{
+    const el=e.target.closest('.specific-cell');if(!el||!activeSpecificCode)return;
+    const max=specificTemplates[activeSpecificCode].cols.length;let r=+el.dataset.r,c=+el.dataset.c;
+    if(e.key==='Enter'||e.key==='ArrowDown'){e.preventDefault();r++;}else if(e.key==='ArrowUp'){e.preventDefault();r--;}else if(e.key==='Tab'){e.preventDefault();c+=e.shiftKey?-1:1;if(c>=max){c=0;r++;}if(c<0){c=max-1;r=Math.max(0,r-1);}}else return;
+    const rows=collectSpecificRows();while(r>=rows.length)rows.push({});renderSpecificRows(rows,activeSpecificCode);$(`#specificTestRows [data-r="${r}"][data-c="${c}"]`)?.focus();
+  });
+  $('#executionType').addEventListener('change',()=>{toggleTestTemplate();});
+  $('#ttrAddRows').addEventListener('click',()=>{
+    const rows=collectTtrRows();const start=rows.length?Math.max(...rows.map(r=>Number(r.tap)||0))+1:1;
+    for(let i=0;i<5;i++)rows.push({tap:start+i});
+    renderTtrRows(rows);
+  });
+  $('#ttrRows').addEventListener('input',e=>{if(!e.target.matches('.ttr-cell')||[3,5,7,9].includes(Number(e.target.dataset.c)))return;const rows=collectTtrRows();renderTtrRows(rows);const r=Number(e.target.dataset.r),c=Number(e.target.dataset.c);$(`#ttrRows [data-r="${r}"][data-c="${c}"]`)?.focus();});
+  $('#ttrRows').addEventListener('paste',e=>{
+    const cell=e.target.closest('.ttr-cell');if(!cell)return;
+    const text=(e.clipboardData||window.clipboardData).getData('text');if(!text.includes('\t')&&!text.includes('\n'))return;
+    e.preventDefault();const lines=text.replace(/\r/g,'').split('\n').filter((x,i,a)=>!(i===a.length-1&&x==='')).map(x=>x.split('\t'));
+    const rows=collectTtrRows(),r0=Number(cell.dataset.r),c0=Number(cell.dataset.c),keys=['tap','at','bt','theoretical','U','errU','V','errV','W','errW','notes'];
+    lines.forEach((line,ri)=>{while(rows.length<=r0+ri)rows.push({tap:rows.length+1});line.forEach((v,ci)=>{if(c0+ci<11 && ![3,5,7,9].includes(c0+ci))rows[r0+ri][keys[c0+ci]]=v.trim();});});
+    renderTtrRows(rows.map(ttrCalc));
+  });
+  $('#ttrRows').addEventListener('keydown',e=>{
+    const el=e.target.closest('.ttr-cell');if(!el)return;
+    let r=Number(el.dataset.r),c=Number(el.dataset.c);
+    if(e.key==='Enter'||e.key==='ArrowDown'){e.preventDefault();r++;}
+    else if(e.key==='ArrowUp'){e.preventDefault();r--;}
+    else if(e.key==='Tab'){e.preventDefault();c+=e.shiftKey?-1:1;if(c>10){c=0;r++;}if(c<0){c=10;r=Math.max(0,r-1);}while([3,5,7,9].includes(c)){c+=e.shiftKey?-1:1;}}
+    else return;
+    const rows=collectTtrRows();while(r>=rows.length)rows.push({tap:rows.length+1});renderTtrRows(rows);
+    $(`#ttrRows [data-r="${r}"][data-c="${c}"]`)?.focus();
+  });
+
+  async function saveExecution(){
+    const date=$('#executionDate').value;if(!date){toast('Selecciona la fecha y hora en que se realizó la prueba.',true);$('#executionDate').focus();return;}
+    const isEditing=activeExecutionId!==null;
+    const code=$('#executionType').value;
+    const measurements=code==='TTR'?ttrToMeasurements():(specificTemplates[code]?specificToMeasurements():collectMeasurementRows());
+    const payload={id:activeExecutionId,transformer_key:transformer.key,test_code:code,executed_at:date,status:$('#executionStatus').value,operator_name:$('#executionOperator').value,supervisor_name:$('#executionSupervisor').value,standard_reference:$('#executionStandard').value,equipment_name:$('#executionEquipment').value,equipment_brand:$('#executionEquipmentBrand').value,equipment_model:$('#executionEquipmentModel').value,equipment_serial:$('#executionEquipmentSerial').value,oil_temperature_c:$('#executionOilTemp').value,ambient_temperature_c:$('#executionAmbientTemp').value,relative_humidity_percent:$('#executionHumidity').value,observations:$('#executionObservations').value,measurements};
+    const btn=$('#saveExecution');btn.disabled=true;btn.textContent=isEditing?'Actualizando...':'Guardando...';
+    try{
+      if(PILOT.demo)throw new Error('Selecciona un transformador real antes de guardar.');
+      if(!PILOT.testsSchemaReady)throw new Error('Prepara las tablas de pruebas eléctricas antes de guardar ejecuciones.');
+      const r=await fetch(api('action=test-save'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      const d=await readApiResponse(r);
+      toast((isEditing?'Ejecución actualizada':'Prueba guardada')+' · Registro #'+d.result.id+' · '+formatExecutionDate(d.result.executed_at));
+      showOnlyMain('testPage');await loadTestHistory();
+    }catch(e){toast(e.message,true);}
+    finally{btn.disabled=false;btn.innerHTML=activeExecutionMode==='edit'?'<svg><use href="#i-check"/></svg>Actualizar registro':'<svg><use href="#i-check"/></svg>Guardar registro';}
+  }
+  $('#saveExecution').addEventListener('click',saveExecution);
+
+  // Navegación global habilitada después de inicializar el estado y las plantillas.
+  document.addEventListener('click', event => {
+    const target = event.target instanceof Element ? event.target : event.target?.parentElement;
+    if (!target) return;
+    const next = target.closest('[data-next]');
+    const newExecution = target.closest('#newTestExecution');
+    try {
+      if (next) {
+        event.preventDefault();
+        showPanel(next.dataset.next);
+        return;
+      }
+      if (newExecution) {
+        event.preventDefault();
+        startExecution('TTR');
+      }
+    } catch (error) {
+      console.error('No se pudo abrir la pantalla solicitada:', error);
+      const status = document.querySelector('#pilotStatus');
+      if (status) {
+        status.className = 'pilot-status warning';
+        const strong = status.querySelector('strong');
+        const span = status.querySelector('span');
+        if (strong) strong.textContent = 'No se pudo abrir la pantalla';
+        if (span) span.textContent = error.message || 'Error de interfaz';
+      } else {
+        window.alert('No se pudo abrir la pantalla: ' + (error.message || error));
+      }
+    }
+  });
+    renderWindings();renderTapChangers();updateCounts();
+  if(state.version_no>0){$('#saveStatus').classList.add('saved');$('#saveStatus').innerHTML='<i></i>Guardado';}
+  window.addEventListener('error', function(ev){ const msg='Error de interfaz: '+(ev.message||'JavaScript'); const s=$('#pilotStatus'); if(s){s.className='pilot-status warning';s.querySelector('strong').textContent='Error al iniciar la interfaz';s.querySelector('span').textContent=msg;} });
+})();
+));
       if(z){rows[z[1]]=rows[z[1]]||{};rows[z[1]][z[2]]=m.value??m.notes??'';}
     });
     let list=Object.keys(rows).sort((a,b)=>Number(a)-Number(b)).map(k=>rows[k]);

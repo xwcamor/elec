@@ -1,3 +1,7 @@
+## v1.5.9
+- Corrige el patrón de lectura del historial para reconstruir filas de plantillas específicas al editar una ejecución.
+- El índice de absorción queda vacío mientras falte la lectura a 30 s o a 1 min; solo se calcula con ambas lecturas válidas.
+
 ## v1.5.8
 - Amplía el catálogo a los protocolos presentes en el Excel LAP: FP del transformador, excitación, TTR, resistencia de devanados, aislamiento, bushings, SFRA, pararrayos y protecciones propias.
 - Añade al aislamiento las tres configuraciones del protocolo y las lecturas a 15 s, 30 s, 45 s y 1 min.
