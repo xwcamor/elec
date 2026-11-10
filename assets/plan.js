@@ -91,30 +91,165 @@
     return out;
   }
   function makeItem(code,old){old=old||{};return {id:old.id||null,code,name:typeName(code),status:old.status||'BORRADOR',standard_reference:old.standard_reference||'',equipment_name:old.equipment_name||'',equipment_brand:old.equipment_brand||'',equipment_model:old.equipment_model||'',equipment_serial:old.equipment_serial||'',observations:old.observations||'',rows:old.rows||defaults(code)};}
+  const requiredByTest={
+    TTR:['tap','at','bt','U','V','W'],
+    POWER_FACTOR:['measurement','test_voltage_v','power_factor_measured','power_factor_corrected_20c','capacitance_nf'],
+    EXCITATION:['tap','phase','test_voltage_kv','output_voltage_v','output_current_a'],
+    WINDING_RESISTANCE:['section','tap','phase','test_current_a','resistance_measured_ohm','resistance_referred_75c_ohm'],
+    INSULATION_RESISTANCE:['point','applied_voltage_kv','reading_15s','reading_30s','reading_45s','reading_1min'],
+    BUSHING:['terminal','test_voltage_kv','power_factor_measured','capacitance_measured_pf'],
+    SFRA:['connection','comparison_result'],
+    ARRESTER:['section','phase','output_voltage_kv','output_current_ma','test_mode','losses_w','capacitance_pf'],
+    PROTECTIONS:['accessory','terminals','contact','condition','result'],
+    CAPACITANCE:['point','connection','test_voltage_kv','capacitance_nf']
+  };
+  const requiredEquipment=['equipment_name','equipment_brand','equipment_model','equipment_serial'];
+  const equipmentLabels={equipment_name:'equipo',equipment_brand:'marca del equipo',equipment_model:'modelo',equipment_serial:'serie'};
+  const generalLabels={date:'fecha de la visita',operator:'responsable / técnico'};
+  function isFilled(value){return value!==null&&value!==undefined&&String(value).trim()!=='';}
+  function missingForRow(code,row){
+    const required=requiredByTest[code]||columns(code).map(c=>c[0]).filter(k=>!['notes','absorption_index','theoretical','errU','errV','errW'].includes(k));
+    const labels=Object.fromEntries(columns(code).map(c=>[c[0],c[1]]));
+    return required.filter(key=>!isFilled(row?.[key])).map(key=>labels[key]||key);
+  }
+  function itemMetrics(item){
+    const rows=Array.isArray(item.rows)?item.rows:[];
+    const metaMissing=requiredEquipment.filter(key=>!isFilled(item[key])).map(key=>equipmentLabels[key]);
+    const required=requiredByTest[item.code]||columns(item.code).map(c=>c[0]).filter(k=>!['notes','absorption_index','theoretical','errU','errV','errW'].includes(k));
+    let total=requiredEquipment.length,filled=requiredEquipment.length-metaMissing.length;
+    const rowStates=rows.map((row,index)=>{
+      const missing=missingForRow(item.code,row),rowFilled=required.length-missing.length;
+      total+=required.length;filled+=rowFilled;
+      const any=columns(item.code).some(([key])=>isFilled(row?.[key]));
+      return {index,missing,filled:rowFilled,total:required.length,any,state:missing.length===0?'complete':(any?'partial':'empty')};
+    });
+    const missing=[...metaMissing];
+    rowStates.forEach(row=>{if(row.missing.length)missing.push('Fila '+(row.index+1)+': '+row.missing.slice(0,5).join(', ')+(row.missing.length>5?'…':''));});
+    if(!rows.length)missing.push('Agrega al menos una fila de medición');
+    const complete=rows.length>0&&missing.length===0;
+    const anyData=filled>0||rows.some(r=>columns(item.code).some(([key])=>isFilled(r?.[key])));
+    const state=item.status==='COMPLETADA'&&complete?'complete':(complete?'ready':(anyData?'partial':'empty'));
+    return {total,filled,percent:total?Math.round(filled/total*100):0,missing,metaMissing,rowStates,complete,anyData,state};
+  }
+  function generalMissing(){
+    const missing=[];
+    if(!isFilled($('#planDate').value))missing.push(generalLabels.date);
+    if(!isFilled($('#planOperator').value))missing.push(generalLabels.operator);
+    return missing;
+  }
+  function planMetrics(){
+    const general=generalMissing(),perItem=items.map(item=>({item,metrics:itemMetrics(item)}));
+    const total=2+perItem.reduce((n,x)=>n+x.metrics.total,0);
+    const filled=2-general.length+perItem.reduce((n,x)=>n+x.metrics.filled,0);
+    const percent=total?Math.round(filled/total*100):0;
+    const ready=perItem.filter(x=>x.metrics.complete).length;
+    const completed=perItem.filter(x=>x.metrics.complete&&x.item.status==='COMPLETADA').length;
+    const missing=[];
+    general.forEach(x=>missing.push('Datos de visita: falta '+x));
+    perItem.forEach(({item,metrics})=>{
+      metrics.missing.slice(0,5).forEach(msg=>missing.push(item.name+': '+msg));
+      if(metrics.missing.length>5)missing.push(item.name+': y '+(metrics.missing.length-5)+' pendientes más');
+      if(metrics.complete&&item.status!=='COMPLETADA')missing.push(item.name+': lista para revisar; falta marcarla como completada');
+      if(item.status==='COMPLETADA'&&!metrics.complete)missing.push(item.name+': marcada como completada, pero faltan datos');
+    });
+    if(!items.length)missing.unshift('Selecciona por lo menos una prueba');
+    return {general,perItem,total,filled,percent,ready,completed,missing,complete:!general.length&&items.length>0&&perItem.every(x=>x.metrics.complete&&x.item.status==='COMPLETADA')};
+  }
+  function stateLabel(state){return ({empty:'SIN DATOS',partial:'EN CURSO',ready:'LISTA PARA REVISAR',complete:'COMPLETADA'})[state]||'EN CURSO';}
+  function refreshFieldStyles(card,item,metrics){
+    card.querySelectorAll('.plan-cell').forEach(input=>{
+      const row=Number(input.dataset.row),field=input.dataset.col,required=(requiredByTest[item.code]||[]).includes(field);
+      input.classList.toggle('is-filled',isFilled(input.value));
+      input.classList.toggle('is-missing',required&&!isFilled(input.value)&&metrics.rowStates[row]?.any);
+    });
+    requiredEquipment.forEach(key=>{
+      const input=card.querySelector('[data-meta="'+key+'"]');if(!input)return;
+      input.classList.toggle('is-filled',isFilled(input.value));
+      input.classList.toggle('is-missing',!isFilled(input.value));
+      input.closest('label')?.classList.toggle('meta-complete',isFilled(input.value));
+      input.closest('label')?.classList.toggle('meta-pending',!isFilled(input.value));
+    });
+    card.querySelectorAll('tbody tr[data-row-state]').forEach((tr,index)=>{tr.dataset.rowState=metrics.rowStates[index]?.state||'empty';});
+    card.dataset.state=metrics.state;
+    const badge=card.querySelector('[data-card-state]');
+    if(badge){badge.dataset.state=metrics.state;badge.textContent=stateLabel(metrics.state);}
+    const progress=card.querySelector('[data-card-progress]');
+    if(progress)progress.textContent=metrics.filled+'/'+metrics.total+' campos mínimos · '+metrics.percent+'%';
+    const rowSummary=card.querySelector('[data-row-summary]');
+    if(rowSummary){
+      const complete=metrics.rowStates.filter(x=>x.state==='complete').length;
+      const partial=metrics.rowStates.filter(x=>x.state==='partial').length;
+      const empty=metrics.rowStates.filter(x=>x.state==='empty').length;
+      rowSummary.textContent=complete+' completas · '+partial+' en curso · '+empty+' sin datos';
+    }
+  }
+  function renderPlanFeedback(){
+    const host=$('#planProgressPanel');if(!host)return;
+    const m=planMetrics(),allReady=m.general.length===0&&m.perItem.length>0&&m.perItem.every(x=>x.metrics.complete);
+    const headline=m.complete?'Plan completo':(allReady?'Todos los formularios están listos para revisar':'Faltan datos por completar');
+    const state=m.complete?'success':(allReady?'info':'warning'),messages=m.missing.slice(0,7);
+    host.dataset.state=state;
+    host.innerHTML='<div class="plan-progress-main"><div class="plan-progress-copy"><div class="plan-progress-heading"><span class="plan-alert-icon">'+(state==='success'?'✓':state==='warning'?'!':'i')+'</span><div><strong>'+headline+'</strong><small>'+(items.length?m.ready+' de '+items.length+' pruebas con campos mínimos completos · '+m.completed+' marcadas como completadas':'Selecciona las pruebas que vas a realizar')+'</small></div></div><div class="plan-progress-track"><span style="width:'+m.percent+'%"></span></div><small class="plan-progress-number">'+m.filled+' de '+m.total+' campos mínimos · '+m.percent+'%</small></div><div class="plan-progress-side"><b>'+m.percent+'%</b><span>avance</span></div></div>'+
+      (messages.length?'<div class="plan-alert-details"><b>Revisar antes de completar</b><ul>'+messages.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>'+(m.missing.length>messages.length?'<small>Y '+(m.missing.length-messages.length)+' pendientes más.</small>':'')+'</div>':'<div class="plan-alert-clear">✓ No hay campos obligatorios pendientes.</div>')+
+      '<div class="plan-color-legend"><span><i class="legend-filled"></i> Verde: dato registrado</span><span><i class="legend-missing"></i> Ámbar: falta completar</span><span><i class="legend-calculated"></i> Gris: cálculo automático</span></div>';
+    const shared=$('#planSharedStatus');
+    if(shared){shared.classList.toggle('is-complete',m.general.length===0);shared.classList.toggle('is-pending',m.general.length>0);shared.textContent=m.general.length?'Pendiente: '+m.general.join(' · '):'Datos generales completos';}
+  }
+  function refreshPlanFeedback(){
+    const general=generalMissing();
+    items.forEach((item,index)=>{
+      const card=$('#planTestCards [data-test-index="'+index+'"]');
+      if(item.status==='COMPLETADA'&&(!itemMetrics(item).complete||general.length)){
+        item.status='BORRADOR';
+        const select=card?.querySelector('[data-meta="status"]');if(select)select.value='BORRADOR';
+      }
+      if(card)refreshFieldStyles(card,item,itemMetrics(item));
+    });
+    renderPlanFeedback();
+    renderPicker();
+  }
+
   function renderPicker(){
-    $('#planTestPicker').innerHTML=catalog.map(t=>{const on=items.some(x=>x.code===t[0]);return '<button type="button" class="plan-pick-btn '+(on?'active':'')+'" data-pick-test="'+t[0]+'"><span class="plan-pick-check">'+(on?'✓':'＋')+'</span><span><b>'+esc(t[1])+'</b><small>'+esc(t[2])+'</small></span></button>';}).join('');
-    $('#planSelectionStatus').textContent=items.length?items.length+' prueba(s) seleccionada(s). Cada una tiene su propio formulario.':'Aún no has añadido pruebas al plan.';
+    $('#planTestPicker').innerHTML=catalog.map(t=>{
+      const item=items.find(x=>x.code===t[0]),metrics=item?itemMetrics(item):null;
+      const state=metrics?metrics.state:'empty';
+      return '<button type="button" class="plan-pick-btn '+(item?'active':'')+'" data-pick-test="'+t[0]+'"><span class="plan-pick-check">'+(item?'✓':'＋')+'</span><span class="plan-pick-copy"><b>'+esc(t[1])+'</b><small>'+esc(t[2])+'</small></span>'+(item?'<span class="plan-pick-state" data-state="'+state+'">'+stateLabel(state)+'</span>':'')+'</button>';
+    }).join('');
+    $('#planSelectionStatus').textContent=items.length?items.length+' prueba(s) seleccionada(s). '+items.filter(x=>itemMetrics(x).complete).length+' lista(s) para revisar.':'Aún no has añadido pruebas al plan.';
   }
   function renderCards(){
     const host=$('#planTestCards');
     if(!items.length){host.innerHTML='<div class="empty-state">Selecciona pruebas para que aparezcan aquí sus formularios.</div>';return;}
     host.innerHTML=items.map((item,idx)=>{
-      const fieldList=columns(item.code),head='<tr>'+fieldList.map(f=>'<th>'+esc(f[1])+'</th>').join('')+'</tr>';
-      const body=item.rows.map((raw,ri)=>{const row=normalize(item.code,raw);return '<tr>'+fieldList.map(([key])=>{const calc=['absorption_index','theoretical','errU','errV','errW'].includes(key);return '<td><input class="plan-cell '+(calc?'calculated':'')+'" data-row="'+ri+'" data-col="'+key+'" value="'+esc(row[key]??'')+'" '+(calc?'readonly title="Campo calculado"':'')+'></td>';}).join('')+'</tr>';}).join('');
+      const fieldList=columns(item.code),required=requiredByTest[item.code]||[],metrics=itemMetrics(item);
+      const head='<tr>'+fieldList.map(f=>'<th>'+esc(f[1])+(required.includes(f[0])?'<i class="required-mark" title="Campo requerido">*</i>':'')+'</th>').join('')+'</tr>';
+      const body=item.rows.map((raw,ri)=>{
+        const row=normalize(item.code,raw),rowMetrics=metrics.rowStates[ri]||{any:false,state:'empty'};
+        return '<tr data-row-state="'+rowMetrics.state+'">'+fieldList.map(([key])=>{
+          const calc=['absorption_index','theoretical','errU','errV','errW'].includes(key),must=required.includes(key),value=row[key]??'';
+          const filled=isFilled(value),missing=must&&!filled&&rowMetrics.any;
+          return '<td><input class="plan-cell '+(calc?'calculated':'')+(filled?' is-filled':'')+(missing?' is-missing':'')+'" data-row="'+ri+'" data-col="'+key+'" value="'+esc(value)+'" '+(must?'data-required="1"':'')+(calc?' readonly title="Campo calculado según el protocolo"':'')+(must&&!filled?' aria-label="'+esc(fieldList.find(f=>f[0]===key)?.[1]||key)+' pendiente"':'')+'></td>';
+        }).join('')+'</tr>';
+      }).join('');
       let hint='';
       if(item.code==='POWER_FACTOR')hint='<div class="plan-reference-note"><b>LAP:</b> seis modos CH+CHL, CH, CHL, CL+CLH, CL y CLH. Criterio mostrado: FP menor a 1%. El FP corregido se registra desde el equipo.</div>';
       if(item.code==='INSULATION_RESISTANCE')hint='<div class="plan-reference-note"><b>Fórmula LAP:</b> IA = R a 1 min / R a 30 s.</div>';
       if(item.code==='TTR')hint='<div class="plan-reference-note"><b>Fórmula LAP:</b> relación teórica = AT / (BT × √3); error por fase = (medida − teórica) × 100 / medida. El ejemplo usa ±0.5%.</div>';
-      return '<article class="plan-test-card" data-test-index="'+idx+'"><div class="plan-test-card-head"><div><span class="eyebrow">ENSAYO '+String(idx+1).padStart(2,'0')+'</span><h4>'+esc(item.name)+'</h4><small>'+fieldList.length+' campos · '+item.rows.length+' fila(s)</small></div><button type="button" class="delete-btn" data-remove-test="'+idx+'">Quitar</button></div>'+
+      return '<article class="plan-test-card" data-test-index="'+idx+'" data-state="'+metrics.state+'">'+
+        '<div class="plan-test-card-head"><div class="plan-test-heading"><span class="eyebrow">ENSAYO '+String(idx+1).padStart(2,'0')+'</span><h4>'+esc(item.name)+'</h4><div class="plan-test-status-line"><span data-card-state data-state="'+metrics.state+'" class="plan-state-badge">'+stateLabel(metrics.state)+'</span><small data-card-progress>'+metrics.filled+'/'+metrics.total+' campos mínimos · '+metrics.percent+'%</small></div></div><button type="button" class="delete-btn" data-remove-test="'+idx+'">Quitar</button></div>'+
         '<div class="plan-test-meta-grid"><label>Estado<select data-meta="status"><option value="BORRADOR" '+(item.status==='BORRADOR'?'selected':'')+'>Borrador</option><option value="COMPLETADA" '+(item.status==='COMPLETADA'?'selected':'')+'>Completada</option></select></label>'+
-        '<label>Norma / referencia<input data-meta="standard_reference" value="'+esc(item.standard_reference)+'" placeholder="Norma o protocolo"></label><label>Equipo<input data-meta="equipment_name" value="'+esc(item.equipment_name)+'" placeholder="Instrumento"></label>'+
-        '<label>Marca<input data-meta="equipment_brand" value="'+esc(item.equipment_brand)+'" placeholder="Marca"></label><label>Modelo<input data-meta="equipment_model" value="'+esc(item.equipment_model)+'" placeholder="Modelo"></label><label>N.º de serie<input data-meta="equipment_serial" value="'+esc(item.equipment_serial)+'" placeholder="Serie"></label></div>'+hint+
-        '<div class="plan-table-toolbar"><div><b>Datos del protocolo</b><small>Ctrl+V permite pegar una tabla desde Excel.</small></div><button class="btn small" type="button" data-add-row="'+idx+'">＋ Agregar fila</button></div>'+
+        '<label>Norma / referencia<input data-meta="standard_reference" value="'+esc(item.standard_reference)+'" placeholder="Norma o protocolo"></label>'+
+        '<label data-meta-wrap="equipment_name">Equipo<input data-meta="equipment_name" value="'+esc(item.equipment_name)+'" placeholder="Instrumento"></label>'+
+        '<label data-meta-wrap="equipment_brand">Marca<input data-meta="equipment_brand" value="'+esc(item.equipment_brand)+'" placeholder="Marca"></label>'+
+        '<label data-meta-wrap="equipment_model">Modelo<input data-meta="equipment_model" value="'+esc(item.equipment_model)+'" placeholder="Modelo"></label>'+
+        '<label data-meta-wrap="equipment_serial">N.º de serie<input data-meta="equipment_serial" value="'+esc(item.equipment_serial)+'" placeholder="Serie"></label></div>'+hint+
+        '<div class="plan-table-toolbar"><div><b>Datos del protocolo</b><small><i class="required-mark">*</i> Campo requerido · Ctrl+V permite pegar desde Excel.</small><small class="plan-row-summary" data-row-summary></small></div><button class="btn small" type="button" data-add-row="'+idx+'">＋ Agregar fila</button></div>'+
         '<div class="measurement-sheet-wrap plan-grid-wrap"><table class="measurement-sheet plan-sheet"><thead>'+head+'</thead><tbody>'+body+'</tbody></table></div>'+
         '<label class="plan-test-observations">Observaciones del ensayo<textarea data-meta="observations" rows="2" placeholder="Resultados, incidencias y comentarios">'+esc(item.observations)+'</textarea></label></article>';
     }).join('');
+    items.forEach((item,index)=>{const card=host.querySelector('[data-test-index="'+index+'"]');if(card)refreshFieldStyles(card,item,itemMetrics(item));});
   }
-  function render(){renderPicker();renderCards();}
+  function render(){renderPicker();renderCards();renderPlanFeedback();}
   function clear(){
     items=[];editingId=null;sessionId=null;
     const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());$('#planDate').value=d.toISOString().slice(0,16);
@@ -140,6 +275,15 @@
   async function save(){
     const date=$('#planDate').value;if(!date){toast('Selecciona la fecha de la visita.',true);$('#planDate').focus();return;}
     if(!items.length){toast('Añade al menos una prueba al plan.',true);$('#planTestPicker').scrollIntoView({behavior:'smooth',block:'center'});return;}
+    const invalidCompleted=items.filter(item=>item.status==='COMPLETADA'&&!itemMetrics(item).complete);
+    if(invalidCompleted.length||(items.some(item=>item.status==='COMPLETADA')&&generalMissing().length)){
+      renderPlanFeedback();
+      toast('Hay pruebas marcadas como completadas con datos pendientes. Revisa los avisos en amarillo.',true);
+      const first=invalidCompleted[0]||items[0];
+      $('#planTestCards [data-test-index="'+items.indexOf(first)+'"]')?.scrollIntoView({behavior:'smooth',block:'center'});
+      return;
+    }
+    const pendingCount=planMetrics().missing.length;
     const tests=items.map(t=>({id:t.id,code:t.code,name:t.name,status:t.status,standard_reference:t.standard_reference,equipment_name:t.equipment_name,equipment_brand:t.equipment_brand,equipment_model:t.equipment_model,equipment_serial:t.equipment_serial,observations:t.observations,measurements:measurementsFromRows(t)}));
     const complete=items.every(t=>t.status==='COMPLETADA');
     const payload={id:editingId,transformer_key:transformer().key,test_code:'PLAN',executed_at:date,status:complete?'COMPLETADA':'BORRADOR',operator_name:$('#planOperator').value,supervisor_name:$('#planSupervisor').value,oil_temperature_c:$('#planOilTemp').value,ambient_temperature_c:$('#planAmbientTemp').value,relative_humidity_percent:$('#planHumidity').value,observations:$('#planObservations').value,measurements:[],plan:{version:1,session_id:sessionId,tests}};
@@ -148,7 +292,7 @@
       if(bridge.demo())throw new Error('Selecciona un transformador real antes de guardar.');
       if(!bridge.testsReady())throw new Error('Prepara las tablas de pruebas eléctricas antes de guardar.');
       const res=await fetch(api('action=test-save'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}),d=await json(res);
-      toast((editingId?'Plan actualizado':'Plan guardado')+' · '+tests.length+' prueba(s) · ID #'+d.result.id);
+      toast((editingId?'Plan actualizado':'Plan guardado')+' · '+tests.length+' prueba(s) · ID #'+d.result.id+(pendingCount?' · Guardado como borrador: '+pendingCount+' pendiente(s)':' · Completo'));
       bridge.showPage('testPage');
       await bridge.reloadTestHistory();
     }catch(e){toast(e.message,true);}
@@ -170,18 +314,35 @@
   });
   $('#planTestCards').addEventListener('input',e=>{
     const card=e.target.closest('[data-test-index]');if(!card)return;const item=items[Number(card.dataset.testIndex)];if(!item)return;
-    if(e.target.dataset.meta){item[e.target.dataset.meta]=e.target.value;return;}
+    if(e.target.dataset.meta){if(e.target.dataset.meta==='status')return;item[e.target.dataset.meta]=e.target.value;refreshPlanFeedback();return;}
     if(!e.target.classList.contains('plan-cell'))return;
     const row=Number(e.target.dataset.row),key=e.target.dataset.col;item.rows[row]=item.rows[row]||{};item.rows[row][key]=e.target.value;
     const nr=normalize(item.code,item.rows[row]);
     if(item.code==='INSULATION_RESISTANCE'&&['reading_30s','reading_1min'].includes(key)){item.rows[row]=nr;const out=card.querySelector('[data-row="'+row+'"][data-col="absorption_index"]');if(out)out.value=nr.absorption_index;}
     if(item.code==='TTR'&&['at','bt','U','V','W'].includes(key)){item.rows[row]=nr;['theoretical','errU','errV','errW'].forEach(k=>{const out=card.querySelector('[data-row="'+row+'"][data-col="'+k+'"]');if(out)out.value=nr[k]||'';});}
+    refreshPlanFeedback();
+  });
+  $('#planTestCards').addEventListener('change',e=>{
+    if(e.target.dataset.meta!=='status')return;
+    const card=e.target.closest('[data-test-index]');if(!card)return;
+    const item=items[Number(card.dataset.testIndex)];if(!item)return;
+    if(e.target.value==='COMPLETADA'){
+      const metrics=itemMetrics(item),general=generalMissing();
+      if(!metrics.complete||general.length){
+        item.status='BORRADOR';e.target.value='BORRADOR';
+        toast('No se puede completar todavía. '+[...general,...metrics.missing].slice(0,5).join(' · '),true);
+      }else item.status='COMPLETADA';
+    }else item.status='BORRADOR';
+    refreshPlanFeedback();
+  });
+  $('#planPage').addEventListener('input',e=>{
+    if(['planDate','planOperator'].includes(e.target.id))renderPlanFeedback();
   });
   $('#planTestCards').addEventListener('paste',e=>{
     const cell=e.target.closest('.plan-cell');if(!cell||cell.readOnly)return;
     const text=(e.clipboardData||window.clipboardData).getData('text');if(!text.includes('\t')&&!text.includes('\n'))return;
     e.preventDefault();const card=cell.closest('[data-test-index]'),item=items[Number(card.dataset.testIndex)],fields=columns(item.code),r0=Number(cell.dataset.row),c0=fields.findIndex(c=>c[0]===cell.dataset.col);
     text.replace(/\r/g,'').split('\n').filter((v,i,a)=>!(i===a.length-1&&v==='')).forEach((line,ri)=>{while(item.rows.length<=r0+ri)item.rows.push({});line.split('\t').forEach((v,ci)=>{const f=fields[c0+ci];if(f&&!['absorption_index','theoretical','errU','errV','errW'].includes(f[0]))item.rows[r0+ri][f[0]]=v.trim();});item.rows[r0+ri]=normalize(item.code,item.rows[r0+ri]);});
-    renderCards();toast('Bloque pegado desde Excel.');
+    renderCards();renderPlanFeedback();toast('Bloque pegado desde Excel.');
   });
 })();

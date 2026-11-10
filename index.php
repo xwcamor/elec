@@ -246,9 +246,13 @@ $initialConfig = $config ?: [
       <div><div class="breadcrumbs">Transformador <span>/</span> Pruebas eléctricas <span>/</span> Plan</div><h2 id="planTitle">Nuevo plan de pruebas</h2><p>Una visita puede incluir varios ensayos. Los datos compartidos se ingresan una vez y cada prueba conserva su propio equipo.</p></div>
       <div class="toolbar-actions"><button class="btn" id="cancelPlan">Cancelar</button><button class="btn primary" id="saveTestPlan"><svg><use href="#i-check"/></svg>Guardar plan</button></div>
     </div>
+    <section class="plan-progress-panel" id="planProgressPanel" data-state="warning" aria-live="polite">
+      <div class="plan-progress-main"><strong>Preparando resumen de avance…</strong></div>
+    </section>
     <section class="execution-card plan-shared-card">
       <div class="execution-card-title"><span class="eyebrow">01 · DATOS COMPARTIDOS</span><h3>Datos de la visita y condiciones ambientales</h3><p>Se ingresan una sola vez y se comparten con todos los ensayos del plan.</p></div>
       <div class="execution-date-card plan-date-inline"><div class="date-emblem"><svg><use href="#i-calendar"/></svg></div><div class="date-copy"><strong>Fecha y hora de las pruebas</strong><small>Fecha real de realización de los ensayos.</small></div><label class="execution-date-field"><span>Realizada el *</span><input id="planDate" type="datetime-local" required></label></div>
+      <div class="plan-shared-status is-pending" id="planSharedStatus" aria-live="polite">Pendiente: fecha de la visita · responsable / técnico</div>
       <div class="form-grid execution-meta-grid plan-shared-grid">
         <label>Responsable / técnico<input id="planOperator" placeholder="Nombre del técnico"></label>
         <label>Supervisor<input id="planSupervisor" placeholder="Nombre del supervisor"></label>
@@ -385,5 +389,5 @@ window.PILOT = <?=json_encode([
 </div>
 
 <script src="./assets/app.js?v=1.5.13"></script>
-<script src="./assets/plan.js?v=1.5.14"></script>
+<script src="./assets/plan.js?v=1.5.15"></script>
 </body></html>

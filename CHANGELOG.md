@@ -1,3 +1,13 @@
+## v1.5.15
+- Añade panel de avance general con porcentaje y lista dinámica de pendientes.
+- Distingue estados por ensayo: sin datos, en curso, lista para revisar y completada.
+- Colorea en verde los campos registrados, en ámbar los campos obligatorios pendientes y en gris los cálculos automáticos.
+- Muestra el progreso de cada formulario y el estado de sus filas.
+- Revisa campos mínimos por tipo de prueba y datos del instrumento (equipo, marca, modelo y serie).
+- Evita marcar una prueba como completada cuando faltan campos mínimos o datos generales obligatorios.
+- Al guardar un plan incompleto, informa que queda como borrador y cuántos pendientes conserva.
+- Actualiza el estado en vivo al escribir, cambiar estados o pegar bloques desde Excel.
+
 ## v1.5.14
 - Corrige la precarga de Protecciones propias según la hoja LAP: 18 verificaciones con accesorios, bornes, contactos, condición y ajustes de temperatura/nivel que aparecen en el Excel.
 - Actualiza la caché del formulario de planes.

@@ -229,3 +229,38 @@
 @media(max-width:1000px){.plan-test-picker{grid-template-columns:repeat(2,minmax(0,1fr))}.plan-test-meta-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){.plan-date-inline{flex-wrap:wrap}.plan-date-inline .date-copy{min-width:calc(100% - 60px)}.plan-date-inline .execution-date-field{flex-basis:100%;margin-left:0}.plan-test-picker{grid-template-columns:1fr}.plan-test-meta-grid{grid-template-columns:1fr 1fr;padding:10px}.plan-test-card-head{padding:11px}.plan-grid-wrap{margin-left:8px;margin-right:8px;max-width:calc(100% - 16px)}.plan-table-toolbar{padding-left:8px;padding-right:8px}}
 @media(max-width:430px){.plan-test-meta-grid{grid-template-columns:1fr}.plan-shared-grid{grid-template-columns:1fr}}
+
+
+/* v1.5.15 · Estado visible, avance y avisos en vivo de planes LAP */
+.plan-progress-panel{margin:0 0 14px;border:1px solid #ead7aa;border-left:4px solid #d99a25;background:#fffaf0;border-radius:9px;padding:13px 15px;color:#34485c}
+.plan-progress-panel[data-state="success"]{border-color:#b8ddc1;border-left-color:#2e9b58;background:#f2faf4}
+.plan-progress-panel[data-state="info"]{border-color:#bfd8ed;border-left-color:#3985c8;background:#f3f8fd}
+.plan-progress-main{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.plan-progress-copy{min-width:0;flex:1}.plan-progress-heading{display:flex;align-items:center;gap:10px}
+.plan-alert-icon{display:grid;place-items:center;width:27px;height:27px;flex:0 0 27px;border-radius:50%;background:#f8e8c5;color:#956313;font-weight:800;font-size:13px}
+.plan-progress-panel[data-state="success"] .plan-alert-icon{background:#d9f0df;color:#247742}.plan-progress-panel[data-state="info"] .plan-alert-icon{background:#deedf9;color:#28689e}
+.plan-progress-heading strong{display:block;font-size:13px;line-height:1.3;color:#263b50}.plan-progress-heading small{display:block;margin-top:3px;font-size:10px;color:#687b8f;line-height:1.4}
+.plan-progress-track{height:7px;border-radius:9px;overflow:hidden;background:#eee5d2;margin-top:10px}.plan-progress-panel[data-state="success"] .plan-progress-track{background:#dceee1}.plan-progress-panel[data-state="info"] .plan-progress-track{background:#dce9f4}
+.plan-progress-track span{display:block;height:100%;border-radius:9px;background:#d49a2f;transition:width .2s ease}.plan-progress-panel[data-state="success"] .plan-progress-track span{background:#319b59}.plan-progress-panel[data-state="info"] .plan-progress-track span{background:#3985c8}
+.plan-progress-number{display:block;margin-top:5px;color:#7a8793;font-size:9px}
+.plan-progress-side{display:flex;flex-direction:column;align-items:flex-end;min-width:54px}.plan-progress-side b{font-size:23px;line-height:1;color:#936819}.plan-progress-panel[data-state="success"] .plan-progress-side b{color:#277848}.plan-progress-panel[data-state="info"] .plan-progress-side b{color:#28689e}
+.plan-progress-side span{font-size:9px;color:#77889a;margin-top:3px}
+.plan-alert-details{margin-top:11px;padding-top:9px;border-top:1px solid rgba(155,116,45,.17)}.plan-alert-details>b{font-size:10px;color:#855f1d}
+.plan-alert-details ul{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 20px;margin:7px 0 0;padding-left:17px}.plan-alert-details li{font-size:10px;color:#6e5a37;line-height:1.4}
+.plan-alert-details small{display:block;margin-top:5px;font-size:9px;color:#8b744e}.plan-alert-clear{margin-top:9px;padding-top:8px;border-top:1px solid #cde6d3;color:#2e7e4a;font-size:10px;font-weight:700}
+.plan-color-legend{display:flex;flex-wrap:wrap;gap:13px;margin-top:10px;padding-top:8px;border-top:1px solid rgba(100,120,140,.13)}
+.plan-color-legend span{display:inline-flex;align-items:center;gap:5px;font-size:9px;color:#738194}.plan-color-legend i{width:9px;height:9px;border-radius:3px;display:inline-block}
+.legend-filled{background:#b8e2c5}.legend-missing{background:#f1d49a}.legend-calculated{background:#dce3ea}
+.plan-shared-status{margin:0 0 10px;padding:8px 10px;border-radius:6px;font-size:10px;font-weight:700;background:#fff5df;color:#956719;border:1px solid #f0dfbb}.plan-shared-status.is-complete{background:#eff9f1;color:#2e824b;border-color:#cfe8d5}
+.plan-test-card{transition:border-color .16s,box-shadow .16s}.plan-test-card[data-state="complete"]{border-color:#a8d5b5;box-shadow:0 0 0 1px rgba(46,155,88,.06)}.plan-test-card[data-state="ready"]{border-color:#b7d3e8}.plan-test-card[data-state="partial"]{border-color:#e8d3a7}
+.plan-test-heading{min-width:0}.plan-test-status-line{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:7px}.plan-test-status-line small{font-size:9px;color:#738397}
+.plan-state-badge,.plan-pick-state{display:inline-flex;align-items:center;justify-content:center;border-radius:30px;padding:4px 8px;font-size:8px;font-weight:800;letter-spacing:.035em;white-space:nowrap;background:#eef1f4;color:#69798a}
+.plan-state-badge[data-state="partial"],.plan-pick-state[data-state="partial"]{background:#fff0d1;color:#966513}.plan-state-badge[data-state="ready"],.plan-pick-state[data-state="ready"]{background:#e6f1fb;color:#286b9f}.plan-state-badge[data-state="complete"],.plan-pick-state[data-state="complete"]{background:#e4f4e8;color:#287847}
+.plan-pick-btn{position:relative;justify-content:flex-start;min-height:62px}.plan-pick-copy{min-width:0;flex:1}.plan-pick-state{font-size:7px;padding:4px 6px;max-width:108px;white-space:normal;text-align:center}
+.required-mark{color:#c17b16;font-style:normal;font-weight:900;margin-left:3px}
+.plan-cell.is-filled{background:#edf8ef!important;color:#235d38}.plan-cell.is-missing{background:#fff3dc!important;box-shadow:inset 0 0 0 1px #e9c77d!important}.plan-cell.calculated{background:#edf1f5!important;color:#52687e}
+.plan-sheet tr[data-row-state="complete"] td{background:#f2faf4}.plan-sheet tr[data-row-state="partial"] td{background:#fffaf0}.plan-sheet tr[data-row-state="complete"] .plan-cell.is-filled{background:#e3f4e7!important}.plan-sheet tr[data-row-state="partial"] .plan-cell.is-missing{background:#fff0d0!important}
+.plan-test-meta-grid label.meta-complete{color:#327b4d}.plan-test-meta-grid label.meta-pending{color:#996d20}
+.plan-test-meta-grid input.is-filled{border-color:#b5d9bd;background:#f3faf4;color:#245d38}.plan-test-meta-grid input.is-missing{border-color:#e7c983;background:#fff9ec}
+.plan-test-meta-grid select{font-weight:650}.plan-row-summary{display:block;color:#75869a}
+@media(max-width:720px){.plan-progress-main{align-items:flex-start}.plan-alert-details ul{grid-template-columns:1fr}.plan-progress-side{min-width:42px}.plan-progress-side b{font-size:20px}.plan-color-legend{gap:8px}}
