@@ -1,20 +1,29 @@
 # ELEC — Mini demo de pruebas eléctricas
 
-Proyecto independiente para registrar pruebas eléctricas. **No forma parte de TR Health y no comparte código ni base de datos con ese proyecto.**
+Aplicación web independiente para registrar equipos, definir tipos de pruebas, guardar ejecuciones y capturar mediciones manuales. No forma parte de TR Health ni comparte código o base de datos con ese proyecto.
 
-## Entorno
-- PHP 8.3.26
+## Requisitos
+- PHP 8.3.26 o compatible
 - MySQL / MariaDB
-- Laragon (Windows)
-- HTML, CSS y JavaScript
+- Laragon
 
-## Instalación local
-1. Clonar en `C:\laragon\www\elec`.
+## Instalación
+1. Clonar el repositorio en `C:\laragon\www\elec`.
 2. Iniciar Apache y MySQL desde Laragon.
-3. Crear una base de datos llamada `elec_demo`.
-4. Importar `database/schema.sql` desde HeidiSQL o phpMyAdmin.
-5. Configurar las credenciales en `config/database.php`.
-6. Abrir `http://elec.test` o `http://localhost/elec`.
+3. Importar `database/schema.sql` en phpMyAdmin o HeidiSQL.
+4. Revisar credenciales en `config/database.php` (por defecto: host 127.0.0.1, base elec_demo, usuario root, contraseña vacía).
+5. Abrir `http://elec.test` o `http://localhost/elec`.
+
+## Funcionalidades implementadas
+- Panel resumen con conteo y actividad reciente.
+- Registro y listado de transformadores.
+- Catálogo editable de tipos de prueba.
+- Registro de ejecuciones con fecha, equipo, prueba, operador, estado, temperatura, humedad y observaciones.
+- Filas dinámicas para capturar parámetros, fase, valor y unidad.
+- Historial de ejecuciones conservado como registros separados.
+
+## Alcance técnico
+Las mediciones numéricas se almacenan como valores numéricos; las no numéricas se conservan como texto. No se calculan relaciones, tolerancias ni veredictos automáticos. Esas reglas deben definirse con los protocolos técnicos propios del demo.
 
 ## Estructura
 ```
@@ -26,14 +35,3 @@ elec/
 ├── index.php
 └── README.md
 ```
-
-## Modelo de datos inicial
-- `elec_transformers`: equipos registrados.
-- `elec_test_types`: catálogo configurable de pruebas.
-- `elec_test_executions`: ejecuciones individuales e historial.
-- `elec_test_measurements`: lecturas vinculadas a cada ejecución.
-
-Las mediciones admiten parámetros, fases, tomas y unidades diferentes. No se imponen fórmulas ni límites de aceptación: se definirán únicamente con los protocolos técnicos que se acuerden.
-
-## Estado
-Base inicial del mini demo. Las pantallas y operaciones de registro/consulta se desarrollarán sobre este esquema.
