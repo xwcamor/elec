@@ -699,3 +699,61 @@ body.test-form-focus .plan-tests-section{scroll-margin-top:84px}
  .topbar-create-transformer{padding:0 7px}
  .topbar-create-transformer span{display:none}
 }
+
+/* v1.5.32 · Wizard LAP y grillas compactas */
+.plan-stepper{grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr) 18px minmax(0,1fr) 18px minmax(0,1fr)}
+.plan-step.active{border-color:#b8d4ec;background:#f2f8fd}
+.plan-step-panel[hidden],.plan-test-card[hidden]{display:none!important}
+.plan-step-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:13px 0 4px;padding:10px 12px;border:1px solid #dfe6eb;border-radius:8px;background:#fff}
+.plan-step-actions span{font-size:10px;color:#75869a}
+.plan-test-nav{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 11px}
+.plan-test-tab{display:flex;align-items:center;gap:7px;min-width:0;padding:7px 10px;border:1px solid #dfe5eb;border-radius:6px;background:#fff;color:#53677c;cursor:pointer}
+.plan-test-tab>span{font-size:9px;font-weight:800;color:#7a8b9b}
+.plan-test-tab>b{font-size:10px;font-weight:700;white-space:nowrap}
+.plan-test-tab>small{font-size:8px;color:#8391a0}
+.plan-test-tab.active{border-color:#8fb9df;background:#f0f7fd;color:#264e73}
+.plan-test-tab.active>span{color:#1d6fb2}
+.plan-core-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.plan-core-grid label{display:flex;flex-direction:column;gap:5px;font-size:10px;color:#526579;font-weight:650}
+.plan-core-grid input{height:33px;min-width:0;border:1px solid #dbe2e9;border-radius:5px;padding:0 9px;font:inherit;font-size:11px;color:#24394e}
+.plan-test-meta-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:10px 12px}
+.plan-test-meta-grid input,.plan-test-meta-grid select{height:30px;padding:0 7px;font-size:10px}
+.plan-sheet{min-width:980px}
+.plan-sheet th{min-width:88px;padding:6px;font-size:9px}
+.plan-sheet td{min-width:88px;height:31px}
+.plan-cell{min-width:82px;height:29px;padding:0 6px!important;font-size:10px}
+.plan-grid-wrap{margin:0 10px 10px;max-width:calc(100% - 20px)}
+.plan-table-toolbar{padding:10px 10px 7px}
+.plan-review-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-bottom:12px}
+.plan-review-metrics>div{display:flex;flex-direction:column;gap:3px;padding:12px;border:1px solid #e1e7ed;border-radius:7px;background:#fafbfd}
+.plan-review-metrics b{font-size:20px;line-height:1.1;color:#263e55}
+.plan-review-metrics span{font-size:9px;color:#78889a}
+.plan-review-list{list-style:none;padding:0;margin:0;border:1px solid #e1e7ed;border-radius:7px;overflow:hidden}
+.plan-review-list li{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #edf0f3}
+.plan-review-list li:last-child{border-bottom:0}
+.plan-review-index{font-size:10px;font-weight:800;color:#7a8c9e}
+.plan-review-list li div{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.plan-review-list li b{font-size:11px;color:#30475f}
+.plan-review-list li small{font-size:9px;color:#8291a0}
+.plan-review-list li strong{font-size:9px;color:#6b7d90}
+.plan-review-list li strong[data-state="complete"]{color:#287847}
+.plan-review-list li strong[data-state="partial"]{color:#966513}
+.plan-review-note{margin:11px 0 0;font-size:10px;color:#60758a;line-height:1.5}
+.plan-review-pending{margin-top:11px;padding:10px 12px;border:1px solid #eadbb8;border-radius:6px;background:#fffaf0;color:#7d642f;font-size:10px}
+.plan-review-pending summary{cursor:pointer;font-weight:700}
+.plan-review-pending ul{margin:8px 0 0;padding-left:18px}
+.plan-review-pending li{margin:3px 0}
+@media(max-width:1000px){.plan-test-meta-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){
+ .plan-stepper{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:5px}
+ .plan-step{min-height:45px;gap:5px;padding:5px 3px;flex-direction:column;align-items:center;text-align:center}
+ .plan-step-number{width:24px;height:24px;flex-basis:24px}
+ .plan-step-copy{width:100%}.plan-step-copy b{font-size:8px}.plan-step-copy small{display:none}
+ .plan-step-connector{display:none}
+ .plan-step-actions{position:sticky;bottom:6px;z-index:5;box-shadow:0 3px 14px rgba(23,42,61,.1)}
+ .plan-step-actions span{font-size:8px}
+ .plan-core-grid{grid-template-columns:1fr 1fr}
+ .plan-test-tab{flex:1 1 calc(50% - 7px)}
+ .plan-review-metrics{gap:5px}.plan-review-metrics>div{padding:9px}
+}
+@media(max-width:430px){.plan-core-grid{grid-template-columns:1fr}.plan-test-tab{flex-basis:100%}}
