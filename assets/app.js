@@ -454,9 +454,15 @@
   function typeName(code){return (testCatalog.find(x=>x[0]===code)||[])[1]||code||'Prueba';}
   function formatExecutionDate(value){if(!value)return '—';const d=new Date(String(value).replace(' ','T'));return Number.isNaN(d.getTime())?value:d.toLocaleString('es-PE',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});}
   function testStats(){
-    const total=testExecutions.length, completed=testExecutions.filter(x=>x.status==='COMPLETADA').length;
+    const visits=testExecutions.length;
+    const included=testExecutions.reduce((n,x)=>n+(x.plan_tests?.length||(x.test_code==='PLAN'?0:1)),0);
+    const types=new Set(testExecutions.flatMap(x=>(x.plan_tests||[]).map(t=>t.code).concat(x.test_code==='PLAN'?[]:[x.test_code])));
     const last=testExecutions[0]?.executed_at;
-    $('#testStats').innerHTML=`<div class="test-stat"><small>Ejecuciones registradas</small><strong>${total}</strong><span>Historial de este transformador</span></div><div class="test-stat"><small>Completadas</small><strong>${completed}</strong><span>Con estado completado</span></div><div class="test-stat"><small>Tipos con registros</small><strong>${new Set(testExecutions.flatMap(x=>(x.plan_tests||[]).map(t=>t.code).concat(x.test_code==='PLAN'?[]:[x.test_code]))).size}</strong><span>De ${testCatalog.length} pruebas disponibles</span></div><div class="test-stat"><small>Última ejecución</small><strong class="test-stat-date">${last?esc(formatExecutionDate(last)):'Sin registros'}</strong><span>Fecha de realización</span></div>`;
+    $('#testStats').innerHTML=
+      '<div class="test-stat"><small>Visitas registradas</small><strong>'+visits+'</strong><span>Planes de ensayos guardados</span></div>'+
+      '<div class="test-stat"><small>Ensayos incluidos</small><strong>'+included+'</strong><span>Pruebas en todas las visitas</span></div>'+
+      '<div class="test-stat"><small>Tipos utilizados</small><strong>'+types.size+'</strong><span>De '+testCatalog.length+' disponibles</span></div>'+
+      '<div class="test-stat"><small>Última visita</small><strong class="test-stat-date">'+(last?esc(formatExecutionDate(last)):'Sin registros')+'</strong><span>Fecha de realización</span></div>';
   }
   function renderTestTypes(){
     $('#testTypeGrid').innerHTML=testCatalog.map(t=>{
@@ -488,11 +494,33 @@
     const total=[...types.values()].reduce((a,b)=>a+b,0);
     list.innerHTML=total?[...types.entries()].sort((a,b)=>b[1]-a[1]).map(([name,count])=>`<div class="type-analytics-row"><div><span>${esc(name)}</span><b>${count}</b></div><div class="type-analytics-track"><i style="width:${Math.round(count/total*100)}%"></i></div></div>`).join(''):'<div class="analytics-empty">Todavía no hay pruebas registradas.</div>';
   }
+  function setTestWorkspaceView(view){
+    const history=view==='history';
+    $('#testHistoryPanel')?.classList.toggle('hidden',!history);
+    $('#testAnalyticsPanel')?.classList.toggle('hidden',history);
+    $$('[data-test-view]').forEach(button=>{
+      const active=button.dataset.testView===view;
+      button.classList.toggle('active',active);
+      button.setAttribute('aria-selected',active?'true':'false');
+    });
+    if(!history)renderHistoricalAnalytics();
+  }
+  $$('[data-test-view]').forEach(button=>button.addEventListener('click',()=>setTestWorkspaceView(button.dataset.testView)));
+
   function renderTestHistory(){
-    testStats();renderTestTypes();renderHistoricalAnalytics();
+    testStats();renderTestTypes();
+    if(!$('#testAnalyticsPanel')?.classList.contains('hidden'))renderHistoricalAnalytics();
     const q=($('#testHistoryFilter')?.value||'').trim().toLocaleLowerCase();
-    const filtered=testExecutions.filter(x=>((x.plan_tests||[]).map(t=>t.name||typeName(t.code)).join(' ')||(x.test_name||typeName(x.test_code))).toLocaleLowerCase().includes(q)||(x.operator_name||'').toLocaleLowerCase().includes(q));
-    $('#testHistoryBody').innerHTML=filtered.length?filtered.map(x=>`<tr><td><b>${esc(formatExecutionDate(x.executed_at))}</b><small>ID #${esc(x.id)}</small></td><td>${esc(x.plan_tests?.length?x.plan_tests.map(t=>t.name||typeName(t.code)).join(' · '):(x.test_name||typeName(x.test_code)))}</td><td>${esc(x.operator_name||'—')}</td><td>${x.plan_tests?.length?x.plan_tests.length+' prueba(s)':Number(x.measurement_count||0)+' fila(s)'}</td><td><span class="execution-status ${x.status==='COMPLETADA'?'done':'draft'}">${x.status==='COMPLETADA'?'Completada':'Borrador'}</span></td><td><button class="btn small" data-open-execution="${x.id}" title="Editar esta ejecución">Editar</button></td></tr>`).join(''):'<tr><td colspan="6" class="test-empty">'+(testExecutions.length?'No hay registros que coincidan con el filtro.':'Aún no hay registros. Selecciona una prueba para registrar la primera ejecución.')+'</td></tr>';
+    const filtered=testExecutions.filter(x=>{
+      const names=(x.plan_tests||[]).map(t=>t.name||typeName(t.code)).join(' ')||(x.test_name||typeName(x.test_code));
+      return names.toLocaleLowerCase().includes(q)||(x.operator_name||'').toLocaleLowerCase().includes(q);
+    });
+    $('#testHistoryBody').innerHTML=filtered.length?filtered.map(x=>{
+      const names=x.plan_tests?.length?x.plan_tests.map(t=>t.name||typeName(t.code)):[x.test_name||typeName(x.test_code)];
+      const measurementCount=Number(x.measurement_count||0);
+      const detail=x.plan_tests?.length?names.length+' ensayos · '+measurementCount+' valores':measurementCount+' valores';
+      return '<tr><td><b>'+esc(formatExecutionDate(x.executed_at))+'</b><small>Visita #'+esc(x.id)+'</small></td><td><b>'+esc(names.join(' · '))+'</b></td><td>'+esc(x.operator_name||'—')+'</td><td>'+esc(detail)+'</td><td><button class="btn small" data-open-execution="'+x.id+'" title="Continuar completando esta visita">Abrir plan</button></td></tr>';
+    }).join(''):'<tr><td colspan="5" class="test-empty">'+(testExecutions.length?'No hay registros que coincidan con el filtro.':'Aún no hay visitas registradas. Selecciona un tipo de prueba para comenzar.')+'</td></tr>';
     $$('[data-open-execution]').forEach(b=>b.addEventListener('click',()=>openExistingExecution(Number(b.dataset.openExecution))));
   }
   $('#testHistoryFilter').addEventListener('input',renderTestHistory);

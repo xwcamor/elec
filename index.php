@@ -54,7 +54,7 @@ $initialConfig = $config ?: [
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.17">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.18">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -164,25 +164,35 @@ $initialConfig = $config ?: [
 
   <section class="test-page hidden" id="testPage">
     <div class="config-toolbar">
-      <div><div class="breadcrumbs">Transformador <span>/</span> Pruebas eléctricas</div><h2>Pruebas eléctricas</h2><p>Historial de ejecuciones. Cada registro corresponde a una prueba realizada en una fecha y hora determinadas.</p></div>
+      <div><div class="breadcrumbs">Transformador <span>/</span> Pruebas eléctricas</div><h2>Pruebas eléctricas</h2><p>Registra los ensayos de este transformador y consulta sus resultados históricos.</p></div>
       <div class="toolbar-actions"><button class="btn" id="backFromTests">Volver a detalles</button><button class="btn primary" id="newTestExecution"><svg><use href="#i-plus"/></svg>Nueva ejecución</button></div>
     </div>
-    <div class="test-info-banner"><svg><use href="#i-info"/></svg><div><b>Un registro por ejecución, no por transformador.</b><span>Selecciona la fecha real en que se efectuó la prueba. Puedes registrar varias ejecuciones del mismo tipo en fechas distintas; ninguna sobrescribe las anteriores.</span></div></div>
+    <div class="test-info-banner"><svg><use href="#i-info"/></svg><div><b>Un plan por visita, varios ensayos.</b><span>Ingresa los datos generales una sola vez, selecciona las pruebas realizadas y completa el formulario específico de cada ensayo. Los avances se guardan automáticamente.</span></div></div>
     <div class="test-stats" id="testStats"></div>
-    <div class="test-type-grid" id="testTypeGrid"></div>
-    <section class="analytics-card" aria-label="Resumen histórico">
-      <div class="analytics-heading"><div><span class="eyebrow">ANÁLISIS HISTÓRICO</span><h3>Evolución de las pruebas</h3><p>Resumen calculado a partir de las ejecuciones registradas para este transformador.</p></div><span class="analytics-period" id="analyticsPeriod">—</span></div>
-      <div class="analytics-grid">
-        <div class="analytics-chart-panel"><b>Ejecuciones por mes</b><div id="monthlyExecutionChart" class="analytics-chart"></div></div>
-        <div class="analytics-chart-panel"><b>Distribución por tipo de prueba</b><div id="testTypeAnalytics" class="type-analytics"></div></div>
-      </div>
-      <div class="analytics-footnote">Los gráficos cuentan ejecuciones; no mezclan magnitudes físicas diferentes ni sustituyen la evaluación técnica de cada protocolo.</div>
+    <section class="test-launch-section">
+      <div class="test-section-heading"><div><span class="eyebrow">NUEVO REGISTRO</span><h3>Selecciona el tipo de prueba</h3><p>También puedes añadir más de un ensayo dentro de una misma visita.</p></div></div>
+      <div class="test-type-grid" id="testTypeGrid"></div>
     </section>
-
-    <div class="test-history-card">
-      <div class="test-history-head"><div><h3>Historial de pruebas</h3><p>Ordenado desde la ejecución más reciente.</p></div><div class="test-filter"><svg><use href="#i-search"/></svg><input id="testHistoryFilter" placeholder="Filtrar por prueba..."></div></div>
-      <div class="test-table-wrap"><table class="test-history-table"><thead><tr><th>Fecha de ejecución</th><th>Prueba</th><th>Responsable</th><th>Mediciones</th><th>Estado</th><th></th></tr></thead><tbody id="testHistoryBody"><tr><td colspan="6" class="test-empty">Aún no hay registros. Usa “Nueva ejecución” para registrar la primera prueba.</td></tr></tbody></table></div>
+    <div class="test-view-switcher" role="tablist" aria-label="Vistas de seguimiento de pruebas">
+      <button class="test-view-tab active" type="button" id="showTestHistory" data-test-view="history" role="tab" aria-selected="true" aria-controls="testHistoryPanel"><svg><use href="#i-list"/></svg>Historial de ejecuciones</button>
+      <button class="test-view-tab" type="button" id="showTestAnalytics" data-test-view="analytics" role="tab" aria-selected="false" aria-controls="testAnalyticsPanel"><svg><use href="#i-chart"/></svg>Evolución de las pruebas</button>
     </div>
+    <section id="testHistoryPanel" class="test-view-panel" role="tabpanel" aria-labelledby="showTestHistory">
+      <div class="test-history-card">
+        <div class="test-history-head"><div><span class="eyebrow">REGISTROS GUARDADOS</span><h3>Historial de ejecuciones</h3><p>Una fila por visita. Abre un registro para continuar completando sus datos.</p></div><div class="test-filter"><svg><use href="#i-search"/></svg><input id="testHistoryFilter" placeholder="Filtrar por prueba o responsable..."></div></div>
+        <div class="test-table-wrap"><table class="test-history-table"><thead><tr><th>Fecha de visita</th><th>Pruebas incluidas</th><th>Responsable</th><th>Datos registrados</th><th>Acción</th></tr></thead><tbody id="testHistoryBody"><tr><td colspan="5" class="test-empty">Aún no hay registros. Selecciona una prueba para crear tu primer plan.</td></tr></tbody></table></div>
+      </div>
+    </section>
+    <section id="testAnalyticsPanel" class="test-view-panel hidden" role="tabpanel" aria-labelledby="showTestAnalytics">
+      <section class="analytics-card" aria-label="Evolución histórica">
+        <div class="analytics-heading"><div><span class="eyebrow">ANÁLISIS HISTÓRICO</span><h3>Evolución de las pruebas</h3><p>Consulta la frecuencia de las visitas registradas y qué tipos de ensayo se utilizan más.</p></div><span class="analytics-period" id="analyticsPeriod">—</span></div>
+        <div class="analytics-grid">
+          <div class="analytics-chart-panel"><b>Visitas registradas por mes</b><div id="monthlyExecutionChart" class="analytics-chart"></div></div>
+          <div class="analytics-chart-panel"><b>Distribución por tipo de prueba</b><div id="testTypeAnalytics" class="type-analytics"></div></div>
+        </div>
+        <div class="analytics-footnote">La vista es estadística: no combina valores eléctricos distintos ni reemplaza la evaluación del protocolo de cada ensayo.</div>
+      </section>
+    </section>
   </section>
 
   <section class="execution-page hidden" id="executionPage">
@@ -244,7 +254,7 @@ $initialConfig = $config ?: [
   <section class="execution-page hidden" id="planPage">
     <div class="config-toolbar">
       <div><div class="breadcrumbs">Transformador <span>/</span> Pruebas eléctricas <span>/</span> Plan</div><h2 id="planTitle">Nuevo plan de pruebas</h2><p>Una visita puede incluir varios ensayos. Los datos compartidos se ingresan una vez y cada prueba conserva su propio equipo.</p></div>
-      <div class="toolbar-actions"><button class="btn" id="cancelPlan">Cancelar</button><button class="btn primary" id="saveTestPlan"><svg><use href="#i-check"/></svg>Guardar plan</button></div>
+      <div class="plan-toolbar-actions"><span id="planSaveStatus" class="plan-save-status" data-state="idle" aria-live="polite"><i></i><span>Se guardará automáticamente al modificar datos</span></span><div class="toolbar-actions"><button class="btn" id="cancelPlan">Volver al historial</button><button class="btn primary" id="saveTestPlan"><svg><use href="#i-check"/></svg>Guardar ahora</button></div></div>
     </div>
     <section class="plan-progress-panel" id="planProgressPanel" data-state="warning" aria-live="polite">
       <div class="plan-progress-main"><strong>Preparando resumen de avance…</strong></div>
@@ -388,6 +398,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.13"></script>
-<script src="./assets/plan.js?v=1.5.17"></script>
+<script src="./assets/app.js?v=1.5.18"></script>
+<script src="./assets/plan.js?v=1.5.18"></script>
 </body></html>
