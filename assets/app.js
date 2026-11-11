@@ -11,15 +11,15 @@
   var activeExecutionMode = 'new';
   var activeSpecificCode = '';
   const specificTemplates={
-    WINDING_RESISTANCE:{title:'Resistencia de devanados',hint:'Una fila por toma y fase. Incluye corriente, tensión y tiempo DC, resistencia medida, desviación y resistencia referida a 75 °C, como en LAP.',prefix:'WR',cols:[['winding','Bobinado (AT/BT)'],['tap','Tap'],['terminal_pair','Bornes / conexión'],['phase','Fase'],['current','I DC (A)'],['dc_voltage_v','V DC (V)'],['time_s','Tiempo (s)'],['resistance','R medida (Ω)'],['resistance_deviation_percent','Desviación R (%)'],['resistance_referred_75c','R referida 75 °C (Ω)'],['fluctuation_percent','Fluctuación (%)'],['slope_a_s','Pendiente (A/s)'],['temperature','Temperatura (°C)'],['unit','Unidad'],['notes','Observación']]},
-    INSULATION_RESISTANCE:{title:'Resistencia de aislamiento',hint:'Registra las tres configuraciones LAP y las lecturas a 15 s, 30 s, 45 s y 1 min. El índice de absorción se calcula como R(1 min) / R(30 s).',prefix:'IR',cols:[['point','Punto de aplicación'],['applied_voltage_kv','Voltaje aplicado (kV)'],['reading_15s','Resistencia a 15 s'],['reading_30s','Resistencia a 30 s'],['reading_45s','Resistencia a 45 s'],['reading_1min','Resistencia a 1 min'],['absorption_index','Índice de absorción'],['reading_unit','Unidad de lectura'],['notes','Observación']]},
+    WINDING_RESISTANCE:{title:'Resistencia de devanados',hint:'Una fila por toma y fase. Incluye corriente, tensión y tiempo DC, resistencia medida, desviación y resistencia referida a 75 °C, como en la hoja de referencia.',prefix:'WR',cols:[['winding','Bobinado (AT/BT)'],['tap','Tap'],['terminal_pair','Bornes / conexión'],['phase','Fase'],['current','I DC (A)'],['dc_voltage_v','V DC (V)'],['time_s','Tiempo (s)'],['resistance','R medida (Ω)'],['resistance_deviation_percent','Desviación R (%)'],['resistance_referred_75c','R referida 75 °C (Ω)'],['fluctuation_percent','Fluctuación (%)'],['slope_a_s','Pendiente (A/s)'],['temperature','Temperatura (°C)'],['unit','Unidad'],['notes','Observación']]},
+    INSULATION_RESISTANCE:{title:'Resistencia de aislamiento',hint:'Registra las tres configuraciones de ensayo y las lecturas a 15 s, 30 s, 45 s y 1 min. El índice de absorción se calcula como R(1 min) / R(30 s).',prefix:'IR',cols:[['point','Punto de aplicación'],['applied_voltage_kv','Voltaje aplicado (kV)'],['reading_15s','Resistencia a 15 s'],['reading_30s','Resistencia a 30 s'],['reading_45s','Resistencia a 45 s'],['reading_1min','Resistencia a 1 min'],['absorption_index','Índice de absorción'],['reading_unit','Unidad de lectura'],['notes','Observación']]},
     CAPACITANCE:{title:'Capacitancia',hint:'Registra punto de prueba, configuración y capacitancia medida.',prefix:'CAP',cols:[['point','Punto / borne'],['connection','Conexión de prueba'],['test_voltage','Tensión de prueba'],['capacitance','Capacitancia'],['unit','Unidad'],['frequency','Frecuencia'],['temperature','Temperatura °C'],['notes','Observación']]},
-    POWER_FACTOR:{title:'Factor de potencia del transformador',hint:'Campos LAP: bloque, modo de prueba, tensión y frecuencia, tensión/corriente de salida, pérdidas, FP medido, FP corregido a 20 °C y capacitancia.',prefix:'PF',cols:[['block','Bloque / sección'],['measurement','Medición (CH+CHL, CH, CHL, CL+CLH...)'],['test_mode','Modo (GST, GSTg-A, UST-A)'],['sweep','Barrido'],['test_voltage_v','Tensión de prueba (V)'],['frequency_hz','Frecuencia (Hz)'],['output_voltage_v','V de salida (V)'],['output_current_a','I de salida (A)'],['power_loss_w','Pérdidas (W)'],['power_factor_measured','FP medido'],['power_factor_corrected_20c','FP corregido a 20 °C'],['capacitance_nf','Capacitancia (nF)'],['global_correction_enabled','Usar factor global de corrección'],['global_correction_factor','Factor de corrección'],['evaluation','Evaluación'],['notes','Observación']]},
-    EXCITATION:{title:'Corriente de excitación',hint:'Una fila por tap y fase. LAP registra tensión de salida, corriente, ángulo de fase, pérdidas y reactancia; la hoja de protocolo resume corriente de excitación y pérdidas.',prefix:'EXC',cols:[['tap','Tap'],['phase','Fase (U-0 / V-0 / W-0)'],['test_voltage_kv','Tensión aplicada (kV)'],['frequency_hz','Frecuencia (Hz)'],['voltage','V de salida (V)'],['current','I de salida (A)'],['current_phase_degrees','Ángulo de corriente (°)'],['power','Pérdidas (W)'],['reactance_ohm','Reactancia (Ω)'],['unit','Unidad / referencia'],['notes','Observación']]},
+    POWER_FACTOR:{title:'Factor de potencia del transformador',hint:'Campos de la plantilla: bloque, modo de prueba, tensión y frecuencia, tensión/corriente de salida, pérdidas, FP medido, FP corregido a 20 °C y capacitancia.',prefix:'PF',cols:[['block','Bloque / sección'],['measurement','Medición (CH+CHL, CH, CHL, CL+CLH...)'],['test_mode','Modo (GST, GSTg-A, UST-A)'],['sweep','Barrido'],['test_voltage_v','Tensión de prueba (V)'],['frequency_hz','Frecuencia (Hz)'],['output_voltage_v','V de salida (V)'],['output_current_a','I de salida (A)'],['power_loss_w','Pérdidas (W)'],['power_factor_measured','FP medido'],['power_factor_corrected_20c','FP corregido a 20 °C'],['capacitance_nf','Capacitancia (nF)'],['global_correction_enabled','Usar factor global de corrección'],['global_correction_factor','Factor de corrección'],['evaluation','Evaluación'],['notes','Observación']]},
+    EXCITATION:{title:'Corriente de excitación',hint:'Una fila por tap y fase. La plantilla registra tensión de salida, corriente, ángulo de fase, pérdidas y reactancia; la hoja de protocolo resume corriente de excitación y pérdidas.',prefix:'EXC',cols:[['tap','Tap'],['phase','Fase (U-0 / V-0 / W-0)'],['test_voltage_kv','Tensión aplicada (kV)'],['frequency_hz','Frecuencia (Hz)'],['voltage','V de salida (V)'],['current','I de salida (A)'],['current_phase_degrees','Ángulo de corriente (°)'],['power','Pérdidas (W)'],['reactance_ohm','Reactancia (Ω)'],['unit','Unidad / referencia'],['notes','Observación']]},
     BUSHING:{title:'Factor de potencia y capacitancia de bushings',hint:'Una fila por borne. Registra serie, tensión, FP de placa y medido, capacitancia de placa y medida, y variación.',prefix:'BUSH',cols:[['terminal','Borne'],['serial','Serie'],['test_voltage','Tensión de prueba (kV)'],['power_factor_plate','FP de placa'],['power_factor','FP medido'],['capacitance_plate','Capacitancia de placa (pF)'],['capacitance','Capacitancia medida (pF)'],['variation_percent','Variación (%)'],['test_mode','Modo de prueba'],['dissipation','Factor de disipación'],['cap_unit','Unidad C'],['notes','Observación']]},
-    SFRA:{title:'Análisis de respuesta al barrido de frecuencia (SFRA)',hint:'El protocolo LAP identifica tres conexiones: AT–BT abierto, BT–AT abierto y AT–BT en cortocircuito. Adjunta o referencia la curva exportada y documenta la comparación campo/planta.',prefix:'SFRA',cols:[['connection','Conexión / configuración'],['tap','Tap'],['file_reference','Archivo de curva / referencia'],['comparison_reference','Curva de referencia (fábrica)'],['comparison_result','Resultado de comparación'],['evaluation','Evaluación'],['instrument','Equipo'],['notes','Observación']]},
-    ARRESTER:{title:'Prueba de pararrayos (AT / MT)',hint:'LAP separa pararrayos AT y MT. Registra fase, tensión y corriente de salida, modo GST, pérdidas y capacitancia medida.',prefix:'ARR',cols:[['section','Sección (AT/MT)'],['phase','Fase / borne'],['output_voltage_v','V de salida (V)'],['output_current_a','I de salida (A)'],['test_mode','Modo de prueba (GST)'],['losses_measured_w','Pérdidas medidas (W)'],['capacitance_measured_pf','Capacitancia medida (pF)'],['evaluation','Evaluación'],['notes','Observación']]},
-    PROTECTIONS:{title:'Verificación de protecciones propias',hint:'Registra cada accesorio y contacto probado, condición (alarma/disparo/ventilación), ajuste, resultado y observación, según el protocolo LAP.',prefix:'PROT',cols:[['accessory','Accesorio'],['terminals','Bornes'],['contact','Contacto'],['condition','Condición'],['setpoint','Ajuste'],['result','Resultado'],['notes','Observación']]}
+    SFRA:{title:'Análisis de respuesta al barrido de frecuencia (SFRA)',hint:'El protocolo contempla tres conexiones: AT–BT abierto, BT–AT abierto y AT–BT en cortocircuito. Adjunta o referencia la curva exportada y documenta la comparación campo/planta.',prefix:'SFRA',cols:[['connection','Conexión / configuración'],['tap','Tap'],['file_reference','Archivo de curva / referencia'],['comparison_reference','Curva de referencia (fábrica)'],['comparison_result','Resultado de comparación'],['evaluation','Evaluación'],['instrument','Equipo'],['notes','Observación']]},
+    ARRESTER:{title:'Prueba de pararrayos (AT / MT)',hint:'La plantilla separa pararrayos AT y MT. Registra fase, tensión y corriente de salida, modo GST, pérdidas y capacitancia medida.',prefix:'ARR',cols:[['section','Sección (AT/MT)'],['phase','Fase / borne'],['output_voltage_v','V de salida (V)'],['output_current_a','I de salida (A)'],['test_mode','Modo de prueba (GST)'],['losses_measured_w','Pérdidas medidas (W)'],['capacitance_measured_pf','Capacitancia medida (pF)'],['evaluation','Evaluación'],['notes','Observación']]},
+    PROTECTIONS:{title:'Verificación de protecciones propias',hint:'Registra cada accesorio y contacto probado, condición (alarma/disparo/ventilación), ajuste, resultado y observación, según el protocolo de referencia.',prefix:'PROT',cols:[['accessory','Accesorio'],['terminals','Bornes'],['contact','Contacto'],['condition','Condición'],['setpoint','Ajuste'],['result','Resultado'],['notes','Observación']]}
   };
 
   var testCatalog = [
@@ -628,9 +628,35 @@
       const names=x.plan_tests?.length?x.plan_tests.map(t=>t.name||typeName(t.code)):[x.test_name||typeName(x.test_code)];
       const measurementCount=Number(x.measurement_count||0);
       const detail=x.plan_tests?.length?names.length+' ensayos · '+measurementCount+' valores':measurementCount+' valores';
-      return '<tr><td><b>'+esc(formatExecutionDate(x.executed_at))+'</b><small>Visita #'+esc(x.id)+'</small></td><td><b>'+esc(names.join(' · '))+'</b></td><td>'+esc(x.operator_name||'—')+'</td><td>'+esc(detail)+'</td><td><button class="btn small" data-open-execution="'+x.id+'" title="Continuar completando esta visita">Abrir plan</button></td></tr>';
+      return '<tr><td><b>'+esc(formatExecutionDate(x.executed_at))+'</b><small>Visita #'+esc(x.id)+'</small></td><td><b>'+esc(names.join(' · '))+'</b></td><td>'+esc(x.operator_name||'—')+'</td><td>'+esc(detail)+'</td><td><div class="test-row-actions"><button class="btn small" data-open-execution="'+x.id+'" title="Continuar completando esta visita">Abrir plan</button><button class="btn small test-delete-button" data-delete-execution="'+x.id+'" title="Eliminar visita" aria-label="Eliminar visita #'+x.id+'"><svg><use href="#i-trash"/></svg></button></div></td></tr>';
     }).join(''):'<tr><td colspan="5" class="test-empty">'+(testExecutions.length?'No hay registros que coincidan con el filtro.':'Aún no hay visitas registradas. Selecciona un tipo de prueba para comenzar.')+'</td></tr>';
-    $$('[data-open-execution]').forEach(b=>b.addEventListener('click',()=>openExistingExecution(Number(b.dataset.openExecution))));
+    $('[data-open-execution]').forEach(b=>b.addEventListener('click',()=>openExistingExecution(Number(b.dataset.openExecution))));
+    $('[data-delete-execution]').forEach(button=>button.addEventListener('click',async()=>{
+      const id=Number(button.dataset.deleteExecution);
+      const visit=testExecutions.find(item=>Number(item.id)===id);
+      if(!id||!visit)return;
+      const date=formatExecutionDate(visit.executed_at);
+      const count=visit.plan_tests?.length||1;
+      const confirmed=window.confirm('¿Eliminar la visita #'+id+' del '+date+'? Se eliminarán también sus '+count+' ensayo(s) y todas sus mediciones. Esta acción no se puede deshacer.');
+      if(!confirmed)return;
+      button.disabled=true;
+      button.title='Eliminando…';
+      try{
+        const response=await fetch(api('action=test-delete'),{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({id:id,transformer_key:transformer.key})
+        });
+        const result=await readApiResponse(response);
+        if(!result.ok)throw new Error(result.message||'No se pudo eliminar la visita.');
+        testExecutions=testExecutions.filter(item=>Number(item.id)!==id);
+        renderTestHistory();
+        toast('Visita #'+id+' eliminada correctamente.');
+      }catch(error){
+        button.disabled=false;
+        button.title='Eliminar visita';
+        toast(error.message,true);
+      }
+    }));
   }
   $('#testHistoryFilter').addEventListener('input',renderTestHistory);
   async function loadTestHistory(){
@@ -701,7 +727,7 @@
       showOnlyMain('executionPage');
     }catch(e){toast(e.message,true);}
   }
-  // TTR: fórmulas reproducidas del protocolo LAP, hoja protocolos.
+  // TTR: fórmulas reproducidas de la hoja de protocolos de referencia.
   // Rt = V_AT(kV) / (V_BT(kV) * sqrt(3)); Error fase = (Rmed - Rt) * 100 / Rmed.
   function ttrRowsFromMeasurements(measurements){
     const byTap={};
