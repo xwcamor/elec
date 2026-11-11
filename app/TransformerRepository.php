@@ -113,6 +113,14 @@ class TransformerRepository
         return $matches[0] ?? null;
     }
 
+    public function all(int $limit = 500): array
+    {
+        $limit = max(1, min(1000, $limit));
+        $sql = 'SELECT * FROM ' . $this->qid($this->table) . ' ORDER BY ' . $this->qid($this->primaryKey) . ' DESC LIMIT ' . $limit;
+        $stmt = $this->pdo->query($sql);
+        return array_map(fn($row) => $this->normalize($row), $stmt->fetchAll());
+    }
+
     public function search(string $term, int $limit = 12): array
     {
         $term = trim($term);
@@ -129,6 +137,120 @@ class TransformerRepository
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         return array_map(fn($r) => $this->normalize($r), $stmt->fetchAll());
+    }
+
+    public function create(array $input): array
+    {
+        $code = trim((string)($input['code'] ?? ''));
+        if ($code === '') throw new InvalidArgumentException('El TAG o código del transformador es obligatorio.');
+        if (!in_array((string)($input['phase_count'] ?? '3'), ['1','3'], true)) {
+            throw new InvalidArgumentException('La cantidad de fases debe ser 1 o 3.');
+        }
+        foreach (['voltage','power','frequency_hz'] as $field) {
+            $value = $input[$field] ?? '';
+            if ($value !== '' && $value !== null && (!is_numeric(str_replace(',','.',$value)) || (float)str_replace(',','.',$value) <= 0)) {
+                throw new InvalidArgumentException('Tensión, potencia y frecuencia deben ser valores mayores que cero.');
+            }
+        }
+        if (($input['num_taps'] ?? '') !== '' && !ctype_digit((string)$input['num_taps'])) {
+            throw new InvalidArgumentException('La cantidad de taps debe ser un entero no negativo.');
+        }
+        if (($input['year'] ?? '') !== '' && (!ctype_digit((string)$input['year']) || (int)$input['year'] < 1800 || (int)$input['year'] > 2200)) {
+            throw new InvalidArgumentException('Revisa el año de fabricación.');
+        }
+
+        $available = array_map(fn($column) => $column['Field'], $this->columns);
+        $codeAliases = ['transformer_number','transformer_code','number','codigo','code','tag','tag_number','serial_number','serie'];
+        foreach ($codeAliases as $alias) {
+            foreach ($available as $column) {
+                if (strcasecmp($alias, $column) !== 0) continue;
+                $duplicate = $this->pdo->prepare('SELECT 1 FROM ' . $this->qid($this->table) . ' WHERE ' . $this->qid($column) . ' = :value LIMIT 1');
+                $duplicate->execute(['value'=>$code]);
+                if ($duplicate->fetchColumn()) throw new InvalidArgumentException('Ya existe un transformador con ese TAG o código.');
+            }
+        }
+
+        $map = [
+            'code' => $codeAliases,
+            'name' => ['name','nombre','denomination','denominacion','description','descripcion','transformer_name'],
+            'company' => ['company_name','customer_name','company','empresa','cliente','customer','owner'],
+            'voltage' => ['voltage_kv','tension_kv','voltage','tension','hv_voltage','primary_voltage'],
+            'power' => ['power_mva','potencia_mva','mva','power','potencia'],
+            'year' => ['manufacturing_year','year_manufacture','year','anio_fabricacion','ano_fabricacion'],
+            'brand' => ['brand','marca','manufacturer','fabricante'],
+            'tap_type' => ['tap_changer_type','tap_type','tipo_conmutador','conmutador'],
+            'num_taps' => ['num_taps','number_of_taps','cantidad_taps'],
+            'vector_group' => ['vector_group','grupo_vectorial','connection_group','grupo_conexion'],
+            'location' => ['location','ubicacion','installation','instalacion','substation','subestacion'],
+            'phase_count' => ['phase_count','phases','numero_fases','cantidad_fases','fases'],
+            'frequency_hz' => ['frequency_hz','frequency','frecuencia_hz','frecuencia'],
+            'insulation_type' => ['insulation_type','insulation','tipo_aislamiento','aislamiento'],
+            'cooling_type' => ['cooling_type','cooling','tipo_refrigeracion','refrigeracion','cooling_method'],
+            'notes' => ['notes','observations','observaciones']
+        ];
+        $values = [];
+        $codeMapped = false;
+        foreach ($map as $field => $candidates) {
+            if (!array_key_exists($field, $input)) continue;
+            $value = trim((string)$input[$field]);
+            foreach ($candidates as $candidate) {
+                foreach ($available as $column) {
+                    if (strcasecmp($candidate, $column) !== 0) continue;
+                    if ($field === 'code') {
+                        $values[$column] = $value;
+                        $codeMapped = true;
+                    } elseif (!array_key_exists($column, $values)) {
+                        $values[$column] = $value;
+                        break 2;
+                    }
+                }
+            }
+        }
+        if (!$codeMapped) throw new RuntimeException('La tabla no contiene una columna compatible con TAG o código.');
+
+        $columnMeta = [];
+        foreach ($this->columns as $column) $columnMeta[$column['Field']] = $column;
+        if (!array_key_exists($this->primaryKey, $values)) {
+            $pk = $columnMeta[$this->primaryKey] ?? null;
+            if ($pk && stripos((string)($pk['Extra'] ?? ''), 'auto_increment') === false
+                && ($pk['Null'] ?? 'YES') === 'NO' && ($pk['Default'] ?? null) === null) {
+                $type = strtolower((string)($pk['Type'] ?? ''));
+                if (preg_match('/^(tinyint|smallint|mediumint|int|bigint)\\b/', $type)) {
+                    $max = $this->pdo->query('SELECT COALESCE(MAX(' . $this->qid($this->primaryKey) . '),0) FROM ' . $this->qid($this->table))->fetchColumn();
+                    $values[$this->primaryKey] = (string)((int)$max + 1);
+                } else {
+                    $values[$this->primaryKey] = $code;
+                }
+            }
+        }
+
+        foreach ($this->columns as $column) {
+            $name = $column['Field'];
+            $extra = strtolower((string)($column['Extra'] ?? ''));
+            if (($column['Null'] ?? 'YES') === 'NO' && ($column['Default'] ?? null) === null
+                && !isset($values[$name]) && stripos($extra, 'auto_increment') === false
+                && !str_contains($extra, 'generated')) {
+                throw new RuntimeException('Falta un valor obligatorio para la columna «' . $name . '» de la tabla configurada.');
+            }
+        }
+        $numericFields = ['voltage_kv','tension_kv','voltage','tension','hv_voltage','primary_voltage','power_mva','potencia_mva','mva','power','potencia','frequency_hz','frequency','frecuencia_hz','frecuencia','manufacturing_year','year_manufacture','year','anio_fabricacion','ano_fabricacion','num_taps','number_of_taps','cantidad_taps','phase_count','phases','numero_fases','cantidad_fases','fases'];
+        $columns = array_keys($values);
+        $params = [];
+        $holders = [];
+        foreach ($columns as $index => $column) {
+            $holders[] = ':v' . $index;
+            $value = $values[$column];
+            $params['v' . $index] = $value === '' ? null : (in_array(strtolower($column), $numericFields, true) ? str_replace(',','.',$value) : $value);
+        }
+        $sql = 'INSERT INTO ' . $this->qid($this->table) . ' (' . implode(',', array_map(fn($name) => $this->qid($name), $columns)) . ') VALUES (' . implode(',', $holders) . ')';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        $lookupKey = $values[$this->primaryKey] ?? (string)$this->pdo->lastInsertId();
+        if ($lookupKey === '') $lookupKey = $code;
+        $created = $this->find((string)$lookupKey) ?: $this->find($code);
+        if (!$created) throw new RuntimeException('El transformador se creó, pero no fue posible volver a leer el registro.');
+        return $created;
     }
 
     public function updateMain(string $identifier, array $input): array
