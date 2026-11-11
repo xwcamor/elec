@@ -70,7 +70,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.29">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.30">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -258,7 +258,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <div id="specificTestEditor" class="ttr-editor hidden">
   <div class="ttr-editor-head"><div><b id="specificTestTitle">Plantilla de prueba</b><small id="specificTestHint">Registra los resultados según el procedimiento aplicado.</small></div><button type="button" class="btn small" id="specificAddRows">＋ Agregar 5 filas</button></div>
   <div class="measurement-sheet-wrap"><table class="measurement-sheet ttr-sheet"><thead id="specificTestHead"></thead><tbody id="specificTestRows"></tbody></table></div>
-  <div class="sheet-hint">Plantilla basada en el protocolo LAP. Los campos calculados se identifican en la propia tabla; los demás valores se registran tal como los entrega el instrumento.</div>
+  <div class="sheet-hint">Plantilla basada en el protocolo de referencia. Los campos calculados se identifican en la propia tabla; los demás valores se registran tal como los entrega el instrumento.</div>
 </div>
 <div class="measurement-sheet-wrap" id="measurementGenericWrap"><table class="measurement-sheet"><thead><tr><th>#</th><th>Parámetro / punto</th><th>Valor medido</th><th>Unidad</th><th>Observación</th><th></th></tr></thead><tbody id="measurementRows"></tbody></table></div>
           <div class="sheet-hint">Atajos: Ctrl+V para pegar una tabla desde Excel · Flechas para moverte entre celdas · Tab para avanzar.</div>
@@ -310,7 +310,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       </details>
     </section>
     <section class="execution-card" id="planSelectionSection">
-      <div class="execution-card-title"><span class="eyebrow">02 · SELECCIÓN DE ENSAYOS</span><h3>¿Qué pruebas vas a registrar?</h3><p>Selecciona una o varias. Cada prueba genera su propio formulario con los campos del protocolo LAP.</p></div>
+      <div class="execution-card-title"><span class="eyebrow">02 · SELECCIÓN DE ENSAYOS</span><h3>¿Qué pruebas vas a registrar?</h3><p>Selecciona una o varias. Cada prueba genera su propio formulario con los campos del protocolo de referencia.</p></div>
       <div class="plan-test-add">
         <label for="planTestTypeSelect">Tipo de ensayo<select id="planTestTypeSelect"></select></label>
         <button class="btn primary" id="addPlanTest" type="button"><svg><use href="#i-plus"/></svg>Añadir ensayo</button>
@@ -441,6 +441,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.29"></script>
-<script src="./assets/plan.js?v=1.5.29"></script>
+<script src="./assets/app.js?v=1.5.30"></script>
+<script src="./assets/plan.js?v=1.5.30"></script>
 </body></html>
