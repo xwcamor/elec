@@ -1,3 +1,7 @@
+## v1.5.26
+- En bushings separa «Evaluación FP» (manual, sin umbral inventado) de «Resultado capacitancia» (automático por variación menor a 5%).
+- El FP de placa y el FP medido son datos obligatorios para conservar la comparación completa del protocolo.
+
 ## v1.5.25
 - Factor de potencia ya no exige capacitancia en cada modo: el Excel LAP solo contiene valores de capacitancia para CL+CLH, CL y CLH.
 - Colorea los resultados automáticos de TTR y bushings según estén correctos/conformes, observados o pendientes.
