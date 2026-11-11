@@ -1,3 +1,10 @@
+## v1.5.31
+- Incorpora en el topbar un selector para cambiar de transformador sin volver al buscador.
+- Añade «Crear trafo» en la barra superior y reutiliza el formulario técnico de alta/edición.
+- La creación escribe únicamente columnas reconocidas en la tabla configurada, respeta valores por defecto y genera la clave primaria cuando la tabla requiere un ID manual.
+- Después de crear, selecciona el nuevo transformador y carga su configuración eléctrica e historial asociados.
+- Añade el listado de transformadores y la acción de alta en la API; no requiere cambios en el esquema SQL.
+
 ## v1.5.30
 - Retira el nombre de la empresa de las referencias a la base de protocolos; la interfaz ahora habla de protocolo u hoja de referencia.
 - Añade la acción Eliminar en el historial de Pruebas eléctricas para borrar una visita completa.
