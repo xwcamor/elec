@@ -3,11 +3,12 @@
 Aplicación web independiente para configurar transformadores y registrar pruebas eléctricas. Es un prototipo PHP + MySQL pensado para ejecutarse localmente con Laragon.
 
 ## Versión
-**1.5.30**
+**1.5.31**
 
 ## Funcionalidades
 
-- Consulta de transformadores desde la tabla `transformers`.
+- Consulta y cambio de transformadores desde el selector superior, además de búsqueda en la tabla `transformers`.
+- Alta de nuevos transformadores desde el botón «Crear trafo» del topbar, compatible con las columnas reconocidas de la tabla configurada.
 - Edición de datos principales del transformador cuando la estructura de la tabla lo permite.
 - Configuración eléctrica: fases, grupo vectorial, frecuencia, bobinados, bornes y fichas de bushings capacitivos.
 - Configuración de conmutadores y posiciones de taps.
@@ -43,7 +44,7 @@ Las tablas propias del prototipo usan el prefijo `eh_`. La configuración y las 
 
 ## Uso
 
-1. Abre el prototipo y selecciona un transformador mediante el buscador.
+1. Abre el prototipo y selecciona un transformador mediante el selector superior o el buscador; usa «Crear trafo» para registrar uno nuevo.
 2. Entra a **Configuración eléctrica** y completa los pasos de datos generales, bobinados/bornes y conmutadores/taps.
 3. Revisa y guarda una versión de la configuración.
 4. Entra a **Pruebas eléctricas** y pulsa **Nueva ejecución** o elige un tipo de prueba.
