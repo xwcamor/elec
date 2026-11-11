@@ -50,6 +50,8 @@
 - [ ] Verificar que el historial muestra fecha, tipo, responsable, cantidad de filas y estado.
 - [ ] Crear otra ejecución del mismo tipo en otra fecha y comprobar que la primera permanece.
 - [ ] Abrir y editar una ejecución existente; verificar que mantiene el mismo ID.
+- [ ] Eliminar una visita desde el historial; confirmar que desaparece y que sus mediciones asociadas también se eliminan.
+- [ ] Cancelar la confirmación de eliminación y verificar que la visita permanece en el historial.
 - [ ] Pegar un bloque de varias filas desde Excel.
 - [ ] Confirmar que se conserva `transformers.num_taps` y no se modifican datos de la tabla original.
 - [ ] Verificar que la configuración vigente se captura como referencia al crear la ejecución.
