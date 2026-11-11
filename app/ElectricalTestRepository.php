@@ -101,10 +101,15 @@ class ElectricalTestRepository
             $tests = $plan['tests'] ?? [];
             if (!is_array($tests) || count($tests) > 20) throw new InvalidArgumentException('Un plan admite hasta 20 pruebas.');
             $safeTests = [];
+            $seenTestCodes = [];
             foreach ($tests as $test) {
                 if (!is_array($test)) continue;
-                $testCode = trim((string)($test['code'] ?? ''));
+                $testCode = strtoupper(trim((string)($test['code'] ?? '')));
                 if ($testCode === '' || $testCode === 'PLAN') continue;
+                if (isset($seenTestCodes[$testCode])) {
+                    throw new InvalidArgumentException('La prueba '.$testCode.' ya está incluida en este plan. Cada tipo de prueba solo puede agregarse una vez por visita.');
+                }
+                $seenTestCodes[$testCode] = true;
                 $testMeasurements = $test['measurements'] ?? [];
                 if (!is_array($testMeasurements) || count($testMeasurements) > 2000) throw new InvalidArgumentException('Una prueba supera el límite de 2,000 valores.');
                 $safeTests[] = [

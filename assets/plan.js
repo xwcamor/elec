@@ -220,6 +220,21 @@
       rowSummary.textContent=complete+' completas · '+partial+' en curso · '+empty+' sin datos';
     }
   }
+  function updatePlanStepper(m){
+    const visitStarted=!!($('#planDate').value||$('#planOperator').value.trim());
+    const sharedState=m.general.length===0?'complete':(visitStarted?'partial':'missing');
+    const selectionState=items.length?'complete':'missing';
+    const resultMetrics=m.perItem.map(entry=>entry.metrics);
+    const resultsState=!items.length?'missing':(resultMetrics.every(metric=>metric.complete)?'complete':(resultMetrics.some(metric=>metric.anyData)?'partial':'missing'));
+    const states={shared:sharedState,selection:selectionState,results:resultsState};
+    Object.entries(states).forEach(([key,state])=>{
+      const step=$('#planStepper [data-plan-step="'+key+'"]');
+      if(!step)return;
+      step.dataset.state=state;
+      const number=step.querySelector('.plan-step-number');
+      if(number)number.dataset.state=state;
+    });
+  }
   function renderPlanFeedback(){
     const host=$('#planProgressPanel');if(!host)return;
     const m=planMetrics(),allReady=m.general.length===0&&m.perItem.length>0&&m.perItem.every(x=>x.metrics.complete);
@@ -231,6 +246,7 @@
       '<div class="plan-color-legend"><span><i class="legend-filled"></i> Verde: dato registrado</span><span><i class="legend-missing"></i> Ámbar: falta completar</span><span><i class="legend-calculated"></i> Gris: cálculo automático</span></div>';
     const shared=$('#planSharedStatus');
     if(shared){shared.classList.toggle('is-complete',m.general.length===0);shared.classList.toggle('is-pending',m.general.length>0);shared.textContent=m.general.length?'Pendiente: '+m.general.join(' · '):'Datos generales completos';}
+    updatePlanStepper(m);
   }
   function refreshPlanFeedback(){
     items.forEach((item,index)=>{
@@ -354,8 +370,20 @@
       $('#planOperator').value=x.operator_name||'';$('#planSupervisor').value=x.supervisor_name||'';
       $('#planOilTemp').value=x.oil_temperature_c??'';$('#planAmbientTemp').value=x.ambient_temperature_c??'';
       $('#planHumidity').value=x.relative_humidity_percent??'';$('#planObservations').value=x.observations||'';
-      if(Array.isArray(x.plan?.tests)&&x.plan.tests.length)items=x.plan.tests.map(t=>makeItem(t.code,{...t,rows:rowsFromMeasurements(t.code,t.measurements||[])}));
-      else if(x.test_code&&x.test_code!=='PLAN')items=[makeItem(x.test_code,{status:x.status,standard_reference:x.standard_reference,equipment_name:x.equipment_name,equipment_brand:x.equipment_brand,equipment_model:x.equipment_model,equipment_serial:x.equipment_serial,rows:rowsFromMeasurements(x.test_code,x.measurements||[])})];
+      if(Array.isArray(x.plan?.tests)&&x.plan.tests.length){
+        const loaded=x.plan.tests.map(t=>makeItem(t.code,{...t,rows:rowsFromMeasurements(t.code,t.measurements||[])}));
+        const grouped=new Map();
+        loaded.forEach(incoming=>{
+          const code=String(incoming.code||'').toUpperCase();
+          if(!grouped.has(code)){grouped.set(code,incoming);return;}
+          const existing=grouped.get(code);
+          existing.rows.push(...incoming.rows);
+          ['standard_reference','equipment_name','equipment_brand','equipment_model','equipment_serial'].forEach(key=>{if(!existing[key]&&incoming[key])existing[key]=incoming[key];});
+          if(incoming.observations)existing.observations=[existing.observations,incoming.observations].filter(Boolean).join('\n');
+        });
+        items=Array.from(grouped.values());
+        if(items.length<loaded.length)toast('Este registro tenía ensayos repetidos; sus mediciones se reunieron en un solo formulario por tipo de prueba.');
+      }else if(x.test_code&&x.test_code!=='PLAN')items=[makeItem(x.test_code,{status:x.status,standard_reference:x.standard_reference,equipment_name:x.equipment_name,equipment_brand:x.equipment_brand,equipment_model:x.equipment_model,equipment_serial:x.equipment_serial,rows:rowsFromMeasurements(x.test_code,x.measurements||[])})];
       editRevision=0;savedRevision=0;
       render();$('#planTitle').textContent='Plan de pruebas #'+editingId;
       $('#saveTestPlan').innerHTML='<svg><use href="#i-check"/></svg>Guardar ahora';
@@ -366,6 +394,18 @@
 
   async function savePlan(automatic){
     if(savePromise){savePending=true;return savePromise;}
+    const seenCodes=new Set();
+    const duplicate=items.find(item=>{
+      const code=String(item.code||'').trim().toUpperCase();
+      if(seenCodes.has(code))return true;
+      seenCodes.add(code);return false;
+    });
+    if(duplicate){
+      const name=duplicate.name||duplicate.code;
+      setSaveStatus('Hay un ensayo duplicado en el plan','warning');
+      if(!automatic)toast('«'+name+'» ya está incluido. Cada tipo de prueba solo puede agregarse una vez por visita.',true);
+      return false;
+    }
     const date=$('#planDate').value;
     if(!items.length){
       setSaveStatus('Selecciona al menos una prueba para guardar','warning');
@@ -462,9 +502,20 @@
   },true);
   $('#cancelPlan').addEventListener('click',leavePlan);
   $('#saveTestPlan').addEventListener('click',saveNow);
+  $('#planStepper').addEventListener('click',e=>{
+    const step=e.target.closest('[data-plan-step]');
+    if(!step)return;
+    document.getElementById(step.dataset.target)?.scrollIntoView({behavior:'smooth',block:'start'});
+  });
   $('#addPlanTest').addEventListener('click',()=>{
     const code=$('#planTestTypeSelect').value;
-    if(!code||items.some(item=>item.code===code))return;
+    if(!code)return;
+    const duplicate=items.find(item=>String(item.code).toUpperCase()===String(code).toUpperCase());
+    if(duplicate){
+      toast('«'+duplicate.name+'» ya está en esta visita. No se permiten ensayos duplicados.',true);
+      renderPicker();
+      return;
+    }
     items.push(makeItem(code));
     render();markPlanChanged(350);
   });

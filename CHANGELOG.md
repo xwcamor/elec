@@ -1,3 +1,10 @@
+## v1.5.29
+- Configuración eléctrica deja de colorear el botón del menú: muestra solo «!» rojo si no está configurada o ámbar si está incompleta; al completarse desaparece el indicador.
+- Pruebas eléctricas evita añadir el mismo tipo de ensayo más de una vez por visita; la validación también se aplica al guardar en el servidor.
+- Al abrir/editar un plan histórico con ensayos repetidos, reúne sus mediciones en un único formulario por tipo para conservar los datos.
+- El formulario de visita oculta la ficha superior del transformador y presenta un Stepper de tres etapas con estados de color y navegación a cada sección.
+- Actualiza la versión de caché de los recursos a 1.5.29.
+
 ## v1.5.28
 - Hace opcional el listener del botón inferior de guardado, que ahora se oculta para evitar duplicar la acción principal.
 

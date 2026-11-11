@@ -137,13 +137,11 @@
     PILOT.configReady=configured;
     const configButton=$('#openConfig'),configState=$('#configNavState');
     if(configButton){
-      configButton.classList.toggle('is-unconfigured',!configured);
-      configButton.classList.toggle('is-configured',configured);
-      configButton.title=configured?'Configuración eléctrica guardada':'Falta guardar la configuración eléctrica.';
+      configButton.classList.remove('is-unconfigured','is-configured');
+      configButton.title=configured?'Configuración eléctrica guardada':'Falta completar la configuración eléctrica.';
     }
-    if(configState){
-      configState.dataset.state=configured?'ready':'missing';
-      configState.textContent=configured?'Configurada':'Sin configurar';
+    if(configState && !configState.dataset.state){
+      configState.dataset.state=configured?'partial':'missing';
     }
     const testsButton=$('#openElectricalTests'),lockIcon=$('#testsNavLock');
     const reason=electricalTestsBlockReason(),allowed=!reason;
@@ -432,6 +430,14 @@
 
     const reviewComplete=generalComplete&&windingsComplete&&(tapsState==='optional'||tapsComplete);
     const reviewState=reviewComplete?'complete':(windingData||vector||state.tap_changers.length?'partial':'missing');
+    const configHasProgress=!!vector||windingData||tapData;
+    const configNavState=reviewComplete?'complete':(configHasProgress?'partial':'missing');
+    const configNavIndicator=$('#configNavState');
+    if(configNavIndicator){
+      configNavIndicator.dataset.state=configNavState;
+      configNavIndicator.hidden=configNavState==='complete';
+      configNavIndicator.setAttribute('aria-label',configNavState==='missing'?'Configuración sin configurar':configNavState==='partial'?'Configuración incompleta':'Configuración completa');
+    }
 
     const steps=[
       ['general',generalState,generalComplete?'Completo':'Revisar datos'],
@@ -536,6 +542,7 @@
   const testPage=$('#testPage'), executionPage=$('#executionPage');
   function showOnlyMain(which){
     document.body.classList.toggle('config-focus',which==='configPage');
+    document.body.classList.toggle('test-form-focus',which==='executionPage'||which==='planPage');
     ['overviewPage','configPage','testPage','executionPage','planPage'].forEach(id=>$('#'+id).classList.toggle('hidden',id!==which));
   }
   function openTests(){
@@ -914,6 +921,8 @@
     api: function(query){ return api(query); },
     readApiResponse: function(response){ return readApiResponse(response); },
     showPage: function(pageId){
+      document.body.classList.toggle('config-focus',pageId==='configPage');
+      document.body.classList.toggle('test-form-focus',pageId==='executionPage'||pageId==='planPage');
       ['overviewPage','configPage','testPage','executionPage','planPage'].forEach(function(id){
         const node=document.getElementById(id);if(node)node.classList.toggle('hidden',id!==pageId);
       });

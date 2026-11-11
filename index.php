@@ -70,7 +70,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.28">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.29">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -162,9 +162,9 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       <div class="nav-caption sub-caption">REGISTRO</div>
       <button class="nav-disabled" type="button" disabled title="Bitácora fuera del alcance de este piloto"><svg><use href="#i-history"/></svg>Bitácora</button>
       <div class="nav-caption sub-caption">CONFIGURACIÓN</div>
-      <button class="nav-action config-link<?= $hasSavedElectricalConfig ? ' is-configured' : ' is-unconfigured' ?>" id="openConfig" type="button">
+      <button class="nav-action config-link" id="openConfig" type="button">
         <svg><use href="#i-settings"/></svg>Configuración eléctrica
-        <span class="nav-state-chip" id="configNavState" data-state="<?= $hasSavedElectricalConfig ? 'ready' : 'missing' ?>"><?= $hasSavedElectricalConfig ? 'Configurada' : 'Sin configurar' ?></span>
+        <span class="config-nav-indicator" id="configNavState" data-state="<?= $hasSavedElectricalConfig ? 'partial' : 'missing' ?>" aria-label="Configuración pendiente">!</span>
       </button>
     </aside>
     <div class="overview-content">
@@ -275,10 +275,23 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       <div><div class="breadcrumbs">Transformador <span>/</span> Pruebas eléctricas <span>/</span> Plan</div><h2 id="planTitle">Nuevo plan de pruebas</h2><p>Una visita puede incluir varios ensayos. Los datos compartidos se ingresan una vez y cada prueba conserva su propio equipo.</p></div>
       <div class="plan-toolbar-actions"><span id="planSaveStatus" class="plan-save-status" data-state="idle" aria-live="polite"><i></i><span>Se guardará automáticamente al modificar datos</span></span><div class="toolbar-actions"><button class="btn" id="cancelPlan">Volver al historial</button><button class="btn primary" id="saveTestPlan"><svg><use href="#i-check"/></svg>Guardar ahora</button></div></div>
     </div>
+    <nav class="plan-stepper" id="planStepper" aria-label="Etapas del registro de pruebas">
+      <button type="button" class="plan-step" data-plan-step="shared" data-target="planSharedSection" data-state="missing">
+        <span class="plan-step-number">01</span><span class="plan-step-copy"><b>Datos de visita</b><small>Fecha y responsable</small></span>
+      </button>
+      <span class="plan-step-connector" aria-hidden="true"></span>
+      <button type="button" class="plan-step" data-plan-step="selection" data-target="planSelectionSection" data-state="missing">
+        <span class="plan-step-number">02</span><span class="plan-step-copy"><b>Selección de ensayos</b><small>Tipos de prueba</small></span>
+      </button>
+      <span class="plan-step-connector" aria-hidden="true"></span>
+      <button type="button" class="plan-step" data-plan-step="results" data-target="planResultsSection" data-state="missing">
+        <span class="plan-step-number">03</span><span class="plan-step-copy"><b>Resultados</b><small>Mediciones y revisión</small></span>
+      </button>
+    </nav>
     <section class="plan-progress-panel" id="planProgressPanel" data-state="warning" aria-live="polite">
       <div class="plan-progress-main"><strong>Preparando resumen de avance…</strong></div>
     </section>
-    <section class="execution-card plan-shared-card">
+    <section class="execution-card plan-shared-card" id="planSharedSection">
       <div class="execution-card-title"><span class="eyebrow">01 · DATOS COMPARTIDOS</span><h3>Datos de la visita y condiciones ambientales</h3><p>Se ingresan una sola vez y se comparten con todos los ensayos del plan.</p></div>
       <div class="execution-date-card plan-date-inline"><div class="date-emblem"><svg><use href="#i-calendar"/></svg></div><div class="date-copy"><strong>Fecha y hora de las pruebas</strong><small>Fecha real de realización de los ensayos.</small></div><label class="execution-date-field"><span>Realizada el *</span><input id="planDate" type="datetime-local" required></label></div>
       <div class="plan-shared-status is-pending" id="planSharedStatus" aria-live="polite">Pendiente: fecha de la visita · responsable / técnico</div>
@@ -296,7 +309,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
         <label class="plan-shared-notes">Observaciones generales<textarea id="planObservations" rows="2" placeholder="Condiciones del servicio, ubicación e incidencias generales..."></textarea></label>
       </details>
     </section>
-    <section class="execution-card">
+    <section class="execution-card" id="planSelectionSection">
       <div class="execution-card-title"><span class="eyebrow">02 · SELECCIÓN DE ENSAYOS</span><h3>¿Qué pruebas vas a registrar?</h3><p>Selecciona una o varias. Cada prueba genera su propio formulario con los campos del protocolo LAP.</p></div>
       <div class="plan-test-add">
         <label for="planTestTypeSelect">Tipo de ensayo<select id="planTestTypeSelect"></select></label>
@@ -304,7 +317,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       </div>
       <div class="plan-selection-status" id="planSelectionStatus" aria-live="polite">Aún no has añadido ensayos al plan.</div>
     </section>
-    <section class="execution-card plan-tests-section">
+    <section class="execution-card plan-tests-section" id="planResultsSection">
       <div class="execution-card-title"><span class="eyebrow">03 · FORMULARIOS DE PRUEBA</span><h3>Resultados por ensayo</h3><p>Marca, modelo, serie, norma y observaciones se registran por prueba, ya que el instrumento puede cambiar entre ensayos.</p></div>
       <div id="planTestCards"><div class="empty-state">Selecciona los ensayos para que aparezcan aquí sus formularios.</div></div>
     </section>
@@ -428,6 +441,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.28"></script>
-<script src="./assets/plan.js?v=1.5.28"></script>
+<script src="./assets/app.js?v=1.5.29"></script>
+<script src="./assets/plan.js?v=1.5.29"></script>
 </body></html>
