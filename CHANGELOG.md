@@ -1,3 +1,11 @@
+## v1.5.24
+- Los formularios incorporan un campo Resultado/Evaluación obligatorio; en ensayos sin umbral explícito, la evaluación queda a cargo del técnico.
+- TTR calcula relación teórica, errores por fase y resultado CORRECTO/FUERA DE TOLERANCIA usando ±0,5%.
+- Bushings calcula variación absoluta entre capacitancia medida y de placa y marca CONFORME cuando es menor a 5%.
+- Resistencia de devanados solicita el resultado del comparativo entre fases (≤5%) sin inventar una fórmula que el Excel no documenta.
+- Retira el límite erróneo de FP <1%; el protocolo LAP registra seis modos y FP corregido, pero no define ese umbral.
+- Añade notas para diferenciar evaluaciones manuales y criterios numéricos presentes en LAP.
+
 ## v1.5.23
 - Al abrir Configuración eléctrica, la interfaz pasa a un modo independiente: oculta la barra superior, la ficha general, las pestañas del transformador y el resto del módulo.
 - Se retira el bloque técnico de conexión que mostraba «Base de datos conectada», base de datos, tabla y código del transformador.

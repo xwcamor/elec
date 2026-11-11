@@ -15,15 +15,15 @@
     ['CAPACITANCE','Capacitancia complementaria','Puntos y conexiones adicionales']
   ];
   const templates={
-    WINDING_RESISTANCE:{prefix:'WR',cols:[['section','Devanado (AT / BT)'],['tap','TAP'],['phase','Fase / conexión'],['test_current_a','I de prueba (A)'],['dc_current_a','I DC medida (A)'],['dc_voltage_v','V DC (V)'],['time_s','Tiempo (s)'],['resistance_measured_ohm','Resistencia medida (Ω)'],['resistance_referred_75c_ohm','Resistencia referida 75 °C (Ω)'],['deviation_percent','Desviación (%)'],['fluctuation_percent','Fluctuación (%)'],['slope_a_s','Pendiente (A/s)'],['temperature_c','Temperatura (°C)'],['notes','Observación']]},
-    INSULATION_RESISTANCE:{prefix:'IR',cols:[['point','Configuración / punto'],['applied_voltage_kv','Voltaje aplicado (kV)'],['reading_15s','R a 15 s'],['reading_30s','R a 30 s'],['reading_45s','R a 45 s'],['reading_1min','R a 1 min'],['absorption_index','Índice de absorción'],['reading_unit','Unidad de resistencia'],['notes','Observación']]},
-    POWER_FACTOR:{prefix:'PF',cols:[['measurement','Modo de medición'],['test_mode','Modo del equipo (GST / GSTg-A / UST-A)'],['sweep','Barrido'],['test_voltage_v','Tensión de prueba (V)'],['frequency_hz','Frecuencia (Hz)'],['output_voltage_v','V de salida (V)'],['output_current_a','I de salida (A)'],['power_loss_w','Pérdidas (W)'],['power_factor_measured','FP medido (%)'],['power_factor_corrected_20c','FP corregido a 20 °C (%)'],['capacitance_nf','Capacitancia (nF)'],['evaluation','Evaluación'],['notes','Observación']]},
-    EXCITATION:{prefix:'EXC',cols:[['tap','TAP'],['phase','Fase'],['test_voltage_kv','Tensión de prueba (kV)'],['frequency_hz','Frecuencia (Hz)'],['output_voltage_v','V de salida (V)'],['output_current_a','I de salida (A)'],['current_phase_deg','Ángulo de corriente (°)'],['losses_w','Pérdidas (W)'],['reactance_ohm','Reactancia (Ω)'],['notes','Observación']]},
-    BUSHING:{prefix:'BUSH',cols:[['terminal','Borne'],['serial','Serie'],['test_voltage_kv','Tensión de prueba (kV)'],['power_factor_plate','FP de placa (%)'],['power_factor_measured','FP medido (%)'],['capacitance_plate_pf','Capacitancia de placa (pF)'],['capacitance_measured_pf','Capacitancia medida (pF)'],['variation_percent','Variación (%)'],['notes','Observación']]},
-    SFRA:{prefix:'SFRA',cols:[['connection','Configuración'],['tap','TAP'],['file_reference','Archivo / curva de campo'],['reference_curve','Curva de referencia (fábrica)'],['comparison_result','Resultado de comparación'],['notes','Observación']]},
-    ARRESTER:{prefix:'ARR',cols:[['section','Sección (AT / MT)'],['phase','Fase'],['output_voltage_kv','V de salida (kV)'],['output_current_ma','I de salida (mA)'],['test_mode','Modo de prueba'],['losses_w','Pérdidas medidas (W)'],['capacitance_pf','Capacitancia medida (pF)'],['notes','Observación']]},
+    WINDING_RESISTANCE:{prefix:'WR',cols:[['section','Devanado (AT / BT)'],['tap','TAP'],['phase','Fase / conexión'],['test_current_a','I de prueba (A)'],['dc_current_a','I DC medida (A)'],['dc_voltage_v','V DC (V)'],['time_s','Tiempo (s)'],['resistance_measured_ohm','Resistencia medida (Ω)'],['resistance_referred_75c_ohm','Resistencia referida 75 °C (Ω)'],['deviation_percent','Desviación (%)'],['fluctuation_percent','Fluctuación (%)'],['slope_a_s','Pendiente (A/s)'],['temperature_c','Temperatura (°C)'],['result','Resultado comparativo'],['notes','Observación']]},
+    INSULATION_RESISTANCE:{prefix:'IR',cols:[['point','Configuración / punto'],['applied_voltage_kv','Voltaje aplicado (kV)'],['reading_15s','R a 15 s'],['reading_30s','R a 30 s'],['reading_45s','R a 45 s'],['reading_1min','R a 1 min'],['absorption_index','Índice de absorción'],['reading_unit','Unidad de resistencia'],['result','Resultado'],['notes','Observación']]},
+    POWER_FACTOR:{prefix:'PF',cols:[['measurement','Modo de medición'],['test_mode','Modo del equipo (GST / GSTg-A / UST-A)'],['sweep','Barrido'],['test_voltage_v','Tensión de prueba (V)'],['frequency_hz','Frecuencia (Hz)'],['output_voltage_v','V de salida (V)'],['output_current_a','I de salida (A)'],['power_loss_w','Pérdidas (W)'],['power_factor_measured','FP medido (%)'],['power_factor_corrected_20c','FP corregido a 20 °C (%)'],['capacitance_nf','Capacitancia (nF)'],['evaluation','Resultado'],['notes','Observación']]},
+    EXCITATION:{prefix:'EXC',cols:[['tap','TAP'],['phase','Fase'],['test_voltage_kv','Tensión de prueba (kV)'],['frequency_hz','Frecuencia (Hz)'],['output_voltage_v','V de salida (V)'],['output_current_a','I de salida (A)'],['current_phase_deg','Ángulo de corriente (°)'],['losses_w','Pérdidas (W)'],['reactance_ohm','Reactancia (Ω)'],['result','Resultado'],['notes','Observación']]},
+    BUSHING:{prefix:'BUSH',cols:[['terminal','Borne'],['serial','Serie'],['test_voltage_kv','Tensión de prueba (kV)'],['power_factor_plate','FP de placa (%)'],['power_factor_measured','FP medido (%)'],['capacitance_plate_pf','Capacitancia de placa (pF)'],['capacitance_measured_pf','Capacitancia medida (pF)'],['variation_percent','Variación (%)'],['result','Resultado'],['notes','Observación']]},
+    SFRA:{prefix:'SFRA',cols:[['connection','Configuración'],['tap','TAP'],['file_reference','Archivo / curva de campo'],['reference_curve','Curva de referencia (fábrica)'],['comparison_result','Resultado de comparación'],['result','Evaluación'],['notes','Observación']]},
+    ARRESTER:{prefix:'ARR',cols:[['section','Sección (AT / MT)'],['phase','Fase'],['output_voltage_kv','V de salida (kV)'],['output_current_ma','I de salida (mA)'],['test_mode','Modo de prueba'],['losses_w','Pérdidas medidas (W)'],['capacitance_pf','Capacitancia medida (pF)'],['result','Resultado'],['notes','Observación']]},
     PROTECTIONS:{prefix:'PROT',cols:[['item','Ítem'],['accessory','Accesorio'],['terminals','Bornes'],['contact','Contacto'],['condition','Condición'],['setpoint','Ajuste'],['result','Resultado'],['notes','Observación']]},
-    CAPACITANCE:{prefix:'CAP',cols:[['point','Punto / borne'],['connection','Conexión de prueba'],['test_voltage_kv','Tensión de prueba (kV)'],['capacitance_nf','Capacitancia (nF)'],['frequency_hz','Frecuencia (Hz)'],['temperature_c','Temperatura (°C)'],['notes','Observación']]}
+    CAPACITANCE:{prefix:'CAP',cols:[['point','Punto / borne'],['connection','Conexión de prueba'],['test_voltage_kv','Tensión de prueba (kV)'],['capacitance_nf','Capacitancia (nF)'],['frequency_hz','Frecuencia (Hz)'],['temperature_c','Temperatura (°C)'],['result','Resultado'],['notes','Observación']]}
   };
   let items=[],editingId=null,sessionId=null;
   let autoSaveTimer=null,savePromise=null,savePending=false,editRevision=0,savedRevision=0;
@@ -54,7 +54,18 @@
   function normalize(code,row){
     const r={...(row||{})};
     if(code==='INSULATION_RESISTANCE'){const a=number(r.reading_30s),b=number(r.reading_1min);r.absorption_index=a!==null&&a!==0&&b!==null?String(b/a):'';}
-    if(code==='TTR'){const a=number(r.at),b=number(r.bt),theo=a!==null&&b!==null&&b!==0?a/(b*Math.sqrt(3)):number(r.theoretical);r.theoretical=theo===null?'':String(theo);['U','V','W'].forEach(k=>{const m=number(r[k]);r['err'+k]=theo!==null&&m!==null&&m!==0?String((m-theo)*100/m):'';});}
+    if(code==='TTR'){
+      const a=number(r.at),b=number(r.bt),theo=a!==null&&b!==null&&b!==0?a/(b*Math.sqrt(3)):number(r.theoretical);
+      r.theoretical=theo===null?'':String(theo);
+      const errors=['U','V','W'].map(k=>{const m=number(r[k]);const error=theo!==null&&m!==null&&m!==0?(m-theo)*100/m:null;r['err'+k]=error===null?'':String(error);return error;});
+      r.result=errors.every(v=>v!==null)?(errors.every(v=>Math.abs(v)<=0.5)?'CORRECTO':'FUERA DE TOLERANCIA'):'PENDIENTE';
+    }
+    if(code==='BUSHING'){
+      const plate=number(r.capacitance_plate_pf),measured=number(r.capacitance_measured_pf);
+      const variation=plate!==null&&plate>0&&measured!==null?Math.abs(measured-plate)*100/plate:null;
+      r.variation_percent=variation===null?'':String(variation);
+      r.result=variation===null?'PENDIENTE':(variation<5?'CONFORME':'OBSERVADO');
+    }
     return r;
   }
   function defaults(code){
@@ -110,25 +121,30 @@
   }
   function makeItem(code,old){old=old||{};return {id:old.id||null,code,name:typeName(code),status:old.status||'BORRADOR',standard_reference:old.standard_reference||'',equipment_name:old.equipment_name||'',equipment_brand:old.equipment_brand||'',equipment_model:old.equipment_model||'',equipment_serial:old.equipment_serial||'',observations:old.observations||'',rows:old.rows||defaults(code)};}
   const requiredByTest={
-    TTR:['tap','at','bt','U','V','W'],
-    POWER_FACTOR:['measurement','test_voltage_v','power_factor_measured','power_factor_corrected_20c','capacitance_nf'],
-    EXCITATION:['tap','phase','test_voltage_kv','output_voltage_v','output_current_a'],
-    WINDING_RESISTANCE:['section','tap','phase','test_current_a','resistance_measured_ohm','resistance_referred_75c_ohm'],
-    INSULATION_RESISTANCE:['point','applied_voltage_kv','reading_15s','reading_30s','reading_45s','reading_1min'],
-    BUSHING:['terminal','test_voltage_kv','power_factor_measured','capacitance_measured_pf'],
-    SFRA:['connection','comparison_result'],
-    ARRESTER:['section','phase','output_voltage_kv','output_current_ma','test_mode','losses_w','capacitance_pf'],
+    TTR:['tap','at','bt','U','V','W','result'],
+    POWER_FACTOR:['measurement','test_voltage_v','power_factor_measured','power_factor_corrected_20c','capacitance_nf','evaluation'],
+    EXCITATION:['tap','phase','test_voltage_kv','output_voltage_v','output_current_a','result'],
+    WINDING_RESISTANCE:['section','tap','phase','test_current_a','resistance_measured_ohm','resistance_referred_75c_ohm','result'],
+    INSULATION_RESISTANCE:['point','applied_voltage_kv','reading_15s','reading_30s','reading_45s','reading_1min','result'],
+    BUSHING:['terminal','test_voltage_kv','power_factor_measured','capacitance_plate_pf','capacitance_measured_pf','variation_percent','result'],
+    SFRA:['connection','comparison_result','result'],
+    ARRESTER:['section','phase','output_voltage_kv','output_current_ma','test_mode','losses_w','capacitance_pf','result'],
     PROTECTIONS:['accessory','terminals','contact','condition','result'],
-    CAPACITANCE:['point','connection','test_voltage_kv','capacitance_nf']
+    CAPACITANCE:['point','connection','test_voltage_kv','capacitance_nf','result']
   };
   const requiredEquipment=['equipment_name','equipment_brand','equipment_model','equipment_serial'];
   const equipmentLabels={equipment_name:'equipo',equipment_brand:'marca del equipo',equipment_model:'modelo',equipment_serial:'serie'};
   const generalLabels={date:'fecha de la visita',operator:'responsable / técnico'};
   function isFilled(value){return value!==null&&value!==undefined&&String(value).trim()!=='';}
+  function requiredValueFilled(key,value){
+    if(['result','evaluation'].includes(key)&&String(value??'').trim().toUpperCase()==='PENDIENTE')return false;
+    return isFilled(value);
+  }
   function missingForRow(code,row){
     const required=requiredByTest[code]||columns(code).map(c=>c[0]).filter(k=>!['notes','absorption_index','theoretical','errU','errV','errW'].includes(k));
     const labels=Object.fromEntries(columns(code).map(c=>[c[0],c[1]]));
-    return required.filter(key=>!isFilled(row?.[key])).map(key=>labels[key]||key);
+    const normalized=normalize(code,row);
+    return required.filter(key=>!requiredValueFilled(key,normalized?.[key])).map(key=>labels[key]||key);
   }
   function itemMetrics(item){
     const rows=Array.isArray(item.rows)?item.rows:[];
@@ -175,8 +191,10 @@
   function refreshFieldStyles(card,item,metrics){
     card.querySelectorAll('.plan-cell').forEach(input=>{
       const row=Number(input.dataset.row),field=input.dataset.col,required=(requiredByTest[item.code]||[]).includes(field);
-      input.classList.toggle('is-filled',isFilled(input.value));
-      input.classList.toggle('is-missing',required&&!isFilled(input.value)&&metrics.rowStates[row]?.any);
+      const valid=requiredValueFilled(field,input.value);
+      input.classList.toggle('is-filled',valid);
+      input.classList.toggle('is-missing',required&&!valid&&metrics.rowStates[row]?.any);
+      if(input.classList.contains('plan-result-select'))input.dataset.state=String(input.value||'PENDIENTE').toLowerCase();
     });
     requiredEquipment.forEach(key=>{
       const input=card.querySelector('[data-meta="'+key+'"]');if(!input)return;
@@ -235,15 +253,24 @@
       const body=item.rows.map((raw,ri)=>{
         const row=normalize(item.code,raw),rowMetrics=metrics.rowStates[ri]||{any:false,state:'empty'};
         return '<tr data-row-state="'+rowMetrics.state+'">'+fieldList.map(([key])=>{
-          const calc=['absorption_index','theoretical','errU','errV','errW'].includes(key),must=required.includes(key),value=row[key]??'';
-          const filled=isFilled(value),missing=must&&!filled&&rowMetrics.any;
+          const calc=['absorption_index','theoretical','errU','errV','errW'].includes(key)||(item.code==='TTR'&&key==='result')||(item.code==='BUSHING'&&['variation_percent','result'].includes(key)),must=required.includes(key),value=row[key]??'';
+          const filled=requiredValueFilled(key,value),missing=must&&!filled&&rowMetrics.any;
+          if(['result','evaluation'].includes(key)&&!calc){
+            const options=['PENDIENTE','CONFORME','OBSERVADO','NO APLICA'],current=String(value||'PENDIENTE').toUpperCase();
+            const extra=options.includes(current)?'':'<option value="'+esc(value)+'" selected>'+esc(value)+'</option>';
+            return '<td><select class="plan-cell plan-result-select '+(filled?'is-filled':'is-missing')+'" data-row="'+ri+'" data-col="'+key+'" data-state="'+(filled?current.toLowerCase():'pending')+'" '+(must?'data-required="1"':'')+'>'+extra+options.map(option=>'<option value="'+option+'" '+(current===option?'selected':'')+'>'+option+'</option>').join('')+'</select></td>';
+          }
           return '<td><input class="plan-cell '+(calc?'calculated':'')+(filled?' is-filled':'')+(missing?' is-missing':'')+'" data-row="'+ri+'" data-col="'+key+'" value="'+esc(value)+'" '+(must?'data-required="1"':'')+(calc?' readonly title="Campo calculado según el protocolo"':'')+(must&&!filled?' aria-label="'+esc(fieldList.find(f=>f[0]===key)?.[1]||key)+' pendiente"':'')+'></td>';
         }).join('')+'</tr>';
       }).join('');
       let hint='';
-      if(item.code==='POWER_FACTOR')hint='<div class="plan-reference-note"><b>LAP:</b> seis modos CH+CHL, CH, CHL, CL+CLH, CL y CLH. Criterio mostrado: FP menor a 1%. El FP corregido se registra desde el equipo.</div>';
-      if(item.code==='INSULATION_RESISTANCE')hint='<div class="plan-reference-note"><b>Fórmula LAP:</b> IA = R a 1 min / R a 30 s.</div>';
-      if(item.code==='TTR')hint='<div class="plan-reference-note"><b>Fórmula LAP:</b> relación teórica = AT / (BT × √3); error por fase = (medida − teórica) × 100 / medida. El ejemplo usa ±0.5%.</div>';
+      if(item.code==='POWER_FACTOR')hint='<div class="plan-reference-note"><b>LAP:</b> seis modos CH+CHL, CH, CHL, CL+CLH, CL y CLH. El archivo registra FP medido y corregido a 20 °C, pero no fija un límite numérico de aceptación; el resultado se evalúa según el criterio técnico aplicable.</div>';
+      if(item.code==='INSULATION_RESISTANCE')hint='<div class="plan-reference-note"><b>LAP:</b> referencia IEEE C57.152-2013, cláusula 7.2.13. El libro no muestra un umbral numérico de aceptación para estas lecturas; registra el resultado tras aplicar el criterio aprobado.</div>';
+      if(item.code==='TTR')hint='<div class="plan-reference-note"><b>Evaluación LAP automática:</b> relación teórica = AT / (BT × √3); error por fase = (medida − teórica) × 100 / medida. Resultado CORRECTO cuando los tres errores están dentro de ±0,5%.</div>';
+      if(item.code==='BUSHING')hint='<div class="plan-reference-note"><b>Evaluación LAP automática:</b> variación absoluta de capacitancia = |medida − placa| / placa × 100. CONFORME cuando la variación es menor a 5%. El FP no recibe un límite inventado.</div>';
+      if(item.code==='WINDING_RESISTANCE')hint='<div class="plan-reference-note"><b>LAP:</b> el comparativo entre fases debe ser ≤5% (IEEE C57.152-2013, cláusula 7.2.7). El archivo no documenta con claridad la fórmula comparativa; por eso el resultado se registra manualmente y no se calcula con la columna auxiliar defectuosa del Excel.</div>';
+      if(item.code==='ARRESTER')hint='<div class="plan-reference-note"><b>LAP:</b> comparar las mediciones con los valores de fábrica. Si no existen, usar esta ejecución como referencia histórica; no se fija un límite absoluto en este formulario.</div>';
+      if(item.code==='SFRA')hint='<div class="plan-reference-note"><b>LAP:</b> la conclusión se obtiene comparando las gráficas de campo con las de planta. La evaluación es manual; el protocolo no define un umbral numérico.</div>';
       return '<article class="plan-test-card" data-test-index="'+idx+'" data-state="'+metrics.state+'">'+
         '<div class="plan-test-card-head"><div class="plan-test-heading"><span class="eyebrow">ENSAYO '+String(idx+1).padStart(2,'0')+'</span><h4>'+esc(item.name)+'</h4><div class="plan-test-progress-line"><small data-card-progress>'+metrics.filled+'/'+metrics.total+' campos mínimos · '+metrics.percent+'%</small></div></div><button type="button" class="delete-btn" data-remove-test="'+idx+'">Quitar</button></div>'+
         '<div class="plan-test-meta-grid"><label>Norma / referencia<input data-meta="standard_reference" value="'+esc(item.standard_reference)+'" placeholder="Norma o protocolo"></label>'+
@@ -433,7 +460,8 @@
     const row=Number(e.target.dataset.row),key=e.target.dataset.col;item.rows[row]=item.rows[row]||{};item.rows[row][key]=e.target.value;
     const nr=normalize(item.code,item.rows[row]);
     if(item.code==='INSULATION_RESISTANCE'&&['reading_30s','reading_1min'].includes(key)){item.rows[row]=nr;const out=card.querySelector('[data-row="'+row+'"][data-col="absorption_index"]');if(out)out.value=nr.absorption_index;}
-    if(item.code==='TTR'&&['at','bt','U','V','W'].includes(key)){item.rows[row]=nr;['theoretical','errU','errV','errW'].forEach(k=>{const out=card.querySelector('[data-row="'+row+'"][data-col="'+k+'"]');if(out)out.value=nr[k]||'';});}
+    if(item.code==='TTR'&&['at','bt','U','V','W'].includes(key)){item.rows[row]=nr;['theoretical','errU','errV','errW','result'].forEach(k=>{const out=card.querySelector('[data-row="'+row+'"][data-col="'+k+'"]');if(out)out.value=nr[k]||'';});}
+    if(item.code==='BUSHING'&&['capacitance_plate_pf','capacitance_measured_pf'].includes(key)){item.rows[row]=nr;['variation_percent','result'].forEach(k=>{const out=card.querySelector('[data-row="'+row+'"][data-col="'+k+'"]');if(out)out.value=nr[k]||'';});}
     refreshPlanFeedback();
   });
     $('#planPage').addEventListener('input',e=>{
@@ -444,7 +472,7 @@
     const cell=e.target.closest('.plan-cell');if(!cell||cell.readOnly)return;
     const text=(e.clipboardData||window.clipboardData).getData('text');if(!text.includes('\t')&&!text.includes('\n'))return;
     e.preventDefault();const card=cell.closest('[data-test-index]'),item=items[Number(card.dataset.testIndex)],fields=columns(item.code),r0=Number(cell.dataset.row),c0=fields.findIndex(c=>c[0]===cell.dataset.col);
-    text.replace(/\r/g,'').split('\n').filter((v,i,a)=>!(i===a.length-1&&v==='')).forEach((line,ri)=>{while(item.rows.length<=r0+ri)item.rows.push({});line.split('\t').forEach((v,ci)=>{const f=fields[c0+ci];if(f&&!['absorption_index','theoretical','errU','errV','errW'].includes(f[0]))item.rows[r0+ri][f[0]]=v.trim();});item.rows[r0+ri]=normalize(item.code,item.rows[r0+ri]);});
+    text.replace(/\r/g,'').split('\n').filter((v,i,a)=>!(i===a.length-1&&v==='')).forEach((line,ri)=>{while(item.rows.length<=r0+ri)item.rows.push({});line.split('\t').forEach((v,ci)=>{const f=fields[c0+ci];if(f&&!['absorption_index','theoretical','errU','errV','errW'].includes(f[0])&&!(item.code==='TTR'&&f[0]==='result')&&!(item.code==='BUSHING'&&['variation_percent','result'].includes(f[0])))item.rows[r0+ri][f[0]]=v.trim();});item.rows[r0+ri]=normalize(item.code,item.rows[r0+ri]);});
     renderCards();refreshPlanFeedback();markPlanChanged(350);toast('Bloque pegado desde Excel.');
   });
 })();
