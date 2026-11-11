@@ -68,3 +68,22 @@
 - [ ] Confirmar que no aparece `Cannot access 'activeExecutionId' before initialization`.
 - [ ] Confirmar que se muestra el formulario de ejecución TTR.
 - [ ] Cancelar y comprobar que regresa al historial.
+
+
+## v1.5.32 — protocolos LAP y asistente de planes
+- [ ] Confirmar que la acción principal de Pruebas eléctricas dice «Registrar pruebas».
+- [ ] Crear un plan y recorrer Datos generales, Ensayos, Mediciones y Resumen.
+- [ ] Agregar varios ensayos y comprobar que se muestra una sola tarjeta de medición a la vez.
+- [ ] Cambiar entre ensayos, agregar/quitar filas y revisar que se mantenga el ensayo activo correcto.
+- [ ] TTR: validar AT, BT, U-0, V-0, W-0, relación teórica y errores por fase.
+- [ ] Factor de potencia: validar seis modos, tensión, FP medido/corregido a 20 °C; capacitancia no debe bloquear los modos sin ese dato.
+- [ ] Excitación: validar TAP, fase, tensión, frecuencia, corriente de excitación y pérdidas, sin ángulo ni reactancia.
+- [ ] Resistencia de devanados: validar AT/BT, corriente de prueba, temperatura medida y resistencias medida/referida a 75 °C.
+- [ ] Aislamiento: validar AT-BT, AT-Masa, BT-Masa, lecturas 15/30/45/60 s e índice de absorción.
+- [ ] Bushings: validar borne, serie, tensión, FP y capacitancias de placa/medidas; comprobar variación calculada.
+- [ ] SFRA: validar tres conexiones del protocolo.
+- [ ] Pararrayos: validar AT (1U/1V/1W), MT (2U/2V/2W/2N), GST y salidas sin unidad forzada.
+- [ ] Protecciones: validar ítem, accesorio, bornes, contacto, condición, ajuste y resultado, sin terminales precargados.
+- [ ] Confirmar que equipo, marca, modelo, serie y referencia por ensayo son opcionales.
+- [ ] Guardar, recargar y editar un plan; verificar que se conservan las mediciones.
+- [ ] Revisar escritorio y móvil: campos compactos y navegación sin una página excesivamente larga.
