@@ -70,7 +70,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.30">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.31">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -109,6 +109,13 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
   <button class="icon-btn dark" aria-label="Menú"><svg><use href="#i-menu"/></svg></button>
   <div class="brand-mark">T</div><strong>TR Health</strong>
   <div class="global-search"><svg><use href="#i-search"/></svg><input id="globalSearch" placeholder="Escribe para ir a un módulo o buscar un trafo..."><kbd>⌘K</kbd><div id="searchResults" class="search-results"></div></div>
+  <div class="topbar-transformer-tools">
+    <label class="topbar-transformer-select" aria-label="Cambiar transformador">
+      <svg><use href="#i-layers"/></svg>
+      <select id="transformerSwitcher" aria-label="Seleccionar transformador"><option value="">Cargando trafos…</option></select>
+    </label>
+    <button type="button" class="btn primary topbar-create-transformer" id="createTransformerBtn"><svg><use href="#i-plus"/></svg><span>Crear trafo</span></button>
+  </div>
   <div class="top-actions"><button class="icon-btn dark" title="Aplicaciones"><svg><use href="#i-grid"/></svg></button><button class="icon-btn dark notification" title="Notificaciones"><svg><use href="#i-bell"/></svg><i>1</i></button><button class="icon-btn dark notification" title="Mensajes"><svg><use href="#i-mail"/></svg><i>1</i></button><div class="user-chip"><span>H</span> Hector G⌄</div></div>
 </header>
 <main class="page-shell">
@@ -415,7 +422,7 @@ window.PILOT = <?=json_encode([
 
 <div class="modal-backdrop hidden" id="transformerEditModal" role="dialog" aria-modal="true" aria-labelledby="editTransformerTitle">
   <div class="modal-panel transformer-edit-panel">
-    <div class="modal-header"><div><h2 id="editTransformerTitle">Editar transformador</h2><p>Modifica los datos principales de la ficha.</p></div><button type="button" class="modal-close" id="closeTransformerModal" aria-label="Cerrar">×</button></div>
+    <div class="modal-header"><div><h2 id="editTransformerTitle">Editar transformador</h2><p id="editTransformerSubtitle">Modifica los datos principales de la ficha.</p></div><button type="button" class="modal-close" id="closeTransformerModal" aria-label="Cerrar">×</button></div>
     <form id="transformerEditForm">
       <div class="transformer-edit-grid">
         <label>TAG / Código<input name="code" id="editTrafoCode" required maxlength="80"></label>
@@ -441,6 +448,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.30"></script>
-<script src="./assets/plan.js?v=1.5.30"></script>
+<script src="./assets/app.js?v=1.5.31"></script>
+<script src="./assets/plan.js?v=1.5.31"></script>
 </body></html>
