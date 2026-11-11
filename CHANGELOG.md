@@ -1,3 +1,12 @@
+## v1.5.32
+- Alinea las plantillas de TTR, factor de potencia, excitación, resistencia de devanados, aislamiento, bushings, SFRA, pararrayos y protecciones con los campos visibles en el libro LAP.
+- Retira campos no presentes en las tablas LAP principales y evita forzar unidades que el encabezado no especifica para las salidas del pararrayos.
+- Mantiene capacitancia independiente como ensayo complementario: en LAP aparece dentro de los bloques de factor de potencia y bushings, no como protocolo separado.
+- Deja opcionales los metadatos de equipo por ensayo para que no bloqueen el registro de mediciones.
+- Convierte el plan en un asistente de cuatro etapas y muestra una sola tarjeta de ensayo a la vez; añade resumen, selector de ensayo y navegación.
+- Compacta grillas y controles; conserva al volver a guardar claves de mediciones antiguas que ya no se muestran en los formularios.
+- Cambia «Nueva visita» por «Registrar pruebas» y actualiza versión de caché y documentación.
+
 ## v1.5.31
 - Incorpora en el topbar un selector para cambiar de transformador sin volver al buscador.
 - Añade «Crear trafo» en la barra superior y reutiliza el formulario técnico de alta/edición.
