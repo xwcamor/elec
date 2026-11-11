@@ -1,3 +1,9 @@
+## v1.5.22
+- Al cambiar de transformador, recarga también los valores visibles de datos generales para que los indicadores de los pasos correspondan al transformador seleccionado.
+- Un bobinado solo se marca completo si tiene nombre, código, tensión nominal, conexión y bornes identificados con fase.
+- Si el transformador tiene tipo o número de taps en sus datos de placa, el paso de conmutadores ya no se muestra como "No aplica" cuando aún no está configurado.
+- Los indicadores rojos distinguen los bobinados pendientes o con identificadores duplicados.
+
 ## v1.5.21
 - Retira las etiquetas visibles de estado en las tarjetas de cada prueba y en el selector de ensayos; conserva el porcentaje de campos mínimos y las alertas de datos faltantes.
 - La misma vista simplificada se aplica al crear una visita nueva y al editar una existente.

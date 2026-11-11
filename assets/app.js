@@ -413,10 +413,13 @@
     const windingData=state.windings.length>0;
     const windingsComplete=windingData&&state.windings.every(w=>{
       const name=String(w.name||'').trim(),code=String(w.code||'').trim();
+      const voltage=Number(w.voltage_kv),connection=String(w.connection_type||'').trim();
       const terminals=(w.terminals||[]).filter(t=>String(t.code||'').trim()||String(t.phase||'').trim()||t.has_capacitive_bushing);
-      return name!==''&&code!==''&&terminals.length>0&&terminals.every(t=>String(t.code||'').trim()!=='');
+      return name!==''&&code!==''&&Number.isFinite(voltage)&&voltage>0&&connection!==''&&
+        terminals.length>0&&terminals.every(t=>String(t.code||'').trim()!==''&&String(t.phase||'').trim()!=='');
     })&&windingIssues.length===0;
-    const windingsState=windingsComplete?'complete':(windingData?'partial':'missing');
+    const duplicateWindingData=windingIssues.some(message=>/repetid/i.test(message));
+    const windingsState=windingsComplete?'complete':(!windingData||duplicateWindingData?'missing':'partial');
 
     const tapData=state.tap_changers.length>0;
     const tapIssues=validateConfiguration().filter(message=>/conmutador|posición/i.test(message));
@@ -427,7 +430,8 @@
         positions.every(p=>String(p.position_no??'').trim()!==''&&Number.isInteger(Number(p.position_no))&&Number(p.position_no)>0)&&
         new Set(numbers).size===numbers.length;
     })&&tapIssues.length===0;
-    const tapsState=!tapData?'optional':(tapsComplete?'complete':'partial');
+    const tapsExpected=String(transformer.tap_type||'').trim()!==''||Number(transformer.num_taps||0)>0;
+    const tapsState=!tapData?(tapsExpected?'missing':'optional'):(tapsComplete?'complete':'partial');
 
     const reviewComplete=generalComplete&&windingsComplete&&(tapsState==='optional'||tapsComplete);
     const reviewState=reviewComplete?'complete':(windingData||vector||state.tap_changers.length?'partial':'missing');
@@ -435,7 +439,7 @@
     const steps=[
       ['general',generalState,generalComplete?'Completo':'Revisar datos'],
       ['windings',windingsState,windingsComplete?'Completo':(windingData?'Incompleto':'Agregar bobinados')],
-      ['taps',tapsState,tapsState==='optional'?'No aplica':(tapsComplete?'Completo':'Revisar posiciones')],
+      ['taps',tapsState,tapsState==='optional'?'No aplica':(tapsComplete?'Completo':(!tapData?'Agregar conmutador':'Revisar posiciones'))],
       ['review',reviewState,reviewComplete?'Listo para revisar':'Pendiente']
     ];
     steps.forEach(([key,status,label])=>{
@@ -514,7 +518,7 @@
     catch(e){toast(e.message,true);}
   }
   async function selectTransformer(key){
-    try{const r=await fetch(api('action=load&key='+encodeURIComponent(key)));const d=await readApiResponse(r);Object.assign(transformer,d.transformer);state=normalizeConfig(d.config||{});PILOT.demo=false;PILOT.transformerFound=true;PILOT.schemaReady=!!d.schemaReady;PILOT.testsSchemaReady=!!d.testsSchemaReady;refreshSidebarAccess();updateTransformerDisplay();const status=$('#pilotStatus');if(status){status.className='pilot-status '+(PILOT.schemaReady&&PILOT.testsSchemaReady?'ready':'warning');status.querySelector('strong').textContent=PILOT.schemaReady&&PILOT.testsSchemaReady?'Base de datos conectada':'Faltan tablas del piloto';status.querySelector('span').textContent='BD: '+(PILOT.dbName||'configurada')+' · Transformador: '+transformer.code;}$('#globalSearch').value='';$('#searchResults').classList.remove('open');renderWindings();renderTapChangers();updateCounts();const dbAlert=$('#dbAlert');if(dbAlert){const message=!PILOT.dbConnected?'No hay conexión con la base de datos. Revisa la configuración de conexión.':(!PILOT.schemaReady?'Falta preparar el almacenamiento de la configuración eléctrica.':'');dbAlert.querySelector('span').textContent=message;dbAlert.classList.toggle('hidden',!message);}markDirty();toast('Transformador '+transformer.code+' seleccionado.');backOverview();}
+    try{const r=await fetch(api('action=load&key='+encodeURIComponent(key)));const d=await readApiResponse(r);Object.assign(transformer,d.transformer);state=normalizeConfig(d.config||{});PILOT.demo=false;PILOT.transformerFound=true;PILOT.schemaReady=!!d.schemaReady;PILOT.testsSchemaReady=!!d.testsSchemaReady;$('#phaseCount').value=String(state.phase_count||3);$('#vectorGroup').value=state.vector_group||'';$('#frequency').value=state.frequency_hz??60;$('#generalNotes').value=state.notes||'';refreshSidebarAccess();updateTransformerDisplay();const status=$('#pilotStatus');if(status){status.className='pilot-status '+(PILOT.schemaReady&&PILOT.testsSchemaReady?'ready':'warning');status.querySelector('strong').textContent=PILOT.schemaReady&&PILOT.testsSchemaReady?'Base de datos conectada':'Faltan tablas del piloto';status.querySelector('span').textContent='BD: '+(PILOT.dbName||'configurada')+' · Transformador: '+transformer.code;}$('#globalSearch').value='';$('#searchResults').classList.remove('open');renderWindings();renderTapChangers();updateCounts();const dbAlert=$('#dbAlert');if(dbAlert){const message=!PILOT.dbConnected?'No hay conexión con la base de datos. Revisa la configuración de conexión.':(!PILOT.schemaReady?'Falta preparar el almacenamiento de la configuración eléctrica.':'');dbAlert.querySelector('span').textContent=message;dbAlert.classList.toggle('hidden',!message);}markDirty();toast('Transformador '+transformer.code+' seleccionado.');backOverview();}
     catch(e){toast(e.message,true);}
   }
   function updateTransformerDisplay(){
