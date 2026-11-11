@@ -114,7 +114,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       <svg><use href="#i-layers"/></svg>
       <select id="transformerSwitcher" aria-label="Seleccionar transformador"><option value="">Cargando trafos…</option></select>
     </label>
-    <button type="button" class="btn primary topbar-create-transformer" id="createTransformerBtn"><svg><use href="#i-plus"/></svg><span>Crear trafo</span></button>
+    <button type="button" class="btn primary topbar-create-transformer" id="createTransformerBtn" title="Crear transformador" aria-label="Crear transformador"><svg><use href="#i-plus"/></svg><span>Crear trafo</span></button>
   </div>
   <div class="top-actions"><button class="icon-btn dark" title="Aplicaciones"><svg><use href="#i-grid"/></svg></button><button class="icon-btn dark notification" title="Notificaciones"><svg><use href="#i-bell"/></svg><i>1</i></button><button class="icon-btn dark notification" title="Mensajes"><svg><use href="#i-mail"/></svg><i>1</i></button><div class="user-chip"><span>H</span> Hector G⌄</div></div>
 </header>
