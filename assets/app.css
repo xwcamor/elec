@@ -199,7 +199,7 @@
  .config-panel .panel-heading>div:first-child{flex-basis:100%}
 }
 
-/* v1.5.8 · Formularios de ejecución a ancho completo y plantillas LAP */
+/* v1.5.8 · Formularios de ejecución a ancho completo y plantillas por tipo de ensayo */
 .execution-layout{display:block;width:100%}
 .execution-main{width:100%;max-width:none;min-width:0}
 .execution-main>.execution-card{width:100%}
@@ -231,7 +231,7 @@
 @media(max-width:430px){.plan-test-meta-grid{grid-template-columns:1fr}.plan-shared-grid{grid-template-columns:1fr}}
 
 
-/* v1.5.15 · Estado visible, avance y avisos en vivo de planes LAP */
+/* v1.5.15 · Estado visible, avance y avisos en vivo de planes de pruebas */
 .plan-progress-panel{margin:0 0 14px;border:1px solid #ead7aa;border-left:4px solid #d99a25;background:#fffaf0;border-radius:9px;padding:13px 15px;color:#34485c}
 .plan-progress-panel[data-state="success"]{border-color:#b8ddc1;border-left-color:#2e9b58;background:#f2faf4}
 .plan-progress-panel[data-state="info"]{border-color:#bfd8ed;border-left-color:#3985c8;background:#f3f8fd}
@@ -660,3 +660,10 @@ body.test-form-focus .plan-tests-section{scroll-margin-top:84px}
   .plan-step{transition:none}
   .plan-step:active{transform:none}
 }
+
+/* v1.5.30 · Acciones del historial de visitas */
+.test-row-actions{display:flex;align-items:center;gap:6px;white-space:nowrap}
+.test-delete-button{width:29px;min-width:29px;padding:0;color:#b42318;border-color:#f0d0cd;background:#fff}
+.test-delete-button svg{width:13px;height:13px}
+.test-delete-button:hover{color:#922018;border-color:#dca6a1;background:#fff7f6}
+.test-delete-button:disabled{opacity:.55;cursor:wait}
