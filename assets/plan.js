@@ -4,7 +4,7 @@
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const catalog=[
     ['TTR','Relación de transformación','TAP, relación teórica y error por fase'],
-    ['POWER_FACTOR','Factor de potencia y capacitancia','Seis modos LAP, FP medido/corregido y capacitancia'],
+    ['POWER_FACTOR','Factor de potencia y capacitancia','Seis modos de ensayo, FP medido/corregido y capacitancia'],
     ['EXCITATION','Corriente de excitación','Tensión, corriente, fase, pérdidas y reactancia'],
     ['WINDING_RESISTANCE','Resistencia de devanados','AT/BT, corriente DC y resistencia referida a 75 °C'],
     ['INSULATION_RESISTANCE','Resistencia de aislamiento','Tres configuraciones y lecturas por tiempo'],
@@ -294,13 +294,13 @@
         }).join('')+'</tr>';
       }).join('');
       let hint='';
-      if(item.code==='POWER_FACTOR')hint='<div class="plan-reference-note"><b>LAP:</b> seis modos CH+CHL, CH, CHL, CL+CLH, CL y CLH. El archivo registra FP medido y corregido a 20 °C, pero no fija un límite numérico de aceptación; el resultado se evalúa según el criterio técnico aplicable.</div>';
-      if(item.code==='INSULATION_RESISTANCE')hint='<div class="plan-reference-note"><b>LAP:</b> referencia IEEE C57.152-2013, cláusula 7.2.13. El libro no muestra un umbral numérico de aceptación para estas lecturas; registra el resultado tras aplicar el criterio aprobado.</div>';
-      if(item.code==='TTR')hint='<div class="plan-reference-note"><b>Evaluación LAP automática:</b> relación teórica = AT / (BT × √3); error por fase = (medida − teórica) × 100 / medida. Resultado CORRECTO cuando los tres errores están dentro de ±0,5%.</div>';
-      if(item.code==='BUSHING')hint='<div class="plan-reference-note"><b>Evaluación LAP automática:</b> variación absoluta de capacitancia = |medida − placa| / placa × 100. CONFORME cuando la variación es menor a 5%. el FP se evalúa por separado, porque el libro no fija un umbral numérico para ese factor.</div>';
-      if(item.code==='WINDING_RESISTANCE')hint='<div class="plan-reference-note"><b>LAP:</b> el comparativo entre fases debe ser ≤5% (IEEE C57.152-2013, cláusula 7.2.7). El archivo no documenta con claridad la fórmula comparativa; por eso el resultado se registra manualmente y no se calcula con la columna auxiliar defectuosa del Excel.</div>';
-      if(item.code==='ARRESTER')hint='<div class="plan-reference-note"><b>LAP:</b> comparar las mediciones con los valores de fábrica. Si no existen, usar esta ejecución como referencia histórica; no se fija un límite absoluto en este formulario.</div>';
-      if(item.code==='SFRA')hint='<div class="plan-reference-note"><b>LAP:</b> la conclusión se obtiene comparando las gráficas de campo con las de planta. La evaluación es manual; el protocolo no define un umbral numérico.</div>';
+      if(item.code==='POWER_FACTOR')hint='<div class="plan-reference-note"><b>Referencia técnica:</b> seis modos CH+CHL, CH, CHL, CL+CLH, CL y CLH. El archivo registra FP medido y corregido a 20 °C, pero no fija un límite numérico de aceptación; el resultado se evalúa según el criterio técnico aplicable.</div>';
+      if(item.code==='INSULATION_RESISTANCE')hint='<div class="plan-reference-note"><b>Referencia técnica:</b> referencia IEEE C57.152-2013, cláusula 7.2.13. El libro no muestra un umbral numérico de aceptación para estas lecturas; registra el resultado tras aplicar el criterio aprobado.</div>';
+      if(item.code==='TTR')hint='<div class="plan-reference-note"><b>Evaluación automática según protocolo:</b> relación teórica = AT / (BT × √3); error por fase = (medida − teórica) × 100 / medida. Resultado CORRECTO cuando los tres errores están dentro de ±0,5%.</div>';
+      if(item.code==='BUSHING')hint='<div class="plan-reference-note"><b>Evaluación automática según protocolo:</b> variación absoluta de capacitancia = |medida − placa| / placa × 100. CONFORME cuando la variación es menor a 5%. el FP se evalúa por separado, porque el libro no fija un umbral numérico para ese factor.</div>';
+      if(item.code==='WINDING_RESISTANCE')hint='<div class="plan-reference-note"><b>Referencia técnica:</b> el comparativo entre fases debe ser ≤5% (IEEE C57.152-2013, cláusula 7.2.7). El archivo no documenta con claridad la fórmula comparativa; por eso el resultado se registra manualmente y no se calcula con la columna auxiliar defectuosa del Excel.</div>';
+      if(item.code==='ARRESTER')hint='<div class="plan-reference-note"><b>Referencia técnica:</b> comparar las mediciones con los valores de fábrica. Si no existen, usar esta ejecución como referencia histórica; no se fija un límite absoluto en este formulario.</div>';
+      if(item.code==='SFRA')hint='<div class="plan-reference-note"><b>Referencia técnica:</b> la conclusión se obtiene comparando las gráficas de campo con las de planta. La evaluación es manual; el protocolo no define un umbral numérico.</div>';
       const openIndexes=[...host.querySelectorAll('.plan-test-card[open]')].map(node=>Number(node.dataset.testIndex));
       const shouldOpen=openIndexes.length?openIndexes.includes(idx):idx===0;
       return '<details class="plan-test-card" data-test-index="'+idx+'" data-state="'+metrics.state+'" '+(shouldOpen?'open':'')+'>'+
