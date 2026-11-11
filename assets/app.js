@@ -119,7 +119,7 @@
       min_position:c.min_position ?? '', max_position:c.max_position ?? '', neutral_position:c.neutral_position ?? '', current_position:c.current_position ?? '', notes:c.notes || '',
       positions:(c.positions || []).map(p => ({position_no:p.position_no,label:p.label || '',voltage_kv:p.voltage_kv ?? '',percent_change:p.percent_change ?? '',is_neutral:Number(p.is_neutral || 0)===1,notes:p.notes || ''}))
     }));
-    return {phase_count:Number(config.phase_count || 3),vector_group:config.vector_group || transformer.vector_group || 'Yd11',frequency_hz:config.frequency_hz ?? 60,notes:config.notes || '',version_no:Number(config.version_no || 0),windings,tap_changers:tapChangers,versions:Array.isArray(config.versions) ? config.versions : []};
+    return {phase_count:Number(config.phase_count || 3),vector_group:config.vector_group || transformer.vector_group || '',frequency_hz:config.frequency_hz ?? 60,notes:config.notes || '',version_no:Number(config.version_no || 0),windings,tap_changers:tapChangers,versions:Array.isArray(config.versions) ? config.versions : []};
   }
 
   function hasSavedElectricalConfiguration(){
@@ -165,6 +165,7 @@
     const badge = $('#saveStatus');
     badge.classList.remove('saved');
     badge.innerHTML = '<i></i>Cambios sin guardar';
+    refreshConfigStepIndicators();
   }
   function toast(message, bad = false) {
     const el = $('#toast'); el.textContent = message; el.style.background = bad ? '#a32b2b' : '#24394e';
@@ -181,6 +182,7 @@
     showOnlyMain('configPage');
     showPanel('general');
     updateCounts();
+    refreshConfigStepIndicators();
   }
   function backOverview() { showOnlyMain('overviewPage'); }
 
@@ -189,7 +191,7 @@
   $$('.config-tab').forEach(b => b.addEventListener('click', () => showPanel(b.dataset.tab)));
   $$('[data-prev]').forEach(b => b.addEventListener('click', () => showPanel(b.dataset.prev)));
   $('#phaseCount').value = String(state.phase_count || 3);
-  $('#vectorGroup').value = state.vector_group || 'Yd11';
+  $('#vectorGroup').value = state.vector_group || '';
   $('#frequency').value = state.frequency_hz ?? 60;
   $('#generalNotes').value = state.notes || '';
   ['phaseCount','vectorGroup','frequency','generalNotes'].forEach(id => $('#'+id).addEventListener('input', () => {state.phase_count=Number($('#phaseCount').value);state.vector_group=$('#vectorGroup').value;state.frequency_hz=$('#frequency').value;state.notes=$('#generalNotes').value;markDirty();}));
@@ -398,7 +400,56 @@
     $('#windingCount').textContent=state.windings.length;
     refreshWindingCounters();
     $('#tapCount').textContent=state.tap_changers.reduce((sum,c)=>sum+c.positions.length,0);
+    refreshConfigStepIndicators();
+  }
 
+  function refreshConfigStepIndicators(){
+    const phase=Number($('#phaseCount').value),frequency=Number($('#frequency').value);
+    const vector=String($('#vectorGroup').value||'').trim();
+    const generalComplete=[1,3].includes(phase)&&vector!==''&&Number.isFinite(frequency)&&frequency>0;
+    const generalState=generalComplete?'complete':'partial';
+
+    const windingIssues=validateConfiguration().filter(message=>/bobinado|borne/i.test(message));
+    const windingData=state.windings.length>0;
+    const windingsComplete=windingData&&state.windings.every(w=>{
+      const name=String(w.name||'').trim(),code=String(w.code||'').trim();
+      const terminals=(w.terminals||[]).filter(t=>String(t.code||'').trim()||String(t.phase||'').trim()||t.has_capacitive_bushing);
+      return name!==''&&code!==''&&terminals.length>0&&terminals.every(t=>String(t.code||'').trim()!=='');
+    })&&windingIssues.length===0;
+    const windingsState=windingsComplete?'complete':(windingData?'partial':'missing');
+
+    const tapData=state.tap_changers.length>0;
+    const tapIssues=validateConfiguration().filter(message=>/conmutador|posición/i.test(message));
+    const tapsComplete=tapData&&state.tap_changers.every(c=>{
+      const positions=Array.isArray(c.positions)?c.positions:[];
+      const numbers=positions.map(p=>Number(p.position_no));
+      return !!state.windings[c.winding_index]&&positions.length>0&&
+        positions.every(p=>String(p.position_no??'').trim()!==''&&Number.isInteger(Number(p.position_no))&&Number(p.position_no)>0)&&
+        new Set(numbers).size===numbers.length;
+    })&&tapIssues.length===0;
+    const tapsState=!tapData?'optional':(tapsComplete?'complete':'partial');
+
+    const reviewComplete=generalComplete&&windingsComplete&&(tapsState==='optional'||tapsComplete);
+    const reviewState=reviewComplete?'complete':(windingData||vector||state.tap_changers.length?'partial':'missing');
+
+    const steps=[
+      ['general',generalState,generalComplete?'Completo':'Revisar datos'],
+      ['windings',windingsState,windingsComplete?'Completo':(windingData?'Incompleto':'Agregar bobinados')],
+      ['taps',tapsState,tapsState==='optional'?'No aplica':(tapsComplete?'Completo':'Revisar posiciones')],
+      ['review',reviewState,reviewComplete?'Listo para revisar':'Pendiente']
+    ];
+    steps.forEach(([key,status,label])=>{
+      const button=document.querySelector('.config-tab[data-tab="'+key+'"]');
+      if(!button)return;
+      const number=button.querySelector('.tab-number');
+      if(number)number.dataset.state=status;
+      const info=button.querySelector('span:last-child');
+      if(!info)return;
+      let badge=info.querySelector('.config-step-state');
+      if(!badge){badge=document.createElement('em');badge.className='config-step-state';info.appendChild(badge);}
+      badge.dataset.state=status;
+      badge.textContent=label;
+    });
   }
   function renderReview(){
     const terminals=state.windings.reduce((n,w)=>n+w.terminals.length,0),bushings=state.windings.reduce((n,w)=>n+w.terminals.filter(t=>t.has_capacitive_bushing).length,0),taps=state.tap_changers.reduce((n,c)=>n+c.positions.length,0);
@@ -450,7 +501,7 @@
     try{
       const response=await fetch(api('action=save'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(collectPayload())});
       const result=await readApiResponse(response);
-      state.version_no=result.result.version_no;state.versions.unshift({version_no:state.version_no,created_at:new Date().toLocaleString('es-PE')});dirty=false;refreshSidebarAccess();$('#saveStatus').classList.add('saved');$('#saveStatus').innerHTML='<i></i>Guardado';$('#versionBadge').textContent='Versión '+state.version_no;renderReview();toast('Configuración guardada como versión '+state.version_no+'.');
+      state.version_no=result.result.version_no;state.versions.unshift({version_no:state.version_no,created_at:new Date().toLocaleString('es-PE')});dirty=false;refreshSidebarAccess();refreshConfigStepIndicators();$('#saveStatus').classList.add('saved');$('#saveStatus').innerHTML='<i></i>Guardado';$('#versionBadge').textContent='Versión '+state.version_no;renderReview();toast('Configuración guardada como versión '+state.version_no+'.');
     }catch(error){toast(error.message,true);}finally{btns.forEach(b=>{b.disabled=false;b.innerHTML='<svg><use href="#i-check"/></svg>Guardar configuración';});}
   }
   $('#saveConfig').addEventListener('click',saveConfig);$('#saveConfigBottom').addEventListener('click',saveConfig);
@@ -571,7 +622,7 @@
     try{
       const [r,ct]=await Promise.all([fetch(api('action=test-list&key='+encodeURIComponent(transformer.key))),fetch(api('action=test-types'))]);
       const d=await readApiResponse(r), c=await readApiResponse(ct);
-      testExecutions=d.items||[];if(ct.ok&&c.ok&&c.items?.length){testCatalog.splice(0,testCatalog.length,...c.items.filter(x=>x.code!=='PLAN').map(x=>[x.code,x.name,'Formato LAP']));}
+      testExecutions=d.items||[];if(ct.ok&&c.ok&&c.items?.length){testCatalog.splice(0,testCatalog.length,...c.items.filter(x=>x.code!=='PLAN').map(x=>[x.code,x.name,'Datos de ensayo']));}
       renderTestHistory();
     }catch(e){testExecutions=[];renderTestHistory();toast(e.message,true);}
   }

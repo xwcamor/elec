@@ -172,7 +172,6 @@
     if(!items.length)missing.unshift('Selecciona por lo menos una prueba');
     return {general,perItem,total,filled,percent,ready,completed,missing,complete:!general.length&&items.length>0&&perItem.every(x=>x.metrics.complete)};
   }
-  function stateLabel(state){return ({empty:'SIN CAPTURA',partial:'FALTAN DATOS',ready:'DATOS COMPLETOS',complete:'DATOS COMPLETOS'})[state]||'FALTAN DATOS';}
   function refreshFieldStyles(card,item,metrics){
     card.querySelectorAll('.plan-cell').forEach(input=>{
       const row=Number(input.dataset.row),field=input.dataset.col,required=(requiredByTest[item.code]||[]).includes(field);
@@ -187,9 +186,6 @@
       input.closest('label')?.classList.toggle('meta-pending',!isFilled(input.value));
     });
     card.querySelectorAll('tbody tr[data-row-state]').forEach((tr,index)=>{tr.dataset.rowState=metrics.rowStates[index]?.state||'empty';});
-    card.dataset.state=metrics.state;
-    const badge=card.querySelector('[data-card-state]');
-    if(badge){badge.dataset.state=metrics.state;badge.textContent=stateLabel(metrics.state);}
     const progress=card.querySelector('[data-card-progress]');
     if(progress)progress.textContent=metrics.filled+'/'+metrics.total+' campos mínimos · '+metrics.percent+'%';
     const rowSummary=card.querySelector('[data-row-summary]');
@@ -225,11 +221,10 @@
 
     function renderPicker(){
     $('#planTestPicker').innerHTML=catalog.map(t=>{
-      const item=items.find(x=>x.code===t[0]),metrics=item?itemMetrics(item):null;
-      const state=metrics?metrics.state:'empty';
-      return '<button type="button" class="plan-pick-btn '+(item?'active':'')+'" data-pick-test="'+t[0]+'"><span class="plan-pick-check">'+(item?'✓':'＋')+'</span><span class="plan-pick-copy"><b>'+esc(t[1])+'</b><small>'+esc(t[2])+'</small></span>'+(item?'<span class="plan-pick-state" data-state="'+state+'">'+stateLabel(state)+'</span>':'')+'</button>';
+      const item=items.find(x=>x.code===t[0]);
+      return '<button type="button" class="plan-pick-btn '+(item?'active':'')+'" data-pick-test="'+t[0]+'"><span class="plan-pick-check">'+(item?'✓':'＋')+'</span><span class="plan-pick-copy"><b>'+esc(t[1])+'</b><small>'+esc(t[2])+'</small></span></button>';
     }).join('');
-    $('#planSelectionStatus').textContent=items.length?items.length+' prueba(s) seleccionada(s). '+items.filter(x=>itemMetrics(x).complete).length+' lista(s) para revisar.':'Aún no has añadido pruebas al plan.';
+    $('#planSelectionStatus').textContent=items.length?items.length+' prueba(s) seleccionada(s). '+items.filter(x=>itemMetrics(x).complete).length+' con todos los campos mínimos completos.':'Aún no has añadido pruebas al plan.';
   }
   function renderCards(){
     const host=$('#planTestCards');
@@ -250,7 +245,7 @@
       if(item.code==='INSULATION_RESISTANCE')hint='<div class="plan-reference-note"><b>Fórmula LAP:</b> IA = R a 1 min / R a 30 s.</div>';
       if(item.code==='TTR')hint='<div class="plan-reference-note"><b>Fórmula LAP:</b> relación teórica = AT / (BT × √3); error por fase = (medida − teórica) × 100 / medida. El ejemplo usa ±0.5%.</div>';
       return '<article class="plan-test-card" data-test-index="'+idx+'" data-state="'+metrics.state+'">'+
-        '<div class="plan-test-card-head"><div class="plan-test-heading"><span class="eyebrow">ENSAYO '+String(idx+1).padStart(2,'0')+'</span><h4>'+esc(item.name)+'</h4><div class="plan-test-status-line"><span data-card-state data-state="'+metrics.state+'" class="plan-state-badge">'+stateLabel(metrics.state)+'</span><small data-card-progress>'+metrics.filled+'/'+metrics.total+' campos mínimos · '+metrics.percent+'%</small></div></div><button type="button" class="delete-btn" data-remove-test="'+idx+'">Quitar</button></div>'+
+        '<div class="plan-test-card-head"><div class="plan-test-heading"><span class="eyebrow">ENSAYO '+String(idx+1).padStart(2,'0')+'</span><h4>'+esc(item.name)+'</h4><div class="plan-test-progress-line"><small data-card-progress>'+metrics.filled+'/'+metrics.total+' campos mínimos · '+metrics.percent+'%</small></div></div><button type="button" class="delete-btn" data-remove-test="'+idx+'">Quitar</button></div>'+
         '<div class="plan-test-meta-grid"><label>Norma / referencia<input data-meta="standard_reference" value="'+esc(item.standard_reference)+'" placeholder="Norma o protocolo"></label>'+
         '<label data-meta-wrap="equipment_name">Equipo<input data-meta="equipment_name" value="'+esc(item.equipment_name)+'" placeholder="Instrumento"></label>'+
         '<label data-meta-wrap="equipment_brand">Marca<input data-meta="equipment_brand" value="'+esc(item.equipment_brand)+'" placeholder="Marca"></label>'+

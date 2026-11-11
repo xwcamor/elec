@@ -318,3 +318,22 @@
 .side-nav button.electrical-tests-link:disabled:hover{background:#f5f6f7;color:#87919b}
 .side-nav button.electrical-tests-link:disabled .nav-state-chip{background:#f1f2f4;color:#777f88}
 @media(max-width:760px){.nav-state-chip{font-size:8px;padding:3px 5px}}
+
+/* v1.5.21 · Estados visuales de pasos de configuración */
+.config-step-state{display:inline-flex;align-self:flex-start;align-items:center;margin-top:4px;font-size:8px;font-style:normal;font-weight:750;line-height:1.2;letter-spacing:.01em;color:#9a6717}
+.config-step-state[data-state="complete"]{color:#177245}
+.config-step-state[data-state="partial"]{color:#9a6717}
+.config-step-state[data-state="missing"]{color:#b42318}
+.config-step-state[data-state="optional"]{color:#7c8792}
+.config-step-state[data-state="ready"]{color:#256da3}
+.config-tab .tab-number[data-state="complete"]{background:#e4f5e9;color:#177245;border:1px solid #b9e2c5}
+.config-tab .tab-number[data-state="partial"]{background:#fff3db;color:#956313;border:1px solid #f0d59e}
+.config-tab .tab-number[data-state="missing"]{background:#fff0ee;color:#b42318;border:1px solid #f2c4bf}
+.config-tab .tab-number[data-state="optional"]{background:#f1f3f5;color:#7c8792;border:1px solid #e1e5e9}
+.config-tab.active .tab-number[data-state="complete"]{background:#d9f0e1;color:#126b3c;border-color:#a9dabb}
+.config-tab.active .tab-number[data-state="partial"]{background:#ffedc7;color:#8d5d12;border-color:#e9c77d}
+.config-tab.active .tab-number[data-state="missing"]{background:#ffe5e2;color:#a52117;border-color:#e8aaa3}
+.config-tab.active .tab-number[data-state="optional"]{background:#edf0f2;color:#687580;border-color:#d7dde2}
+.plan-test-progress-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:7px}
+.plan-test-progress-line small{font-size:9px;color:#738397}
+.plan-test-card-head .plan-test-heading{min-width:0}

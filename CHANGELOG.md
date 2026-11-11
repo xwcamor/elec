@@ -1,3 +1,12 @@
+## v1.5.21
+- Retira las etiquetas visibles de estado en las tarjetas de cada prueba y en el selector de ensayos; conserva el porcentaje de campos mínimos y las alertas de datos faltantes.
+- La misma vista simplificada se aplica al crear una visita nueva y al editar una existente.
+- Elimina el texto "Formato LAP" de las tarjetas de selección de prueba y lo reemplaza por "Datos de ensayo".
+- Colorea los números de los pasos de Configuración eléctrica según su avance: verde completo, ámbar pendiente/incompleto, rojo cuando faltan bobinados y gris cuando los taps no aplican.
+- Añade una etiqueta breve bajo cada paso: Completo, Revisar datos, Agregar bobinados, No aplica o Listo para revisar.
+- Los indicadores se actualizan al editar los campos, agregar/quitar bobinados o taps, abrir la configuración y guardar.
+- Evita sugerir Yd11 automáticamente cuando no existe un grupo vectorial registrado; el campo queda vacío hasta que se confirme.
+
 ## v1.5.20
 - La ficha del transformador se mantiene como cabecera común al navegar por el piloto; no se duplica dentro de Pruebas eléctricas.
 - El acceso a Configuración eléctrica muestra un indicador rojo "Sin configurar" hasta que exista una versión guardada con al menos un bobinado.

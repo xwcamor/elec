@@ -70,7 +70,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.20">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.21">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -298,7 +298,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       <div class="plan-test-picker" id="planTestPicker"></div><div class="plan-selection-status" id="planSelectionStatus">Aún no has añadido pruebas al plan.</div>
     </section>
     <section class="execution-card plan-tests-section">
-      <div class="execution-card-title"><span class="eyebrow">03 · FORMULARIOS DE PRUEBA</span><h3>Resultados por ensayo</h3><p>Marca, modelo, serie, norma y estado se registran por prueba, ya que el instrumento puede cambiar entre ensayos.</p></div>
+      <div class="execution-card-title"><span class="eyebrow">03 · FORMULARIOS DE PRUEBA</span><h3>Resultados por ensayo</h3><p>Marca, modelo, serie, norma y observaciones se registran por prueba, ya que el instrumento puede cambiar entre ensayos.</p></div>
       <div id="planTestCards"><div class="empty-state">Selecciona los ensayos para que aparezcan aquí sus formularios.</div></div>
     </section>
   </section>
@@ -421,6 +421,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.20"></script>
-<script src="./assets/plan.js?v=1.5.20"></script>
+<script src="./assets/app.js?v=1.5.21"></script>
+<script src="./assets/plan.js?v=1.5.21"></script>
 </body></html>
