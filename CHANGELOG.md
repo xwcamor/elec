@@ -1,3 +1,9 @@
+## v1.5.30
+- Retira el nombre de la empresa de las referencias a la base de protocolos; la interfaz ahora habla de protocolo u hoja de referencia.
+- Añade la acción Eliminar en el historial de Pruebas eléctricas para borrar una visita completa.
+- La eliminación pide confirmación, valida que el registro pertenezca al transformador seleccionado y elimina sus mediciones asociadas mediante la relación en cascada.
+- Actualiza la lista de verificación y la documentación a la versión 1.5.30.
+
 ## v1.5.29
 - Configuración eléctrica deja de colorear el botón del menú: muestra solo «!» rojo si no está configurada o ámbar si está incompleta; al completarse desaparece el indicador.
 - Pruebas eléctricas evita añadir el mismo tipo de ensayo más de una vez por visita; la validación también se aplica al guardar en el servidor.
@@ -22,7 +28,7 @@
 - El FP de placa y el FP medido son datos obligatorios para conservar la comparación completa del protocolo.
 
 ## v1.5.25
-- Factor de potencia ya no exige capacitancia en cada modo: el Excel LAP solo contiene valores de capacitancia para CL+CLH, CL y CLH.
+- Factor de potencia ya no exige capacitancia en cada modo: el Excel de referencia solo contiene valores de capacitancia para CL+CLH, CL y CLH.
 - Colorea los resultados automáticos de TTR y bushings según estén correctos/conformes, observados o pendientes.
 
 ## v1.5.24
@@ -30,8 +36,8 @@
 - TTR calcula relación teórica, errores por fase y resultado CORRECTO/FUERA DE TOLERANCIA usando ±0,5%.
 - Bushings calcula variación absoluta entre capacitancia medida y de placa y marca CONFORME cuando es menor a 5%.
 - Resistencia de devanados solicita el resultado del comparativo entre fases (≤5%) sin inventar una fórmula que el Excel no documenta.
-- Retira el límite erróneo de FP <1%; el protocolo LAP registra seis modos y FP corregido, pero no define ese umbral.
-- Añade notas para diferenciar evaluaciones manuales y criterios numéricos presentes en LAP.
+- Retira el límite erróneo de FP <1%; el protocolo de referencia registra seis modos y FP corregido, pero no define ese umbral.
+- Añade notas para diferenciar evaluaciones manuales y criterios numéricos presentes en la referencia técnica.
 
 ## v1.5.23
 - Al abrir Configuración eléctrica, la interfaz pasa a un modo independiente: oculta la barra superior, la ficha general, las pestañas del transformador y el resto del módulo.
@@ -48,7 +54,7 @@
 ## v1.5.21
 - Retira las etiquetas visibles de estado en las tarjetas de cada prueba y en el selector de ensayos; conserva el porcentaje de campos mínimos y las alertas de datos faltantes.
 - La misma vista simplificada se aplica al crear una visita nueva y al editar una existente.
-- Elimina el texto "Formato LAP" de las tarjetas de selección de prueba y lo reemplaza por "Datos de ensayo".
+- Elimina el texto "Formato de referencia" de las tarjetas de selección de prueba y lo reemplaza por "Datos de ensayo".
 - Colorea los números de los pasos de Configuración eléctrica según su avance: verde completo, ámbar pendiente/incompleto, rojo cuando faltan bobinados y gris cuando los taps no aplican.
 - Añade una etiqueta breve bajo cada paso: Completo, Revisar datos, Agregar bobinados, No aplica o Listo para revisar.
 - Los indicadores se actualizan al editar los campos, agregar/quitar bobinados o taps, abrir la configuración y guardar.
@@ -95,7 +101,7 @@
 - Actualiza el estado en vivo al escribir, cambiar estados o pegar bloques desde Excel.
 
 ## v1.5.14
-- Corrige la precarga de Protecciones propias según la hoja LAP: 18 verificaciones con accesorios, bornes, contactos, condición y ajustes de temperatura/nivel que aparecen en el Excel.
+- Corrige la precarga de Protecciones propias según la hoja de referencia: 18 verificaciones con accesorios, bornes, contactos, condición y ajustes de temperatura/nivel que aparecen en el Excel.
 - Actualiza la caché del formulario de planes.
 
 ## v1.5.13
@@ -109,15 +115,15 @@
 - Incorpora un plan por visita: fecha, responsable, supervisor y condiciones ambientales se ingresan una sola vez.
 - Permite elegir varias pruebas y genera un formulario independiente por ensayo.
 - Equipo, marca, modelo, serie, norma, estado y observaciones se registran por prueba.
-- Ajusta los formularios al protocolo LAP: FP/capacitancia, aislamiento, devanados AT/BT, excitación, bushings, SFRA, pararrayos y protecciones.
-- Precarga seis modos de FP, tres configuraciones de aislamiento, fases/taps de excitación, secciones AT/MT de pararrayos y contactos LAP de protecciones.
+- Ajusta los formularios al protocolo de referencia: FP/capacitancia, aislamiento, devanados AT/BT, excitación, bushings, SFRA, pararrayos y protecciones.
+- Precarga seis modos de FP, tres configuraciones de aislamiento, fases/taps de excitación, secciones AT/MT de pararrayos y contactos de la plantilla de protecciones.
 - Calcula relación TTR e índice de absorción; no calcula FP corregido ni variación de bushings donde el Excel no define fórmula.
 - Guarda el plan dentro del JSON de la ejecución existente; no requiere tablas nuevas ni reimportar el esquema.
 - Permite editar el plan completo y conserva apertura de registros históricos individuales.
 - Añade pegado desde Excel por grilla.
 ## v1.5.11
 - Elimina un bloque duplicado que había quedado después del cierre del módulo JavaScript.
-- Retira la segunda declaración antigua del catálogo para conservar las 10 pruebas LAP desde el inicio.
+- Retira la segunda declaración antigua del catálogo para conservar las 10 pruebas del catálogo desde el inicio.
 - Valida la sintaxis del archivo JavaScript completo antes de publicar.
 
 ## v1.5.10
@@ -128,10 +134,10 @@
 - El índice de absorción queda vacío mientras falte la lectura a 30 s o a 1 min; solo se calcula con ambas lecturas válidas.
 
 ## v1.5.8
-- Amplía el catálogo a los protocolos presentes en el Excel LAP: FP del transformador, excitación, TTR, resistencia de devanados, aislamiento, bushings, SFRA, pararrayos y protecciones propias.
+- Amplía el catálogo a los protocolos presentes en el Excel de referencia: FP del transformador, excitación, TTR, resistencia de devanados, aislamiento, bushings, SFRA, pararrayos y protecciones propias.
 - Añade al aislamiento las tres configuraciones del protocolo y las lecturas a 15 s, 30 s, 45 s y 1 min.
-- Calcula el índice de absorción como R(1 min) / R(30 s), tal como está en la hoja LAP.
-- Añade campos LAP de resistencia de devanados AT/BT, corriente de excitación por fase, factor de potencia, bushings, pararrayos y SFRA.
+- Calcula el índice de absorción como R(1 min) / R(30 s), tal como está en la hoja de referencia.
+- Añade campos de la plantilla de resistencia de devanados AT/BT, corriente de excitación por fase, factor de potencia, bushings, pararrayos y SFRA.
 - El historial muestra «Editar» de forma explícita; editar conserva el ID y actualiza esa ejecución en vez de crear otra.
 - Retira el panel lateral duplicado del transformador en el formulario de ejecución y libera el ancho de trabajo.
 - Sin cambios en la estructura de las tablas de ejecución: las plantillas siguen almacenadas en el payload de mediciones.
@@ -277,7 +283,7 @@
 - Las llamadas AJAX ahora resuelven `api.php` desde la carpeta real de instalación, incluso bajo `/pe/`.
 - Se consolidó el esquema SQL en un único archivo: `database/schema.sql`.
 
-## 1.5.0 — TTR calculado según protocolo LAP
+## 1.5.0 — TTR calculado según protocolo de referencia
 - Se amplió la plantilla TTR con tensión nominal AT y BT por posición.
 - Se implementó la relación teórica `V AT / (V BT × √3)` observada en la hoja `protocolos`.
 - Se implementó la desviación por fase U/V/W: `(relación medida − relación teórica) × 100 / relación medida`.
