@@ -17,6 +17,14 @@ try {
         $q = trim((string)($_GET['q'] ?? ''));
         json_response(['ok' => true, 'items' => $transformers->search($q)]);
     }
+    if ($action === 'transformer-list') {
+        json_response(['ok'=>true,'items'=>$transformers->all(500)]);
+    }
+    if ($action === 'transformer-create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        $payload = json_decode(file_get_contents('php://input'), true) ?: [];
+        $created = $transformers->create($payload);
+        json_response(['ok'=>true,'message'=>'Transformador creado correctamente.','transformer'=>$created], 201);
+    }
     if ($action === 'load') {
         $key = trim((string)($_GET['key'] ?? ''));
         $transformer = $transformers->find($key);
