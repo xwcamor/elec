@@ -62,6 +62,15 @@ try {
         $result = $tests->save($payload);
         json_response(['ok' => true, 'message' => 'Registro de prueba guardado.', 'result' => $result]);
     }
+    if ($action === 'test-delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        $payload = json_decode(file_get_contents('php://input'), true) ?: [];
+        $key = trim((string)($payload['transformer_key'] ?? ''));
+        $id = (int)($payload['id'] ?? 0);
+        if ($key === '' || $id < 1) json_response(['ok'=>false,'message'=>'Falta identificar la visita que deseas eliminar.'], 422);
+        if (!$transformers->find($key)) json_response(['ok'=>false,'message'=>'No se identificó el transformador. Vuelve a seleccionarlo.'], 422);
+        if (!$tests->delete($id, $key)) json_response(['ok'=>false,'message'=>'La visita no existe o no pertenece al transformador seleccionado.'], 404);
+        json_response(['ok'=>true,'message'=>'Visita y mediciones eliminadas.','result'=>['id'=>$id]]);
+    }
     json_response(['ok' => false, 'message' => 'Acción no válida.'], 400);
 } catch (PDOException $e) {
     json_response(['ok' => false, 'message' => 'No se pudo conectar o consultar MySQL. Revisa config/database.php y que el esquema del piloto esté instalado.', 'detail' => $e->getMessage()], 500);
