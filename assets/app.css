@@ -667,3 +667,35 @@ body.test-form-focus .plan-tests-section{scroll-margin-top:84px}
 .test-delete-button svg{width:12px;height:12px}
 .test-delete-button:hover{color:#922018;border-color:#dca6a1;background:#fff7f6}
 .test-delete-button:disabled{opacity:.55;cursor:wait}
+
+
+/* v1.5.31 · Selector de transformador y alta rápida desde el topbar */
+.topbar-transformer-tools{display:flex;align-items:center;gap:7px;flex:none}
+.topbar-transformer-select{height:28px;max-width:260px;min-width:150px;display:flex;align-items:center;gap:6px;padding:0 8px;border:1px solid rgba(255,255,255,.2);border-radius:6px;background:#455c72;color:#e6eef5}
+.topbar-transformer-select svg{width:13px;height:13px;color:#b9d0e3}
+.topbar-transformer-select select{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#fff;font:inherit;font-size:10px;cursor:pointer}
+.topbar-transformer-select select option{background:#fff;color:#26394b}
+.topbar-transformer-select select:disabled{opacity:.65;cursor:wait}
+.topbar-create-transformer{height:28px;padding:0 10px;border-radius:6px;font-size:10px;font-weight:700}
+.topbar-create-transformer svg{width:13px;height:13px}
+.topbar-create-transformer:disabled{opacity:.55;cursor:not-allowed}
+.modal-header p{margin:4px 0 0;color:#8291a1;font-size:11px}
+@media(max-width:1120px){
+ .global-search{width:min(250px,24vw)}
+ .topbar-transformer-select{max-width:190px;min-width:130px}
+}
+@media(max-width:820px){
+ .global-search{display:none}
+ .topbar{gap:7px;padding:0 9px}
+ .topbar-transformer-tools{margin-left:auto}
+ .topbar-transformer-select{max-width:175px;min-width:115px}
+ .top-actions{gap:2px}
+ .top-actions .notification,.top-actions .icon-btn{display:none}
+}
+@media(max-width:520px){
+ .topbar>strong{font-size:11px}
+ .topbar-transformer-select{min-width:100px;max-width:138px;padding:0 5px}
+ .topbar-transformer-select select{font-size:9px}
+ .topbar-create-transformer{padding:0 7px}
+ .topbar-create-transformer span{display:none}
+}
