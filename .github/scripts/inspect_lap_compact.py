@@ -13,15 +13,16 @@ for ws in wb.worksheets:
             if vals: print(" | ".join(vals))
         continue
     if ws.title.lower() == "protocolos":
-        for row in ws.iter_rows():
+        for row in ws.iter_rows(min_row=108, max_row=161):
             vals=[]
             for c in row:
                 v=c.value
                 if isinstance(v,str) and v and not v.startswith("="):
-                    s=re.sub(r"\\s+"," ",v).strip()
-                    if s: vals.append(f"{c.coordinate}:{s[:100]}")
+                    label=re.sub(r"\\s+"," ",v).strip()
+                    if label: vals.append(f"{c.coordinate}:{label[:100]}")
             if vals:
                 print("ROW",row[0].row," | ".join(vals[:65]))
+        continue
         print("FORMULAS:")
         for row in ws.iter_rows():
             for c in row:
