@@ -663,7 +663,7 @@ body.test-form-focus .plan-tests-section{scroll-margin-top:84px}
 
 /* v1.5.30 · Acciones del historial de visitas */
 .test-row-actions{display:flex;align-items:center;gap:6px;white-space:nowrap}
-.test-delete-button{width:29px;min-width:29px;padding:0;color:#b42318;border-color:#f0d0cd;background:#fff}
-.test-delete-button svg{width:13px;height:13px}
+.test-delete-button{height:23px;padding:0 8px;color:#b42318;border-color:#f0d0cd;background:#fff}
+.test-delete-button svg{width:12px;height:12px}
 .test-delete-button:hover{color:#922018;border-color:#dca6a1;background:#fff7f6}
 .test-delete-button:disabled{opacity:.55;cursor:wait}
