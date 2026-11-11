@@ -1,3 +1,8 @@
+## v1.5.19
+- Quita el selector de estado también del formulario legado de una sola prueba.
+- Antes de cambiar a Configuración, Inicio o Pruebas desde el menú, intenta guardar los cambios pendientes del plan actual.
+- Si el guardado falla, solicita confirmación antes de abandonar el formulario.
+
 ## v1.5.18
 - Reorganiza la pantalla de Pruebas eléctricas en dos vistas independientes: Historial de ejecuciones y Evolución de las pruebas.
 - El historial deja de mostrar estados manuales de Borrador/Completado; lista cada visita con sus ensayos, responsable y cantidad de datos registrados.

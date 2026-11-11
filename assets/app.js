@@ -537,7 +537,7 @@
   function clearExecutionForm(){
     activeExecutionId=null;activeExecutionMode='new';activeSpecificCode='';if($('#specificTestRows'))$('#specificTestRows').innerHTML='';
     ['executionOperator','executionSupervisor','executionStandard','executionEquipment','executionEquipmentBrand','executionEquipmentModel','executionEquipmentSerial','executionOilTemp','executionAmbientTemp','executionHumidity','executionObservations'].forEach(id=>$('#'+id).value='');
-    $('#executionStatus').value='BORRADOR';$('#executionDate').value=localDateTime();
+    $('#executionDate').value=localDateTime();
     renderMeasurementRows([{parameter:'',value:'',unit:'',notes:''},{parameter:'',value:'',unit:'',notes:''},{parameter:'',value:'',unit:'',notes:''}]);renderTtrRows([]);
     $('#executionTitle').textContent='Nueva ejecución de prueba';
     const saveButton=$('#saveExecution');if(saveButton)saveButton.innerHTML='<svg><use href="#i-check"/></svg>Guardar registro';
@@ -580,7 +580,6 @@
       else if(specificTemplates[x.test_code])renderSpecificRows(specificRowsFromMeasurements(x.measurements||[],x.test_code),x.test_code);
       else renderMeasurementRows(x.measurements||[]);
       $('#executionDate').value=String(x.executed_at||'').replace(' ','T').slice(0,16);
-      $('#executionStatus').value=x.status||'BORRADOR';
       $('#executionOperator').value=x.operator_name||'';$('#executionSupervisor').value=x.supervisor_name||'';
       $('#executionStandard').value=x.standard_reference||'';$('#executionEquipment').value=x.equipment_name||'';
       $('#executionEquipmentBrand').value=x.equipment_brand||'';$('#executionEquipmentModel').value=x.equipment_model||'';
@@ -758,7 +757,7 @@
     const isEditing=activeExecutionId!==null;
     const code=$('#executionType').value;
     const measurements=code==='TTR'?ttrToMeasurements():(specificTemplates[code]?specificToMeasurements():collectMeasurementRows());
-    const payload={id:activeExecutionId,transformer_key:transformer.key,test_code:code,executed_at:date,status:$('#executionStatus').value,operator_name:$('#executionOperator').value,supervisor_name:$('#executionSupervisor').value,standard_reference:$('#executionStandard').value,equipment_name:$('#executionEquipment').value,equipment_brand:$('#executionEquipmentBrand').value,equipment_model:$('#executionEquipmentModel').value,equipment_serial:$('#executionEquipmentSerial').value,oil_temperature_c:$('#executionOilTemp').value,ambient_temperature_c:$('#executionAmbientTemp').value,relative_humidity_percent:$('#executionHumidity').value,observations:$('#executionObservations').value,measurements};
+    const payload={id:activeExecutionId,transformer_key:transformer.key,test_code:code,executed_at:date,status:'BORRADOR',operator_name:$('#executionOperator').value,supervisor_name:$('#executionSupervisor').value,standard_reference:$('#executionStandard').value,equipment_name:$('#executionEquipment').value,equipment_brand:$('#executionEquipmentBrand').value,equipment_model:$('#executionEquipmentModel').value,equipment_serial:$('#executionEquipmentSerial').value,oil_temperature_c:$('#executionOilTemp').value,ambient_temperature_c:$('#executionAmbientTemp').value,relative_humidity_percent:$('#executionHumidity').value,observations:$('#executionObservations').value,measurements};
     const btn=$('#saveExecution');btn.disabled=true;btn.textContent=isEditing?'Actualizando...':'Guardando...';
     try{
       if(PILOT.demo)throw new Error('Selecciona un transformador real antes de guardar.');
@@ -815,6 +814,11 @@
       ['overviewPage','configPage','testPage','executionPage','planPage'].forEach(function(id){
         const node=document.getElementById(id);if(node)node.classList.toggle('hidden',id!==pageId);
       });
+    },
+    navigatePage: function(targetId){
+      if(targetId==='openConfig')openConfig();
+      else if(targetId==='backOverview')backOverview();
+      else if(targetId==='openElectricalTests'||targetId==='backFromTests')openTests();
     },
     notify: function(message,isError){ toast(message,!!isError); },
     demo: function(){ return !!PILOT.demo; },

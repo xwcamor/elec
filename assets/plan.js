@@ -285,7 +285,7 @@
     }else items.push(makeItem(code));
     render();markPlanChanged(350);
   }
-  async function leavePlan(){
+  async function flushPlanBeforeLeave(){
     if(autoSaveTimer)clearTimeout(autoSaveTimer);
     for(let attempt=0;attempt<3&&hasUnsavedChanges()&&items.length;attempt++){
       if(autoSaveTimer)clearTimeout(autoSaveTimer);
@@ -293,8 +293,12 @@
       if(!saved)break;
     }
     if(hasUnsavedChanges()){
-      if(!window.confirm('No se pudo confirmar el guardado de los últimos cambios. ¿Deseas salir de todas formas?'))return;
+      return window.confirm('No se pudo confirmar el guardado de los últimos cambios. ¿Deseas salir de todas formas?');
     }
+    return true;
+  }
+  async function leavePlan(){
+    if(!await flushPlanBeforeLeave())return;
     bridge.showPage('testPage');
     await bridge.reloadTestHistory();
   }
@@ -401,6 +405,13 @@
   }
   document.addEventListener('click',e=>{
     const target=e.target instanceof Element?e.target:null;if(!target)return;
+    const planActive=!$('#planPage').classList.contains('hidden');
+    const navBtn=target.closest('#openConfig,#backOverview,#openElectricalTests,#backFromTests');
+    if(planActive&&navBtn){
+      e.preventDefault();e.stopImmediatePropagation();
+      flushPlanBeforeLeave().then(ok=>{if(ok)bridge.navigatePage(navBtn.id);});
+      return;
+    }
     const newBtn=target.closest('#newTestExecution'),pick=target.closest('[data-new-test]'),editBtn=target.closest('[data-open-execution]');
     if(!newBtn&&!pick&&!editBtn)return;
     e.preventDefault();e.stopImmediatePropagation();
