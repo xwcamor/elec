@@ -70,7 +70,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.22">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.23">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -111,22 +111,17 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
   <div class="global-search"><svg><use href="#i-search"/></svg><input id="globalSearch" placeholder="Escribe para ir a un módulo o buscar un trafo..."><kbd>⌘K</kbd><div id="searchResults" class="search-results"></div></div>
   <div class="top-actions"><button class="icon-btn dark" title="Aplicaciones"><svg><use href="#i-grid"/></svg></button><button class="icon-btn dark notification" title="Notificaciones"><svg><use href="#i-bell"/></svg><i>1</i></button><button class="icon-btn dark notification" title="Mensajes"><svg><use href="#i-mail"/></svg><i>1</i></button><div class="user-chip"><span>H</span> Hector G⌄</div></div>
 </header>
-<div class="pilot-status <?=(!$dbConnected || !$transformerFound || !$schemaReady || !$testsSchemaReady) ? 'warning' : 'ready'?>" id="pilotStatus">
-  <strong><?=h(!$dbConnected ? 'Sin conexión a MySQL' : (!$transformerFound ? 'Transformador no identificado' : (!$schemaReady || !$testsSchemaReady ? 'Faltan tablas del piloto' : 'Base de datos conectada')))?></strong>
-  <span><?=h($dbMessage ?: ('BD: '.$dbName.' · Tabla: transformers · Transformador: '.$displayCode))?></span>
-  <?php if (!$transformerFound): ?><small>Busca el transformador en la barra superior y selecciónalo antes de guardar. Verifica también DB_NAME en config/database.php.</small><?php endif; ?>
-</div>
 <main class="page-shell">
   <section class="record-heading">
     <button class="back-btn" title="Volver"><svg><use href="#i-chevron"/></svg></button>
     <div class="record-icon"><svg><use href="#i-calendar"/></svg></div>
     <div class="record-title"><h1 id="transformerCode"><?=h($displayCode)?></h1><div id="companyName"><?=h($transformer['company'])?></div></div>
     <div class="heading-actions">
-      <button class="btn primary"><svg><use href="#i-file"/></svg>Exportar informe</button>
-      <button class="btn"><svg><use href="#i-share"/></svg>Compartir</button>
+      
+      
       <button class="btn primary" id="editTransformerBtn" type="button"><svg><use href="#i-edit"/></svg>Editar transformador</button>
-      <button class="btn danger"><svg><use href="#i-trash"/></svg>Eliminar</button>
-      <button class="btn"><svg><use href="#i-lock"/></svg>Bloquear</button>
+      
+      
     </div>
   </section>
   <nav class="record-tabs"><button class="active"><svg><use href="#i-file"/></svg>Detalles</button><button><svg><use href="#i-history"/></svg>Historial <small>1</small></button></nav>
@@ -160,9 +155,9 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       <button class="nav-disabled" type="button" disabled title="Módulo fuera del alcance de este piloto"><svg><use href="#i-droplet"/></svg>Fisicoquímico</button>
       <button class="nav-disabled" type="button" disabled title="Módulo fuera del alcance de este piloto"><svg><use href="#i-file"/></svg>Furanos</button>
       <button class="nav-disabled" type="button" disabled title="Módulo fuera del alcance de este piloto"><svg><use href="#i-percent"/></svg>Factor de Potencia</button>
-      <button class="nav-action electrical-tests-link<?= $canAccessElectricalTests ? '' : ' is-locked' ?>" id="openElectricalTests" type="button" <?= $canAccessElectricalTests ? '' : 'disabled aria-disabled="true"' ?> title="<?=h($testsAccessBlockReason ?: 'Pruebas eléctricas disponibles')?>">
+      <button class="nav-action electrical-tests-link<?= $canAccessElectricalTests ? '' : ' is-locked' ?>" id="openElectricalTests" type="button" <?= $canAccessElectricalTests ? '' : 'disabled aria-disabled="true"' ?> title="<?=h($testsAccessBlockReason ?: 'Abrir pruebas eléctricas')?>">
         <svg><use href="#i-zap"/></svg>Pruebas eléctricas
-        <span class="nav-state-chip" id="testsNavState" data-state="<?= $canAccessElectricalTests ? 'ready' : 'locked' ?>"><?= $canAccessElectricalTests ? 'Disponible' : 'Bloqueada' ?></span>
+        <svg class="nav-lock-icon<?= $canAccessElectricalTests ? ' hidden' : '' ?>" id="testsNavLock" aria-label="Bloqueado" role="img"><use href="#i-lock"/></svg>
       </button>
       <div class="nav-caption sub-caption">REGISTRO</div>
       <button class="nav-disabled" type="button" disabled title="Bitácora fuera del alcance de este piloto"><svg><use href="#i-history"/></svg>Bitácora</button>
@@ -421,6 +416,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.22"></script>
-<script src="./assets/plan.js?v=1.5.22"></script>
+<script src="./assets/app.js?v=1.5.23"></script>
+<script src="./assets/plan.js?v=1.5.23"></script>
 </body></html>

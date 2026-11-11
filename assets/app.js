@@ -128,7 +128,7 @@
   function electricalTestsBlockReason(){
     if(PILOT.demo || !PILOT.transformerFound) return 'Selecciona un transformador real para habilitar las pruebas eléctricas.';
     if(!PILOT.schemaReady) return 'Falta preparar el almacenamiento de la configuración eléctrica.';
-    if(!hasSavedElectricalConfiguration()) return 'Primero completa y guarda la Configuración eléctrica del transformador.';
+    if(!hasSavedElectricalConfiguration()) return 'No podrás entrar mientras no exista una configuración eléctrica guardada.';
     if(!PILOT.testsSchemaReady) return 'Faltan las tablas del módulo de pruebas eléctricas.';
     return '';
   }
@@ -145,18 +145,15 @@
       configState.dataset.state=configured?'ready':'missing';
       configState.textContent=configured?'Configurada':'Sin configurar';
     }
-    const testsButton=$('#openElectricalTests'),testsState=$('#testsNavState');
+    const testsButton=$('#openElectricalTests'),lockIcon=$('#testsNavLock');
     const reason=electricalTestsBlockReason(),allowed=!reason;
     if(testsButton){
       testsButton.disabled=!allowed;
       testsButton.setAttribute('aria-disabled',allowed?'false':'true');
       testsButton.classList.toggle('is-locked',!allowed);
-      testsButton.title=reason||'Pruebas eléctricas disponibles';
+      testsButton.title=reason||'Abrir pruebas eléctricas';
     }
-    if(testsState){
-      testsState.dataset.state=allowed?'ready':'locked';
-      testsState.textContent=allowed?'Disponible':'Bloqueada';
-    }
+    if(lockIcon) lockIcon.classList.toggle('hidden',allowed);
   }
   refreshSidebarAccess();
 
@@ -537,7 +534,10 @@
   let testExecutions = [];
   let testCatalogLoaded = false;
   const testPage=$('#testPage'), executionPage=$('#executionPage');
-  function showOnlyMain(which){['overviewPage','configPage','testPage','executionPage','planPage'].forEach(id=>$('#'+id).classList.toggle('hidden',id!==which));}
+  function showOnlyMain(which){
+    document.body.classList.toggle('config-focus',which==='configPage');
+    ['overviewPage','configPage','testPage','executionPage','planPage'].forEach(id=>$('#'+id).classList.toggle('hidden',id!==which));
+  }
   function openTests(){
     const reason=electricalTestsBlockReason();
     if(reason){refreshSidebarAccess();toast(reason,true);return false;}

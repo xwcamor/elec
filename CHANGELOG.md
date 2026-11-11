@@ -1,3 +1,9 @@
+## v1.5.23
+- Al abrir Configuración eléctrica, la interfaz pasa a un modo independiente: oculta la barra superior, la ficha general, las pestañas del transformador y el resto del módulo.
+- Se retira el bloque técnico de conexión que mostraba «Base de datos conectada», base de datos, tabla y código del transformador.
+- Se eliminan de la ficha los botones Exportar, Compartir, Eliminar y Bloquear; se conserva Editar transformador.
+- Pruebas eléctricas queda bloqueada hasta guardar una configuración eléctrica; el acceso muestra candado en lugar de etiquetas de estado y no muestra «Disponible» cuando está habilitado.
+
 ## v1.5.22
 - Al cambiar de transformador, recarga también los valores visibles de datos generales para que los indicadores de los pasos correspondan al transformador seleccionado.
 - Un bobinado solo se marca completo si tiene nombre, código, tensión nominal, conexión y bornes identificados con fase.
