@@ -128,7 +128,7 @@
     if(!rows.length)missing.push('Agrega al menos una fila de medición');
     const complete=rows.length>0&&missing.length===0;
     const anyData=filled>0||rows.some(r=>columns(item.code).some(([key])=>isFilled(r?.[key])));
-    const state=item.status==='COMPLETADA'&&complete?'complete':(complete?'ready':(anyData?'partial':'empty'));
+    const state=complete?'complete':(anyData?'partial':'empty');
     return {total,filled,percent:total?Math.round(filled/total*100):0,missing,metaMissing,rowStates,complete,anyData,state};
   }
   function generalMissing(){
@@ -143,19 +143,18 @@
     const filled=2-general.length+perItem.reduce((n,x)=>n+x.metrics.filled,0);
     const percent=total?Math.round(filled/total*100):0;
     const ready=perItem.filter(x=>x.metrics.complete).length;
-    const completed=perItem.filter(x=>x.metrics.complete&&x.item.status==='COMPLETADA').length;
+    const completed=ready;
     const missing=[];
     general.forEach(x=>missing.push('Datos de visita: falta '+x));
     perItem.forEach(({item,metrics})=>{
       metrics.missing.slice(0,5).forEach(msg=>missing.push(item.name+': '+msg));
       if(metrics.missing.length>5)missing.push(item.name+': y '+(metrics.missing.length-5)+' pendientes más');
-      if(metrics.complete&&item.status!=='COMPLETADA')missing.push(item.name+': lista para revisar; falta marcarla como completada');
-      if(item.status==='COMPLETADA'&&!metrics.complete)missing.push(item.name+': marcada como completada, pero faltan datos');
+      item.status=metrics.complete?'COMPLETADA':'BORRADOR';
     });
     if(!items.length)missing.unshift('Selecciona por lo menos una prueba');
-    return {general,perItem,total,filled,percent,ready,completed,missing,complete:!general.length&&items.length>0&&perItem.every(x=>x.metrics.complete&&x.item.status==='COMPLETADA')};
+    return {general,perItem,total,filled,percent,ready,completed,missing,complete:!general.length&&items.length>0&&perItem.every(x=>x.metrics.complete)};
   }
-  function stateLabel(state){return ({empty:'SIN DATOS',partial:'EN CURSO',ready:'LISTA PARA REVISAR',complete:'COMPLETADA'})[state]||'EN CURSO';}
+  function stateLabel(state){return ({empty:'SIN CAPTURA',partial:'FALTAN DATOS',ready:'DATOS COMPLETOS',complete:'DATOS COMPLETOS'})[state]||'FALTAN DATOS';}
   function refreshFieldStyles(card,item,metrics){
     card.querySelectorAll('.plan-cell').forEach(input=>{
       const row=Number(input.dataset.row),field=input.dataset.col,required=(requiredByTest[item.code]||[]).includes(field);
@@ -186,30 +185,27 @@
   function renderPlanFeedback(){
     const host=$('#planProgressPanel');if(!host)return;
     const m=planMetrics(),allReady=m.general.length===0&&m.perItem.length>0&&m.perItem.every(x=>x.metrics.complete);
-    const headline=m.complete?'Plan completo':(allReady?'Todos los formularios están listos para revisar':'Faltan datos por completar');
+    const headline=m.complete?'Información completa':(allReady?'Los formularios están listos':'Faltan datos por completar');
     const state=m.complete?'success':(allReady?'info':'warning'),messages=m.missing.slice(0,7);
     host.dataset.state=state;
-    host.innerHTML='<div class="plan-progress-main"><div class="plan-progress-copy"><div class="plan-progress-heading"><span class="plan-alert-icon">'+(state==='success'?'✓':state==='warning'?'!':'i')+'</span><div><strong>'+headline+'</strong><small>'+(items.length?m.ready+' de '+items.length+' pruebas con campos mínimos completos · '+m.completed+' marcadas como completadas':'Selecciona las pruebas que vas a realizar')+'</small></div></div><div class="plan-progress-track"><span style="width:'+m.percent+'%"></span></div><small class="plan-progress-number">'+m.filled+' de '+m.total+' campos mínimos · '+m.percent+'%</small></div><div class="plan-progress-side"><b>'+m.percent+'%</b><span>avance</span></div></div>'+
-      (messages.length?'<div class="plan-alert-details"><b>Revisar antes de completar</b><ul>'+messages.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>'+(m.missing.length>messages.length?'<small>Y '+(m.missing.length-messages.length)+' pendientes más.</small>':'')+'</div>':'<div class="plan-alert-clear">✓ No hay campos obligatorios pendientes.</div>')+
+    host.innerHTML='<div class="plan-progress-main"><div class="plan-progress-copy"><div class="plan-progress-heading"><span class="plan-alert-icon">'+(state==='success'?'✓':state==='warning'?'!':'i')+'</span><div><strong>'+headline+'</strong><small>'+(items.length?m.ready+' de '+items.length+' formularios con campos mínimos completos':'Selecciona las pruebas que vas a realizar')+'</small></div></div><div class="plan-progress-track"><span style="width:'+m.percent+'%"></span></div><small class="plan-progress-number">'+m.filled+' de '+m.total+' campos mínimos · '+m.percent+'%</small></div><div class="plan-progress-side"><b>'+m.percent+'%</b><span>avance</span></div></div>'+
+      (messages.length?'<div class="plan-alert-details"><b>Datos pendientes por completar</b><ul>'+messages.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>'+(m.missing.length>messages.length?'<small>Y '+(m.missing.length-messages.length)+' pendientes más.</small>':'')+'</div>':'<div class="plan-alert-clear">✓ No hay campos obligatorios pendientes. Los datos están guardados.</div>')+
       '<div class="plan-color-legend"><span><i class="legend-filled"></i> Verde: dato registrado</span><span><i class="legend-missing"></i> Ámbar: falta completar</span><span><i class="legend-calculated"></i> Gris: cálculo automático</span></div>';
     const shared=$('#planSharedStatus');
     if(shared){shared.classList.toggle('is-complete',m.general.length===0);shared.classList.toggle('is-pending',m.general.length>0);shared.textContent=m.general.length?'Pendiente: '+m.general.join(' · '):'Datos generales completos';}
   }
   function refreshPlanFeedback(){
-    const general=generalMissing();
     items.forEach((item,index)=>{
       const card=$('#planTestCards [data-test-index="'+index+'"]');
-      if(item.status==='COMPLETADA'&&(!itemMetrics(item).complete||general.length)){
-        item.status='BORRADOR';
-        const select=card?.querySelector('[data-meta="status"]');if(select)select.value='BORRADOR';
-      }
-      if(card)refreshFieldStyles(card,item,itemMetrics(item));
+      const metrics=itemMetrics(item);
+      item.status=metrics.complete?'COMPLETADA':'BORRADOR';
+      if(card)refreshFieldStyles(card,item,metrics);
     });
     renderPlanFeedback();
     renderPicker();
   }
 
-  function renderPicker(){
+    function renderPicker(){
     $('#planTestPicker').innerHTML=catalog.map(t=>{
       const item=items.find(x=>x.code===t[0]),metrics=item?itemMetrics(item):null;
       const state=metrics?metrics.state:'empty';
@@ -237,8 +233,7 @@
       if(item.code==='TTR')hint='<div class="plan-reference-note"><b>Fórmula LAP:</b> relación teórica = AT / (BT × √3); error por fase = (medida − teórica) × 100 / medida. El ejemplo usa ±0.5%.</div>';
       return '<article class="plan-test-card" data-test-index="'+idx+'" data-state="'+metrics.state+'">'+
         '<div class="plan-test-card-head"><div class="plan-test-heading"><span class="eyebrow">ENSAYO '+String(idx+1).padStart(2,'0')+'</span><h4>'+esc(item.name)+'</h4><div class="plan-test-status-line"><span data-card-state data-state="'+metrics.state+'" class="plan-state-badge">'+stateLabel(metrics.state)+'</span><small data-card-progress>'+metrics.filled+'/'+metrics.total+' campos mínimos · '+metrics.percent+'%</small></div></div><button type="button" class="delete-btn" data-remove-test="'+idx+'">Quitar</button></div>'+
-        '<div class="plan-test-meta-grid"><label>Estado<select data-meta="status"><option value="BORRADOR" '+(item.status==='BORRADOR'?'selected':'')+'>Borrador</option><option value="COMPLETADA" '+(item.status==='COMPLETADA'?'selected':'')+'>Completada</option></select></label>'+
-        '<label>Norma / referencia<input data-meta="standard_reference" value="'+esc(item.standard_reference)+'" placeholder="Norma o protocolo"></label>'+
+        '<div class="plan-test-meta-grid"><label>Norma / referencia<input data-meta="standard_reference" value="'+esc(item.standard_reference)+'" placeholder="Norma o protocolo"></label>'+
         '<label data-meta-wrap="equipment_name">Equipo<input data-meta="equipment_name" value="'+esc(item.equipment_name)+'" placeholder="Instrumento"></label>'+
         '<label data-meta-wrap="equipment_brand">Marca<input data-meta="equipment_brand" value="'+esc(item.equipment_brand)+'" placeholder="Marca"></label>'+
         '<label data-meta-wrap="equipment_model">Modelo<input data-meta="equipment_model" value="'+esc(item.equipment_model)+'" placeholder="Modelo"></label>'+
@@ -322,23 +317,7 @@
     if(item.code==='TTR'&&['at','bt','U','V','W'].includes(key)){item.rows[row]=nr;['theoretical','errU','errV','errW'].forEach(k=>{const out=card.querySelector('[data-row="'+row+'"][data-col="'+k+'"]');if(out)out.value=nr[k]||'';});}
     refreshPlanFeedback();
   });
-  $('#planTestCards').addEventListener('change',e=>{
-    if(e.target.dataset.meta!=='status')return;
-    const card=e.target.closest('[data-test-index]');if(!card)return;
-    const item=items[Number(card.dataset.testIndex)];if(!item)return;
-    if(e.target.value==='COMPLETADA'){
-      const metrics=itemMetrics(item),general=generalMissing();
-      if(!metrics.complete||general.length){
-        item.status='BORRADOR';e.target.value='BORRADOR';
-        toast('No se puede completar todavía. '+[...general,...metrics.missing].slice(0,5).join(' · '),true);
-      }else item.status='COMPLETADA';
-    }else item.status='BORRADOR';
-    refreshPlanFeedback();
-  });
-  $('#planPage').addEventListener('input',e=>{
-    if(['planDate','planOperator'].includes(e.target.id))refreshPlanFeedback();
-  });
-  $('#planTestCards').addEventListener('paste',e=>{
+    $('#planTestCards').addEventListener('paste',e=>{
     const cell=e.target.closest('.plan-cell');if(!cell||cell.readOnly)return;
     const text=(e.clipboardData||window.clipboardData).getData('text');if(!text.includes('\t')&&!text.includes('\n'))return;
     e.preventDefault();const card=cell.closest('[data-test-index]'),item=items[Number(card.dataset.testIndex)],fields=columns(item.code),r0=Number(cell.dataset.row),c0=fields.findIndex(c=>c[0]===cell.dataset.col);
