@@ -174,8 +174,8 @@ $initialConfig = $config ?: [
       <div class="test-type-grid" id="testTypeGrid"></div>
     </section>
     <div class="test-view-switcher" role="tablist" aria-label="Vistas de seguimiento de pruebas">
-      <button class="test-view-tab active" type="button" id="showTestHistory" data-test-view="history" role="tab" aria-selected="true" aria-controls="testHistoryPanel"><svg><use href="#i-list"/></svg>Historial de ejecuciones</button>
-      <button class="test-view-tab" type="button" id="showTestAnalytics" data-test-view="analytics" role="tab" aria-selected="false" aria-controls="testAnalyticsPanel"><svg><use href="#i-chart"/></svg>Evolución de las pruebas</button>
+      <button class="test-view-tab active" type="button" id="showTestHistory" data-test-view="history" role="tab" aria-selected="true" aria-controls="testHistoryPanel"><svg><use href="#i-history"/></svg>Historial de ejecuciones</button>
+      <button class="test-view-tab" type="button" id="showTestAnalytics" data-test-view="analytics" role="tab" aria-selected="false" aria-controls="testAnalyticsPanel"><svg><use href="#i-activity"/></svg>Evolución de las pruebas</button>
     </div>
     <section id="testHistoryPanel" class="test-view-panel" role="tabpanel" aria-labelledby="showTestHistory">
       <div class="test-history-card">

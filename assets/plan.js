@@ -287,7 +287,11 @@
   }
   async function leavePlan(){
     if(autoSaveTimer)clearTimeout(autoSaveTimer);
-    if(hasUnsavedChanges()&&items.length)await savePlan(true);
+    for(let attempt=0;attempt<3&&hasUnsavedChanges()&&items.length;attempt++){
+      if(autoSaveTimer)clearTimeout(autoSaveTimer);
+      const saved=await savePlan(true);
+      if(!saved)break;
+    }
     if(hasUnsavedChanges()){
       if(!window.confirm('No se pudo confirmar el guardado de los últimos cambios. ¿Deseas salir de todas formas?'))return;
     }

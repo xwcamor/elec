@@ -1,3 +1,13 @@
+## v1.5.18
+- Reorganiza la pantalla de Pruebas eléctricas en dos vistas independientes: Historial de ejecuciones y Evolución de las pruebas.
+- El historial deja de mostrar estados manuales de Borrador/Completado; lista cada visita con sus ensayos, responsable y cantidad de datos registrados.
+- Cambia las tarjetas de resumen para mostrar visitas, ensayos incluidos, tipos utilizados y última visita.
+- Retira el selector manual de estado de cada ensayo; el valor interno se deriva de los campos mínimos requeridos.
+- Incorpora guardado automático después de escribir, pegar desde Excel, añadir o quitar filas.
+- Mantiene el formulario abierto después de guardar; el botón Guardar ahora fuerza el guardado sin salir del formulario.
+- Los planes incompletos también se guardan y el indicador informa cuántos datos faltan. Al volver al historial se intenta completar el guardado pendiente; solo se pregunta antes de salir si la conexión impide guardar.
+- Conserva valores internos BORRADOR/COMPLETADA en la base de datos por compatibilidad con registros anteriores; ya no son opciones del usuario.
+
 ## v1.5.17
 - Ajusta el porcentaje de avance: un plan sin pruebas seleccionadas ya no puede mostrar 100% solo por tener completos los datos generales.
 
