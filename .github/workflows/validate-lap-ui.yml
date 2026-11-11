@@ -1,0 +1,52 @@
+name: Validate LAP UI changes
+on:
+  push:
+    branches: [lap-protocol-ui]
+    paths:
+      - "index.php"
+      - "assets/**"
+      - "app/**"
+      - "tests/**"
+      - ".github/workflows/validate-lap-ui.yml"
+permissions:
+  contents: read
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+      - name: JavaScript syntax
+        run: |
+          node --check assets/app.js
+          node --check assets/plan.js
+      - name: PHP syntax
+        run: |
+          find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
+      - name: Validate wizard markup
+        run: |
+          python - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          class Ids(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.ids = []
+              def handle_starttag(self, tag, attrs):
+                  values = dict(attrs)
+                  if values.get("id"):
+                      self.ids.append(values["id"])
+          parser = Ids()
+          parser.feed(Path("index.php").read_text(encoding="utf-8"))
+          duplicates = sorted({x for x in parser.ids if parser.ids.count(x) > 1})
+          assert not duplicates, f"IDs duplicados: {duplicates}"
+          required = {"planPage","planStepper","planSharedSection","planSelectionSection","planResultsSection","planReviewSection","planTestNav","planStepBack","planStepNext"}
+          missing = sorted(required - set(parser.ids))
+          assert not missing, f"Faltan controles del asistente: {missing}"
+          print("Markup wizard OK; IDs únicos y etapas presentes.")
+          PY
