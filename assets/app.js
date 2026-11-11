@@ -505,7 +505,7 @@
       state.version_no=result.result.version_no;state.versions.unshift({version_no:state.version_no,created_at:new Date().toLocaleString('es-PE')});dirty=false;refreshSidebarAccess();refreshConfigStepIndicators();$('#saveStatus').classList.add('saved');$('#saveStatus').innerHTML='<i></i>Guardado';$('#versionBadge').textContent='Versión '+state.version_no;renderReview();toast('Configuración guardada como versión '+state.version_no+'.');
     }catch(error){toast(error.message,true);}finally{btns.forEach(b=>{b.disabled=false;b.innerHTML='<svg><use href="#i-check"/></svg>Guardar configuración';});}
   }
-  $('#saveConfig').addEventListener('click',saveConfig);$('#saveConfigBottom').addEventListener('click',saveConfig);
+  $('#saveConfig').addEventListener('click',saveConfig);$('#saveConfigBottom')?.addEventListener('click',saveConfig);
 
   // Search the existing transformers table; the displayed code is not assumed to be its PK.
   let searchTimer=null;

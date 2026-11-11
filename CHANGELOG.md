@@ -1,3 +1,6 @@
+## v1.5.28
+- Hace opcional el listener del botón inferior de guardado, que ahora se oculta para evitar duplicar la acción principal.
+
 ## v1.5.27
 - Reorganiza Pruebas eléctricas en tres vistas: Resumen, Tabla y Gráfico.
 - El Resumen reduce los accesos visibles a una sola acción principal: Nueva visita.
