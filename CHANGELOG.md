@@ -1,3 +1,7 @@
+## v1.5.25
+- Factor de potencia ya no exige capacitancia en cada modo: el Excel LAP solo contiene valores de capacitancia para CL+CLH, CL y CLH.
+- Colorea los resultados automáticos de TTR y bushings según estén correctos/conformes, observados o pendientes.
+
 ## v1.5.24
 - Los formularios incorporan un campo Resultado/Evaluación obligatorio; en ensayos sin umbral explícito, la evaluación queda a cargo del técnico.
 - TTR calcula relación teórica, errores por fase y resultado CORRECTO/FUERA DE TOLERANCIA usando ±0,5%.

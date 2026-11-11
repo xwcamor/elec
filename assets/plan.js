@@ -122,7 +122,7 @@
   function makeItem(code,old){old=old||{};return {id:old.id||null,code,name:typeName(code),status:old.status||'BORRADOR',standard_reference:old.standard_reference||'',equipment_name:old.equipment_name||'',equipment_brand:old.equipment_brand||'',equipment_model:old.equipment_model||'',equipment_serial:old.equipment_serial||'',observations:old.observations||'',rows:old.rows||defaults(code)};}
   const requiredByTest={
     TTR:['tap','at','bt','U','V','W','result'],
-    POWER_FACTOR:['measurement','test_voltage_v','power_factor_measured','power_factor_corrected_20c','capacitance_nf','evaluation'],
+    POWER_FACTOR:['measurement','test_voltage_v','power_factor_measured','power_factor_corrected_20c','evaluation'],
     EXCITATION:['tap','phase','test_voltage_kv','output_voltage_v','output_current_a','result'],
     WINDING_RESISTANCE:['section','tap','phase','test_current_a','resistance_measured_ohm','resistance_referred_75c_ohm','result'],
     INSULATION_RESISTANCE:['point','applied_voltage_kv','reading_15s','reading_30s','reading_45s','reading_1min','result'],
@@ -195,6 +195,12 @@
       input.classList.toggle('is-filled',valid);
       input.classList.toggle('is-missing',required&&!valid&&metrics.rowStates[row]?.any);
       if(input.classList.contains('plan-result-select'))input.dataset.state=String(input.value||'PENDIENTE').toLowerCase();
+      if(field==='result'){
+        const state=String(input.value||'').trim().toUpperCase();
+        input.classList.toggle('result-good',['CORRECTO','CONFORME'].includes(state));
+        input.classList.toggle('result-bad',['OBSERVADO','FUERA DE TOLERANCIA'].includes(state));
+        input.classList.toggle('result-pending',!state||state==='PENDIENTE');
+      }
     });
     requiredEquipment.forEach(key=>{
       const input=card.querySelector('[data-meta="'+key+'"]');if(!input)return;

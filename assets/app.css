@@ -357,3 +357,9 @@ body.config-focus .config-toolbar{padding-top:14px}
 .plan-result-select[data-state="no aplica"]{color:#64748b;background:#f1f5f9}
 .plan-result-select[data-state="pending"],.plan-result-select[data-state="pendiente"]{color:#9a6817;background:#fff7e8}
 .plan-cell.calculated[data-col="result"]{font-weight:800;letter-spacing:.1px}
+
+
+/* v1.5.25 · Semáforo de resultados calculados */
+.plan-cell.calculated.result-good{background:#eaf7ef!important;color:#167345!important}
+.plan-cell.calculated.result-bad{background:#fff0ee!important;color:#a3332d!important}
+.plan-cell.calculated.result-pending{background:#fff7e8!important;color:#94630f!important}
