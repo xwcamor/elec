@@ -58,37 +58,61 @@
     num_taps:'editTrafoNumTaps',vector_group:'editTrafoVector',location:'editTrafoLocation',
     phase_count:'editTrafoPhaseCount',frequency_hz:'editTrafoFrequency',insulation_type:'editTrafoInsulation',cooling_type:'editTrafoCooling',notes:'editTrafoNotes'
   };
-  function openTransformerEditor(){
-    const vals={code:transformer.code,name:transformer.name||'',company:transformer.company||'',voltage:transformer.voltage??'',power:transformer.power??'',year:transformer.year??'',brand:transformer.brand||'',tap_type:transformer.tap_type||'',num_taps:transformer.num_taps??'',vector_group:transformer.vector_group||'',location:transformer.location||'',phase_count:transformer.phase_count??'',frequency_hz:transformer.frequency_hz??'',insulation_type:transformer.insulation_type||'',cooling_type:transformer.cooling_type||'',notes:transformer.notes||''};
-    Object.entries(editFields).forEach(([k,id])=>$('#'+id).value=vals[k]??'');
-    $('#editTransformerStatus').textContent='';
-    $('#transformerEditModal').classList.remove('hidden');
-    $('#editTrafoCode').focus();
+  let transformerFormMode='edit';
+  function setTransformerFormMode(mode){
+    transformerFormMode=mode;
+    $('#editTransformerTitle').textContent=mode==='create'?'Crear transformador':'Editar transformador';
+    $('#editTransformerSubtitle').textContent=mode==='create'?'Registra un nuevo equipo en la tabla de transformadores.':'Modifica los datos principales de la ficha.';
+    $('#saveTransformerEdit').textContent=mode==='create'?'Crear transformador':'Guardar cambios';
   }
-  function closeTransformerEditor(){$('#transformerEditModal').classList.add('hidden');}
+  function openTransformerEditor(){
+    setTransformerFormMode('edit');
+    const vals={code:transformer.code,name:transformer.name||'',company:transformer.company||'',voltage:transformer.voltage??'',power:transformer.power??'',year:transformer.year??'',brand:transformer.brand||'',tap_type:transformer.tap_type||'',num_taps:transformer.num_taps??'',vector_group:transformer.vector_group||'',location:transformer.location||'',phase_count:transformer.phase_count??'',frequency_hz:transformer.frequency_hz??'',insulation_type:transformer.insulation_type||'',cooling_type:transformer.cooling_type||'',notes:transformer.notes||''};
+    Object.entries(editFields).forEach(([key,id])=>$('#'+id).value=vals[key]??'');
+    $('#editTransformerStatus').textContent='';$('#transformerEditModal').classList.remove('hidden');$('#editTrafoCode').focus();
+  }
+  function openTransformerCreate(){
+    setTransformerFormMode('create');
+    Object.values(editFields).forEach(id=>$('#'+id).value='');
+    $('#editTrafoPhaseCount').value='3';$('#editTrafoFrequency').value='60';
+    $('#editTransformerStatus').textContent='';$('#transformerEditModal').classList.remove('hidden');$('#editTrafoCode').focus();
+  }
+  function closeTransformerEditor(){$('#transformerEditModal').classList.add('hidden');setTransformerFormMode('edit');}
   $('#editTransformerBtn')?.addEventListener('click',openTransformerEditor);
   $('#closeTransformerModal')?.addEventListener('click',closeTransformerEditor);
   $('#cancelTransformerEdit')?.addEventListener('click',closeTransformerEditor);
   $('#transformerEditModal')?.addEventListener('click',e=>{if(e.target.id==='transformerEditModal')closeTransformerEditor();});
   $('#transformerEditForm')?.addEventListener('submit',async e=>{
     e.preventDefault();
-    const payload={transformer_key:transformer.key};
-    Object.entries(editFields).forEach(([k,id])=>payload[k]=$('#'+id).value.trim());
-    const btn=$('#saveTransformerEdit');btn.disabled=true;btn.textContent='Guardando...';
+    const mode=transformerFormMode;
+    const payload={};
+    if(mode==='edit')payload.transformer_key=transformer.key;
+    Object.entries(editFields).forEach(([key,id])=>payload[key]=$('#'+id).value.trim());
+    const btn=$('#saveTransformerEdit');btn.disabled=true;btn.textContent=mode==='create'?'Creando...':'Guardando...';
     try{
-      if(PILOT.demo)throw new Error('No se puede editar en modo demostración. Conecta MySQL y selecciona un transformador existente.');
-      const response=await fetch(api('action=transformer-update'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      if(PILOT.demo)throw new Error('No hay conexión con MySQL. Conecta la base de datos para registrar transformadores.');
+      const action=mode==='create'?'transformer-create':'transformer-update';
+      const response=await fetch(api('action='+action),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
       const result=await readApiResponse(response);
-      const t=result.transformer;
-      Object.assign(transformer,t);
-      updateTransformerDisplay();
-      if(result.unsupported_fields?.length){
-        const labels={phase_count:'número de fases',frequency_hz:'frecuencia',insulation_type:'aislamiento',cooling_type:'refrigeración',notes:'observaciones'};
-        toast('Guardado parcial. Tu tabla no tiene columnas para: '+result.unsupported_fields.map(k=>labels[k]||k).join(', ')+'.',true);
-      }else toast('Datos de placa del transformador actualizados.');
-      closeTransformerEditor();
+      if(mode==='edit'){
+        Object.assign(transformer,result.transformer);
+        updateTransformerDisplay();
+        await loadTransformerSwitcher(transformer.key);
+        if(result.unsupported_fields?.length){
+          const labels={phase_count:'número de fases',frequency_hz:'frecuencia',insulation_type:'aislamiento',cooling_type:'refrigeración',notes:'observaciones'};
+          toast('Guardado parcial. Tu tabla no tiene columnas para: '+result.unsupported_fields.map(k=>labels[k]||k).join(', ')+'.',true);
+        }else toast('Datos de placa del transformador actualizados.');
+        closeTransformerEditor();
+      }else{
+        const createdKey=result.transformer.key;
+        closeTransformerEditor();
+        await loadTransformerSwitcher(createdKey);
+        const switched=await selectTransformer(createdKey);
+        if(!switched)await loadTransformerSwitcher(transformer.key);
+        toast('Transformador '+result.transformer.code+(switched?' creado y seleccionado.':' creado. No se cambió el transformador activo.'));
+      }
     }catch(err){$('#editTransformerStatus').textContent=err.message;toast(err.message,true);}
-    finally{btn.disabled=false;btn.innerHTML='Guardar cambios';}
+    finally{btn.disabled=false;btn.textContent=transformerFormMode==='create'?'Crear transformador':'Guardar cambios';}
   });
 
 
@@ -520,10 +544,68 @@
     try{const r=await fetch(api('action=search&q='+encodeURIComponent(q)));const d=await readApiResponse(r);const box=$('#searchResults');box.innerHTML=d.items.length?d.items.map(t=>`<div class="search-item" data-key="${esc(t.key)}"><strong>${esc(t.code)}</strong><small>${esc(t.company)} · ${esc(t.name)}</small></div>`).join(''):'<div class="search-item"><strong>Sin resultados</strong><small>No se encontraron coincidencias en transformers.</small></div>';box.classList.add('open');box.querySelectorAll('[data-key]').forEach(item=>item.addEventListener('click',()=>selectTransformer(item.dataset.key)));}
     catch(e){toast(e.message,true);}
   }
-  async function selectTransformer(key){
-    try{const r=await fetch(api('action=load&key='+encodeURIComponent(key)));const d=await readApiResponse(r);Object.assign(transformer,d.transformer);state=normalizeConfig(d.config||{});PILOT.demo=false;PILOT.transformerFound=true;PILOT.schemaReady=!!d.schemaReady;PILOT.testsSchemaReady=!!d.testsSchemaReady;$('#phaseCount').value=String(state.phase_count||3);$('#vectorGroup').value=state.vector_group||'';$('#frequency').value=state.frequency_hz??60;$('#generalNotes').value=state.notes||'';refreshSidebarAccess();updateTransformerDisplay();const status=$('#pilotStatus');if(status){status.className='pilot-status '+(PILOT.schemaReady&&PILOT.testsSchemaReady?'ready':'warning');status.querySelector('strong').textContent=PILOT.schemaReady&&PILOT.testsSchemaReady?'Base de datos conectada':'Faltan tablas del piloto';status.querySelector('span').textContent='BD: '+(PILOT.dbName||'configurada')+' · Transformador: '+transformer.code;}$('#globalSearch').value='';$('#searchResults').classList.remove('open');renderWindings();renderTapChangers();updateCounts();const dbAlert=$('#dbAlert');if(dbAlert){const message=!PILOT.dbConnected?'No hay conexión con la base de datos. Revisa la configuración de conexión.':(!PILOT.schemaReady?'Falta preparar el almacenamiento de la configuración eléctrica.':'');dbAlert.querySelector('span').textContent=message;dbAlert.classList.toggle('hidden',!message);}markDirty();toast('Transformador '+transformer.code+' seleccionado.');backOverview();}
-    catch(e){toast(e.message,true);}
+  async function loadTransformerSwitcher(selectedKey=transformer.key){
+    const select=$('#transformerSwitcher');if(!select)return;
+    try{
+      const response=await fetch(api('action=transformer-list'));
+      const data=await readApiResponse(response);
+      const options=data.items||[];
+      select.innerHTML='';
+      options.forEach(item=>{
+        const option=document.createElement('option');
+        option.value=String(item.key);
+        option.textContent=[item.code||item.key,item.name,item.company].filter(Boolean).join(' · ');
+        select.appendChild(option);
+      });
+      if(selectedKey&&!options.some(item=>String(item.key)===String(selectedKey))){
+        const option=document.createElement('option');
+        option.value=String(transformer.key);
+        option.textContent=[transformer.code||transformer.key,transformer.name,transformer.company].filter(Boolean).join(' · ');
+        select.appendChild(option);
+      }
+      if(selectedKey)select.value=String(selectedKey);
+      select.disabled=options.length===0;
+    }catch(error){
+      select.innerHTML='<option value="">No se pudo cargar la lista</option>';
+      select.disabled=true;
+      console.warn('No se pudo cargar el selector de transformadores:',error);
+    }
   }
+  async function selectTransformer(key){
+    if(!key||String(key)===String(transformer.key))return false;
+    if(dirty&&!window.confirm('Hay cambios de configuración sin guardar. ¿Deseas descartarlos y cambiar de transformador?')){
+      $('#transformerSwitcher').value=String(transformer.key);
+      return false;
+    }
+    try{
+      const r=await fetch(api('action=load&key='+encodeURIComponent(key)));
+      const d=await readApiResponse(r);
+      Object.assign(transformer,d.transformer);state=normalizeConfig(d.config||{});
+      PILOT.demo=false;PILOT.transformerFound=true;PILOT.schemaReady=!!d.schemaReady;PILOT.testsSchemaReady=!!d.testsSchemaReady;
+      $('#phaseCount').value=String(state.phase_count||3);$('#vectorGroup').value=state.vector_group||'';$('#frequency').value=state.frequency_hz??60;$('#generalNotes').value=state.notes||'';
+      refreshSidebarAccess();updateTransformerDisplay();
+      const status=$('#pilotStatus');
+      if(status){status.className='pilot-status '+(PILOT.schemaReady&&PILOT.testsSchemaReady?'ready':'warning');status.querySelector('strong').textContent=PILOT.schemaReady&&PILOT.testsSchemaReady?'Base de datos conectada':'Faltan tablas del piloto';status.querySelector('span').textContent='BD: '+(PILOT.dbName||'configurada')+' · Transformador: '+transformer.code;}
+      $('#globalSearch').value='';$('#searchResults').classList.remove('open');
+      renderWindings();renderTapChangers();updateCounts();
+      const dbAlert=$('#dbAlert');
+      if(dbAlert){const message=!PILOT.dbConnected?'No hay conexión con la base de datos. Revisa la configuración de conexión.':(!PILOT.schemaReady?'Falta preparar el almacenamiento de la configuración eléctrica.':'');dbAlert.querySelector('span').textContent=message;dbAlert.classList.toggle('hidden',!message);}
+      dirty=false;
+      const saveStatus=$('#saveStatus');
+      if(saveStatus){saveStatus.classList.toggle('saved',Number(state.version_no)>0);saveStatus.innerHTML=Number(state.version_no)>0?'<i></i>Guardado':'<i></i>Sin configurar';}
+      await loadTransformerSwitcher(transformer.key);
+      toast('Transformador '+transformer.code+' seleccionado.');
+      backOverview();
+      return true;
+    }catch(e){
+      $('#transformerSwitcher').value=String(transformer.key);
+      toast(e.message,true);
+      return false;
+    }
+  }
+  $('#transformerSwitcher')?.addEventListener('change',event=>selectTransformer(event.target.value));
+  $('#createTransformerBtn')?.addEventListener('click',()=>openTransformerCreate());
+  loadTransformerSwitcher();
   function updateTransformerDisplay(){
     $('#transformerCode').textContent=transformer.code;$('#summaryCode').textContent=transformer.code;$('#companyName').textContent=transformer.company;$('#summaryCompany').textContent=transformer.company;
     $('#summaryTag').textContent='TAG '+(transformer.tag||'—');$('#summaryVoltage').textContent=transformer.voltage||'—';$('#summaryPower').textContent=transformer.power||'—';$('#summaryYear').textContent=transformer.year||'—';$('#summaryBrand').textContent=transformer.brand||'—';$('#summaryTapType').textContent=transformer.tap_type||'—';$('#summaryVector').textContent=transformer.vector_group||'—';$('#summaryLocation').textContent=transformer.location||'—';$('#summaryTechnicalDetails').textContent=[transformer.phase_count?transformer.phase_count+' fases':'',transformer.frequency_hz?transformer.frequency_hz+' Hz':'',transformer.insulation_type||'',transformer.cooling_type||''].filter(Boolean).join(' · ');
