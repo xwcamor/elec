@@ -312,31 +312,88 @@
       bridge.showPage('planPage');
     }catch(e){toast(e.message,true);}
   }
-  async function save(){
-    const date=$('#planDate').value;if(!date){toast('Selecciona la fecha de la visita.',true);$('#planDate').focus();return;}
-    if(!items.length){toast('Añade al menos una prueba al plan.',true);$('#planTestPicker').scrollIntoView({behavior:'smooth',block:'center'});return;}
-    const invalidCompleted=items.filter(item=>item.status==='COMPLETADA'&&!itemMetrics(item).complete);
-    if(invalidCompleted.length||(items.some(item=>item.status==='COMPLETADA')&&generalMissing().length)){
-      renderPlanFeedback();
-      toast('Hay pruebas marcadas como completadas con datos pendientes. Revisa los avisos en amarillo.',true);
-      const first=invalidCompleted[0]||items[0];
-      $('#planTestCards [data-test-index="'+items.indexOf(first)+'"]')?.scrollIntoView({behavior:'smooth',block:'center'});
-      return;
+
+  async function savePlan(automatic){
+    if(savePromise){savePending=true;return savePromise;}
+    const date=$('#planDate').value;
+    if(!items.length){
+      setSaveStatus('Selecciona al menos una prueba para guardar','warning');
+      if(!automatic)toast('Añade al menos una prueba al plan.',true);
+      return false;
     }
-    const pendingCount=planMetrics().missing.length;
-    const tests=items.map(t=>({id:t.id,code:t.code,name:t.name,status:t.status,standard_reference:t.standard_reference,equipment_name:t.equipment_name,equipment_brand:t.equipment_brand,equipment_model:t.equipment_model,equipment_serial:t.equipment_serial,observations:t.observations,measurements:measurementsFromRows(t)}));
-    const complete=items.every(t=>t.status==='COMPLETADA');
-    const payload={id:editingId,transformer_key:transformer().key,test_code:'PLAN',executed_at:date,status:complete?'COMPLETADA':'BORRADOR',operator_name:$('#planOperator').value,supervisor_name:$('#planSupervisor').value,oil_temperature_c:$('#planOilTemp').value,ambient_temperature_c:$('#planAmbientTemp').value,relative_humidity_percent:$('#planHumidity').value,observations:$('#planObservations').value,measurements:[],plan:{version:1,session_id:sessionId,tests}};
-    const btn=$('#saveTestPlan');btn.disabled=true;btn.textContent='Guardando...';
-    try{
-      if(bridge.demo())throw new Error('Selecciona un transformador real antes de guardar.');
-      if(!bridge.testsReady())throw new Error('Prepara las tablas de pruebas eléctricas antes de guardar.');
-      const res=await fetch(api('action=test-save'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}),d=await json(res);
-      toast((editingId?'Plan actualizado':'Plan guardado')+' · '+tests.length+' prueba(s) · ID #'+d.result.id+(pendingCount?' · Guardado como borrador: '+pendingCount+' pendiente(s)':' · Completo'));
-      bridge.showPage('testPage');
-      await bridge.reloadTestHistory();
-    }catch(e){toast(e.message,true);}
-    finally{btn.disabled=false;btn.textContent=editingId?'Actualizar plan':'Guardar plan';}
+    if(!date){
+      setSaveStatus('Falta la fecha de visita para guardar','warning');
+      if(!automatic)toast('Selecciona la fecha de visita.',true);
+      return false;
+    }
+    const revisionAtStart=editRevision;
+    const tests=items.map(item=>({
+      id:item.id,code:item.code,name:item.name,
+      status:itemMetrics(item).complete?'COMPLETADA':'BORRADOR',
+      standard_reference:item.standard_reference,
+      equipment_name:item.equipment_name,equipment_brand:item.equipment_brand,
+      equipment_model:item.equipment_model,equipment_serial:item.equipment_serial,
+      observations:item.observations,measurements:measurementsFromRows(item)
+    }));
+    const complete=generalMissing().length===0&&items.every(item=>itemMetrics(item).complete);
+    const payload={
+      id:editingId,transformer_key:transformer().key,test_code:'PLAN',
+      executed_at:date,status:complete?'COMPLETADA':'BORRADOR',
+      operator_name:$('#planOperator').value,supervisor_name:$('#planSupervisor').value,
+      oil_temperature_c:$('#planOilTemp').value,ambient_temperature_c:$('#planAmbientTemp').value,
+      relative_humidity_percent:$('#planHumidity').value,observations:$('#planObservations').value,
+      measurements:[],plan:{version:1,session_id:sessionId,tests}
+    };
+    const btn=$('#saveTestPlan');
+    if(btn){btn.disabled=true;btn.innerHTML='<svg><use href="#i-check"/></svg>Guardando...';}
+    setSaveStatus('Guardando cambios...','saving');
+    const operation=(async()=>{
+      try{
+        if(bridge.demo())throw new Error('Selecciona un transformador real antes de guardar.');
+        if(!bridge.testsReady())throw new Error('Prepara las tablas de pruebas eléctricas antes de guardar.');
+        const response=await fetch(api('action=test-save'),{
+          method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)
+        });
+        const data=await json(response);
+        if(!data.result?.id)throw new Error('El servidor no confirmó el ID del plan guardado.');
+        editingId=Number(data.result.id);
+        savedRevision=revisionAtStart;
+        $('#planTitle').textContent='Plan de pruebas #'+editingId;
+        const pending=planMetrics().missing.length;
+        setSaveStatus(
+          pending?'Guardado automáticamente · faltan '+pending+' datos por completar':'Todos los datos están guardados',
+          'saved'
+        );
+        if(!automatic){
+          toast(pending
+            ?'Cambios guardados. Quedan '+pending+' datos pendientes; puedes continuar después.'
+            :'Todos los datos del plan están guardados.');
+        }
+        return true;
+      }catch(error){
+        setSaveStatus('No se pudo guardar · revisa la conexión y vuelve a intentar','error');
+        if(!automatic)toast(error.message,true);
+        return false;
+      }finally{
+        if(btn){btn.disabled=false;btn.innerHTML='<svg><use href="#i-check"/></svg>Guardar ahora';}
+      }
+    })();
+    savePromise=operation;
+    let result=false;
+    try{result=await operation;}
+    finally{
+      if(savePromise===operation)savePromise=null;
+      if(savePending||hasUnsavedChanges()){
+        savePending=false;
+        if(autoSaveTimer)clearTimeout(autoSaveTimer);
+        scheduleAutoSave(250);
+      }
+    }
+    return result;
+  }
+  async function saveNow(){
+    if(autoSaveTimer)clearTimeout(autoSaveTimer);
+    return savePlan(false);
   }
   document.addEventListener('click',e=>{
     const target=e.target instanceof Element?e.target:null;if(!target)return;
@@ -345,8 +402,8 @@
     e.preventDefault();e.stopImmediatePropagation();
     if(editBtn)edit(Number(editBtn.dataset.openExecution));else if(pick)start(pick.dataset.newTest);else start(null);
   },true);
-  $('#cancelPlan').addEventListener('click',()=>bridge.showPage('testPage'));
-  $('#saveTestPlan').addEventListener('click',save);
+  $('#cancelPlan').addEventListener('click',leavePlan);
+  $('#saveTestPlan').addEventListener('click',saveNow);
   $('#planTestPicker').addEventListener('click',e=>{const b=e.target.closest('[data-pick-test]');if(b)toggle(b.dataset.pickTest);});
   $('#planTestCards').addEventListener('click',e=>{
     const del=e.target.closest('[data-remove-test]');if(del){items.splice(Number(del.dataset.removeTest),1);render();return;}
