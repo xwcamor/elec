@@ -244,11 +244,19 @@
   }
 
     function renderPicker(){
-    $('#planTestPicker').innerHTML=catalog.map(t=>{
-      const item=items.find(x=>x.code===t[0]);
-      return '<button type="button" class="plan-pick-btn '+(item?'active':'')+'" data-pick-test="'+t[0]+'"><span class="plan-pick-check">'+(item?'✓':'＋')+'</span><span class="plan-pick-copy"><b>'+esc(t[1])+'</b><small>'+esc(t[2])+'</small></span></button>';
-    }).join('');
-    $('#planSelectionStatus').textContent=items.length?items.length+' prueba(s) seleccionada(s). '+items.filter(x=>itemMetrics(x).complete).length+' con todos los campos mínimos completos.':'Aún no has añadido pruebas al plan.';
+    const select=$('#planTestTypeSelect'),add=$('#addPlanTest');
+    const available=catalog.filter(t=>!items.some(x=>x.code===t[0]));
+    const previous=select.value;
+    select.innerHTML=catalog.map(t=>'<option value="'+esc(t[0])+'" '+(items.some(x=>x.code===t[0])?'disabled':'')+'>'+esc(t[1])+(items.some(x=>x.code===t[0])?' · añadida':'')+'</option>').join('');
+    const next=available.find(t=>t[0]===previous)||available[0];
+    if(next)select.value=next[0];
+    select.disabled=available.length===0;
+    add.disabled=available.length===0;
+    const complete=items.filter(x=>itemMetrics(x).complete).length;
+    const names=items.map(x=>x.name).join(' · ');
+    $('#planSelectionStatus').textContent=items.length
+      ?items.length+' ensayo(s) en el plan · '+complete+' completos'+(names?' — '+names:'')
+      :'Aún no has añadido ensayos al plan.';
   }
   function renderCards(){
     const host=$('#planTestCards');
@@ -277,16 +285,21 @@
       if(item.code==='WINDING_RESISTANCE')hint='<div class="plan-reference-note"><b>LAP:</b> el comparativo entre fases debe ser ≤5% (IEEE C57.152-2013, cláusula 7.2.7). El archivo no documenta con claridad la fórmula comparativa; por eso el resultado se registra manualmente y no se calcula con la columna auxiliar defectuosa del Excel.</div>';
       if(item.code==='ARRESTER')hint='<div class="plan-reference-note"><b>LAP:</b> comparar las mediciones con los valores de fábrica. Si no existen, usar esta ejecución como referencia histórica; no se fija un límite absoluto en este formulario.</div>';
       if(item.code==='SFRA')hint='<div class="plan-reference-note"><b>LAP:</b> la conclusión se obtiene comparando las gráficas de campo con las de planta. La evaluación es manual; el protocolo no define un umbral numérico.</div>';
-      return '<article class="plan-test-card" data-test-index="'+idx+'" data-state="'+metrics.state+'">'+
-        '<div class="plan-test-card-head"><div class="plan-test-heading"><span class="eyebrow">ENSAYO '+String(idx+1).padStart(2,'0')+'</span><h4>'+esc(item.name)+'</h4><div class="plan-test-progress-line"><small data-card-progress>'+metrics.filled+'/'+metrics.total+' campos mínimos · '+metrics.percent+'%</small></div></div><button type="button" class="delete-btn" data-remove-test="'+idx+'">Quitar</button></div>'+
+      const openIndexes=[...host.querySelectorAll('.plan-test-card[open]')].map(node=>Number(node.dataset.testIndex));
+      const shouldOpen=openIndexes.length?openIndexes.includes(idx):idx===0;
+      return '<details class="plan-test-card" data-test-index="'+idx+'" data-state="'+metrics.state+'" '+(shouldOpen?'open':'')+'>'+
+        '<summary class="plan-test-card-head"><span class="plan-test-index">'+String(idx+1).padStart(2,'0')+'</span><span class="plan-test-heading"><b>'+esc(item.name)+'</b><small data-card-progress>'+metrics.filled+'/'+metrics.total+' campos · '+metrics.percent+'%</small></span><span class="plan-card-state" data-state="'+metrics.state+'">'+(metrics.complete?'Completo':metrics.anyData?'En curso':'Pendiente')+'</span><span class="plan-card-chevron">⌄</span></summary>'+
+        '<div class="plan-test-body">'+
+        '<details class="plan-optional-details plan-test-meta-details"><summary><span>Equipo y referencia</span><small>Instrumento, marca, modelo, serie y norma</small></summary>'+
         '<div class="plan-test-meta-grid"><label>Norma / referencia<input data-meta="standard_reference" value="'+esc(item.standard_reference)+'" placeholder="Norma o protocolo"></label>'+
         '<label data-meta-wrap="equipment_name">Equipo<input data-meta="equipment_name" value="'+esc(item.equipment_name)+'" placeholder="Instrumento"></label>'+
         '<label data-meta-wrap="equipment_brand">Marca<input data-meta="equipment_brand" value="'+esc(item.equipment_brand)+'" placeholder="Marca"></label>'+
         '<label data-meta-wrap="equipment_model">Modelo<input data-meta="equipment_model" value="'+esc(item.equipment_model)+'" placeholder="Modelo"></label>'+
-        '<label data-meta-wrap="equipment_serial">N.º de serie<input data-meta="equipment_serial" value="'+esc(item.equipment_serial)+'" placeholder="Serie"></label></div>'+hint+
-        '<div class="plan-table-toolbar"><div><b>Datos del protocolo</b><small><i class="required-mark">*</i> Campo requerido · Ctrl+V permite pegar desde Excel.</small><small class="plan-row-summary" data-row-summary></small></div><button class="btn small" type="button" data-add-row="'+idx+'">＋ Agregar fila</button></div>'+
+        '<label data-meta-wrap="equipment_serial">N.º de serie<input data-meta="equipment_serial" value="'+esc(item.equipment_serial)+'" placeholder="Serie"></label></div></details>'+hint+
+        '<div class="plan-table-toolbar"><div><b>Mediciones del ensayo</b><small><i class="required-mark">*</i> Campo requerido · Puedes pegar desde Excel.</small><small class="plan-row-summary" data-row-summary></small></div><button class="btn small secondary-action" type="button" data-add-row="'+idx+'">+ Fila</button></div>'+
         '<div class="measurement-sheet-wrap plan-grid-wrap"><table class="measurement-sheet plan-sheet"><thead>'+head+'</thead><tbody>'+body+'</tbody></table></div>'+
-        '<label class="plan-test-observations">Observaciones del ensayo<textarea data-meta="observations" rows="2" placeholder="Resultados, incidencias y comentarios">'+esc(item.observations)+'</textarea></label></article>';
+        '<details class="plan-optional-details plan-observation-details"><summary><span>Observaciones del ensayo</span><small>Notas e incidencias</small></summary><label class="plan-test-observations"><textarea data-meta="observations" rows="2" placeholder="Resultados, incidencias y comentarios">'+esc(item.observations)+'</textarea></label></details>'+
+        '<div class="plan-card-actions"><button type="button" class="text-action" data-remove-test="'+idx+'">Retirar este ensayo</button></div></div></details>';
     }).join('');
     items.forEach((item,index)=>{const card=host.querySelector('[data-test-index="'+index+'"]');if(card)refreshFieldStyles(card,item,itemMetrics(item));});
   }
@@ -449,7 +462,12 @@
   },true);
   $('#cancelPlan').addEventListener('click',leavePlan);
   $('#saveTestPlan').addEventListener('click',saveNow);
-  $('#planTestPicker').addEventListener('click',e=>{const b=e.target.closest('[data-pick-test]');if(b)toggle(b.dataset.pickTest);});
+  $('#addPlanTest').addEventListener('click',()=>{
+    const code=$('#planTestTypeSelect').value;
+    if(!code||items.some(item=>item.code===code))return;
+    items.push(makeItem(code));
+    render();markPlanChanged(350);
+  });
   $('#planTestCards').addEventListener('click',e=>{
     const del=e.target.closest('[data-remove-test]');
     if(del){

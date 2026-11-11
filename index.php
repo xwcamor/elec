@@ -70,7 +70,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.26">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.27">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -182,27 +182,30 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
   <section class="test-page hidden" id="testPage">
     <div class="config-toolbar">
       <div><div class="breadcrumbs">Transformador <span>/</span> Pruebas eléctricas</div><h2>Pruebas eléctricas</h2><p>Registra los ensayos de este transformador y consulta sus resultados históricos.</p></div>
-      <div class="toolbar-actions"><button class="btn" id="backFromTests">Volver a detalles</button><button class="btn primary" id="newTestExecution"><svg><use href="#i-plus"/></svg>Nueva ejecución</button></div>
+      <div class="toolbar-actions"><button class="btn" id="backFromTests">Volver a detalles</button><button class="btn primary" id="newTestExecution"><svg><use href="#i-plus"/></svg>Nueva visita</button></div>
     </div>
-    <div class="test-info-banner"><svg><use href="#i-info"/></svg><div><b>Un plan por visita, varios ensayos.</b><span>Ingresa los datos generales una sola vez, selecciona las pruebas realizadas y completa el formulario específico de cada ensayo. Los avances se guardan automáticamente.</span></div></div>
-    <div class="test-stats" id="testStats"></div>
-    <section class="test-launch-section">
-      <div class="test-section-heading"><div><span class="eyebrow">NUEVO REGISTRO</span><h3>Selecciona el tipo de prueba</h3><p>También puedes añadir más de un ensayo dentro de una misma visita.</p></div></div>
-      <div class="test-type-grid" id="testTypeGrid"></div>
+    <div class="test-view-switcher" role="tablist" aria-label="Secciones de pruebas eléctricas">
+      <button class="test-view-tab active" type="button" id="showTestSummary" data-test-view="summary" role="tab" aria-selected="true" aria-controls="testSummaryPanel"><svg><use href="#i-grid"/></svg>Resumen</button>
+      <button class="test-view-tab" type="button" id="showTestTable" data-test-view="table" role="tab" aria-selected="false" aria-controls="testHistoryPanel"><svg><use href="#i-file"/></svg>Tabla</button>
+      <button class="test-view-tab" type="button" id="showTestGraph" data-test-view="graph" role="tab" aria-selected="false" aria-controls="testAnalyticsPanel"><svg><use href="#i-activity"/></svg>Gráfico</button>
+    </div>
+    <section id="testSummaryPanel" class="test-view-panel" role="tabpanel" aria-labelledby="showTestSummary">
+      <div class="test-info-banner"><svg><use href="#i-info"/></svg><div><b>Un registro por visita.</b><span>Reúne los ensayos de una misma jornada en un plan, con sus mediciones, resultados y observaciones.</span></div></div>
+      <div class="test-stats" id="testStats"></div>
+      <div class="test-summary-intro">
+        <div><span class="eyebrow">SEGUIMIENTO DEL TRANSFORMADOR</span><h3>Actividad de ensayos</h3><p>Consulta el historial o revisa la evolución sin mezclar magnitudes eléctricas distintas.</p></div>
+        <div class="test-summary-latest" id="testSummaryLatest"><span>Última visita</span><strong>Sin registros</strong></div>
+      </div>
     </section>
-    <div class="test-view-switcher" role="tablist" aria-label="Vistas de seguimiento de pruebas">
-      <button class="test-view-tab active" type="button" id="showTestHistory" data-test-view="history" role="tab" aria-selected="true" aria-controls="testHistoryPanel"><svg><use href="#i-history"/></svg>Historial de ejecuciones</button>
-      <button class="test-view-tab" type="button" id="showTestAnalytics" data-test-view="analytics" role="tab" aria-selected="false" aria-controls="testAnalyticsPanel"><svg><use href="#i-activity"/></svg>Evolución de las pruebas</button>
-    </div>
-    <section id="testHistoryPanel" class="test-view-panel" role="tabpanel" aria-labelledby="showTestHistory">
+    <section id="testHistoryPanel" class="test-view-panel hidden" role="tabpanel" aria-labelledby="showTestTable">
       <div class="test-history-card">
-        <div class="test-history-head"><div><span class="eyebrow">REGISTROS GUARDADOS</span><h3>Historial de ejecuciones</h3><p>Una fila por visita. Abre un registro para continuar completando sus datos.</p></div><div class="test-filter"><svg><use href="#i-search"/></svg><input id="testHistoryFilter" placeholder="Filtrar por prueba o responsable..."></div></div>
+        <div class="test-history-head"><div><span class="eyebrow">TABLA DE REGISTROS</span><h3>Visitas y ensayos registrados</h3><p>Una fila por visita. Abre un registro para consultar o continuar completando sus datos.</p></div><div class="test-filter"><svg><use href="#i-search"/></svg><input id="testHistoryFilter" placeholder="Filtrar por prueba o responsable..."></div></div>
         <div class="test-table-wrap"><table class="test-history-table"><thead><tr><th>Fecha de visita</th><th>Pruebas incluidas</th><th>Responsable</th><th>Datos registrados</th><th>Acción</th></tr></thead><tbody id="testHistoryBody"><tr><td colspan="5" class="test-empty">Aún no hay registros. Selecciona una prueba para crear tu primer plan.</td></tr></tbody></table></div>
       </div>
     </section>
-    <section id="testAnalyticsPanel" class="test-view-panel hidden" role="tabpanel" aria-labelledby="showTestAnalytics">
+    <section id="testAnalyticsPanel" class="test-view-panel hidden" role="tabpanel" aria-labelledby="showTestGraph">
       <section class="analytics-card" aria-label="Evolución histórica">
-        <div class="analytics-heading"><div><span class="eyebrow">ANÁLISIS HISTÓRICO</span><h3>Evolución de las pruebas</h3><p>Consulta la frecuencia de las visitas registradas y qué tipos de ensayo se utilizan más.</p></div><span class="analytics-period" id="analyticsPeriod">—</span></div>
+        <div class="analytics-heading"><div><span class="eyebrow">LECTURA VISUAL</span><h3>Actividad de ensayos</h3><p>Compara la cantidad de visitas por mes y la distribución de los tipos de prueba.</p></div><span class="analytics-period" id="analyticsPeriod">—</span></div>
         <div class="analytics-grid">
           <div class="analytics-chart-panel"><b>Visitas registradas por mes</b><div id="monthlyExecutionChart" class="analytics-chart"></div></div>
           <div class="analytics-chart-panel"><b>Distribución por tipo de prueba</b><div id="testTypeAnalytics" class="type-analytics"></div></div>
@@ -279,18 +282,27 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       <div class="execution-card-title"><span class="eyebrow">01 · DATOS COMPARTIDOS</span><h3>Datos de la visita y condiciones ambientales</h3><p>Se ingresan una sola vez y se comparten con todos los ensayos del plan.</p></div>
       <div class="execution-date-card plan-date-inline"><div class="date-emblem"><svg><use href="#i-calendar"/></svg></div><div class="date-copy"><strong>Fecha y hora de las pruebas</strong><small>Fecha real de realización de los ensayos.</small></div><label class="execution-date-field"><span>Realizada el *</span><input id="planDate" type="datetime-local" required></label></div>
       <div class="plan-shared-status is-pending" id="planSharedStatus" aria-live="polite">Pendiente: fecha de la visita · responsable / técnico</div>
-      <div class="form-grid execution-meta-grid plan-shared-grid">
+      <div class="plan-core-grid">
         <label>Responsable / técnico<input id="planOperator" placeholder="Nombre del técnico"></label>
-        <label>Supervisor<input id="planSupervisor" placeholder="Nombre del supervisor"></label>
-        <label>Temperatura del aceite (°C)<input id="planOilTemp" inputmode="decimal" placeholder="Ej. 35.5"></label>
-        <label>Temperatura ambiente (°C)<input id="planAmbientTemp" inputmode="decimal" placeholder="Ej. 22"></label>
-        <label>Humedad relativa (%)<input id="planHumidity" inputmode="decimal" placeholder="Ej. 74"></label>
       </div>
-      <label class="plan-shared-notes">Observaciones generales de la visita<textarea id="planObservations" rows="2" placeholder="Condiciones del servicio, ubicación e incidencias generales..."></textarea></label>
+      <details class="plan-optional-details">
+        <summary><span>Condiciones y datos complementarios</span><small>Supervisor, temperaturas y observaciones</small></summary>
+        <div class="form-grid execution-meta-grid plan-shared-grid">
+          <label>Supervisor<input id="planSupervisor" placeholder="Nombre del supervisor"></label>
+          <label>Temperatura del aceite (°C)<input id="planOilTemp" inputmode="decimal" placeholder="Ej. 35.5"></label>
+          <label>Temperatura ambiente (°C)<input id="planAmbientTemp" inputmode="decimal" placeholder="Ej. 22"></label>
+          <label>Humedad relativa (%)<input id="planHumidity" inputmode="decimal" placeholder="Ej. 74"></label>
+        </div>
+        <label class="plan-shared-notes">Observaciones generales<textarea id="planObservations" rows="2" placeholder="Condiciones del servicio, ubicación e incidencias generales..."></textarea></label>
+      </details>
     </section>
     <section class="execution-card">
       <div class="execution-card-title"><span class="eyebrow">02 · SELECCIÓN DE ENSAYOS</span><h3>¿Qué pruebas vas a registrar?</h3><p>Selecciona una o varias. Cada prueba genera su propio formulario con los campos del protocolo LAP.</p></div>
-      <div class="plan-test-picker" id="planTestPicker"></div><div class="plan-selection-status" id="planSelectionStatus">Aún no has añadido pruebas al plan.</div>
+      <div class="plan-test-add">
+        <label for="planTestTypeSelect">Tipo de ensayo<select id="planTestTypeSelect"></select></label>
+        <button class="btn primary" id="addPlanTest" type="button"><svg><use href="#i-plus"/></svg>Añadir ensayo</button>
+      </div>
+      <div class="plan-selection-status" id="planSelectionStatus" aria-live="polite">Aún no has añadido ensayos al plan.</div>
     </section>
     <section class="execution-card plan-tests-section">
       <div class="execution-card-title"><span class="eyebrow">03 · FORMULARIOS DE PRUEBA</span><h3>Resultados por ensayo</h3><p>Marca, modelo, serie, norma y observaciones se registran por prueba, ya que el instrumento puede cambiar entre ensayos.</p></div>
@@ -342,7 +354,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
           <div id="reviewSummary" class="review-summary"></div>
           <div class="version-history"><div class="history-heading"><div><h4>Versiones guardadas</h4><p>La configuración previa se conserva como fotografía histórica.</p></div><span id="versionBadge" class="version-badge">Versión 0</span></div><div id="versionList"><div class="empty-history">Todavía no hay versiones guardadas.</div></div></div>
           <div class="callout"><svg><use href="#i-info"/></svg><div><b>Qué se guarda</b><p>Datos eléctricos generales, bobinados, bornes, bushings y posiciones de los conmutadores.</p></div></div>
-          <div class="panel-footer"><button class="btn" data-prev="taps">← Anterior</button><span>Al guardar se crea una nueva versión de configuración.</span><button class="btn primary" id="saveConfigBottom"><svg><use href="#i-check"/></svg>Guardar configuración</button></div>
+          <div class="panel-footer"><button class="btn" data-prev="taps">← Anterior</button><span>Al guardar se crea una nueva versión de configuración.</span><span class="config-save-hint">Usa «Guardar configuración» en la parte superior para crear la versión.</span></div>
         </section>
       </div>
     </div>
@@ -416,6 +428,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.26"></script>
-<script src="./assets/plan.js?v=1.5.26"></script>
+<script src="./assets/app.js?v=1.5.27"></script>
+<script src="./assets/plan.js?v=1.5.27"></script>
 </body></html>

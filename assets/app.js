@@ -541,7 +541,7 @@
   function openTests(){
     const reason=electricalTestsBlockReason();
     if(reason){refreshSidebarAccess();toast(reason,true);return false;}
-    showOnlyMain('testPage');loadTestHistory();return true;
+    showOnlyMain('testPage');setTestWorkspaceView('summary');loadTestHistory();return true;
   }
   $('#openElectricalTests').addEventListener('click',e=>{e.preventDefault();openTests();});
   $('#backFromTests').addEventListener('click',()=>showOnlyMain('overviewPage'));
@@ -561,12 +561,15 @@
       '<div class="test-stat"><small>Última visita</small><strong class="test-stat-date">'+(last?esc(formatExecutionDate(last)):'Sin registros')+'</strong><span>Fecha de realización</span></div>';
   }
   function renderTestTypes(){
-    $('#testTypeGrid').innerHTML=testCatalog.map(t=>{
-      const items=testExecutions.filter(x=>x.test_code===t[0]||(x.plan_tests||[]).some(p=>p.code===t[0]));
-      const last=items[0]?.executed_at;
-      return `<button class="test-type-card" type="button" data-new-test="${t[0]}"><span class="test-type-icon"><svg><use href="#i-zap"/></svg></span><span class="test-type-copy"><b>${esc(t[1])}</b><small>${esc(t[2])}</small><em>${items.length?items.length+' registro(s) · último '+esc(formatExecutionDate(last)):'Sin registros todavía'}</em></span><span class="test-type-arrow">＋</span></button>`;
-    }).join('');
-    $$('[data-new-test]').forEach(b=>b.addEventListener('click',()=>startExecution(b.dataset.newTest)));
+    const host=$('#testTypeGrid');
+    if(!host)return;
+    host.innerHTML='';
+  }
+  function renderTestSummary(){
+    testStats();
+    const latest=testExecutions[0]?.executed_at;
+    const host=$('#testSummaryLatest');
+    if(host)host.innerHTML='<span>Última visita</span><strong>'+(latest?esc(formatExecutionDate(latest)):'Sin registros')+'</strong>';
   }
 
   function renderHistoricalAnalytics(){
@@ -591,15 +594,18 @@
     list.innerHTML=total?[...types.entries()].sort((a,b)=>b[1]-a[1]).map(([name,count])=>`<div class="type-analytics-row"><div><span>${esc(name)}</span><b>${count}</b></div><div class="type-analytics-track"><i style="width:${Math.round(count/total*100)}%"></i></div></div>`).join(''):'<div class="analytics-empty">Todavía no hay pruebas registradas.</div>';
   }
   function setTestWorkspaceView(view){
-    const history=view==='history';
-    $('#testHistoryPanel')?.classList.toggle('hidden',!history);
-    $('#testAnalyticsPanel')?.classList.toggle('hidden',history);
-    $$('[data-test-view]').forEach(button=>{
+    const panels={summary:'#testSummaryPanel',table:'#testHistoryPanel',graph:'#testAnalyticsPanel'};
+    Object.entries(panels).forEach(([key,selector])=>{
+      $(selector)?.classList.toggle('hidden',key!==view);
+    });
+    $('[data-test-view]').forEach(button=>{
       const active=button.dataset.testView===view;
       button.classList.toggle('active',active);
       button.setAttribute('aria-selected',active?'true':'false');
     });
-    if(!history)renderHistoricalAnalytics();
+    if(view==='summary')renderTestSummary();
+    if(view==='table')renderTestHistory();
+    if(view==='graph')renderHistoricalAnalytics();
   }
   $$('[data-test-view]').forEach(button=>button.addEventListener('click',()=>setTestWorkspaceView(button.dataset.testView)));
 

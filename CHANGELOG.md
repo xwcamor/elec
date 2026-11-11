@@ -1,3 +1,12 @@
+## v1.5.27
+- Reorganiza Pruebas eléctricas en tres vistas: Resumen, Tabla y Gráfico.
+- El Resumen reduce los accesos visibles a una sola acción principal: Nueva visita.
+- La selección de ensayos en un plan pasa de una cuadrícula de botones a un selector compacto.
+- Los datos ambientales, de supervisión, instrumento y observaciones se agrupan en secciones opcionales plegadas.
+- Los formularios de cada ensayo se presentan como paneles desplegables; solo se abre el primero por defecto.
+- Rediseña Configuración eléctrica con los cuatro pasos en una barra horizontal, formularios más sobrios y una sola acción principal de guardado.
+- Añade microinteracciones rápidas y accesibles: feedback de pulsación, transición breve entre paneles y soporte para movimiento reducido.
+
 ## v1.5.26
 - En bushings separa «Evaluación FP» (manual, sin umbral inventado) de «Resultado capacitancia» (automático por variación menor a 5%).
 - El FP de placa y el FP medido son datos obligatorios para conservar la comparación completa del protocolo.
