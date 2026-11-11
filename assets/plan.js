@@ -26,6 +26,24 @@
     CAPACITANCE:{prefix:'CAP',cols:[['point','Punto / borne'],['connection','Conexión de prueba'],['test_voltage_kv','Tensión de prueba (kV)'],['capacitance_nf','Capacitancia (nF)'],['frequency_hz','Frecuencia (Hz)'],['temperature_c','Temperatura (°C)'],['notes','Observación']]}
   };
   let items=[],editingId=null,sessionId=null;
+  let autoSaveTimer=null,savePromise=null,savePending=false,editRevision=0,savedRevision=0;
+  function hasUnsavedChanges(){return editRevision>savedRevision;}
+  function setSaveStatus(message,state){
+    const node=$('#planSaveStatus');if(!node)return;
+    node.dataset.state=state||'idle';
+    const label=node.querySelector('span');if(label)label.textContent=message;
+  }
+  function scheduleAutoSave(delay){
+    if(autoSaveTimer)clearTimeout(autoSaveTimer);
+    if(!items.length){setSaveStatus('Selecciona una prueba para iniciar el guardado automático','idle');return;}
+    if(!$('#planDate').value){setSaveStatus('Falta la fecha de visita para guardar','warning');return;}
+    setSaveStatus('Cambios pendientes · se guardarán automáticamente','pending');
+    autoSaveTimer=setTimeout(()=>savePlan(true),delay??900);
+  }
+  function markPlanChanged(delay){editRevision++;scheduleAutoSave(delay);}
+  window.addEventListener('beforeunload',event=>{
+    if(hasUnsavedChanges()||savePromise){event.preventDefault();event.returnValue='';}
+  });
   function typeName(code){return (catalog.find(x=>x[0]===code)||[])[1]||code;}
   function api(q){return bridge.api(q);}
   async function json(response){return bridge.readApiResponse(response);}
@@ -246,14 +264,37 @@
   }
   function render(){renderPicker();renderCards();renderPlanFeedback();}
   function clear(){
-    items=[];editingId=null;sessionId=null;
+    if(autoSaveTimer)clearTimeout(autoSaveTimer);
+    items=[];editingId=null;sessionId=null;savePending=false;editRevision=0;savedRevision=0;
     const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());$('#planDate').value=d.toISOString().slice(0,16);
     ['planOperator','planSupervisor','planOilTemp','planAmbientTemp','planHumidity','planObservations'].forEach(id=>$('#'+id).value='');
-    $('#planTitle').textContent='Nuevo plan de pruebas';$('#saveTestPlan').textContent='Guardar plan';render();
+    $('#planTitle').textContent='Nuevo plan de pruebas';
+    $('#saveTestPlan').innerHTML='<svg><use href="#i-check"/></svg>Guardar ahora';
+    setSaveStatus('Se guardará automáticamente al modificar datos','idle');
+    render();
   }
-  function start(code){clear();if(code)items.push(makeItem(code));render();bridge.showPage('planPage');}
-  function toggle(code){const i=items.findIndex(x=>x.code===code);if(i>=0)items.splice(i,1);else items.push(makeItem(code));render();}
-  async function edit(id){
+  function start(code){
+    clear();if(code)items.push(makeItem(code));render();bridge.showPage('planPage');
+    if(code)markPlanChanged(350);
+  }
+  function toggle(code){
+    const index=items.findIndex(x=>x.code===code);
+    if(index>=0){
+      if(items.length===1){toast('El plan debe conservar al menos una prueba.',true);return;}
+      items.splice(index,1);
+    }else items.push(makeItem(code));
+    render();markPlanChanged(350);
+  }
+  async function leavePlan(){
+    if(autoSaveTimer)clearTimeout(autoSaveTimer);
+    if(hasUnsavedChanges()&&items.length)await savePlan(true);
+    if(hasUnsavedChanges()){
+      if(!window.confirm('No se pudo confirmar el guardado de los últimos cambios. ¿Deseas salir de todas formas?'))return;
+    }
+    bridge.showPage('testPage');
+    await bridge.reloadTestHistory();
+  }
+    async function edit(id){
     if(bridge.demo()){toast('El historial no está disponible en modo demostración.',true);return;}
     try{
       const res=await fetch(api('action=test-get&key='+encodeURIComponent(transformer().key)+'&id='+id)),data=await json(res),x=data.item;
@@ -264,7 +305,11 @@
       $('#planHumidity').value=x.relative_humidity_percent??'';$('#planObservations').value=x.observations||'';
       if(Array.isArray(x.plan?.tests)&&x.plan.tests.length)items=x.plan.tests.map(t=>makeItem(t.code,{...t,rows:rowsFromMeasurements(t.code,t.measurements||[])}));
       else if(x.test_code&&x.test_code!=='PLAN')items=[makeItem(x.test_code,{status:x.status,standard_reference:x.standard_reference,equipment_name:x.equipment_name,equipment_brand:x.equipment_brand,equipment_model:x.equipment_model,equipment_serial:x.equipment_serial,rows:rowsFromMeasurements(x.test_code,x.measurements||[])})];
-      render();$('#planTitle').textContent='Editar plan #'+editingId;$('#saveTestPlan').textContent='Actualizar plan';bridge.showPage('planPage');
+      editRevision=0;savedRevision=0;
+      render();$('#planTitle').textContent='Plan de pruebas #'+editingId;
+      $('#saveTestPlan').innerHTML='<svg><use href="#i-check"/></svg>Guardar ahora';
+      setSaveStatus('Datos guardados · puedes continuar completando el plan','saved');
+      bridge.showPage('planPage');
     }catch(e){toast(e.message,true);}
   }
   async function save(){
