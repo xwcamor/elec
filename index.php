@@ -48,13 +48,29 @@ $initialConfig = $config ?: [
   'phase_count' => 3, 'vector_group' => $transformer['vector_group'] ?? '', 'frequency_hz' => 60, 'notes' => '', 'version_no' => 0,
   'windings' => [], 'tap_changers' => [], 'versions' => []
 ];
+$hasSavedElectricalConfig = is_array($config)
+    && (int)($config['version_no'] ?? 0) > 0
+    && !empty($config['windings']);
+if (!$transformerFound) {
+    $testsAccessBlockReason = 'Selecciona un transformador real para habilitar las pruebas eléctricas.';
+} elseif (!$schemaReady) {
+    $testsAccessBlockReason = 'Falta preparar el almacenamiento de la configuración eléctrica.';
+} elseif (!$hasSavedElectricalConfig) {
+    $testsAccessBlockReason = 'Primero completa y guarda la Configuración eléctrica del transformador.';
+} elseif (!$testsSchemaReady) {
+    $testsAccessBlockReason = 'Faltan las tablas del módulo de pruebas eléctricas.';
+} else {
+    $testsAccessBlockReason = '';
+}
+$canAccessElectricalTests = $testsAccessBlockReason === '';
+
 ?>
 <!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.19">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.20">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -144,11 +160,17 @@ $initialConfig = $config ?: [
       <button class="nav-disabled" type="button" disabled title="Módulo fuera del alcance de este piloto"><svg><use href="#i-droplet"/></svg>Fisicoquímico</button>
       <button class="nav-disabled" type="button" disabled title="Módulo fuera del alcance de este piloto"><svg><use href="#i-file"/></svg>Furanos</button>
       <button class="nav-disabled" type="button" disabled title="Módulo fuera del alcance de este piloto"><svg><use href="#i-percent"/></svg>Factor de Potencia</button>
-      <button class="nav-action electrical-tests-link" id="openElectricalTests" type="button"><svg><use href="#i-zap"/></svg>Pruebas eléctricas <i class="dot blue"></i></button>
+      <button class="nav-action electrical-tests-link<?= $canAccessElectricalTests ? '' : ' is-locked' ?>" id="openElectricalTests" type="button" <?= $canAccessElectricalTests ? '' : 'disabled aria-disabled="true"' ?> title="<?=h($testsAccessBlockReason ?: 'Pruebas eléctricas disponibles')?>">
+        <svg><use href="#i-zap"/></svg>Pruebas eléctricas
+        <span class="nav-state-chip" id="testsNavState" data-state="<?= $canAccessElectricalTests ? 'ready' : 'locked' ?>"><?= $canAccessElectricalTests ? 'Disponible' : 'Bloqueada' ?></span>
+      </button>
       <div class="nav-caption sub-caption">REGISTRO</div>
       <button class="nav-disabled" type="button" disabled title="Bitácora fuera del alcance de este piloto"><svg><use href="#i-history"/></svg>Bitácora</button>
       <div class="nav-caption sub-caption">CONFIGURACIÓN</div>
-      <button class="nav-action config-link" id="openConfig" type="button"><svg><use href="#i-settings"/></svg>Configuración eléctrica</button>
+      <button class="nav-action config-link<?= $hasSavedElectricalConfig ? ' is-configured' : ' is-unconfigured' ?>" id="openConfig" type="button">
+        <svg><use href="#i-settings"/></svg>Configuración eléctrica
+        <span class="nav-state-chip" id="configNavState" data-state="<?= $hasSavedElectricalConfig ? 'ready' : 'missing' ?>"><?= $hasSavedElectricalConfig ? 'Configurada' : 'Sin configurar' ?></span>
+      </button>
     </aside>
     <div class="overview-content">
       <div class="info-banner"><svg><use href="#i-info"/></svg> Diagnóstico parcial: faltan pruebas. El índice se calcula solo con las que tienen datos.</div>
@@ -345,6 +367,8 @@ window.PILOT = <?=json_encode([
   'apiUrl' => rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/')), '/') . '/api.php',
   'transformer' => ['key'=>$transformer['key'], 'code'=>$transformer['code'], 'company'=>$transformer['company'], 'tag'=>$transformer['tag'], 'voltage'=>$transformer['voltage'], 'power'=>$transformer['power'], 'year'=>$transformer['year'], 'brand'=>$transformer['brand'], 'tap_type'=>$transformer['tap_type'], 'num_taps'=>$transformer['num_taps'], 'vector_group'=>$transformer['vector_group'], 'location'=>$transformer['location'], 'phase_count'=>$transformer['phase_count'], 'frequency_hz'=>$transformer['frequency_hz'], 'insulation_type'=>$transformer['insulation_type'], 'cooling_type'=>$transformer['cooling_type'], 'notes'=>$transformer['notes']],
   'config' => $initialConfig,
+  'configReady' => $hasSavedElectricalConfig,
+  'testsAccessBlockReason' => $testsAccessBlockReason,
   'dbConnected' => $dbConnected, 'dbName' => $dbName, 'dbMessage' => $dbMessage, 'transformerFound' => $transformerFound, 'schemaReady' => $schemaReady, 'testsSchemaReady' => $testsSchemaReady, 'demo' => !$dbConnected || !$transformerFound
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)?>;
 </script>
@@ -397,6 +421,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.19"></script>
-<script src="./assets/plan.js?v=1.5.19"></script>
+<script src="./assets/app.js?v=1.5.20"></script>
+<script src="./assets/plan.js?v=1.5.20"></script>
 </body></html>

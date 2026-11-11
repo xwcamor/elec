@@ -1,3 +1,11 @@
+## v1.5.20
+- La ficha del transformador se mantiene como cabecera común al navegar por el piloto; no se duplica dentro de Pruebas eléctricas.
+- El acceso a Configuración eléctrica muestra un indicador rojo "Sin configurar" hasta que exista una versión guardada con al menos un bobinado.
+- Pruebas eléctricas queda realmente deshabilitada si no existe configuración eléctrica guardada o si faltan las tablas del módulo.
+- La navegación del módulo y la creación/edición de planes validan también el prerrequisito, no solo el aspecto del botón.
+- Al guardar correctamente la configuración, se actualizan el estado del sidebar y el acceso a Pruebas eléctricas inmediatamente.
+- Al cambiar de transformador, el estado de acceso se recalcula con la configuración propia de ese registro.
+
 ## v1.5.19
 - Quita el selector de estado también del formulario legado de una sola prueba.
 - Antes de cambiar a Configuración, Inicio o Pruebas desde el menú, intenta guardar los cambios pendientes del plan actual.

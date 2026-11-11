@@ -122,6 +122,43 @@
     return {phase_count:Number(config.phase_count || 3),vector_group:config.vector_group || transformer.vector_group || 'Yd11',frequency_hz:config.frequency_hz ?? 60,notes:config.notes || '',version_no:Number(config.version_no || 0),windings,tap_changers:tapChangers,versions:Array.isArray(config.versions) ? config.versions : []};
   }
 
+  function hasSavedElectricalConfiguration(){
+    return Number(state?.version_no || 0) > 0 && Array.isArray(state?.windings) && state.windings.length > 0;
+  }
+  function electricalTestsBlockReason(){
+    if(PILOT.demo || !PILOT.transformerFound) return 'Selecciona un transformador real para habilitar las pruebas eléctricas.';
+    if(!PILOT.schemaReady) return 'Falta preparar el almacenamiento de la configuración eléctrica.';
+    if(!hasSavedElectricalConfiguration()) return 'Primero completa y guarda la Configuración eléctrica del transformador.';
+    if(!PILOT.testsSchemaReady) return 'Faltan las tablas del módulo de pruebas eléctricas.';
+    return '';
+  }
+  function refreshSidebarAccess(){
+    const configured=hasSavedElectricalConfiguration();
+    PILOT.configReady=configured;
+    const configButton=$('#openConfig'),configState=$('#configNavState');
+    if(configButton){
+      configButton.classList.toggle('is-unconfigured',!configured);
+      configButton.classList.toggle('is-configured',configured);
+      configButton.title=configured?'Configuración eléctrica guardada':'Falta guardar la configuración eléctrica.';
+    }
+    if(configState){
+      configState.dataset.state=configured?'ready':'missing';
+      configState.textContent=configured?'Configurada':'Sin configurar';
+    }
+    const testsButton=$('#openElectricalTests'),testsState=$('#testsNavState');
+    const reason=electricalTestsBlockReason(),allowed=!reason;
+    if(testsButton){
+      testsButton.disabled=!allowed;
+      testsButton.setAttribute('aria-disabled',allowed?'false':'true');
+      testsButton.classList.toggle('is-locked',!allowed);
+      testsButton.title=reason||'Pruebas eléctricas disponibles';
+    }
+    if(testsState){
+      testsState.dataset.state=allowed?'ready':'locked';
+      testsState.textContent=allowed?'Disponible':'Bloqueada';
+    }
+  }
+  refreshSidebarAccess();
 
   function markDirty() {
     dirty = true;
@@ -413,7 +450,7 @@
     try{
       const response=await fetch(api('action=save'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(collectPayload())});
       const result=await readApiResponse(response);
-      state.version_no=result.result.version_no;state.versions.unshift({version_no:state.version_no,created_at:new Date().toLocaleString('es-PE')});dirty=false;$('#saveStatus').classList.add('saved');$('#saveStatus').innerHTML='<i></i>Guardado';$('#versionBadge').textContent='Versión '+state.version_no;renderReview();toast('Configuración guardada como versión '+state.version_no+'.');
+      state.version_no=result.result.version_no;state.versions.unshift({version_no:state.version_no,created_at:new Date().toLocaleString('es-PE')});dirty=false;refreshSidebarAccess();$('#saveStatus').classList.add('saved');$('#saveStatus').innerHTML='<i></i>Guardado';$('#versionBadge').textContent='Versión '+state.version_no;renderReview();toast('Configuración guardada como versión '+state.version_no+'.');
     }catch(error){toast(error.message,true);}finally{btns.forEach(b=>{b.disabled=false;b.innerHTML='<svg><use href="#i-check"/></svg>Guardar configuración';});}
   }
   $('#saveConfig').addEventListener('click',saveConfig);$('#saveConfigBottom').addEventListener('click',saveConfig);
@@ -426,7 +463,7 @@
     catch(e){toast(e.message,true);}
   }
   async function selectTransformer(key){
-    try{const r=await fetch(api('action=load&key='+encodeURIComponent(key)));const d=await readApiResponse(r);Object.assign(transformer,d.transformer);state=normalizeConfig(d.config||{});PILOT.demo=false;PILOT.transformerFound=true;PILOT.schemaReady=!!d.schemaReady;PILOT.testsSchemaReady=!!d.testsSchemaReady;updateTransformerDisplay();const status=$('#pilotStatus');if(status){status.className='pilot-status '+(PILOT.schemaReady&&PILOT.testsSchemaReady?'ready':'warning');status.querySelector('strong').textContent=PILOT.schemaReady&&PILOT.testsSchemaReady?'Base de datos conectada':'Faltan tablas del piloto';status.querySelector('span').textContent='BD: '+(PILOT.dbName||'configurada')+' · Transformador: '+transformer.code;}$('#globalSearch').value='';$('#searchResults').classList.remove('open');renderWindings();renderTapChangers();updateCounts();const dbAlert=$('#dbAlert');if(dbAlert){const message=!PILOT.dbConnected?'No hay conexión con la base de datos. Revisa la configuración de conexión.':(!PILOT.schemaReady?'Falta preparar el almacenamiento de la configuración eléctrica.':'');dbAlert.querySelector('span').textContent=message;dbAlert.classList.toggle('hidden',!message);}markDirty();toast('Transformador '+transformer.code+' seleccionado.');backOverview();}
+    try{const r=await fetch(api('action=load&key='+encodeURIComponent(key)));const d=await readApiResponse(r);Object.assign(transformer,d.transformer);state=normalizeConfig(d.config||{});PILOT.demo=false;PILOT.transformerFound=true;PILOT.schemaReady=!!d.schemaReady;PILOT.testsSchemaReady=!!d.testsSchemaReady;refreshSidebarAccess();updateTransformerDisplay();const status=$('#pilotStatus');if(status){status.className='pilot-status '+(PILOT.schemaReady&&PILOT.testsSchemaReady?'ready':'warning');status.querySelector('strong').textContent=PILOT.schemaReady&&PILOT.testsSchemaReady?'Base de datos conectada':'Faltan tablas del piloto';status.querySelector('span').textContent='BD: '+(PILOT.dbName||'configurada')+' · Transformador: '+transformer.code;}$('#globalSearch').value='';$('#searchResults').classList.remove('open');renderWindings();renderTapChangers();updateCounts();const dbAlert=$('#dbAlert');if(dbAlert){const message=!PILOT.dbConnected?'No hay conexión con la base de datos. Revisa la configuración de conexión.':(!PILOT.schemaReady?'Falta preparar el almacenamiento de la configuración eléctrica.':'');dbAlert.querySelector('span').textContent=message;dbAlert.classList.toggle('hidden',!message);}markDirty();toast('Transformador '+transformer.code+' seleccionado.');backOverview();}
     catch(e){toast(e.message,true);}
   }
   function updateTransformerDisplay(){
@@ -446,7 +483,11 @@
   let testCatalogLoaded = false;
   const testPage=$('#testPage'), executionPage=$('#executionPage');
   function showOnlyMain(which){['overviewPage','configPage','testPage','executionPage','planPage'].forEach(id=>$('#'+id).classList.toggle('hidden',id!==which));}
-  function openTests(){showOnlyMain('testPage');loadTestHistory();}
+  function openTests(){
+    const reason=electricalTestsBlockReason();
+    if(reason){refreshSidebarAccess();toast(reason,true);return false;}
+    showOnlyMain('testPage');loadTestHistory();return true;
+  }
   $('#openElectricalTests').addEventListener('click',e=>{e.preventDefault();openTests();});
   $('#backFromTests').addEventListener('click',()=>showOnlyMain('overviewPage'));
   $('#cancelExecution').addEventListener('click',()=>{showOnlyMain('testPage');loadTestHistory();});
@@ -544,6 +585,7 @@
   }
   function fillTypeOptions(selected){$('#executionType').innerHTML=testCatalog.map(t=>'<option value="'+esc(t[0])+'" '+(t[0]===selected?'selected':'')+'>'+esc(t[1])+'</option>').join('');}
   function startExecution(code){
+    const reason=electricalTestsBlockReason();if(reason){toast(reason,true);refreshSidebarAccess();return false;}
     clearExecutionForm();fillTypeOptions(code);toggleTestTemplate();
     $('#executionTitle').textContent='Nueva ejecución · '+typeName(code);
     showOnlyMain('executionPage');
@@ -822,7 +864,9 @@
     },
     notify: function(message,isError){ toast(message,!!isError); },
     demo: function(){ return !!PILOT.demo; },
-    testsReady: function(){ return !!PILOT.testsSchemaReady; }
+    testsReady: function(){ return !!PILOT.testsSchemaReady; },
+    canRunTests: function(){ return !electricalTestsBlockReason(); },
+    testAccessReason: function(){ return electricalTestsBlockReason(); }
   };
 
 })()

@@ -274,6 +274,7 @@
     render();
   }
   function start(code){
+    if(bridge.canRunTests&&!bridge.canRunTests()){toast(bridge.testAccessReason?.()||'Primero guarda la Configuración eléctrica.',true);return;}
     clear();if(code)items.push(makeItem(code));render();bridge.showPage('planPage');
     if(code)markPlanChanged(350);
   }
@@ -303,6 +304,7 @@
     await bridge.reloadTestHistory();
   }
     async function edit(id){
+    if(bridge.canRunTests&&!bridge.canRunTests()){toast(bridge.testAccessReason?.()||'Primero guarda la Configuración eléctrica.',true);return;}
     if(bridge.demo()){toast('El historial no está disponible en modo demostración.',true);return;}
     try{
       const res=await fetch(api('action=test-get&key='+encodeURIComponent(transformer().key)+'&id='+id)),data=await json(res),x=data.item;

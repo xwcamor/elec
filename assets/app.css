@@ -300,3 +300,21 @@
  .plan-save-status{text-align:left}
 }
 @media(max-width:430px){.plan-toolbar-actions .toolbar-actions{flex-wrap:wrap}.test-view-tab{gap:5px}}
+
+/* v1.5.20 · Estado de configuración y bloqueo de pruebas */
+.side-nav button.nav-action{min-width:0}
+.nav-state-chip{margin-left:auto;flex:none;border-radius:12px;padding:3px 6px;font-size:8px;font-weight:750;letter-spacing:0;line-height:1.2;background:#edf1f5;color:#6f7d8b;white-space:nowrap}
+.nav-state-chip[data-state="missing"]{background:#fff0ee;color:#b42318;border:1px solid #ffd4cf}
+.nav-state-chip[data-state="ready"]{background:#e8f7ed;color:#177245;border:1px solid #c8ead3}
+.nav-state-chip[data-state="locked"]{background:#f1f2f4;color:#7f8791;border:1px solid #e0e3e7}
+.side-nav button.config-link.is-unconfigured{background:#fff5f4;color:#b42318}
+.side-nav button.config-link.is-unconfigured svg{color:#c43227}
+.side-nav button.config-link.is-configured{background:#f2faf5;color:#177245}
+.side-nav button.config-link.is-configured svg{color:#238653}
+.side-nav button.electrical-tests-link.is-locked,
+.side-nav button.electrical-tests-link:disabled{background:#f5f6f7;color:#87919b;cursor:not-allowed;opacity:1}
+.side-nav button.electrical-tests-link.is-locked svg,
+.side-nav button.electrical-tests-link:disabled svg{color:#9aa3ad}
+.side-nav button.electrical-tests-link:disabled:hover{background:#f5f6f7;color:#87919b}
+.side-nav button.electrical-tests-link:disabled .nav-state-chip{background:#f1f2f4;color:#777f88}
+@media(max-width:760px){.nav-state-chip{font-size:8px;padding:3px 5px}}
