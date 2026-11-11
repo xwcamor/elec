@@ -182,5 +182,14 @@ class ElectricalTestRepository
         } catch(Throwable $e){if($this->pdo->inTransaction())$this->pdo->rollBack();throw $e;}
     }
 
+    public function delete(int $id, string $key): bool
+    {
+        if ($id < 1 || trim($key) === '') return false;
+        $st = $this->pdo->prepare('DELETE FROM eh_test_executions WHERE id = :id AND transformer_key = :key');
+        $st->execute(['id'=>$id, 'key'=>$key]);
+        // eh_test_execution_data is removed by its ON DELETE CASCADE foreign key.
+        return $st->rowCount() === 1;
+    }
+
     private function num($v): ?float { if($v===null||$v==='')return null; if(is_string($v))$v=str_replace(',','.',$v); return is_numeric($v)?(float)$v:null; }
 }
