@@ -70,7 +70,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.31">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.32">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -189,7 +189,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
   <section class="test-page hidden" id="testPage">
     <div class="config-toolbar">
       <div><div class="breadcrumbs">Transformador <span>/</span> Pruebas eléctricas</div><h2>Pruebas eléctricas</h2><p>Registra los ensayos de este transformador y consulta sus resultados históricos.</p></div>
-      <div class="toolbar-actions"><button class="btn" id="backFromTests">Volver a detalles</button><button class="btn primary" id="newTestExecution"><svg><use href="#i-plus"/></svg>Nueva visita</button></div>
+      <div class="toolbar-actions"><button class="btn" id="backFromTests">Volver a detalles</button><button class="btn primary" id="newTestExecution"><svg><use href="#i-plus"/></svg>Registrar pruebas</button></div>
     </div>
     <div class="test-view-switcher" role="tablist" aria-label="Secciones de pruebas eléctricas">
       <button class="test-view-tab active" type="button" id="showTestSummary" data-test-view="summary" role="tab" aria-selected="true" aria-controls="testSummaryPanel"><svg><use href="#i-grid"/></svg>Resumen</button>
@@ -279,36 +279,32 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 
   <section class="execution-page hidden" id="planPage">
     <div class="config-toolbar">
-      <div><div class="breadcrumbs">Transformador <span>/</span> Pruebas eléctricas <span>/</span> Plan</div><h2 id="planTitle">Nuevo plan de pruebas</h2><p>Una visita puede incluir varios ensayos. Los datos compartidos se ingresan una vez y cada prueba conserva su propio equipo.</p></div>
+      <div><div class="breadcrumbs">Transformador <span>/</span> Pruebas eléctricas <span>/</span> Plan</div><h2 id="planTitle">Nuevo registro de pruebas</h2><p>Organiza los datos generales, selecciona los ensayos y completa cada protocolo por separado.</p></div>
       <div class="plan-toolbar-actions"><span id="planSaveStatus" class="plan-save-status" data-state="idle" aria-live="polite"><i></i><span>Se guardará automáticamente al modificar datos</span></span><div class="toolbar-actions"><button class="btn" id="cancelPlan">Volver al historial</button><button class="btn primary" id="saveTestPlan"><svg><use href="#i-check"/></svg>Guardar ahora</button></div></div>
     </div>
     <nav class="plan-stepper" id="planStepper" aria-label="Etapas del registro de pruebas">
-      <button type="button" class="plan-step" data-plan-step="shared" data-target="planSharedSection" data-state="missing">
-        <span class="plan-step-number">01</span><span class="plan-step-copy"><b>Datos de visita</b><small>Fecha y responsable</small></span>
-      </button>
+      <button type="button" class="plan-step" data-plan-step="shared" data-state="missing" aria-current="step"><span class="plan-step-number">01</span><span class="plan-step-copy"><b>Datos generales</b><small>Fecha y responsables</small></span></button>
       <span class="plan-step-connector" aria-hidden="true"></span>
-      <button type="button" class="plan-step" data-plan-step="selection" data-target="planSelectionSection" data-state="missing">
-        <span class="plan-step-number">02</span><span class="plan-step-copy"><b>Selección de ensayos</b><small>Tipos de prueba</small></span>
-      </button>
+      <button type="button" class="plan-step" data-plan-step="selection" data-state="missing"><span class="plan-step-number">02</span><span class="plan-step-copy"><b>Ensayos</b><small>Seleccionar pruebas</small></span></button>
       <span class="plan-step-connector" aria-hidden="true"></span>
-      <button type="button" class="plan-step" data-plan-step="results" data-target="planResultsSection" data-state="missing">
-        <span class="plan-step-number">03</span><span class="plan-step-copy"><b>Resultados</b><small>Mediciones y revisión</small></span>
-      </button>
+      <button type="button" class="plan-step" data-plan-step="results" data-state="missing"><span class="plan-step-number">03</span><span class="plan-step-copy"><b>Mediciones</b><small>Un ensayo a la vez</small></span></button>
+      <span class="plan-step-connector" aria-hidden="true"></span>
+      <button type="button" class="plan-step" data-plan-step="review" data-state="missing"><span class="plan-step-number">04</span><span class="plan-step-copy"><b>Resumen</b><small>Revisión y guardado</small></span></button>
     </nav>
     <section class="plan-progress-panel" id="planProgressPanel" data-state="warning" aria-live="polite">
       <div class="plan-progress-main"><strong>Preparando resumen de avance…</strong></div>
     </section>
-    <section class="execution-card plan-shared-card" id="planSharedSection">
+    <section class="execution-card plan-shared-card plan-step-panel" id="planSharedSection" data-plan-panel="shared">
       <div class="execution-card-title"><span class="eyebrow">01 · DATOS COMPARTIDOS</span><h3>Datos de la visita y condiciones ambientales</h3><p>Se ingresan una sola vez y se comparten con todos los ensayos del plan.</p></div>
       <div class="execution-date-card plan-date-inline"><div class="date-emblem"><svg><use href="#i-calendar"/></svg></div><div class="date-copy"><strong>Fecha y hora de las pruebas</strong><small>Fecha real de realización de los ensayos.</small></div><label class="execution-date-field"><span>Realizada el *</span><input id="planDate" type="datetime-local" required></label></div>
       <div class="plan-shared-status is-pending" id="planSharedStatus" aria-live="polite">Pendiente: fecha de la visita · responsable / técnico</div>
       <div class="plan-core-grid">
         <label>Responsable / técnico<input id="planOperator" placeholder="Nombre del técnico"></label>
+        <label>Supervisor<input id="planSupervisor" placeholder="Nombre del supervisor"></label>
       </div>
       <details class="plan-optional-details">
-        <summary><span>Condiciones y datos complementarios</span><small>Supervisor, temperaturas y observaciones</small></summary>
+        <summary><span>Condiciones ambientales</span><small>Temperaturas, humedad y observaciones</small></summary>
         <div class="form-grid execution-meta-grid plan-shared-grid">
-          <label>Supervisor<input id="planSupervisor" placeholder="Nombre del supervisor"></label>
           <label>Temperatura del aceite (°C)<input id="planOilTemp" inputmode="decimal" placeholder="Ej. 35.5"></label>
           <label>Temperatura ambiente (°C)<input id="planAmbientTemp" inputmode="decimal" placeholder="Ej. 22"></label>
           <label>Humedad relativa (%)<input id="planHumidity" inputmode="decimal" placeholder="Ej. 74"></label>
@@ -316,7 +312,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
         <label class="plan-shared-notes">Observaciones generales<textarea id="planObservations" rows="2" placeholder="Condiciones del servicio, ubicación e incidencias generales..."></textarea></label>
       </details>
     </section>
-    <section class="execution-card" id="planSelectionSection">
+    <section class="execution-card plan-step-panel" id="planSelectionSection" data-plan-panel="selection" hidden>
       <div class="execution-card-title"><span class="eyebrow">02 · SELECCIÓN DE ENSAYOS</span><h3>¿Qué pruebas vas a registrar?</h3><p>Selecciona una o varias. Cada prueba genera su propio formulario con los campos del protocolo de referencia.</p></div>
       <div class="plan-test-add">
         <label for="planTestTypeSelect">Tipo de ensayo<select id="planTestTypeSelect"></select></label>
@@ -324,10 +320,20 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       </div>
       <div class="plan-selection-status" id="planSelectionStatus" aria-live="polite">Aún no has añadido ensayos al plan.</div>
     </section>
-    <section class="execution-card plan-tests-section" id="planResultsSection">
+    <section class="execution-card plan-tests-section plan-step-panel" id="planResultsSection" data-plan-panel="results" hidden>
       <div class="execution-card-title"><span class="eyebrow">03 · FORMULARIOS DE PRUEBA</span><h3>Resultados por ensayo</h3><p>Marca, modelo, serie, norma y observaciones se registran por prueba, ya que el instrumento puede cambiar entre ensayos.</p></div>
+      <div id="planTestNav" class="plan-test-nav" aria-label="Ensayos seleccionados"></div>
       <div id="planTestCards"><div class="empty-state">Selecciona los ensayos para que aparezcan aquí sus formularios.</div></div>
     </section>
+    <section class="execution-card plan-step-panel" id="planReviewSection" data-plan-panel="review" hidden>
+      <div class="execution-card-title"><span class="eyebrow">04 · RESUMEN</span><h3>Revisa el registro antes de guardarlo</h3><p>Comprueba los ensayos incluidos, el avance y los datos pendientes.</p></div>
+      <div id="planReviewSummary"></div>
+    </section>
+    <div class="plan-step-actions" id="planStepActions">
+      <button class="btn" type="button" id="planStepBack" disabled>Anterior</button>
+      <span id="planStepHint">Etapa 1 de 4 · Datos generales</span>
+      <button class="btn primary" type="button" id="planStepNext">Continuar</button>
+    </div>
   </section>
 
   <section class="config-page hidden" id="configPage">
@@ -448,6 +454,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.31"></script>
-<script src="./assets/plan.js?v=1.5.31"></script>
+<script src="./assets/app.js?v=1.5.32"></script>
+<script src="./assets/plan.js?v=1.5.32"></script>
 </body></html>
