@@ -228,7 +228,8 @@ class TransformerRepository
             $name = $column['Field'];
             $extra = strtolower((string)($column['Extra'] ?? ''));
             if (($column['Null'] ?? 'YES') === 'NO' && ($column['Default'] ?? null) === null
-                && !isset($values[$name]) && stripos($extra, 'auto_increment') === false
+                && (!array_key_exists($name, $values) || $values[$name] === null || $values[$name] === '')
+                && stripos($extra, 'auto_increment') === false
                 && !str_contains($extra, 'generated')) {
                 throw new RuntimeException('Falta un valor obligatorio para la columna «' . $name . '» de la tabla configurada.');
             }
