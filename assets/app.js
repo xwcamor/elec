@@ -153,7 +153,7 @@
       conductor_material: w.conductor_material || '',
       notes: w.notes || '',
       terminals: (w.terminals || []).map(t => ({
-        code: t.terminal_code || t.code || '', phase: t.phase_code || t.phase || '', type: t.terminal_type || t.type || 'Fase',
+        code: t.terminal_code || t.code || '', phase: t.phase_code || t.phase || '', type: (t.terminal_type || t.type || 'Fase') === 'Terciario' ? 'Fase' : (t.terminal_type || t.type || 'Fase'),
         has_capacitive_bushing: Number(t.has_capacitive_bushing || 0) === 1 || t.has_capacitive_bushing === true,
         bushing: {serial_number:t.serial_number || '',manufacturer:t.bushing_manufacturer || '',model:t.bushing_model || '',rated_voltage_kv:t.rated_voltage_kv ?? '',capacitance_pf:t.capacitance_pf ?? '',power_factor_percent:t.power_factor_percent ?? '',notes:t.bushing_notes || ''}
       }))
@@ -323,13 +323,13 @@
           </div><button class="delete-btn" data-remove-winding="${wi}" title="Eliminar bobinado"><svg><use href="#i-trash"/></svg></button></div>
           <section class="terminal-section">
             <div class="terminal-section-heading">
-              <div class="terminal-section-title"><strong>Bornes y terminales</strong><small data-winding-stats="${wi}">${w.terminals.length} registros · ${w.terminals.filter(t=>t.has_capacitive_bushing).length} bushings capacitivos</small></div>
+              <div class="terminal-section-title"><strong>Bornes y terminales</strong><small data-winding-stats="${wi}">${w.terminals.length} registros · ${w.terminals.filter(t=>t.has_capacitive_bushing).length} elementos capacitivos</small></div>
               <div class="sheet-tools"><button type="button" data-add-terminal="${wi}">+ Fila</button><button type="button" data-copy-terminals="${wi}">Copiar bornes</button></div>
             </div>
             <div class="terminal-section-content">
               <div class="table-caption"><strong>Conexiones del bobinado</strong></div>
               <div class="sheet-wrap" id="terminal-grid-${wi}"></div>
-              <div class="sheet-hint">Pega bloques desde Excel con Ctrl+V en la primera celda. Las fichas de bushing capacitivo se registran por borne.</div>
+              <div class="sheet-hint">Pega bloques desde Excel con Ctrl+V en la primera celda. Los datos del elemento capacitivo se registran por borne.</div>
             </div>
           </section>
         </div>
@@ -337,11 +337,10 @@
     host.querySelectorAll('[data-wfield]').forEach(el=>el.addEventListener('change', e=>{const card=e.target.closest('[data-winding]');const i=Number(card.dataset.winding);const key=e.target.dataset.wfield;state.windings[i][key]=key==='has_neutral'?e.target.value==='1':(key==='voltage_kv'?normalizeNumeric(e.target.value):e.target.value);if(key==='voltage_kv')e.target.value=state.windings[i][key];const summary=e.target.closest('.winding-card').querySelector('.winding-summary-main');if(summary)summary.innerHTML='<strong>'+esc(state.windings[i].name||'Bobinado sin nombre')+'</strong><small>'+esc(state.windings[i].voltage_kv||'—')+' kV</small>';markDirty();}));
     host.querySelectorAll('[data-remove-winding]').forEach(b=>b.addEventListener('click',()=>{const i=Number(b.dataset.removeWinding);if(!confirm('¿Eliminar este bobinado y sus bornes de la configuración actual?'))return;state.windings.splice(i,1);state.tap_changers=state.tap_changers.filter(c=>c.winding_index!==i).map(c=>({...c,winding_index:c.winding_index>i?c.winding_index-1:c.winding_index}));renderWindings();renderTapChangers();updateCounts();markDirty();}));
     host.querySelectorAll('[data-add-terminal]').forEach(b=>b.addEventListener('click',()=>{const i=Number(b.dataset.addTerminal);state.windings[i].terminals.push(blankTerminal(''));renderWindings();markDirty();}));
-    host.querySelectorAll('[data-copy-terminals]').forEach(b=>b.addEventListener('click',()=>copyGrid([['Borne','Fase','Tipo','¿Bushing capacitivo?','Notas bushing'],...state.windings[Number(b.dataset.copyTerminals)].terminals.map(t=>[t.code,t.phase,t.type,t.has_capacitive_bushing?'Sí':'No',t.bushing.notes])].map(r=>r.join('\t')).join('\n'))));
+    host.querySelectorAll('[data-copy-terminals]').forEach(b=>b.addEventListener('click',()=>copyGrid([['Borne','Fase / designación','Función','¿Capacitivo?'],...state.windings[Number(b.dataset.copyTerminals)].terminals.map(t=>[t.code,t.phase,t.type,t.has_capacitive_bushing?'Sí':'No'])].map(r=>r.join('\t')).join('\n'))));
     state.windings.forEach((w,i)=>buildGrid($('#terminal-grid-'+i),w.terminals,[
-      {key:'code',label:'Borne',type:'text'},{key:'phase',label:'Fase',type:'select',options:['','U','V','W','A','B','C','N','T']},{key:'type',label:'Tipo',type:'select',options:['Fase','Neutro','Terciario','Tierra','Otro']},{key:'has_capacitive_bushing',label:'¿Tiene bushing capacitivo?',type:'yesno'},
-      {key:'notes',label:'Notas bushing',type:'bushing'}
-    ],(row,key,value)=>{if(key==='has_capacitive_bushing'){row[key]=!!value;if(!row[key])row.bushing={serial_number:'',manufacturer:'',model:'',rated_voltage_kv:'',capacitance_pf:'',power_factor_percent:'',notes:''};}else if(['serial_number','manufacturer','model','rated_voltage_kv','capacitance_pf','power_factor_percent','notes'].includes(key)){if(String(value).trim()!=='')row.has_capacitive_bushing=true;row.bushing[key]=value;}else row[key]=value;markDirty();refreshWindingCounters();}));
+      {key:'code',label:'Borne',type:'text',maxLength:20,uppercase:true},{key:'phase',label:'Fase / designación',type:'text',maxLength:8,uppercase:true},{key:'type',label:'Función',type:'select',options:['Fase','Neutro','Tierra','Auxiliar','Otro']},{key:'has_capacitive_bushing',label:'¿Capacitivo?',type:'yesno'}
+    ],(row,key,value)=>{if(key==='has_capacitive_bushing'){row[key]=!!value;if(!row[key])row.bushing={serial_number:'',manufacturer:'',model:'',rated_voltage_kv:'',capacitance_pf:'',power_factor_percent:'',notes:''};}else if(['serial_number','manufacturer','model','rated_voltage_kv','capacitance_pf','power_factor_percent','notes'].includes(key)){if(String(value).trim()!=='')row.has_capacitive_bushing=true;row.bushing[key]=value;}else if(key==='code'){row.code=String(value||'').trim().toUpperCase();const match=row.code.match(/^([UVWABC])(?:[-/]?\d+)?$/);if(match){row.phase=match[1];row.type='Fase';}else if(/^N(?:[-/]?\d+)?$/.test(row.code)){row.phase='N';row.type='Neutro';}else row.code=row.code;}else row[key]=value;markDirty();refreshWindingCounters();}));
   }
   function loadExample() {
     state.windings = [
@@ -368,7 +367,7 @@
       const body = rows.map((row,ri)=>`<tr data-grid-row="${ri}"><td>${ri+1}</td>${columns.map((col,ci)=>`<td>${renderCell(row,col,ri,ci)}</td>`).join('')}</tr>`).join('');
       container.innerHTML = `<table class="sheet-table"><thead><tr><th>#</th>${head}</tr></thead><tbody>${body}</tbody></table>`;
       container.querySelectorAll('.sheet-cell').forEach(cell=>{
-        cell.addEventListener('change',()=>{const r=Number(cell.dataset.row),c=Number(cell.dataset.col),key=columns[c].key,col=columns[c],raw=cell.type==='checkbox'?cell.checked:cell.value,val=['number','bushing-number'].includes(col.type)?normalizeNumeric(raw):raw;if(['number','bushing-number'].includes(col.type))cell.value=val;onChange(rows[r],key,val);});
+        cell.addEventListener('change',()=>{const r=Number(cell.dataset.row),c=Number(cell.dataset.col),key=columns[c].key,col=columns[c],raw=cell.type==='checkbox'?cell.checked:cell.value,val=['number','bushing-number'].includes(col.type)?normalizeNumeric(raw):(col.uppercase?String(raw).trim().toUpperCase():raw);if(['number','bushing-number'].includes(col.type)||col.uppercase)cell.value=val;onChange(rows[r],key,val);});
       });
       container.querySelectorAll('.sheet-cell').forEach(cell=>cell.addEventListener('keydown',e=>navigateGrid(e,container,rows,columns,render)));
       const table=container.querySelector('table');
@@ -379,7 +378,7 @@
       if(col.type==='check') return `<div style="display:grid;place-items:center;height:32px"><input class="sheet-cell sheet-check" type="checkbox" data-row="${ri}" data-col="${ci}" ${val?'checked':''} aria-label="${esc(col.label)}"></div>`;
       if(col.type==='yesno') return `<select class="sheet-cell sheet-select" data-row="${ri}" data-col="${ci}" aria-label="${esc(col.label)}"><option value="0" ${!val?'selected':''}>No</option><option value="1" ${val?'selected':''}>Sí</option></select>`;
       if(col.type==='select') return `<select class="sheet-cell sheet-select" data-row="${ri}" data-col="${ci}">${col.options.map(o=>`<option value="${esc(o)}" ${String(val)===o?'selected':''}>${esc(o || '—')}</option>`).join('')}</select>`;
-      return `<input class="sheet-cell" data-row="${ri}" data-col="${ci}" type="text" ${['number','bushing-number'].includes(col.type)?'inputmode="decimal" data-numeric="1"':''} value="${esc(val)}" aria-label="${esc(col.label)}">`;
+      return `<input class="sheet-cell" data-row="${ri}" data-col="${ci}" type="text" maxlength="${col.maxLength||120}" ${col.uppercase?'style="text-transform:uppercase"':''} ${['number','bushing-number'].includes(col.type)?'inputmode="decimal" data-numeric="1"':''} value="${esc(val)}" aria-label="${esc(col.label)}">`;
     }
     function navigateGrid(e,host,allRows,cols,rerender){
       if(!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Enter','Tab'].includes(e.key))return;
