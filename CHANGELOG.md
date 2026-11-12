@@ -1,3 +1,8 @@
+## v1.5.107
+- Corrige navegación por teclado en el plan: ahora se puede entrar y salir de las celdas calculadas «Capacitancia medida» y «Estado» sin quedar atrapado.
+- Factor de potencia: unidades explícitas en encabezados: tensión de prueba (V), FP medido (%) y FP corregido (%), sin mostrar 20 °C en el título.
+- Añade control para eliminar filas; conserva obligatorios los seis modos LAP de factor de potencia y evita dejar otros ensayos sin filas.
+
 ## v1.5.106
 - Factor de potencia: encabezados completos y uniformes para FP medido y FP corregido a 20 °C.
 - Capacitancia medida calculada automáticamente en nF desde capacitancia fuente en F (× 10⁹), siguiendo el libro LAP.
