@@ -1,3 +1,7 @@
+## 1.5.63
+- Se elimina el texto descriptivo «Instrumento, marca, modelo, serie y norma» del encabezado de las tarjetas «Equipo y referencia».
+- Se conservan los campos y sus etiquetas para registrar norma, equipo, marca, modelo y número de serie.
+
 ## 1.5.62
 - Retira el título «¿Qué pruebas vas a registrar?» y el texto explicativo de la sección de selección de ensayos para simplificar el formulario.
 - Actualiza la caché de recursos.
