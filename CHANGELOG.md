@@ -1,3 +1,8 @@
+## 1.5.43
+- En el Historial, «Datos registrados» muestra únicamente la cantidad de pruebas y queda inmediatamente después de «Pruebas incluidas».
+- Retira el identificador «Ejecución #...» debajo de la fecha de visita.
+- Actualiza los identificadores de caché de CSS y JavaScript.
+
 # CHANGELOG
 
 ## 1.5.42
