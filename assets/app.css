@@ -1365,3 +1365,22 @@ body.config-focus .config-save-hint{display:none!important}
 #transformerEditModal.tap-count-only .modal-panel{max-width:520px}
 
 #syncTapPositions{margin-top:10px}
+
+/* Bobinados y bornes en acordeones jerárquicos */
+.winding-accordion{display:block;background:#fff;border:1px solid #dfe7ee;border-radius:9px;overflow:hidden}
+.winding-accordion>.winding-accordion-summary{list-style:none;display:flex;align-items:center;gap:11px;padding:13px 15px;cursor:pointer;background:#f7fafc;min-height:62px}
+.winding-accordion>.winding-accordion-summary::-webkit-details-marker,.terminal-accordion>summary::-webkit-details-marker{display:none}
+.winding-summary-main{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.winding-summary-main strong{font-size:12px;color:#263d54}
+.winding-summary-main small{font-size:10px;color:#8291a1}
+.winding-summary-count{font-size:10px;color:#52718e;background:#edf4fa;border:1px solid #dce8f2;border-radius:20px;padding:5px 9px;white-space:nowrap}
+.accordion-chevron{color:#7890a5;font-size:17px;transition:transform .18s ease}
+.winding-accordion[open]>.winding-accordion-summary .accordion-chevron,.terminal-accordion[open]>summary .accordion-chevron{transform:rotate(180deg)}
+.winding-accordion-body{padding:0 13px 13px}
+.winding-accordion-body>.winding-card-head{padding:13px 0;border-bottom:1px solid #edf1f4;background:#fff}
+.terminal-accordion{border:1px solid #e2e9ef;border-radius:7px;overflow:hidden;margin-top:12px}
+.terminal-accordion>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:11px 12px;background:#f8fafc;cursor:pointer}
+.terminal-accordion>summary>span:first-child{font-size:11px;font-weight:700;color:#40566d}
+.terminal-accordion>summary small{font-size:9px;color:#8594a3;flex:1}
+.terminal-accordion-body{padding:12px}
+@media(max-width:600px){.winding-accordion>.winding-accordion-summary{gap:7px;padding:10px}.winding-summary-count{font-size:9px;padding:4px 6px}.winding-accordion-body{padding:0 9px 9px}.terminal-accordion>summary{flex-wrap:wrap}}
