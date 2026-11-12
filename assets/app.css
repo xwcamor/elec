@@ -612,6 +612,15 @@ body.test-form-focus #pilotStatus,
 body.test-form-focus .record-heading,
 body.test-form-focus .record-tabs,
 body.test-form-focus>.page-shell>.general-card{display:none!important}
+body.test-page-focus .topbar,
+body.test-page-focus #pilotStatus,
+body.test-page-focus .record-heading,
+body.test-page-focus .record-tabs,
+body.test-page-focus>.page-shell>.general-card{display:none!important}
+body.test-page-focus .page-shell{width:100%;max-width:none;margin:0;padding:0 24px 22px}
+body.test-page-focus .test-page{margin-top:0;min-height:calc(100vh - 20px)}
+body.test-page-focus .test-page>.config-toolbar{padding-top:14px}
+@media(max-width:760px){body.test-page-focus .page-shell{padding:0 12px 16px}body.test-page-focus .test-page>.config-toolbar{padding-top:10px}}
 body.test-form-focus .page-shell{width:100%;max-width:none;margin:0;padding:0 24px 22px}
 body.test-form-focus .execution-page{margin-top:0;min-height:calc(100vh - 20px)}
 body.test-form-focus .config-toolbar{padding-top:14px}
