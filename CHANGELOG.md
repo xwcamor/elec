@@ -1,3 +1,9 @@
+## 1.5.54
+- Pestañas de resultados por ensayo con estados visibles: verde para completo, ámbar para incompleto y gris para sin iniciar.
+- Selección activa con contorno azul independiente del color de estado.
+- Mejora el tamaño y la legibilidad de los nombres, números y porcentajes de cada ensayo; ajustes para pantallas pequeñas.
+- Actualiza la caché de recursos.
+
 ## 1.5.53
 - Elimina el aviso dinámico «Pendiente: responsable / técnico · supervisor» de la sección de datos compartidos.
 - Retira el subtítulo «Condiciones ambientales · Temperaturas y humedad durante los ensayos»; los campos ambientales permanecen visibles sin encabezado redundante.
