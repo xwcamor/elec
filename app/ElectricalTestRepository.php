@@ -22,7 +22,14 @@ class ElectricalTestRepository
             $stored = json_decode($item['payload_json'] ?? '{}', true) ?: [];
             $tests = $stored['plan']['tests'] ?? [];
             $item['plan_tests'] = array_map(static function($test) {
-                return ['code'=>$test['code'] ?? '', 'name'=>$test['name'] ?? '', 'status'=>$test['status'] ?? 'BORRADOR'];
+                $measurements = is_array($test['measurements'] ?? null) ? $test['measurements'] : [];
+                $hasData = count($measurements) > 0
+                    || trim((string)($test['observations'] ?? '')) !== ''
+                    || trim((string)($test['equipment_name'] ?? '')) !== ''
+                    || trim((string)($test['equipment_brand'] ?? '')) !== ''
+                    || trim((string)($test['equipment_model'] ?? '')) !== ''
+                    || trim((string)($test['equipment_serial'] ?? '')) !== '';
+                return ['code'=>$test['code'] ?? '', 'name'=>$test['name'] ?? '', 'status'=>$test['status'] ?? 'BORRADOR', 'has_data'=>$hasData];
             }, is_array($tests) ? $tests : []);
             $item['plan_count'] = count($item['plan_tests']);
             unset($item['payload_json']);
