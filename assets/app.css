@@ -1358,3 +1358,8 @@ body.config-focus .config-save-hint{display:none!important}
 .tap-source-values strong{font-size:13px;color:#29435d}
 .tap-source-note{margin:9px 0 0;line-height:1.45}
 @media(max-width:600px){.tap-source-heading{align-items:flex-start;flex-wrap:wrap}.tap-source-edit{margin-left:40px;padding:2px 0}.tap-source-values{grid-template-columns:1fr 1fr}}
+
+#transformerEditModal.tap-count-only .transformer-edit-grid>label:not(#editTrafoNumTapsField),
+#transformerEditModal.tap-count-only .transformer-edit-grid>.edit-section-title{display:none}
+#transformerEditModal.tap-count-only .transformer-edit-grid{grid-template-columns:minmax(0,1fr);max-width:420px}
+#transformerEditModal.tap-count-only .modal-panel{max-width:520px}
