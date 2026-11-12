@@ -908,8 +908,8 @@
       return '<tr><td><b>'+esc(formatExecutionDate(x.executed_at))+'</b></td><td><b>'+esc(names.join(' · ')||'Sin ensayos seleccionados')+'</b></td><td>'+testCount+'</td><td>'+esc(x.operator_name||'—')+'</td><td><span class="execution-status '+state.className+'">'+state.label+'</span></td><td><div class="test-row-actions"><button class="btn small" data-open-execution="'+x.id+'" title="Abrir este registro">Abrir registro</button><button class="btn small" data-export-execution="'+x.id+'" title="Exportar informe PDF">Exportar PDF</button><button class="btn small danger test-delete-button" data-delete-execution="'+x.id+'" title="Eliminar registro" aria-label="Eliminar registro #'+x.id+'"><svg><use href="#i-trash"/></svg>Eliminar</button></div></td></tr>';
     }).join(''):'<tr><td colspan="6" class="test-empty">'+(testHistoryLoadError?'No se pudo consultar el historial: '+esc(testHistoryLoadError):(testExecutions.length?'No hay registros que coincidan con el filtro.':'No hay registros para este transformador. Los registros se ordenan por fecha, del más reciente al más antiguo.'))+'</td></tr>';
 
-    $('[data-export-execution]').forEach(button=>button.addEventListener('click',()=>exportExecutionPdf(Number(button.dataset.exportExecution))));
-    $('[data-delete-execution]').forEach(button=>button.addEventListener('click',async()=>{
+    Array.from(document.querySelectorAll('[data-export-execution]')).forEach(button=>button.addEventListener('click',()=>exportExecutionPdf(Number(button.dataset.exportExecution))));
+    Array.from(document.querySelectorAll('[data-delete-execution]')).forEach(button=>button.addEventListener('click',async()=>{
       const id=Number(button.dataset.deleteExecution);
       const visit=testExecutions.find(item=>Number(item.id)===id);
       if(!id||!visit)return;
