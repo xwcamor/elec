@@ -1,3 +1,8 @@
+## 1.5.44
+- Renombra el historial como «Pruebas eléctricas registradas» y reemplaza las referencias a visitas por registros de pruebas.
+- Cambia «Datos registrados» por «N.º de pruebas», que muestra el número de ensayos incluidos en cada registro.
+- Actualiza los identificadores de caché de CSS y JavaScript.
+
 ## 1.5.43
 - En el Historial, «Datos registrados» muestra únicamente la cantidad de pruebas y queda inmediatamente después de «Pruebas incluidas».
 - Retira el identificador «Ejecución #...» debajo de la fecha de visita.
