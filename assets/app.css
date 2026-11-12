@@ -1451,3 +1451,11 @@ body.config-focus .config-save-hint{display:none!important}
 /* Required terminal names remain visibly pending until a value is entered. */
 .sheet-cell.is-required-missing{background:#fff3dc!important;box-shadow:inset 0 0 0 1px #e9c77d!important;color:#795b24}
 .sheet-cell.is-required-missing:focus{background:#fff8e9!important}
+
+/* Configuración eléctrica: navegación horizontal alineada al módulo de pruebas. */
+.config-layout{display:block}
+.config-view-switcher{width:max-content;max-width:100%;margin:4px 0 12px;overflow-x:auto}
+.config-view-tab{min-height:36px}
+.config-tab-meta{display:inline-flex;align-items:center;justify-content:center;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:#edf2f7;color:#61758a;font-size:9px;font-weight:800}
+.config-view-tab.active .config-tab-meta{background:#e8f2fb;color:#1f598b}
+@media(max-width:760px){.config-view-switcher{width:100%;display:flex;gap:3px}.config-view-tab{flex:1;justify-content:center;padding:8px 6px;font-size:9px;white-space:normal;text-align:center}.config-view-tab svg{display:none}.config-tab-meta{min-width:17px;height:17px}}
