@@ -1,3 +1,6 @@
+## v1.5.95
+- Corrige la alineación del botón eliminar del bobinado dentro del acordeón: queda en la parte superior derecha, separado de los campos y sin ocupar una columna incorrecta del formulario.
+
 ## v1.5.94
 - Presenta cada bobinado como un acordeón independiente con resumen de nombre, código, tensión, conexión y cantidad de bornes.
 - Agrupa bornes/terminales en un segundo acordeón dentro de cada bobinado para distinguir claramente ambos niveles.
