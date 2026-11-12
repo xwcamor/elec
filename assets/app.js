@@ -219,7 +219,7 @@
     const complete=state.windings.length>0&&state.windings.every(w=>{
       const name=String(w.name||'').trim(),code=String(w.code||'').trim();
       const voltage=Number(w.voltage_kv);
-      const terminals=Array.isArray(w.terminals)?w.terminals:[];
+      const terminals=(Array.isArray(w.terminals)?w.terminals:[]).filter(t=>!(t._draft&&!String(t.code||'').trim()&&!t.has_capacitive_bushing));
       return name!==''&&code!==''&&Number.isFinite(voltage)&&voltage>0&&
         terminals.length>0&&terminals.every(t=>String(t.code||'').trim()!=='');
     })&&issues.length===0;
@@ -336,11 +336,11 @@
       </details>`).join('');
     host.querySelectorAll('[data-wfield]').forEach(el=>el.addEventListener('change', e=>{const card=e.target.closest('[data-winding]');const i=Number(card.dataset.winding);const key=e.target.dataset.wfield;state.windings[i][key]=key==='has_neutral'?e.target.value==='1':(key==='voltage_kv'?normalizeNumeric(e.target.value):e.target.value);if(key==='voltage_kv')e.target.value=state.windings[i][key];const summary=e.target.closest('.winding-card').querySelector('.winding-summary-main');if(summary)summary.innerHTML='<strong>'+esc(state.windings[i].name||'Bobinado sin nombre')+'</strong><small>'+esc(state.windings[i].voltage_kv||'—')+' kV</small>';markDirty();}));
     host.querySelectorAll('[data-remove-winding]').forEach(b=>b.addEventListener('click',()=>{const i=Number(b.dataset.removeWinding);if(!confirm('¿Eliminar este bobinado y sus bornes de la configuración actual?'))return;state.windings.splice(i,1);state.tap_changers=state.tap_changers.filter(c=>c.winding_index!==i).map(c=>({...c,winding_index:c.winding_index>i?c.winding_index-1:c.winding_index}));renderWindings();renderTapChangers();updateCounts();markDirty();}));
-    host.querySelectorAll('[data-add-terminal]').forEach(b=>b.addEventListener('click',()=>{const i=Number(b.dataset.addTerminal);state.windings[i].terminals.push(blankTerminal(''));renderWindings();markDirty();}));
+    host.querySelectorAll('[data-add-terminal]').forEach(b=>b.addEventListener('click',()=>{const i=Number(b.dataset.addTerminal),row=blankTerminal('');row._draft=true;state.windings[i].terminals.push(row);renderWindings();refreshWindingCounters();}));
     host.querySelectorAll('[data-copy-terminals]').forEach(b=>b.addEventListener('click',()=>copyGrid([['Borne','¿Capacitivo?'],...state.windings[Number(b.dataset.copyTerminals)].terminals.map(t=>[t.code,t.has_capacitive_bushing?'Sí':'No'])].map(r=>r.join('\t')).join('\n'))));
     state.windings.forEach((w,i)=>buildGrid($('#terminal-grid-'+i),w.terminals,[
       {key:'code',label:'Borne',type:'text',maxLength:20,uppercase:true,required:true},{key:'has_capacitive_bushing',label:'¿Capacitivo?',type:'yesno'},{key:'_delete',label:'',type:'delete'}
-    ],(row,key,value)=>{if(key==='has_capacitive_bushing'){row[key]=!!value;if(!row[key])row.bushing={serial_number:'',manufacturer:'',model:'',rated_voltage_kv:'',capacitance_pf:'',power_factor_percent:'',notes:''};}else if(['serial_number','manufacturer','model','rated_voltage_kv','capacitance_pf','power_factor_percent','notes'].includes(key)){if(String(value).trim()!=='')row.has_capacitive_bushing=true;row.bushing[key]=value;}else if(key==='code'){row.code=String(value||'').trim().toUpperCase();const match=row.code.match(/^([UVWABC])(?:[-/]?\d+)?$/);if(match){row.phase=match[1];row.type='Fase';}else if(/^N(?:[-/]?\d+)?$/.test(row.code)){row.phase='N';row.type='Neutro';}else row.code=row.code;}else row[key]=value;markDirty();refreshWindingCounters();},()=>{markDirty();refreshWindingCounters();}));
+    ],(row,key,value)=>{if(key==='has_capacitive_bushing'){row[key]=!!value;if(!row[key])row.bushing={serial_number:'',manufacturer:'',model:'',rated_voltage_kv:'',capacitance_pf:'',power_factor_percent:'',notes:''};}else if(['serial_number','manufacturer','model','rated_voltage_kv','capacitance_pf','power_factor_percent','notes'].includes(key)){if(String(value).trim()!=='')row.has_capacitive_bushing=true;row.bushing[key]=value;}else if(key==='code'){row.code=String(value||'').trim().toUpperCase();const match=row.code.match(/^([UVWABC])(?:[-/]?\d+)?$/);if(match){row.phase=match[1];row.type='Fase';}else if(/^N(?:[-/]?\d+)?$/.test(row.code)){row.phase='N';row.type='Neutro';}else row.code=row.code;}else row[key]=value;row._draft=false;markDirty();refreshWindingCounters();},removed=>{const hasContent=!!(String(removed?.code||'').trim()||removed?.has_capacitive_bushing);if(hasContent)markDirty();refreshWindingCounters();}));
   }
   function loadExample() {
     state.windings = [
@@ -366,7 +366,7 @@
       const head = columns.map(c=>`<th>${esc(c.label)}</th>`).join('');
       const body = rows.map((row,ri)=>`<tr data-grid-row="${ri}"><td>${ri+1}</td>${columns.map((col,ci)=>`<td>${renderCell(row,col,ri,ci)}</td>`).join('')}</tr>`).join('');
       container.innerHTML = `<table class="sheet-table"><thead><tr><th>#</th>${head}</tr></thead><tbody>${body}</tbody></table>`;
-      container.querySelectorAll('[data-delete-row]').forEach(button=>button.addEventListener('click',()=>{if(rows.length<=1){toast('Debe mantenerse al menos una fila.',true);return;}rows.splice(Number(button.dataset.deleteRow),1);render();if(typeof onRowsChanged==='function')onRowsChanged();}));
+      container.querySelectorAll('[data-delete-row]').forEach(button=>button.addEventListener('click',()=>{if(rows.length<=1){toast('Debe mantenerse al menos una fila.',true);return;}const removed=rows.splice(Number(button.dataset.deleteRow),1)[0];render();if(typeof onRowsChanged==='function')onRowsChanged(removed);}));
       container.querySelectorAll('.sheet-cell').forEach(cell=>{
         cell.addEventListener('change',()=>{const r=Number(cell.dataset.row),c=Number(cell.dataset.col),key=columns[c].key,col=columns[c],raw=cell.type==='checkbox'?cell.checked:cell.value,val=['number','bushing-number'].includes(col.type)?normalizeNumeric(raw):(col.uppercase?String(raw).trim().toUpperCase():raw);if(['number','bushing-number'].includes(col.type)||col.uppercase)cell.value=val;onChange(rows[r],key,val);if(key==='code')render();});
       });
@@ -586,7 +586,7 @@
   }
 
   function collectPayload(){
-    return {transformer_key:transformer.key,phase_count:Number(state.phase_count||3),vector_group:String(state.vector_group||''),frequency_hz:state.frequency_hz??'',notes:state.notes||'',windings:state.windings.map(w=>({...w,terminals:w.terminals.filter(t=>String(t.code||'').trim()!=='').map(t=>({...t,bushing:t.bushing||{}}))})),tap_changers:state.tap_changers};
+    return {transformer_key:transformer.key,phase_count:Number(state.phase_count||3),vector_group:String(state.vector_group||''),frequency_hz:state.frequency_hz??'',notes:state.notes||'',windings:state.windings.map(w=>({...w,terminals:w.terminals.filter(t=>String(t.code||'').trim()!=='').map(({_draft,...t})=>({...t,bushing:t.bushing||{}}))})),tap_changers:state.tap_changers};
   }
   function validateConfiguration(){
     const errors=[];const codes=new Set();
@@ -602,6 +602,7 @@
       if(!(w.terminals||[]).length)errors.push(`Agrega al menos un borne al bobinado ${w.name||wi+1}.`);
       w.terminals.forEach((t,ti)=>{
         const terminal=(t.code||'').trim().toUpperCase();
+        if(t._draft&&!terminal&&!t.has_capacitive_bushing)return;
         if(!terminal){errors.push(`Completa el nombre del borne en la fila ${ti+1} de ${w.name||'el bobinado '+(wi+1)}.`);return;}
         if(terminalCodes.has(terminal))errors.push(`El borne ${terminal} está repetido en ${w.name||'el bobinado '+(wi+1)}.`);else terminalCodes.add(terminal);
       });
