@@ -1,6 +1,38 @@
 (() => {
   const $ = (s, root = document) => root.querySelector(s);
-  const $$ = (s, root = document) => [...root.querySelectorAll(s)];
+  const $ = (s, root = document) => [...root.querySelectorAll(s)];
+  // Indicador uniforme para cualquier campo marcado como obligatorio.
+  function decorateRequiredLabels(root=document){
+    const labels=[];
+    if(root.matches?.('label'))labels.push(root);
+    labels.push(...(root.querySelectorAll?.('label:has(input[required],select[required],textarea[required])')||[]));
+    labels.forEach(label=>{
+      const controls=label.querySelectorAll('input[required],select[required],textarea[required]');
+      if(!controls.length||label.querySelector('.required-mark'))return;
+      const marker=document.createElement('i');
+      marker.className='required-mark';
+      marker.textContent='*';
+      marker.setAttribute('aria-hidden','true');
+      const textSpan=[...label.children].find(el=>el.tagName==='SPAN'&&!el.classList.contains('required-mark'));
+      if(textSpan){
+        const clean=textSpan.textContent.replace(/\\s*\\*\\s*$/,'').trimEnd();
+        textSpan.textContent=clean+' ';
+        textSpan.appendChild(marker);
+      }else{
+        const firstControl=controls[0];
+        const leadingText=[...label.childNodes].find(node=>node.nodeType===Node.TEXT_NODE&&node.textContent.trim());
+        if(leadingText)leadingText.textContent=leadingText.textContent.replace(/\\s*\\*\\s*$/,' ');
+        label.insertBefore(marker,firstControl);
+      }
+    });
+  }
+  decorateRequiredLabels();
+  const requiredLabelObserver=new MutationObserver(records=>{
+    records.forEach(record=>record.addedNodes.forEach(node=>{
+      if(node.nodeType===Node.ELEMENT_NODE)decorateRequiredLabels(node);
+    }));
+  });
+  requiredLabelObserver.observe(document.documentElement,{childList:true,subtree:true});
   const clone = value => JSON.parse(JSON.stringify(value));
   // Variables de estado declaradas al inicio para evitar accesos durante la TDZ.
   var state = null;
@@ -367,7 +399,7 @@
   function buildGrid(container, rows, columns, onChange, onRowsChanged) {
     if (!rows.length) rows.push({});
     const render = () => {
-      const head = columns.map(c=>`<th>${esc(c.label)}</th>`).join('');
+      const head = columns.map(c=>`<th>${esc(c.label)}${c.required?'<i class="required-mark" aria-hidden="true">*</i>':''}</th>`).join('');
       const body = rows.map((row,ri)=>`<tr data-grid-row="${ri}"><td>${ri+1}</td>${columns.map((col,ci)=>`<td>${renderCell(row,col,ri,ci)}</td>`).join('')}</tr>`).join('');
       container.innerHTML = `<table class="sheet-table"><thead><tr><th>#</th>${head}</tr></thead><tbody>${body}</tbody></table>`;
       container.querySelectorAll('[data-delete-row]').forEach(button=>button.addEventListener('click',()=>{if(rows.length<=1){toast('Debe mantenerse al menos una fila.',true);return;}const removed=rows.splice(Number(button.dataset.deleteRow),1)[0];render();if(typeof onRowsChanged==='function')onRowsChanged(removed);}));
