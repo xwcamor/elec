@@ -565,6 +565,7 @@
       if(card)card.dataset.state=complete?'complete':'incomplete';
     });
     refreshWindingOverview();
+    refreshConfigStepIndicators();
   }
 
   function updateCounts(){
