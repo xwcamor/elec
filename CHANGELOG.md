@@ -1,3 +1,7 @@
+## v1.5.87
+- Sustituye los indicadores de salud y resultados de ejemplo por estados reales de configuración y disponibilidad del piloto; no muestra un 100/100 ficticio.
+- Mejora la jerarquía de las tarjetas de módulos, los estados de foco y las microinteracciones; respeta la preferencia del sistema por movimiento reducido.
+
 ## v1.5.86
 - La validación del servidor vuelve a comprobar los campos obligatorios y los valores numéricos de cada ensayo antes de permitir completar un registro.
 - Rechaza códigos de ensayo desconocidos, fechas inválidas y cierres sin detalle de ensayos.
