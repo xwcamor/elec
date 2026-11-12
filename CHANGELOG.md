@@ -1,4 +1,8 @@
-## v1.5.127
+## v1.5.128
+- Corrige la visualización del título y los contadores del paso «Conmutadores y TAP» en el indicador de Configuración eléctrica.
+- Refuerza la distribución de los tres pasos para mantener visibles y alineados sus textos en escritorio y móvil.
+
+# v1.5.127
 - Configuración eléctrica adopta el stepper numerado con círculos, conectores y estados del formulario de pruebas.
 - Elimina el bloque redundante «Qué se guarda» y el aviso repetitivo de bornes capacitivos.
 - Simplifica encabezados, instrucciones y botones de navegación.
