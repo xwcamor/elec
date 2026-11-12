@@ -1411,3 +1411,7 @@ body.config-focus .config-save-hint{display:none!important}
 .tap-positions-accordion>summary small{font-size:9px;color:#8594a3;flex:1}
 .tap-accordion-body .tap-card-body{padding:12px}
 @media(max-width:600px){.tap-accordion>.tap-accordion-summary{gap:7px;padding:10px}.tap-accordion-body{padding:0 9px 9px}.tap-accordion-body>.tap-card-head{gap:7px}.tap-accordion-body>.tap-card-head>.delete-btn{flex-basis:32px;width:32px;height:32px}.tap-positions-accordion>summary{flex-wrap:wrap}}
+
+/* Datos de ficha técnica: solo dos indicadores, sin bloque de origen */
+.tap-source-values{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:640px){.tap-source-values{grid-template-columns:1fr}}
