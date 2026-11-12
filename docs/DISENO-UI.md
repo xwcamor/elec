@@ -155,6 +155,16 @@ Sí se estandarizan. El separador es un elemento de jerarquía y agrupación, no
 
 No crear más variantes salvo que exista una necesidad de interacción claramente distinta. Si el contenedor ya utiliza un `border-bottom` para cumplir la misma función, no agregar además un `hr` duplicado.
 
+## 4.1. Separador del encabezado de página
+
+El encabezado de Configuración eléctrica y el encabezado del formulario de Registro de pruebas deben mostrar siempre el mismo separador horizontal inferior.
+
+- Línea de 1 px con el token neutro `var(--ui-border)`.
+- Mismo ancho que el área de contenido.
+- 16 px entre la línea y el contenido siguiente en escritorio; 12 px en móvil.
+- Se implementa como borde inferior del encabezado compartido, no como un `hr` aislado que pueda faltar en una pantalla.
+- No duplicar el borde con un `hr` adicional.
+
 ## 5. Padding y márgenes de formularios por steps
 
 Los formularios de los asistentes de Configuración eléctrica y Registro de pruebas deben compartir el mismo contenedor visual y el mismo ritmo de espaciado.
