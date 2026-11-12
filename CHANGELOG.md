@@ -1,3 +1,11 @@
+## v1.5.116
+- Corriente de excitación se organiza por TAP seleccionado: una fila por TAP y tres grupos de fase U-0, V-0 y W-0, cada uno con corriente de excitación (mA) y pérdidas (W).
+- Tensión de prueba y frecuencia quedan visibles por TAP; la frecuencia se propone desde la configuración del transformador y la tensión se registra en el ensayo.
+- Los TAP se seleccionan desde las posiciones del conmutador configurado; se evita generar automáticamente todas las posiciones y se valida que no se repita un TAP.
+- La evaluación por fila es manual: PENDIENTE, CONFORME, OBSERVADO o NO CONCLUYENTE. No se infiere conformidad por completar campos ni por asumir un tipo de núcleo.
+- Se añade el tipo de núcleo como dato opcional con valor inicial «No especificado» y se conserva en el detalle del ensayo.
+- Se adapta la exportación PDF a la misma tabla agrupada y se mantiene la lectura de registros antiguos con mediciones por fase.
+
 ## v1.5.115
 - La exportación deja de abrir el diálogo de impresión del navegador: ahora solicita el PDF al servidor PHP y descarga el archivo directamente.
 - Se agrega el endpoint `action=test-pdf`, que genera el documento A4 mediante Dompdf y devuelve `application/pdf`.
