@@ -320,13 +320,16 @@
         <summary class="winding-accordion-summary">
           <span class="winding-index">${String(wi+1).padStart(2,'0')}</span>
           <span class="winding-summary-main"><strong>${esc(w.name||'Bobinado sin nombre')}</strong><small>${esc(w.voltage_kv||'—')} kV</small></span>
-          <span class="winding-summary-count">${w.terminals.length} bornes</span><span class="accordion-chevron">⌄</span>
+          <span class="winding-summary-status" data-winding-status="${wi}" data-state="${String(w.name||'').trim()&&String(w.code||'').trim()&&Number(w.voltage_kv)>0&&w.terminals.length>0&&w.terminals.every(t=>String(t.code||'').trim())?'complete':'incomplete'}">${String(w.name||'').trim()&&String(w.code||'').trim()&&Number(w.voltage_kv)>0&&w.terminals.length>0&&w.terminals.every(t=>String(t.code||'').trim())?'Completo':'Pendiente'}</span><span class="accordion-chevron">⌄</span>
         </summary>
         <div class="winding-accordion-body">
-          <div class="winding-card-head"><div class="winding-head-fields">
-            <label class="config-field"><span>Nombre del bobinado <i class="required-mark">*</i></span><input aria-label="Nombre bobinado" data-wfield="name" value="${esc(w.name)}" placeholder="Ej. Bobinado AT" required></label>
-            <label class="config-field"><span>Tensión del bobinado (kV) <i class="required-mark">*</i></span><input class="w-voltage" aria-label="Tensión kV" data-wfield="voltage_kv" type="text" inputmode="decimal" value="${esc(w.voltage_kv)}" placeholder="Ej. 220" required></label>
-          </div><button type="button" class="text-remove" data-remove-winding="${wi}">Quitar bobinado</button></div>
+          <section class="winding-data-section">
+            <div class="winding-data-heading"><strong>Datos del bobinado</strong><button type="button" class="text-remove" data-remove-winding="${wi}">Quitar bobinado</button></div>
+            <div class="winding-head-fields">
+              <label class="config-field"><span>Nombre del bobinado <i class="required-mark">*</i></span><input aria-label="Nombre bobinado" data-wfield="name" value="${esc(w.name)}" placeholder="Ej. Bobinado AT" required></label>
+              <label class="config-field"><span>Tensión del bobinado (kV) <i class="required-mark">*</i></span><input class="w-voltage" aria-label="Tensión kV" data-wfield="voltage_kv" type="text" inputmode="decimal" value="${esc(w.voltage_kv)}" placeholder="Ej. 220" required></label>
+            </div>
+          </section>
           <section class="terminal-section">
             <div class="terminal-section-heading">
               <div class="terminal-section-title"><strong>Bornes y terminales</strong><small data-winding-stats="${wi}">${w.terminals.filter(t=>!(t._draft&&!String(t.code||'').trim()&&!t.has_capacitive_bushing)).length} bornes · ${w.terminals.filter(t=>t.has_capacitive_bushing).length} capacitivos</small></div>
@@ -539,9 +542,16 @@
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#tapRowsModal').classList.contains('hidden'))closeTapGenerator();});
 
   function refreshWindingCounters(){
-    $$('[data-winding-stats]').forEach(el=>{
+    $('[data-winding-stats]').forEach(el=>{
       const i=Number(el.dataset.windingStats),w=state.windings[i];
       if(w)el.textContent=`${w.terminals.filter(t=>!(t._draft&&!String(t.code||'').trim()&&!t.has_capacitive_bushing)).length} bornes · ${w.terminals.filter(t=>t.has_capacitive_bushing).length} capacitivos`;
+    });
+    $('[data-winding-status]').forEach(el=>{
+      const w=state.windings[Number(el.dataset.windingStatus)];
+      if(!w)return;
+      const complete=String(w.name||'').trim()!==''&&String(w.code||'').trim()!==''&&Number.isFinite(Number(w.voltage_kv))&&Number(w.voltage_kv)>0&&w.terminals.length>0&&w.terminals.every(t=>String(t.code||'').trim()!=='');
+      el.dataset.state=complete?'complete':'incomplete';
+      el.textContent=complete?'Completo':'Pendiente';
     });
   }
 
