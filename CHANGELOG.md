@@ -1,3 +1,6 @@
+## 1.5.66
+- Simplifica el aviso al intentar pasar al resumen con ensayos incompletos: ahora muestra únicamente el nombre de la prueba pendiente.
+
 ## 1.5.65
 - Se oculta el resumen «ensayo(s) en el plan · completos» al agregar pruebas; se conserva el mensaje inicial cuando aún no hay ensayos.
 - Se simplifica el encabezado de selección a «Selecciona los ensayos».
