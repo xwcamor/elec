@@ -1,3 +1,11 @@
+# CHANGELOG
+
+## 1.5.33
+- Verifica la persistencia de la configuración eléctrica mediante una lectura posterior a la escritura en MySQL.
+- Comprueba todas las tablas requeridas antes de habilitar o ejecutar el guardado de configuración.
+- Expone el detalle técnico de errores API para facilitar el diagnóstico en Laragon.
+- Actualiza la versión de recursos para evitar que el navegador conserve JavaScript anterior en caché.
+
 ## v1.5.32
 - Alinea las plantillas de TTR, factor de potencia, excitación, resistencia de devanados, aislamiento, bushings, SFRA, pararrayos y protecciones con los campos visibles en el libro LAP.
 - Retira campos no presentes en las tablas LAP principales y evita forzar unidades que el encabezado no especifica para las salidas del pararrayos.
