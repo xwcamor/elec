@@ -1,3 +1,9 @@
+## 1.5.48
+- En Configuración eléctrica, tipo de transformador (fases), grupo vectorial y frecuencia nominal se toman de la ficha del transformador y se muestran como datos de solo lectura.
+- Al abrir Configuración eléctrica se sincronizan esos valores desde el registro del transformador; la estructura de bobinados y bornes se mantiene editable.
+- Retira la etiqueta redundante «Configuración base» y simplifica la nota sobre grupo vectorial y conexiones por bobinado.
+- Corrige la superposición del stepper sobre la cabecera: las acciones superiores quedan por encima y el stepper deja de fijarse sobre ellas.
+- Actualiza la caché de CSS y JavaScript.
 ## 1.5.47
 - Unifica la apertura de registros desde Resumen e Historial: ambos accesos abren el editor de planes por etapas.
 - Elimina el enlace del Resumen al formulario antiguo de edición y evita el manejador duplicado del Historial.
