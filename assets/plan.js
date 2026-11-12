@@ -323,6 +323,7 @@
     if(back)back.disabled=index===0;
     if(next)next.textContent=step==='review'?'Guardar plan':'Continuar';
     if(hint)hint.textContent='Etapa '+(index+1)+' de 4 · '+planStepLabels[step];
+    renderPlanFeedback();
     if(step==='review')renderPlanReview();
     return true;
   }
