@@ -139,7 +139,7 @@
     });
     return out;
   }
-  function makeItem(code,old){old=old||{};return {id:old.id||null,code,name:typeName(code),status:old.status||'BORRADOR',standard_reference:old.standard_reference||'',equipment_name:old.equipment_name||'',equipment_brand:old.equipment_brand||'',equipment_model:old.equipment_model||'',equipment_serial:old.equipment_serial||'',capacitance_unit:old.capacitance_unit||'nF',observations:old.observations||'',rows:old.rows||defaults(code)};}
+  function makeItem(code,old){old=old||{};return {id:old.id||null,code,name:typeName(code),status:old.status||'BORRADOR',standard_reference:old.standard_reference||'',equipment_name:old.equipment_name||'',equipment_brand:old.equipment_brand||'',equipment_model:old.equipment_model||'',equipment_serial:old.equipment_serial||'',core_type:old.core_type||'NO_ESPECIFICADO',capacitance_unit:old.capacitance_unit||'nF',observations:old.observations||'',rows:old.rows||defaults(code)};}
   const requiredByTest={
     TTR:['tap','at','bt','U','V','W','result'],
     POWER_FACTOR:['measurement','test_voltage','power_factor_measured','power_factor_corrected_20c','capacitance_source_f','status'],
@@ -479,7 +479,7 @@
           const filled=requiredValueFilled(key,value),missing=must&&!filled;
           if(item.code==='EXCITATION'&&key==='tap'){const config=bridge.getElectricalConfig()||{},positions=[...new Set((config.tap_changers||[]).flatMap(c=>(c.positions||[]).map(x=>String(x.position_no??'').trim()).filter(Boolean)))].sort((a,b)=>Number(a)-Number(b));const options=positions.length?positions:Array.from({length:Math.min(150,Math.max(0,Number(transformer().num_taps||0)))},(_,i)=>String(i+1));const opts=options.map(v=>'<option value="'+esc(v)+'" '+(String(value)===String(v)?'selected':'')+'>TAP '+esc(v)+'</option>').join('');return '<td><select class="plan-cell" data-row="'+ri+'" data-col="tap"><option value="">Selecciona TAP</option>'+opts+(value&&!options.includes(String(value))?'<option selected value="'+esc(value)+'">'+esc(value)+' · registro anterior</option>':'')+'</select></td>';}
           if(['result','evaluation'].includes(key)&&!calc){
-            const options=['PENDIENTE','CONFORME','OBSERVADO','NO APLICA'],current=String(value||'PENDIENTE').toUpperCase();
+            const options=['PENDIENTE','CONFORME','OBSERVADO','NO CONCLUYENTE','NO APLICA'],current=String(value||'PENDIENTE').toUpperCase();
             const extra=options.includes(current)?'':'<option value="'+esc(value)+'" selected>'+esc(value)+'</option>';
             return '<td><select class="plan-cell plan-result-select '+(filled?'is-filled':'is-missing')+'" data-row="'+ri+'" data-col="'+key+'" data-state="'+(filled?current.toLowerCase():'pending')+'" '+(must?'data-required="1"':'')+'>'+extra+options.map(option=>'<option value="'+option+'" '+(current===option?'selected':'')+'>'+option+'</option>').join('')+'</select></td>';
           }
@@ -505,7 +505,7 @@
         '<label data-meta-wrap="equipment_name">Equipo<input data-meta="equipment_name" value="'+esc(item.equipment_name)+'" placeholder="Instrumento"></label>'+
         '<label data-meta-wrap="equipment_brand">Marca<input data-meta="equipment_brand" value="'+esc(item.equipment_brand)+'" placeholder="Marca"></label>'+
         '<label data-meta-wrap="equipment_model">Modelo<input data-meta="equipment_model" value="'+esc(item.equipment_model)+'" placeholder="Modelo"></label>'+
-        '<label data-meta-wrap="equipment_serial">N.º de serie<input data-meta="equipment_serial" value="'+esc(item.equipment_serial)+'" placeholder="Serie"></label></div></section>'+hint+
+        '<label data-meta-wrap="equipment_serial">N.º de serie<input data-meta="equipment_serial" value="'+esc(item.equipment_serial)+'" placeholder="Serie"></label>'+(item.code==='EXCITATION'?'<label data-meta-wrap="core_type">Tipo de núcleo (opcional)<select data-meta="core_type"><option value="NO_ESPECIFICADO" '+(item.core_type==='NO_ESPECIFICADO'?'selected':'')+'>No especificado</option><option value="TRES_COLUMNAS" '+(item.core_type==='TRES_COLUMNAS'?'selected':'')+'>Tres columnas</option><option value="CINCO_COLUMNAS" '+(item.core_type==='CINCO_COLUMNAS'?'selected':'')+'>Cinco columnas</option><option value="ACORAZADO" '+(item.core_type==='ACORAZADO'?'selected':'')+'>Acorazado</option><option value="OTRO" '+(item.core_type==='OTRO'?'selected':'')+'>Otro</option></select></label>':'')+'</div></section>'+hint+
         '<div class="plan-table-toolbar"><div><b>Mediciones del ensayo</b><small><i class="required-mark">*</i> Campo requerido · Puedes pegar desde Excel.</small><small class="plan-row-summary" data-row-summary></small></div><button class="btn small secondary-action" type="button" data-add-row="'+idx+'">+ Fila</button></div>'+
         '<div class="measurement-sheet-wrap plan-grid-wrap"><table class="measurement-sheet plan-sheet"><thead>'+head+'</thead><tbody>'+body+'</tbody></table></div>'+
         '<details class="plan-optional-details plan-observation-details" '+(item.code==='POWER_FACTOR'?'open':'')+'><summary><span>Observaciones del ensayo</span><small>'+(item.code==='POWER_FACTOR'?'Resultado automático según Estado':'Notas e incidencias')+'</small></summary><label class="plan-test-observations"><textarea data-meta="observations" rows="2" placeholder="Resultados, incidencias y comentarios" '+(item.code==='POWER_FACTOR'?'readonly title="Se genera automáticamente según los estados de las mediciones"':'')+'>'+esc(item.observations)+'</textarea></label></details>'+
@@ -622,7 +622,7 @@
       capacitance_unit:item.capacitance_unit||'nF',
       standard_reference:item.standard_reference,
       equipment_name:item.equipment_name,equipment_brand:item.equipment_brand,
-      equipment_model:item.equipment_model,equipment_serial:item.equipment_serial,
+      equipment_model:item.equipment_model,equipment_serial:item.equipment_serial,core_type:item.core_type||'NO_ESPECIFICADO',
       observations:item.observations,measurements:measurementsFromRows(item)
     }));
     const metrics=planMetrics();
@@ -753,7 +753,7 @@
   $('#planTestCards').addEventListener('change',e=>{
     const card=e.target.closest('[data-test-index]');if(!card)return;
     const item=items[Number(card.dataset.testIndex)];if(!item)return;
-    if(e.target.dataset.meta||e.target.classList.contains('plan-cell')){if(item.code==='POWER_FACTOR')refreshPowerFactorLive(card,item);refreshCardStatus(card,item);refreshPlanFeedback();}
+    if(e.target.dataset.meta||e.target.classList.contains('plan-cell')){if(item.code==='POWER_FACTOR')refreshPowerFactorLive(card,item);if(e.target.dataset.meta)item[e.target.dataset.meta]=e.target.value;else if(e.target.classList.contains('plan-cell')){const row=Number(e.target.dataset.row),key=e.target.dataset.col;item.rows[row]=item.rows[row]||{};item.rows[row][key]=e.target.value;}refreshCardStatus(card,item);refreshPlanFeedback();markPlanChanged(350);}
   });
     $('#planPage').addEventListener('input',e=>{
     if(['planDate','planOperator','planSupervisor'].includes(e.target.id))refreshPlanFeedback();
