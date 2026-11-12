@@ -180,7 +180,7 @@
       if(metrics.missing.length>5)missing.push(item.name+': y '+(metrics.missing.length-5)+' pendientes más');
       item.status=metrics.complete?'COMPLETADA':'BORRADOR';
     });
-    if(!items.length)missing.unshift('Selecciona por lo menos una prueba');
+    if(!items.length)missing.unshift('Selecciona al menos un ensayo');
     return {general,perItem,total,filled,percent,ready,completed,missing,complete:!general.length&&items.length>0&&perItem.every(x=>x.metrics.complete)};
   }
   function refreshResultsSummary(){
@@ -552,12 +552,12 @@
           method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)
         });
         const data=await json(response);
-        if(!data.result?.id)throw new Error('El servidor no confirmó el ID del plan guardado.');
+        if(!data.result?.id)throw new Error('El servidor no confirmó el ID del registro guardado.');
         editingId=Number(data.result.id);
         savedRevision=revisionAtStart;
         $('#planTitle').textContent='Registro de pruebas #'+editingId;
         const pending=planMetrics().missing.length;
-        setSaveStatus(confirmCompletion?'Registro completado':(hasWork?'Cambios guardados automáticamente':'Borrador guardado automáticamente'),'saved');
+        setSaveStatus(confirmCompletion?'Registro completado':(complete?'Todos los ensayos completos · confirma el registro':(hasWork?'Cambios guardados automáticamente':'Borrador guardado automáticamente')),'saved');
         if(confirmCompletion){toast('Registro de pruebas #'+editingId+' completado correctamente.');await bridge.reloadTestHistory();bridge.showPage('testPage');}
         else if(!automatic){toast(hasWork?'Cambios guardados. Puedes continuar completando el registro.':'Borrador guardado.');}
         return true;
@@ -566,7 +566,7 @@
         if(!automatic)toast(error.message,true);
         return false;
       }finally{
-        if(btn){btn.disabled=false;btn.innerHTML='<svg><use href="#i-check"/></svg>Guardar ahora';}
+        if(btn){btn.disabled=false;btn.innerHTML='<svg><use href="#i-check"/></svg>Guardar cambios';}
       }
     })();
     savePromise=operation;
