@@ -152,8 +152,11 @@ class TransformerRepository
                 throw new InvalidArgumentException('Tensión, potencia y frecuencia deben ser valores mayores que cero.');
             }
         }
-        if (($input['num_taps'] ?? '') !== '' && !ctype_digit((string)$input['num_taps'])) {
-            throw new InvalidArgumentException('La cantidad de taps debe ser un entero no negativo.');
+        if (($input['num_taps'] ?? '') !== '') {
+            $tapCount = (string)$input['num_taps'];
+            if (!ctype_digit($tapCount) || strlen($tapCount) > 3 || (int)$tapCount < 1 || (int)$tapCount > 150) {
+                throw new InvalidArgumentException('La cantidad de TAP debe ser un entero entre 1 y 150.');
+            }
         }
         if (($input['year'] ?? '') !== '' && (!ctype_digit((string)$input['year']) || (int)$input['year'] < 1800 || (int)$input['year'] > 2200)) {
             throw new InvalidArgumentException('Revisa el año de fabricación.');
@@ -291,7 +294,7 @@ class TransformerRepository
         if (array_key_exists('code', $input) && trim((string)$input['code']) === '') throw new InvalidArgumentException('El TAG o código del transformador es obligatorio.');
         foreach (['voltage','power','frequency_hz'] as $f) if (isset($input[$f]) && $input[$f] !== '' && (!is_numeric(str_replace(',','.',$input[$f])) || (float)str_replace(',','.',$input[$f]) <= 0)) throw new InvalidArgumentException('Tensión, potencia y frecuencia deben ser valores numéricos mayores que cero.');
         if (array_key_exists('phase_count', $input) && !in_array((string)$input['phase_count'], ['1','3'], true)) throw new InvalidArgumentException('La cantidad de fases debe ser 1 o 3.');
-        if (isset($input['num_taps']) && $input['num_taps'] !== '' && (!ctype_digit((string)$input['num_taps']) || (int)$input['num_taps'] < 0)) throw new InvalidArgumentException('La cantidad de taps debe ser un entero no negativo.');
+        if (isset($input['num_taps']) && $input['num_taps'] !== '') { $tapCount=(string)$input['num_taps']; if (!ctype_digit($tapCount) || strlen($tapCount)>3 || (int)$tapCount<1 || (int)$tapCount>150) throw new InvalidArgumentException('La cantidad de TAP debe ser un entero entre 1 y 150.'); }
         if (isset($input['year']) && $input['year'] !== '' && (!ctype_digit((string)$input['year']) || (int)$input['year'] < 1800 || (int)$input['year'] > 2200)) throw new InvalidArgumentException('Revisa el año de fabricación.');
         if (!$updates) throw new RuntimeException('No se encontraron columnas compatibles para actualizar.');
         $submittedFields = array_keys(array_intersect_key($map, $input));
