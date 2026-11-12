@@ -81,7 +81,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.77">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.78">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -470,7 +470,7 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.77"></script>
-<script src="./assets/plan.js?v=1.5.77"></script>
+<script src="./assets/app.js?v=1.5.78"></script>
+<script src="./assets/plan.js?v=1.5.78"></script>
 </body></html>
 0
