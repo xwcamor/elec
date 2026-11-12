@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.5.42
+- La vista Resumen, Historial y Gráfico de Pruebas eléctricas utiliza modo de enfoque, igual que Configuración y los formularios de planes: oculta la ficha general del transformador y libera el ancho de trabajo.
+- Al volver a Detalles se restablece la ficha del transformador; al abrir Configuración o los formularios se conserva su modo de enfoque independiente.
+
 ## 1.5.41
 - Añade columna Estado calculada en el historial: Completo, Incompleto o En borrador, sin crear columnas ni modificar registros en MySQL.
 - Añade filtro de historial por estado y mantiene el filtro de texto por prueba y responsable.
