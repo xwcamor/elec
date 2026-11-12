@@ -1,3 +1,8 @@
+## v1.5.146
+- Alinea el estado de guardado/autoguardado del registro de pruebas a la izquierda del botón «Volver a registros», siguiendo el patrón de Configuración eléctrica.
+- Homologa la barra de acciones del asistente de pruebas con el componente compartido `toolbar-actions`.
+- Documenta esta regla de alineación en el estándar de diseño para evitar divergencias futuras.
+
 ## v1.5.145
 - Separa Configuración eléctrica y Pruebas eléctricas en módulos JavaScript independientes.
 - Configuración conserva el estado exclusivo de bobinados, bornes, conmutadores, TAP y versiones.
