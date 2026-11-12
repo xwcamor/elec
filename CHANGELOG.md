@@ -1,3 +1,7 @@
+## v1.5.137
+- Corrige el refresco inicial de los indicadores de bobinados usando selectores de colección válidos; los estados se calculan al cargar la configuración, no solo después de guardar.
+- Actualiza la caché del JavaScript para que el navegador reciba la corrección.
+
 ## v1.5.136
 - Reduce el tamaño del título «Bobinados y bornes» para equilibrarlo con el resto del formulario.
 - Elimina el rótulo redundante «Conexiones del bobinado» sobre la grilla de bornes.
