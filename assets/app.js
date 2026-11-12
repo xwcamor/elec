@@ -54,7 +54,7 @@
   const transformer = {...PILOT.transformer};
   let dirty = false;
   state = normalizeConfig(PILOT.config || {});
-  let selectedTab = 'general';
+  let selectedTab = 'windings';
 
   const editFields = {
     code:'editTrafoCode',name:'editTrafoName',company:'editTrafoCompany',voltage:'editTrafoVoltage',
@@ -497,7 +497,7 @@
 
   function renderReview(){
     const terminals=state.windings.reduce((n,w)=>n+w.terminals.length,0),bushings=state.windings.reduce((n,w)=>n+w.terminals.filter(t=>t.has_capacitive_bushing).length,0),taps=state.tap_changers.reduce((n,c)=>n+c.positions.length,0);
-    $('#reviewSummary').innerHTML=`<div class="review-stat"><small>Bobinados</small><strong>${state.windings.length}</strong><span>Configurados</span></div><div class="review-stat"><small>Bornes</small><strong>${terminals}</strong><span>Terminales</span></div><div class="review-stat"><small>Bushings capacitivos</small><strong>${bushings}</strong><span>Identificados</span></div><div class="review-stat"><small>Conmutadores</small><strong>${state.tap_changers.length}</strong><span>Configurados</span></div><div class="review-stat"><small>Posiciones de tap</small><strong>${taps}</strong><span>Registradas</span></div><div class="review-stat"><small>Grupo vectorial</small><strong>${esc(state.vector_group||'—')}</strong><span>${esc(state.phase_count)} fase(s) · ${esc(state.frequency_hz)} Hz</span></div>`+
+    $('#reviewSummary').innerHTML=`<div class="review-stat"><small>Bobinados</small><strong>${state.windings.length}</strong><span>Configurados</span></div><div class="review-stat"><small>Bornes</small><strong>${terminals}</strong><span>Terminales</span></div><div class="review-stat"><small>Bushings capacitivos</small><strong>${bushings}</strong><span>Identificados</span></div><div class="review-stat"><small>Conmutadores</small><strong>${state.tap_changers.length}</strong><span>Configurados</span></div><div class="review-stat"><small>Posiciones de tap</small><strong>${taps}</strong><span>Registradas</span></div><div class="review-stat"><small>Datos de placa · referencia</small><strong>${esc(state.vector_group||'—')}</strong><span>${esc(state.phase_count)} fase(s) · ${esc(state.frequency_hz)} Hz</span></div>`+
       state.windings.map((w,i)=>`<div class="review-winding"><h4>${i+1}. ${esc(w.name)} · ${esc(w.voltage_kv||'—')} kV · ${esc(w.connection_type||'Conexión pendiente')}</h4><p>${esc(w.terminals.length)} bornes · Material: ${esc(w.conductor_material||'No indicado')}</p><div class="review-tags">${w.terminals.map(t=>`<span>${esc(t.code||'Sin código')} · ${esc(t.phase||'—')}${t.has_capacitive_bushing?' · C1':''}</span>`).join('')}</div></div>`).join('');
     $('#versionBadge').textContent='Versión '+(state.version_no||0);
     $('#versionList').innerHTML=(state.versions||[]).length?state.versions.map(v=>`<div class="version-row"><b>Versión ${v.version_no}</b><span>${esc(v.created_at||'')}</span></div>`).join(''):'<div class="empty-history">Todavía no hay versiones guardadas.</div>';
