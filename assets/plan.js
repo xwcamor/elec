@@ -149,7 +149,7 @@
     PROTECTIONS:['accessory','terminals','contact','condition','result'],
     CAPACITANCE:['point','connection','test_voltage_kv','capacitance_nf']
   };
-  const requiredEquipment=[];
+  const requiredEquipment=['equipment_name','equipment_brand','equipment_model','equipment_serial'];
   const equipmentLabels={equipment_name:'equipo',equipment_brand:'marca del equipo',equipment_model:'modelo',equipment_serial:'serie'};
   const generalLabels={date:'fecha de realización',operator:'responsable / técnico'};
   function isFilled(value){return value!==null&&value!==undefined&&String(value).trim()!=='';}
@@ -497,7 +497,7 @@
         '<summary class="plan-test-card-head"><span class="plan-test-index">'+String(idx+1).padStart(2,'0')+'</span><span class="plan-test-heading"><b>'+esc(item.name)+'</b><small data-card-progress>'+metrics.filled+'/'+metrics.total+' campos · '+metrics.percent+'%</small></span><span class="plan-card-state" data-state="'+metrics.state+'">'+(metrics.complete?'Completo':metrics.anyData?'En curso':'Pendiente')+'</span><span class="plan-card-chevron">⌄</span></summary>'+
         '<div class="plan-test-body">'+
         '<section class="plan-test-meta-card"><div class="plan-test-meta-card-head"><b>Equipo y referencia</b></div>'+
-        '<div class="plan-test-meta-grid"><label>Norma / referencia<input data-meta="standard_reference" value="'+esc(item.standard_reference)+'" placeholder="Norma o protocolo"></label>'+
+        '<div class="plan-test-meta-grid">'+
         '<label data-meta-wrap="equipment_name">Equipo<input data-meta="equipment_name" value="'+esc(item.equipment_name)+'" placeholder="Instrumento"></label>'+
         '<label data-meta-wrap="equipment_brand">Marca<input data-meta="equipment_brand" value="'+esc(item.equipment_brand)+'" placeholder="Marca"></label>'+
         '<label data-meta-wrap="equipment_model">Modelo<input data-meta="equipment_model" value="'+esc(item.equipment_model)+'" placeholder="Modelo"></label>'+
