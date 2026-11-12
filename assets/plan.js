@@ -12,7 +12,7 @@
     ['SFRA','SFRA','Tres conexiones y comparación de curvas'],
     ['ARRESTER','Pararrayos AT / MT','Fase, salidas, modo GST, pérdidas y capacitancia'],
     ['PROTECTIONS','Protecciones propias','Ítem, accesorio, bornes, contacto, condición y ajuste'],
-    ['CAPACITANCE','Capacitancia complementaria (fuera de LAP)','Ensayo adicional no incluido como bloque independiente en LAP']
+    ['CAPACITANCE','Capacitancia complementaria','Ensayo adicional no incluido como bloque independiente en LAP']
   ];
   const templates={
     WINDING_RESISTANCE:{prefix:'WR',cols:[['section','Devanado (AT / BT)'],['tap','TAP'],['phase','Fase / conexión'],['test_current_a','I de prueba (A)'],['temperature_c','Temperatura medida (°C)'],['resistance_measured','Resistencia medida'],['resistance_referred_75c','Resistencia referida 75 °C'],['notes','Observación']]},
