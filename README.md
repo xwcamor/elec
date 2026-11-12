@@ -92,3 +92,7 @@ Este repositorio contiene un prototipo local, no una aplicación lista para prod
 ## Historial
 
 Consulta [CHANGELOG.md](CHANGELOG.md) para el detalle de cambios por versión.
+
+
+### Límite de posiciones TAP
+La aplicación admite entre 1 y 150 posiciones TAP por conmutador. El límite se valida en interfaz, generador de filas y servidor PHP para proteger la base de datos y evitar cargas excesivas.
