@@ -393,7 +393,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <div class="modal-backdrop hidden" id="tapRowsModal" role="dialog" aria-modal="true" aria-labelledby="tapRowsTitle">
   <div class="modal-card">
     <div class="modal-card-head"><div><span class="eyebrow">CONMUTADOR</span><h3 id="tapRowsTitle">Generar posiciones de tap</h3><p>Conserva los datos existentes dentro de la cantidad seleccionada.</p></div><button class="modal-close" type="button" id="cancelTapRows" aria-label="Cerrar">×</button></div>
-    <label class="modal-field">Cantidad de posiciones<input id="tapRowsCount" type="number" min="1" max="1000" step="1" value="27"></label>
+    <label class="modal-field">Cantidad de posiciones<input id="tapRowsCount" type="number" min="1" max="150" step="1" step="1" value="27"></label>
     <div class="modal-hint"><svg><use href="#i-info"/></svg><span>Indica la cantidad de posiciones que necesitas registrar. Ajusta el valor según la placa del conmutador.</span></div>
     <div class="modal-actions"><button class="btn" type="button" id="cancelTapRowsAlt">Cancelar</button><button class="btn primary" type="button" id="confirmTapRows"><svg><use href="#i-check"/></svg>Generar filas</button></div>
   </div>
@@ -443,7 +443,7 @@ window.PILOT = <?=json_encode([
         <label>Año de fabricación<input name="year" id="editTrafoYear" inputmode="numeric"></label>
         <label>Marca<input name="brand" id="editTrafoBrand"></label>
         <label>Tipo de conmutador<select name="tap_type" id="editTrafoTapType"><option value="">Seleccionar</option><option>DETC</option><option>OLTC</option></select></label>
-        <label id="editTrafoNumTapsField">Número de taps<input name="num_taps" id="editTrafoNumTaps" inputmode="numeric"></label>
+        <label id="editTrafoNumTapsField">Número de taps<input name="num_taps" id="editTrafoNumTaps" type="number" min="1" max="150" step="1" inputmode="numeric"></label>
         <label>Grupo vectorial<input name="vector_group" id="editTrafoVector" placeholder="Ej. Yd11"></label>
         <label class="wide">Ubicación / Subestación<input name="location" id="editTrafoLocation"></label>
         <div class="edit-section-title">Datos de placa y características nominales</div>
