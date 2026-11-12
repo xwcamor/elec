@@ -16,7 +16,7 @@
     CAPACITANCE:{title:'Capacitancia complementaria',hint:'Ensayo adicional; no aparece como bloque independiente en el protocolo LAP.',prefix:'CAP',cols:[['point','Punto / borne'],['connection','Conexión de prueba'],['test_voltage','Tensión de prueba'],['capacitance','Capacitancia'],['unit','Unidad'],['frequency','Frecuencia'],['temperature','Temperatura °C'],['notes','Observación']]},
     POWER_FACTOR:{title:'Factor de potencia del transformador',hint:'Campos LAP: modo, tensión de prueba, FP medido, FP corregido a 20 °C y capacitancia medida. La hoja no fija unidad en el encabezado de capacitancia ni exige ese dato en todos los modos.',prefix:'PF',cols:[['measurement','Modo de medición'],['test_voltage','Tensión de prueba'],['power_factor_measured','FP medido'],['power_factor_corrected_20c','FP corregido a 20 °C'],['capacitance_measured','Capacitancia medida'],['notes','Observación']]},
     EXCITATION:{title:'Corriente de excitación',hint:'Campos LAP por TAP y fase: frecuencia, corriente de excitación y pérdidas. No se fuerza tensión de prueba ni unidades ausentes en los encabezados.',prefix:'EXC',cols:[['tap','TAP'],['phase','Fase (U-0 / V-0 / W-0)'],['frequency_hz','Frecuencia (Hz)'],['excitation_current','Corriente de excitación'],['losses','Pérdidas'],['notes','Observación']]},
-    BUSHING:{title:'Factor de potencia y capacitancia de bushings',hint:'Campos LAP por borne: serie, tensión de prueba, FP de placa/medido, capacitancia de placa/medida y variación. La unidad se registra según protocolo/equipo.',prefix:'BUSH',cols:[['terminal','Borne'],['serial','Serie'],['test_voltage','Tensión de prueba'],['power_factor_plate','FP de placa'],['power_factor_measured','FP medido'],['capacitance_plate','Capacitancia de placa'],['capacitance_measured','Capacitancia medida'],['variation_percent','Variación (%)'],['notes','Observación']]},
+    BUSHING:{title:'Factor de potencia y capacitancia de bushings',hint:'Campos LAP por borne: serie, tensión de prueba, FP de placa/medido, capacitancia de placa/medida y variación. La variación se calcula a partir de capacitancias; el FP no tiene umbral automático.',prefix:'BUSH',cols:[['terminal','Borne'],['serial','Serie'],['test_voltage','Tensión de prueba'],['power_factor_plate','FP de placa'],['power_factor_measured','FP medido'],['capacitance_plate','Capacitancia de placa'],['capacitance_measured','Capacitancia medida'],['variation_percent','Variación (%)'],['result','Resultado capacitancia'],['notes','Observación']]},
     SFRA:{title:'Análisis de respuesta al barrido de frecuencia (SFRA)',hint:'Tres configuraciones LAP: AT–BT abierto, BT–AT abierto y AT–BT en cortocircuito. Documenta curva de campo y comparación con fábrica.',prefix:'SFRA',cols:[['connection','Configuración'],['tap','TAP'],['file_reference','Archivo / curva de campo'],['comparison_reference','Curva de referencia (fábrica)'],['comparison_result','Resultado de comparación'],['evaluation','Evaluación manual'],['notes','Observación']]},
     ARRESTER:{title:'Prueba de pararrayos (AT / MT)',hint:'Campos LAP: fase, V. salida, I. salida, modo GST, pérdidas y capacitancia. Los encabezados no fijan unidades; registra las unidades del equipo.',prefix:'ARR',cols:[['section','Sección (AT/MT)'],['phase','Fase / borne'],['output_voltage','V. salida'],['output_current','I. salida'],['test_mode','Modo de prueba (GST)'],['losses_measured','Pérdidas medidas'],['capacitance_measured','Capacitancia medida'],['notes','Observación']]},
     PROTECTIONS:{title:'Verificación de protecciones propias',hint:'Campos LAP: ítem, accesorio, bornes, contacto, condición, ajuste, resultado y observación. No se precargan contactos de otro transformador.',prefix:'PROT',cols:[['item','Ítem'],['accessory','Accesorio'],['terminals','Bornes'],['contact','Contacto'],['condition','Condición'],['setpoint','Ajuste'],['result','Resultado'],['notes','Observación']]}
@@ -883,24 +883,42 @@
     if(code==='INSULATION_RESISTANCE'){
       const raw30=String(out.reading_30s??'').trim().replace(',','.');
       const raw1=String(out.reading_1min??'').trim().replace(',','.');
-      const n30=raw30===''?NaN:Number(raw30);
-      const n1=raw1===''?NaN:Number(raw1);
+      const n30=raw30===''?NaN:Number(raw30),n1=raw1===''?NaN:Number(raw1);
       out.absorption_index=raw30!==''&&raw1!==''&&Number.isFinite(n30)&&n30!==0&&Number.isFinite(n1)?String(n1/n30):'';
     }
     if(code==='WINDING_RESISTANCE'){
       out.phase=out.phase||out.terminal_pair||'';
       out.winding=out.winding||out.section||'';
-      out.resistance=out.resistance||out.resistance_measured||out.resistance_measured_ohm||'';
+      out.resistance_measured=out.resistance_measured||out.resistance||out.resistance_measured_ohm||'';
       out.resistance_referred_75c=out.resistance_referred_75c||out.resistance_referred_75c_ohm||'';
     }
     if(code==='POWER_FACTOR'){
+      out.test_voltage=out.test_voltage||out.test_voltage_v||out.test_voltage_kv||'';
       out.power_factor_measured=out.power_factor_measured||out.power_factor||'';
       out.power_factor_corrected_20c=out.power_factor_corrected_20c||out.power_factor_corrected||'';
+      out.capacitance_measured=out.capacitance_measured||out.capacitance_nf||out.capacitance||'';
+    }
+    if(code==='EXCITATION'){
+      out.excitation_current=out.excitation_current||out.current||out.output_current_a||'';
+      out.losses=out.losses||out.power||out.losses_w||'';
     }
     if(code==='BUSHING'){
-      const plate=Number(String(out.capacitance_plate??out.capacitance_plate_pf??'').replace(',','.'));
-      const measured=Number(String(out.capacitance??out.capacitance_measured??out.capacitance_measured_pf??'').replace(',','.'));
-      out.variation_percent=Number.isFinite(plate)&&plate>0&&Number.isFinite(measured)&&String(out.capacitance??out.capacitance_measured??'').trim()!==''?String(Math.abs(measured-plate)*100/plate):(out.variation_percent||'');
+      out.test_voltage=out.test_voltage||out.test_voltage_kv||'';
+      out.power_factor_measured=out.power_factor_measured||out.power_factor||'';
+      out.capacitance_plate=out.capacitance_plate||out.capacitance_plate_pf||'';
+      out.capacitance_measured=out.capacitance_measured||out.capacitance||out.capacitance_measured_pf||'';
+      out.serial=out.serial||out.serial_number||'';
+      const plate=Number(String(out.capacitance_plate??'').trim().replace(',','.'));
+      const measured=Number(String(out.capacitance_measured??'').trim().replace(',','.'));
+      const variation=String(out.capacitance_measured??'').trim()!==''&&Number.isFinite(plate)&&plate>0&&Number.isFinite(measured)?Math.abs(measured-plate)*100/plate:null;
+      out.variation_percent=variation===null?(out.variation_percent||''):String(variation);
+      out.result=variation===null?'PENDIENTE':(variation<5?'CONFORME':'OBSERVADO');
+    }
+    if(code==='ARRESTER'){
+      out.output_voltage=out.output_voltage||out.output_voltage_v||out.output_voltage_kv||'';
+      out.output_current=out.output_current||out.output_current_a||out.output_current_ma||'';
+      out.losses_measured=out.losses_measured||out.losses_measured_w||out.losses_w||'';
+      out.capacitance_measured=out.capacitance_measured||out.capacitance_measured_pf||out.capacitance_pf||'';
     }
     return out;
   }
