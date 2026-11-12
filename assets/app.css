@@ -757,3 +757,18 @@ body.test-form-focus .plan-tests-section{scroll-margin-top:84px}
  .plan-review-metrics{gap:5px}.plan-review-metrics>div{padding:9px}
 }
 @media(max-width:430px){.plan-core-grid{grid-template-columns:1fr}.plan-test-tab{flex-basis:100%}}
+
+
+/* v1.5.34 · Asistente de cuatro etapas y captura compacta */
+.plan-stepper{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:8px}
+.plan-step-connector{display:none}
+.plan-step{min-height:48px;gap:8px;padding:6px 7px}
+.plan-step-number{width:28px;height:28px;flex-basis:28px}
+.plan-core-grid{grid-template-columns:repeat(2,minmax(180px,1fr));max-width:680px;gap:10px}
+.plan-core-grid input,.plan-optional-details input{height:32px}
+.plan-test-meta-grid input{height:31px;font-size:10px}
+.plan-sheet{min-width:980px}
+.plan-sheet th{min-width:88px;padding:6px 7px;font-size:8px}
+.plan-sheet td{min-width:86px;height:32px}
+.plan-cell{min-width:80px;height:30px;padding:0 6px!important;font-size:9px}
+@media(max-width:760px){.plan-stepper{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.plan-step{min-height:46px;padding:5px}.plan-core-grid{grid-template-columns:1fr;max-width:none}}
