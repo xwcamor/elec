@@ -81,7 +81,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.68">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.69">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -296,6 +296,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       <div><div class="breadcrumbs">Transformador <span>/</span> Pruebas eléctricas <span>/</span> Plan</div><h2 id="planTitle">Nuevo registro de pruebas</h2><p>Organiza los datos generales, selecciona los ensayos y completa cada protocolo por separado.</p></div>
       <div class="plan-toolbar-actions"><span id="planSaveStatus" class="plan-save-status" data-state="idle" aria-live="polite"><i></i><span>Se guardará automáticamente al modificar datos</span></span><div class="toolbar-actions"><button class="btn" id="cancelPlan">Volver al historial</button><button class="btn primary" id="saveTestPlan"><svg><use href="#i-check"/></svg>Guardar ahora</button></div></div>
     </div>
+    <div class="plan-wizard-shell">
     <nav class="plan-stepper" id="planStepper" aria-label="Etapas del registro de pruebas">
       <button type="button" class="plan-step" data-plan-step="shared" data-state="missing" aria-current="step"><span class="plan-step-number">01</span></button>
       <span class="plan-step-connector" aria-hidden="true"></span>
@@ -348,6 +349,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       <button class="btn" type="button" id="planStepBack" disabled>Anterior</button>
       <span id="planStepHint">Etapa 1 de 4 · Datos generales</span>
       <button class="btn primary" type="button" id="planStepNext">Continuar</button>
+    </div>
     </div>
   </section>
 
@@ -469,7 +471,7 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.68"></script>
-<script src="./assets/plan.js?v=1.5.68"></script>
+<script src="./assets/app.js?v=1.5.69"></script>
+<script src="./assets/plan.js?v=1.5.69"></script>
 </body></html>
 0
