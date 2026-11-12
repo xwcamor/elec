@@ -163,12 +163,13 @@
     const missing=[];
     if(!isFilled($('#planDate').value))missing.push(generalLabels.date);
     if(!isFilled($('#planOperator').value))missing.push(generalLabels.operator);
+    if(!isFilled($('#planSupervisor').value))missing.push(generalLabels.supervisor||'supervisor');
     return missing;
   }
   function planMetrics(){
     const general=generalMissing(),perItem=items.map(item=>({item,metrics:itemMetrics(item)}));
-    const total=2+(items.length?0:1)+perItem.reduce((n,x)=>n+x.metrics.total,0);
-    const filled=2-general.length+perItem.reduce((n,x)=>n+x.metrics.filled,0);
+    const total=3+(items.length?0:1)+perItem.reduce((n,x)=>n+x.metrics.total,0);
+    const filled=3-general.length+perItem.reduce((n,x)=>n+x.metrics.filled,0);
     const percent=total?Math.round(filled/total*100):0;
     const ready=perItem.filter(x=>x.metrics.complete).length;
     const completed=ready;
@@ -215,7 +216,7 @@
     }
   }
   function updatePlanStepper(m){
-    const visitStarted=!!($('#planDate').value||$('#planOperator').value.trim());
+    const visitStarted=!!($('#planDate').value||$('#planOperator').value.trim()||$('#planSupervisor').value.trim());
     const sharedState=m.general.length===0?'complete':(visitStarted?'partial':'missing');
     const selectionState=items.length?'complete':'missing';
     const resultMetrics=m.perItem.map(entry=>entry.metrics);
@@ -241,6 +242,7 @@
     host.innerHTML='<div class="plan-progress-main"><div class="plan-progress-copy"><div class="plan-progress-heading"><span class="plan-alert-icon">'+(state==='success'?'✓':state==='warning'?'!':'i')+'</span><div><strong>'+headline+'</strong><small>'+(items.length?m.ready+' de '+items.length+' formularios con campos mínimos completos':'Selecciona las pruebas que vas a realizar')+'</small></div></div><div class="plan-progress-track"><span style="width:'+m.percent+'%"></span></div><small class="plan-progress-number">'+m.filled+' de '+m.total+' campos mínimos · '+m.percent+'%</small></div><div class="plan-progress-side"><b>'+m.percent+'%</b><span>avance</span></div></div>'+
       (messages.length?'<div class="plan-alert-details"><b>Datos pendientes por completar</b><ul>'+messages.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>'+(m.missing.length>messages.length?'<small>Y '+(m.missing.length-messages.length)+' pendientes más.</small>':'')+'</div>':'<div class="plan-alert-clear">✓ No hay campos obligatorios pendientes. Los datos están guardados.</div>')+
       '<div class="plan-color-legend"><span><i class="legend-filled"></i> Verde: dato registrado</span><span><i class="legend-missing"></i> Ámbar: falta completar</span><span><i class="legend-calculated"></i> Gris: cálculo automático</span></div>';
+    ['planDate','planOperator','planSupervisor'].forEach(id=>{const field=$('#'+id);if(!field)return;const filled=isFilled(field.value);field.classList.toggle('is-filled',filled);field.classList.toggle('is-missing',!filled);field.closest('label')?.classList.toggle('meta-complete',filled);field.closest('label')?.classList.toggle('meta-pending',!filled);});
     const shared=$('#planSharedStatus');
     if(shared){shared.classList.toggle('is-complete',m.general.length===0);shared.classList.toggle('is-pending',m.general.length>0);shared.textContent=m.general.length?'Pendiente: '+m.general.join(' · '):'Datos generales completos';}
     updatePlanStepper(m);
@@ -628,7 +630,7 @@
     refreshPlanFeedback();
   });
     $('#planPage').addEventListener('input',e=>{
-    if(['planDate','planOperator'].includes(e.target.id))refreshPlanFeedback();
+    if(['planDate','planOperator','planSupervisor'].includes(e.target.id))refreshPlanFeedback();
     markPlanChanged();
   });
   $('#planTestCards').addEventListener('paste',e=>{
