@@ -141,6 +141,7 @@ class ElectricalTestRepository
                     'equipment_brand'=>substr(trim((string)($test['equipment_brand'] ?? '')),0,100),
                     'equipment_model'=>substr(trim((string)($test['equipment_model'] ?? '')),0,100),
                     'equipment_serial'=>substr(trim((string)($test['equipment_serial'] ?? '')),0,100),
+                    'core_type'=>in_array((string)($test['core_type'] ?? 'NO_ESPECIFICADO'),['NO_ESPECIFICADO','TRES_COLUMNAS','CINCO_COLUMNAS','ACORAZADO','OTRO'],true)?(string)($test['core_type'] ?? 'NO_ESPECIFICADO'):'NO_ESPECIFICADO',
                     'observations'=>substr(trim((string)($test['observations'] ?? '')),0,4000),
                     'measurements'=>$testMeasurements
                 ];
