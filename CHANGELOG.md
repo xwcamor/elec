@@ -1,3 +1,10 @@
+## v1.5.105
+- Estandariza navegación por teclado en las tablas de ensayos: flechas, Enter, Tab y Shift+Tab.
+- Añade navegación horizontal a las grillas de TTR y ensayos específicos.
+- Incorpora navegación por teclado en las tablas del plan de ensayos.
+- Conserva el pegado de bloques TSV desde Excel en las grillas de mediciones y configuración.
+- Las columnas calculadas permanecen protegidas durante el pegado.
+
 ## v1.5.104
 - Vincula campos de bobinado, borne, bushing y TAP en plantillas de ensayos con los elementos reales de la configuración eléctrica.
 - Precarga filas para resistencia de devanados, aislamiento, excitación, bushings y capacitancia desde bobinados/terminales configurados.
