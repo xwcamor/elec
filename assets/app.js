@@ -253,7 +253,7 @@
 
   $('#openConfig').addEventListener('click', e => {e.preventDefault();openConfig();});
   $('#backOverview').addEventListener('click', backOverview);
-  $$$('.config-tab').forEach(b => b.addEventListener('click', () => showPanel(b.dataset.tab)));
+  $$('.config-tab').forEach(b => b.addEventListener('click', () => showPanel(b.dataset.tab)));
   $$('[data-prev]').forEach(b => b.addEventListener('click', () => showPanel(b.dataset.prev)));
   syncTransformerNominals();
 
