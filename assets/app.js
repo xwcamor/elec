@@ -1,6 +1,6 @@
 (() => {
   const $ = (s, root = document) => root.querySelector(s);
-  const $ = (s, root = document) => [...root.querySelectorAll(s)];
+  const queryAll = (s, root = document) => [...root.querySelectorAll(s)];
   // Indicador uniforme para cualquier campo marcado como obligatorio.
   function decorateRequiredLabels(root=document){
     const labels=[];
