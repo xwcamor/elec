@@ -11,31 +11,126 @@ class ElectricalConfigRepository
         $config = $stmt->fetch();
         if (!$config) return null;
 
-        $w = $this->pdo->prepare('SELECT * FROM eh_windings WHERE config_id = ? ORDER BY winding_order, id');
-        $w->execute([$config['id']]);
-        $windings = $w->fetchAll();
-        foreach ($windings as &$winding) {
-            $t = $this->pdo->prepare('SELECT t.*, b.serial_number, b.manufacturer AS bushing_manufacturer, b.model AS bushing_model, b.rated_voltage_kv, b.capacitance_pf, b.power_factor_percent, b.notes AS bushing_notes FROM eh_terminals t LEFT JOIN eh_bushings b ON b.terminal_id=t.id WHERE t.winding_id=? ORDER BY t.terminal_order, t.id');
-            $t->execute([$winding['id']]);
-            $winding['terminals'] = $t->fetchAll();
+        $configId = (int)$config['id'];
+
+        // Carga todos los bobinados, bornes y bushings en una sola consulta.
+        $windingStmt = $this->pdo->prepare(
+            'SELECT w.*, t.id AS terminal_id, t.terminal_order, t.terminal_code,
+                    t.phase_code, t.terminal_type, t.has_capacitive_bushing,
+                    b.serial_number, b.manufacturer AS bushing_manufacturer,
+                    b.model AS bushing_model, b.rated_voltage_kv,
+                    b.capacitance_pf, b.power_factor_percent, b.notes AS bushing_notes
+             FROM eh_windings w
+             LEFT JOIN eh_terminals t ON t.winding_id = w.id
+             LEFT JOIN eh_bushings b ON b.terminal_id = t.id
+             WHERE w.config_id = ?
+             ORDER BY w.winding_order, w.id, t.terminal_order, t.id'
+        );
+        $windingStmt->execute([$configId]);
+        $windingsById = [];
+        foreach ($windingStmt->fetchAll() as $row) {
+            $windingId = (int)$row['id'];
+            if (!isset($windingsById[$windingId])) {
+                $windingsById[$windingId] = [
+                    'id' => $windingId,
+                    'config_id' => (int)$row['config_id'],
+                    'winding_order' => (int)$row['winding_order'],
+                    'winding_name' => $row['winding_name'],
+                    'winding_code' => $row['winding_code'],
+                    'voltage_kv' => $row['voltage_kv'],
+                    'connection_type' => $row['connection_type'],
+                    'has_neutral' => (int)$row['has_neutral'],
+                    'conductor_material' => $row['conductor_material'],
+                    'notes' => $row['notes'],
+                    'terminals' => [],
+                ];
+            }
+            if ($row['terminal_id'] !== null) {
+                $terminal = [
+                    'id' => (int)$row['terminal_id'],
+                    'winding_id' => $windingId,
+                    'terminal_order' => (int)$row['terminal_order'],
+                    'terminal_code' => $row['terminal_code'],
+                    'phase_code' => $row['phase_code'],
+                    'terminal_type' => $row['terminal_type'],
+                    'has_capacitive_bushing' => (int)$row['has_capacitive_bushing'],
+                ];
+                if ((int)$row['has_capacitive_bushing'] === 1) {
+                    $terminal['bushing'] = [
+                        'serial_number' => $row['serial_number'],
+                        'manufacturer' => $row['bushing_manufacturer'],
+                        'model' => $row['bushing_model'],
+                        'rated_voltage_kv' => $row['rated_voltage_kv'],
+                        'capacitance_pf' => $row['capacitance_pf'],
+                        'power_factor_percent' => $row['power_factor_percent'],
+                        'notes' => $row['bushing_notes'],
+                    ];
+                }
+                $windingsById[$windingId]['terminals'][] = $terminal;
+            }
         }
-        unset($winding);
-        $tc = $this->pdo->prepare('SELECT * FROM eh_tap_changers WHERE config_id = ? ORDER BY id');
-        $tc->execute([$config['id']]);
-        $changers = $tc->fetchAll();
-        foreach ($changers as &$changer) {
-            $p = $this->pdo->prepare('SELECT * FROM eh_tap_positions WHERE tap_changer_id = ? ORDER BY position_no');
-            $p->execute([$changer['id']]);
-            $changer['positions'] = $p->fetchAll();
+        $windings = array_values($windingsById);
+
+        // Carga conmutadores y posiciones de TAP en una sola consulta adicional.
+        $changerStmt = $this->pdo->prepare(
+            'SELECT c.*, p.id AS position_id, p.position_no, p.label AS position_label,
+                    p.voltage_kv AS position_voltage_kv,
+                    p.percent_change, p.is_neutral, p.notes AS position_notes
+             FROM eh_tap_changers c
+             LEFT JOIN eh_tap_positions p ON p.tap_changer_id = c.id
+             WHERE c.config_id = ?
+             ORDER BY c.id, p.position_no'
+        );
+        $changerStmt->execute([$configId]);
+        $changersById = [];
+        foreach ($changerStmt->fetchAll() as $row) {
+            $changerId = (int)$row['id'];
+            if (!isset($changersById[$changerId])) {
+                $changersById[$changerId] = [
+                    'id' => $changerId,
+                    'config_id' => (int)$row['config_id'],
+                    'winding_id' => (int)$row['winding_id'],
+                    'changer_name' => $row['changer_name'],
+                    'changer_type' => $row['changer_type'],
+                    'operation_type' => $row['operation_type'],
+                    'min_position' => $row['min_position'],
+                    'max_position' => $row['max_position'],
+                    'neutral_position' => $row['neutral_position'],
+                    'current_position' => $row['current_position'],
+                    'notes' => $row['notes'],
+                    'positions' => [],
+                ];
+            }
+            if ($row['position_id'] !== null) {
+                $changersById[$changerId]['positions'][] = [
+                    'id' => (int)$row['position_id'],
+                    'tap_changer_id' => $changerId,
+                    'position_no' => (int)$row['position_no'],
+                    'label' => $row['position_label'],
+                    'voltage_kv' => $row['position_voltage_kv'],
+                    'percent_change' => $row['percent_change'],
+                    'is_neutral' => (int)$row['is_neutral'],
+                    'notes' => $row['position_notes'],
+                ];
+            }
         }
-        unset($changer);
-        $v = $this->pdo->prepare('SELECT version_no, created_at FROM eh_electrical_config_versions WHERE config_id=? ORDER BY version_no DESC LIMIT 8');
-        $v->execute([$config['id']]);
+
+        $versionsStmt = $this->pdo->prepare(
+            'SELECT version_no, created_at FROM eh_electrical_config_versions
+             WHERE config_id = ? ORDER BY version_no DESC LIMIT 8'
+        );
+        $versionsStmt->execute([$configId]);
+
         return [
-            'id' => (int)$config['id'], 'phase_count' => (int)$config['phase_count'],
-            'vector_group' => $config['vector_group'], 'frequency_hz' => $config['frequency_hz'],
-            'notes' => $config['notes'], 'version_no' => (int)$config['version_no'],
-            'windings' => $windings, 'tap_changers' => $changers, 'versions' => $v->fetchAll(),
+            'id' => $configId,
+            'phase_count' => (int)$config['phase_count'],
+            'vector_group' => $config['vector_group'],
+            'frequency_hz' => $config['frequency_hz'],
+            'notes' => $config['notes'],
+            'version_no' => (int)$config['version_no'],
+            'windings' => $windings,
+            'tap_changers' => array_values($changersById),
+            'versions' => $versionsStmt->fetchAll(),
         ];
     }
 
