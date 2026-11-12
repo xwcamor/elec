@@ -1,3 +1,11 @@
+## v1.5.117
+- Simplifica la tabla de bornes: elimina la columna de notas y conserva los datos de los elementos capacitivos existentes.
+- Renombra el indicador a «¿Capacitivo?» y la columna «Tipo» a «Función» con opciones Fase, Neutro, Tierra, Auxiliar y Otro.
+- La fase/designación pasa a ser editable y admite nomenclaturas personalizadas de hasta 8 caracteres.
+- Al escribir U1/V1/W1/A1/B1/C1 se propone automáticamente la fase correspondiente y la función Fase; N1 propone N y Neutro. Designaciones no reconocidas quedan para edición manual.
+- El código de borne se normaliza a mayúsculas y admite hasta 20 caracteres; PHP valida los límites y guarda en mayúsculas.
+- El copiado de bornes refleja las columnas actuales y omite las notas.
+
 ## v1.5.116
 - Corriente de excitación se organiza por TAP seleccionado: una fila por TAP y tres grupos de fase U-0, V-0 y W-0, cada uno con corriente de excitación (mA) y pérdidas (W).
 - Tensión de prueba y frecuencia quedan visibles por TAP; la frecuencia se propone desde la configuración del transformador y la tensión se registra en el ensayo.
