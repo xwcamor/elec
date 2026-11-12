@@ -510,10 +510,15 @@
     const errors=[];const codes=new Set();
     state.windings.forEach((w,wi)=>{
       const code=(w.code||'').trim().toUpperCase();
-      if(!w.name.trim())errors.push(`El bobinado ${wi+1} necesita un nombre.`);
+      if(!String(w.name||'').trim())errors.push(`El bobinado ${wi+1} necesita un nombre.`);
       if(!code)errors.push(`El bobinado ${wi+1} necesita un código.`);
       else if(codes.has(code))errors.push(`El código de bobinado ${code} está repetido.`);else codes.add(code);
+      const voltage=Number(w.voltage_kv);
+      if(!Number.isFinite(voltage)||voltage<=0)errors.push(`Indica una tensión nominal válida para el bobinado ${w.name||wi+1}.`);
+      if(!String(w.connection_type||'').trim())errors.push(`Selecciona la conexión del bobinado ${w.name||wi+1}.`);
       const terminalCodes=new Set();
+      const activeTerminals=(w.terminals||[]).filter(t=>String(t.code||'').trim()||String(t.phase||'').trim()||t.has_capacitive_bushing);
+      if(!activeTerminals.length)errors.push(`Agrega al menos un borne al bobinado ${w.name||wi+1}.`);
       w.terminals.forEach((t,ti)=>{
         const terminal=(t.code||'').trim().toUpperCase();
         const b=t.bushing||{};
@@ -538,10 +543,13 @@
 
   async function saveConfig(){
     if(!state.windings.length){toast('Debes configurar al menos un bobinado.',true);showPanel('windings');return;}
+    const windingProgress=getWindingProgress(),tapProgress=getTapProgress();
+    if(!windingProgress.complete){toast(windingProgress.issues[0]||'Completa los datos obligatorios de todos los bobinados y bornes.',true);showPanel('windings');return;}
+    if(!tapProgress.complete&&!tapProgress.optional){toast(tapProgress.issues[0]||'Completa los conmutadores y sus posiciones de TAP.',true);showPanel('taps');return;}
     const validationErrors=validateConfiguration();if(validationErrors.length){toast(validationErrors[0],true);showPanel(validationErrors[0].includes('posición')?'taps':'windings');return;}
     if(PILOT.demo){toast('Estás en modo demostración. Conecta MySQL y selecciona un registro real de transformers para guardar.',true);return;}
     if(!PILOT.schemaReady){toast('Importa database/schema.sql en la base de datos del sistema.',true);return;}
-    const btns=[$('#saveConfig'),$('#saveConfigBottom')].filter(Boolean);btns.forEach(b=>{b.disabled=true;b.textContent='Guardando...';});
+    const btns=[$('#saveConfig')].filter(Boolean);btns.forEach(b=>{b.disabled=true;b.textContent='Guardando...';});
     try{
       const payload=collectPayload();
       const response=await fetch(api('action=save'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
@@ -566,7 +574,7 @@
       toast('Configuración guardada y verificada en MySQL · versión '+state.version_no+'.');
     }catch(error){toast(error.message,true);}finally{btns.forEach(b=>{b.disabled=false;b.innerHTML='<svg><use href="#i-check"/></svg>Guardar configuración';});}
   }
-  $('#saveConfig').addEventListener('click',saveConfig);$('#saveConfigBottom')?.addEventListener('click',saveConfig);
+  $('#saveConfig')?.addEventListener('click',saveConfig);
 
   // Search the existing transformers table; the displayed code is not assumed to be its PK.
   let searchTimer=null;
