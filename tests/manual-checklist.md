@@ -94,3 +94,14 @@
 - [ ] Recargar la página y confirmar que bobinados, bornes, bushings, conmutadores y posiciones siguen presentes.
 - [ ] Retirar temporalmente una tabla eh_ en una base de pruebas y confirmar que el sistema bloquea el guardado indicando su nombre; no realizar esta prueba en una base con datos reales.
 - [ ] Simular un error SQL en una base de pruebas y confirmar que la interfaz muestra el detalle técnico devuelto por PHP.
+
+## v1.5.34 — Validación LAP
+- [ ] Factor de potencia: seis modos; capacitancia opcional y sin unidad inventada.
+- [ ] Excitación: TAP, fase, frecuencia, corriente y pérdidas; sin tensión forzada.
+- [ ] Resistencia: corrientes iniciales vacías; resistencias medida y referida 75 °C.
+- [ ] Aislamiento: tres puntos, lecturas 15/30/45/60 s e índice R(1 min)/R(30 s).
+- [ ] Bushings: bornes desde configuración; variación calculada; sin umbral FP.
+- [ ] Pararrayos: campos sin unidades forzadas ni evaluación automática inventada.
+- [ ] Abrir datos antiguos y verificar alias históricos.
+- [ ] Stepper de cuatro etapas y grillas compactas; pegado TSV.
+- [ ] Historial con etiqueta «Ejecuciones».
