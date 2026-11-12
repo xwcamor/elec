@@ -464,7 +464,7 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.138"></script>
+<script src="./assets/app.js?v=1.5.140"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="./assets/plan.js?v=1.5.127"></script>
 </body></html>
