@@ -1,3 +1,7 @@
+## 1.5.47
+- Unifica la apertura de registros desde Resumen e Historial: ambos accesos abren el editor de planes por etapas.
+- Elimina el enlace del Resumen al formulario antiguo de edición y evita el manejador duplicado del Historial.
+- El botón de acceso desde los registros de atención se denomina «Abrir plan».
 ## 1.5.46
 - El botón de salida de Pruebas eléctricas ahora dice «Volver al transformador».
 - El Resumen elimina el banner explicativo y muestra un bloque de registros que requieren atención, con acceso directo para abrirlos.
