@@ -149,8 +149,52 @@ class ElectricalConfigRepository
         $changers = is_array($payload['tap_changers'] ?? null) ? $payload['tap_changers'] : [];
         if (!$windings) throw new InvalidArgumentException('Agrega al menos un bobinado antes de guardar.');
 
+        $phaseCount = (int)($payload['phase_count'] ?? 3);
+        if (!in_array($phaseCount, [1, 3], true)) throw new InvalidArgumentException('La cantidad de fases debe ser 1 o 3.');
+        $frequency = $payload['frequency_hz'] ?? '';
+        if ($frequency !== '' && (!is_numeric($frequency) || (float)$frequency <= 0)) {
+            throw new InvalidArgumentException('La frecuencia debe ser un valor numérico mayor que cero.');
+        }
+        $windingCodes = [];
+        foreach ($windings as $wIndex => $winding) {
+            if (!is_array($winding)) throw new InvalidArgumentException('Hay un bobinado con datos inválidos.');
+            $name = trim((string)($winding['name'] ?? ''));
+            $code = strtoupper(trim((string)($winding['code'] ?? '')));
+            if ($name === '') throw new InvalidArgumentException('El bobinado '.($wIndex + 1).' necesita un nombre.');
+            if ($code === '') throw new InvalidArgumentException('El bobinado '.($wIndex + 1).' necesita un código.');
+            if (isset($windingCodes[$code])) throw new InvalidArgumentException('El código de bobinado '.$code.' está repetido.');
+            $windingCodes[$code] = true;
+            $terminalCodes = [];
+            foreach (($winding['terminals'] ?? []) as $tIndex => $terminal) {
+                if (!is_array($terminal)) continue;
+                $terminalCode = strtoupper(trim((string)($terminal['code'] ?? '')));
+                $hasData = $terminalCode !== '' || trim((string)($terminal['phase'] ?? '')) !== '' || !empty($terminal['has_capacitive_bushing']);
+                if (!$hasData) continue;
+                if ($terminalCode === '') throw new InvalidArgumentException('Falta el código del borne '.($tIndex + 1).' en '.$name.'.');
+                if (isset($terminalCodes[$terminalCode])) throw new InvalidArgumentException('El borne '.$terminalCode.' está repetido en '.$name.'.');
+                $terminalCodes[$terminalCode] = true;
+            }
+        }
+        foreach ($changers as $cIndex => $changer) {
+            if (!is_array($changer)) throw new InvalidArgumentException('Hay un conmutador con datos inválidos.');
+            $windingIndex = $changer['winding_index'] ?? null;
+            if (!is_numeric($windingIndex) || (int)$windingIndex < 0 || (int)$windingIndex >= count($windings)) {
+                throw new InvalidArgumentException('El conmutador '.($cIndex + 1).' debe estar asociado a un bobinado válido.');
+            }
+            $positions = [];
+            foreach (($changer['positions'] ?? []) as $position) {
+                if (!is_array($position)) continue;
+                $rawPosition = trim((string)($position['position_no'] ?? ''));
+                if ($rawPosition === '') continue;
+                if (!ctype_digit($rawPosition) || (int)$rawPosition < 1) throw new InvalidArgumentException('Las posiciones de TAP deben ser enteros positivos.');
+                $positionNo = (int)$rawPosition;
+                if (isset($positions[$positionNo])) throw new InvalidArgumentException('La posición '.$positionNo.' está duplicada en '.$changer['name'].'.');
+                $positions[$positionNo] = true;
+            }
+        }
+
         $snapshot = [
-            'phase_count' => (int)($payload['phase_count'] ?? 3),
+            'phase_count' => $phaseCount,
             'vector_group' => trim((string)($payload['vector_group'] ?? '')),
             'frequency_hz' => (($payload['frequency_hz'] ?? '') !== '' && is_numeric($payload['frequency_hz'] ?? null)) ? (float)$payload['frequency_hz'] : null,
             'notes' => trim((string)($payload['notes'] ?? '')),
