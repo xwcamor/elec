@@ -1,3 +1,11 @@
+## v1.5.88
+- Elimina la etapa «Datos eléctricos generales»: fases, grupo vectorial y frecuencia se toman de la ficha del transformador y dejan de presentarse como campos configurables.
+- Reduce el asistente a tres etapas: Bobinados y bornes, Conmutadores y TAP, y Revisión y versiones.
+- Elimina la duplicidad de acciones de guardado: el botón «Guardar configuración» aparece únicamente al final de la revisión.
+- La navegación lateral y los botones de avance validan las etapas previas antes de permitir continuar o guardar.
+- Refuerza la validación de tensión nominal, conexión y bornes por bobinado tanto en cliente como en servidor.
+- Ajusta la navegación al cambiar de transformador para no acceder a campos retirados.
+
 ## v1.5.87
 - Sustituye los indicadores de salud y resultados de ejemplo por estados reales de configuración y disponibilidad del piloto; no muestra un 100/100 ficticio.
 - Mejora la jerarquía de las tarjetas de módulos, los estados de foco y las microinteracciones; respeta la preferencia del sistema por movimiento reducido.
