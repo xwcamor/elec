@@ -1,3 +1,8 @@
+## 1.5.68
+- Simplifica el stepper progresivo: muestra únicamente los cuatro números, sin títulos ni descripciones permanentes.
+- Los títulos y el contexto permanecen dentro del contenido de cada etapa activa.
+- Centra los indicadores numéricos y reduce la altura de la navegación, también en móvil.
+
 ## 1.5.67
 - Corrige un fragmento residual `ion>` que quedó visible al retirar el panel de avance del plan.
 
