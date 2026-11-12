@@ -174,7 +174,7 @@
     const ready=perItem.filter(x=>x.metrics.complete).length;
     const completed=ready;
     const missing=[];
-    general.forEach(x=>missing.push('Datos de visita: falta '+x));
+    general.forEach(x=>missing.push('Datos generales: falta '+x));
     perItem.forEach(({item,metrics})=>{
       metrics.missing.slice(0,5).forEach(msg=>missing.push(item.name+': '+msg));
       if(metrics.missing.length>5)missing.push(item.name+': y '+(metrics.missing.length-5)+' pendientes más');
@@ -332,7 +332,7 @@
       const metrics=itemMetrics(item),label=metrics.complete?'Completo':(metrics.anyData?'En curso':'Pendiente');
       return '<li><span class="plan-review-index">'+String(index+1).padStart(2,'0')+'</span><div><b>'+esc(item.name)+'</b><small>'+item.rows.length+' fila(s) · '+metrics.percent+'% de campos mínimos</small></div><strong data-state="'+metrics.state+'">'+label+'</strong></li>';
     }).join('');
-    host.innerHTML='<div class="plan-review-metrics"><div><b>'+items.length+'</b><span>Ensayos</span></div><div><b>'+m.percent+'%</b><span>Avance general</span></div><div><b>'+m.missing.length+'</b><span>Pendientes</span></div></div><ul class="plan-review-list">'+rows+'</ul><p class="plan-review-note">'+(m.complete?'Los datos mínimos están completos. Puedes guardar el registro.':'Puedes guardar como borrador y continuar después. Los campos pendientes se conservan.')+'</p>'+(m.missing.length?'<details class="plan-review-pending"><summary>Ver datos pendientes</summary><ul>'+m.missing.slice(0,12).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></details>':'');
+    host.innerHTML='<div class="plan-review-metrics"><div><b>'+items.length+'</b><span>Ensayos</span></div><div><b>'+m.percent+'%</b><span>Avance general</span></div><div><b>'+m.missing.length+'</b><span>Pendientes</span></div></div><ul class="plan-review-list">'+rows+'</ul><p class="plan-review-note">'+(m.complete?'Todos los ensayos están completos. Confirma el registro para cerrarlo.':'Los cambios se guardan automáticamente. Completa los ensayos pendientes y luego confirma el registro.')+'</p>'+(m.missing.length?'<details class="plan-review-pending"><summary>Ver datos pendientes</summary><ul>'+m.missing.slice(0,12).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></details>':'');
   }
   function renderTestNav(){
     const host=$('#planTestNav');if(!host)return;
@@ -495,7 +495,7 @@
       editRevision=0;savedRevision=0;
       activeTestIndex=0;render();$('#planTitle').textContent='Registro de pruebas #'+editingId;
       if($('#saveTestPlan'))$('#saveTestPlan').innerHTML='<svg><use href="#i-check"/></svg>Guardar cambios';
-      setSaveStatus('Datos guardados · puedes continuar completando el plan','saved');
+      setSaveStatus('Cambios guardados · puedes continuar el registro','saved');
       bridge.showPage('planPage');setPlanStep(items.length?'results':'shared');
     }catch(e){toast(e.message,true);}
   }
@@ -510,7 +510,7 @@
     });
     if(duplicate){
       const name=duplicate.name||duplicate.code;
-      setSaveStatus('Hay un ensayo duplicado en el plan','warning');
+      setSaveStatus('Hay un ensayo duplicado en el registro','warning');
       if(!automatic)toast('«'+name+'» ya está incluido en este registro. Cada ensayo solo puede agregarse una vez por jornada.',true);
       return false;
     }
@@ -532,7 +532,7 @@
     const metrics=planMetrics();
     const complete=metrics.complete;
     if(confirmCompletion&&!complete){setSaveStatus('Hay datos pendientes por completar','warning');toast('Completa todos los ensayos antes de confirmar el registro.',true);return false;}
-    const hasWork=items.some(item=>itemMetrics(item).anyData)||!!($('#planOperator').value.trim()||$('#planSupervisor').value.trim()||$('#planOilTemp').value||$('#planAmbientTemp').value||$('#planHumidity').value||$('#planObservations').value.trim());
+    const hasWork=items.some(item=>itemMetrics(item).anyData||!!(item.standard_reference||item.equipment_name||item.equipment_brand||item.equipment_model||item.equipment_serial||item.observations))||!!($('#planOperator').value.trim()||$('#planSupervisor').value.trim()||$('#planOilTemp').value||$('#planAmbientTemp').value||$('#planHumidity').value||$('#planObservations').value.trim());
     const payload={
       id:editingId,transformer_key:transformer().key,test_code:'PLAN',
       executed_at:date,status:confirmCompletion?'COMPLETADA':(hasWork?'EN_PROCESO':'BORRADOR'),
