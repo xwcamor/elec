@@ -167,7 +167,7 @@ class ElectricalConfigRepository
             $windingCodes[$code] = true;
             $voltage = $winding['voltage_kv'] ?? null;
             if (!is_numeric($voltage) || (float)$voltage <= 0) throw new InvalidArgumentException('Indica una tensión nominal válida para el bobinado '.$name.'.');
-            if (trim((string)($winding['connection_type'] ?? '')) === '') throw new InvalidArgumentException('Selecciona la conexión del bobinado '.$name.'.');
+
             $terminalCodes = [];
             $activeTerminals = 0;
             foreach (($winding['terminals'] ?? []) as $tIndex => $terminal) {
