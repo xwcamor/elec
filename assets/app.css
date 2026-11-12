@@ -804,3 +804,17 @@ body.test-form-focus .plan-tests-section{scroll-margin-top:84px}
 .plan-picker-option.is-selected .plan-picker-state{color:#39845c}
 .plan-picker-option:focus-within{outline:3px solid rgba(48,125,183,.18);outline-offset:2px}
 @media(max-width:720px){.plan-test-picker{grid-template-columns:1fr}.plan-test-picker-head{align-items:flex-start;flex-direction:column}.plan-picker-option{min-height:64px}}
+
+/* Resumen: atención prioritaria de registros pendientes */
+.test-attention-card{background:#fff;border:1px solid var(--ui-line);border-radius:8px;margin:0 0 15px;box-shadow:var(--ui-shadow);overflow:hidden}
+.test-attention-head{padding:15px 18px;border-bottom:1px solid var(--ui-line)}
+.test-attention-head h3{margin:4px 0;font-size:15px;color:#253b4f}
+.test-attention-head p{margin:0;color:#82909c;font-size:10px}
+.test-attention-list{padding:0 18px}
+.test-attention-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid #edf0f2}
+.test-attention-row:last-child{border-bottom:0}
+.test-attention-copy{display:grid;gap:3px;min-width:0}
+.test-attention-copy b{font-size:11px;color:#40566b}
+.test-attention-copy span{font-size:10px;color:#82909c;overflow-wrap:anywhere}
+.test-attention-empty{padding:17px 0;color:#688071;font-size:11px}
+@media(max-width:650px){.test-attention-row{grid-template-columns:minmax(0,1fr) auto;gap:8px}.test-attention-row .btn{grid-column:1/-1;justify-self:start}}
