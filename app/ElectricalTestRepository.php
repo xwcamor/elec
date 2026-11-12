@@ -82,10 +82,16 @@ class ElectricalTestRepository
         $date=trim((string)($p['executed_at']??''));
         if($key==='') throw new InvalidArgumentException('No se identificó el transformador.');
         if($code==='') throw new InvalidArgumentException('Selecciona el tipo de prueba.');
-        $dt=DateTime::createFromFormat('Y-m-d\\TH:i',$date);
-        if(!$dt) $dt=DateTime::createFromFormat('Y-m-d H:i:s',$date);
-        if(!$dt) throw new InvalidArgumentException('Ingresa la fecha y hora en que se realizó la prueba.');
-        $executedAt=$dt->format('Y-m-d H:i:s');
+        $dt = DateTime::createFromFormat('!Y-m-d\\TH:i', $date);
+        $dateErrors = DateTime::getLastErrors();
+        if (!$dt || ($dateErrors && ($dateErrors['warning_count'] > 0 || $dateErrors['error_count'] > 0))) {
+            $dt = DateTime::createFromFormat('!Y-m-d H:i:s', $date);
+            $dateErrors = DateTime::getLastErrors();
+        }
+        if (!$dt || ($dateErrors && ($dateErrors['warning_count'] > 0 || $dateErrors['error_count'] > 0))) {
+            throw new InvalidArgumentException('Ingresa una fecha y hora válida para la realización de la prueba.');
+        }
+        $executedAt = $dt->format('Y-m-d H:i:s');
         $typeSt=$this->pdo->prepare('SELECT id FROM eh_test_types WHERE code=? LIMIT 1');
         $typeSt->execute([$code]); $type=$typeSt->fetch();
         if(!$type) throw new InvalidArgumentException('El tipo de prueba no existe en el catálogo.');
@@ -106,6 +112,7 @@ class ElectricalTestRepository
         }
         $storedPayload = ['measurements'=>$clean];
         $plan = $p['plan'] ?? null;
+        if ($status === 'COMPLETADA' && !is_array($plan)) throw new InvalidArgumentException('No se puede completar un registro sin el detalle de sus ensayos.');
         if (is_array($plan)) {
             $tests = $plan['tests'] ?? [];
             if (!is_array($tests) || count($tests) > 20) throw new InvalidArgumentException('Un registro admite hasta 20 ensayos.');
