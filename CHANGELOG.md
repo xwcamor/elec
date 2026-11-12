@@ -1,3 +1,8 @@
+## v1.5.101
+- Convierte «Bornes y terminales» en una sección fija dentro de cada bobinado; deja de comportarse como acordeón.
+- Reorganiza el encabezado con el contador de registros y acciones «+ Fila» / «Copiar bornes» alineadas.
+- Separa visualmente la sección y el contenido de la tabla para mejorar jerarquía, espaciado y adaptación móvil.
+
 ## v1.5.100
 - Retira los campos «Código» y «Notas» de la edición de bobinados.
 - Actualiza «Copiar bobinados» para incluir solo nombre, tensión, conexión y neutro.
