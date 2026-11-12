@@ -81,7 +81,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.56">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.57">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -340,6 +340,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
         <p id="planResultsAccordionMeta">Ensayos seleccionados</p>
         <span class="plan-results-accordion-status" id="planResultsAccordionStatus"></span>
       </div>
+      <div id="planTestNav" hidden aria-hidden="true"></div>
       <div id="planTestCards"><div class="empty-state">Selecciona los ensayos para que aparezcan aquí sus formularios.</div></div>
     </section>
     <section class="execution-card plan-step-panel" id="planReviewSection" data-plan-panel="review" hidden>
@@ -471,6 +472,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.56"></script>
-<script src="./assets/plan.js?v=1.5.56"></script>
+<script src="./assets/app.js?v=1.5.57"></script>
+<script src="./assets/plan.js?v=1.5.57"></script>
 </body></html>
