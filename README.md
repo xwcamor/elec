@@ -99,3 +99,25 @@ La aplicación admite entre 1 y 150 posiciones TAP por conmutador. El límite se
 
 
 La cantidad de posiciones indicada en la ficha técnica se compara con los conmutadores configurados. Si difiere, el usuario puede sincronizar las filas conservando las existentes y confirmando antes de descartar filas con datos. La sincronización afecta únicamente el borrador de configuración; las versiones y ensayos anteriores permanecen intactos.
+
+
+## Pendientes para pruebas de cierre (Laragon + MySQL)
+
+Esta lista queda como guía para la siguiente ronda de pruebas funcionales. Marcar cada punto solo después de comprobarlo en el entorno local.
+
+- [ ] Crear una configuración eléctrica inicial y verificar que se guarde en MySQL.
+- [ ] Crear un ensayo en borrador con la versión 1 (por ejemplo, 5 TAP).
+- [ ] Crear después una versión 2 con otra cantidad de TAP (por ejemplo, 20).
+- [ ] Reabrir el borrador de la versión 1 y comprobar que conserva su versión y fotografía original.
+- [ ] Completar el ensayo antiguo y verificar que no adopta los TAP de la versión 2.
+- [ ] Sincronizar una configuración con menos posiciones; confirmar que conserva las filas existentes que caben.
+- [ ] Comprobar que solicita confirmación antes de eliminar filas sobrantes con datos.
+- [ ] Verificar que las versiones históricas y ensayos anteriores no se modifican tras sincronizar.
+- [ ] Probar varios conmutadores asociados a bobinados distintos.
+- [ ] Probar pegado desde Excel y copia de tablas de bornes y posiciones TAP.
+- [ ] Intentar guardar 0, negativos, decimales, 151 y 100000000 TAP desde la interfaz.
+- [ ] Enviar una petición directa a la API con una cantidad superior a 150 y confirmar el rechazo del servidor.
+- [ ] Probar los mensajes de validación al intentar avanzar con bobinados, bornes o TAP incompletos.
+- [ ] Revisar en el navegador que no haya errores JavaScript y comprobar el flujo completo de alta, edición, guardado y reapertura.
+
+**Criterio de cierre:** todos los puntos anteriores comprobados con datos de prueba en Laragon/MySQL, sin alterar registros reales.
