@@ -2005,3 +2005,13 @@ body.config-focus .config-field input[required]:placeholder-shown:focus{backgrou
  vertical-align:baseline!important;
 }
 .config-layout .sheet-table th .required-mark{margin-left:3px!important}
+
+
+/* v1.5.144 · El paso activo conserva prioridad visual frente al estado pendiente. */
+.config-stepper>.config-view-tab.active>.plan-step-number,
+.config-stepper>.config-view-tab[aria-current="step"]>.plan-step-number{
+ border-color:#2475b2!important;
+ background:#2475b2!important;
+ color:#fff!important;
+ box-shadow:0 0 0 5px rgba(36,117,178,.10)!important;
+}
