@@ -1,3 +1,8 @@
+## v1.5.111
+- Añade «Exportar PDF» por registro en el historial.
+- El informe incluye identificación del transformador, datos generales de ejecución, cada ensayo, su estado, todas las mediciones, unidades, notas y observaciones.
+- Compatible con registros agrupados (PLAN) y ejecuciones individuales heredadas. El navegador permite imprimir o guardar como PDF.
+
 ## v1.5.110
 - Encabezados de factor de potencia: «Factor de Potencia medido (%)» y «Factor de Potencia corregido (%)».
 - Los seis modos iniciales ahora se pueden reducir; solo se impide eliminar la última fila.
