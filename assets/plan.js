@@ -390,12 +390,12 @@
       return '<details class="plan-test-card" data-test-index="'+idx+'" data-state="'+metrics.state+'" '+(shouldOpen?'open':'')+'>'+
         '<summary class="plan-test-card-head"><span class="plan-test-index">'+String(idx+1).padStart(2,'0')+'</span><span class="plan-test-heading"><b>'+esc(item.name)+'</b><small data-card-progress>'+metrics.filled+'/'+metrics.total+' campos · '+metrics.percent+'%</small></span><span class="plan-card-state" data-state="'+metrics.state+'">'+(metrics.complete?'Completo':metrics.anyData?'En curso':'Pendiente')+'</span><span class="plan-card-chevron">⌄</span></summary>'+
         '<div class="plan-test-body">'+
-        '<details class="plan-optional-details plan-test-meta-details"><summary><span>Equipo y referencia</span><small>Instrumento, marca, modelo, serie y norma</small></summary>'+
+        '<section class="plan-test-meta-card"><div class="plan-test-meta-card-head"><b>Equipo y referencia</b><small>Instrumento, marca, modelo, serie y norma</small></div>'+
         '<div class="plan-test-meta-grid"><label>Norma / referencia<input data-meta="standard_reference" value="'+esc(item.standard_reference)+'" placeholder="Norma o protocolo"></label>'+
         '<label data-meta-wrap="equipment_name">Equipo<input data-meta="equipment_name" value="'+esc(item.equipment_name)+'" placeholder="Instrumento"></label>'+
         '<label data-meta-wrap="equipment_brand">Marca<input data-meta="equipment_brand" value="'+esc(item.equipment_brand)+'" placeholder="Marca"></label>'+
         '<label data-meta-wrap="equipment_model">Modelo<input data-meta="equipment_model" value="'+esc(item.equipment_model)+'" placeholder="Modelo"></label>'+
-        '<label data-meta-wrap="equipment_serial">N.º de serie<input data-meta="equipment_serial" value="'+esc(item.equipment_serial)+'" placeholder="Serie"></label></div></details>'+hint+
+        '<label data-meta-wrap="equipment_serial">N.º de serie<input data-meta="equipment_serial" value="'+esc(item.equipment_serial)+'" placeholder="Serie"></label></div></section>'+hint+
         '<div class="plan-table-toolbar"><div><b>Mediciones del ensayo</b><small><i class="required-mark">*</i> Campo requerido · Puedes pegar desde Excel.</small><small class="plan-row-summary" data-row-summary></small></div><button class="btn small secondary-action" type="button" data-add-row="'+idx+'">+ Fila</button></div>'+
         '<div class="measurement-sheet-wrap plan-grid-wrap"><table class="measurement-sheet plan-sheet"><thead>'+head+'</thead><tbody>'+body+'</tbody></table></div>'+
         '<details class="plan-optional-details plan-observation-details"><summary><span>Observaciones del ensayo</span><small>Notas e incidencias</small></summary><label class="plan-test-observations"><textarea data-meta="observations" rows="2" placeholder="Resultados, incidencias y comentarios">'+esc(item.observations)+'</textarea></label></details>'+
