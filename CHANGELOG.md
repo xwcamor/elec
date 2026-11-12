@@ -1,3 +1,8 @@
+## v1.5.98
+- Retira la columna «Serie bushing» de la grilla de bornes en Configuración eléctrica.
+- Actualiza «Copiar bornes» para excluir la serie y mantener correspondencia con las columnas visibles.
+- Los datos de serie previamente almacenados no se eliminan; solo dejan de mostrarse y editarse en esta grilla.
+
 ## v1.5.97
 - Elimina los campos editables Tipo y Accionamiento de cada conmutador; se conservan internamente los valores existentes para no alterar datos ni compatibilidad.
 - Retira el indicador «Origen: Base de datos» de la tarjeta de ficha técnica.
