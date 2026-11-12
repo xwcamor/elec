@@ -1013,7 +1013,7 @@
   function renderTtrRows(rows){
     const body=$('#ttrRows'); if(!body)return;
     body.innerHTML=(rows||[]).map((raw,i)=>{const r=ttrCalc(raw);return `<tr>
-      <td><input class="ttr-cell" data-r="${i}" data-c="0" value="${esc(r.tap||i+1)}"></td>
+      <td><select class="ttr-cell contextual-select" data-r="${i}" data-c="0">${[['','Selecciona TAP'],...configuredTapOptions()].map(([v,label])=>'<option value="'+esc(v)+'" '+(String(r.tap||i+1)===String(v)?'selected':'')+'>'+esc(label)+'</option>').join('')}</select></td>
       <td><input class="ttr-cell numeric" data-r="${i}" data-c="1" value="${esc(r.at||'')}"></td>
       <td><input class="ttr-cell numeric" data-r="${i}" data-c="2" value="${esc(r.bt||'')}"></td>
       <td><input class="ttr-cell numeric ttr-calculated" data-r="${i}" data-c="3" value="${esc(r.theoretical||'')}" readonly title="V AT / (V BT × √3)"></td>
@@ -1182,7 +1182,15 @@
     $('#measurementGenericCard')?.classList.toggle('hidden',isTtr||isSpecific);
     if(activeSpecificCode!==code && $('#specificTestRows'))$('#specificTestRows').innerHTML='';
     activeSpecificCode=isSpecific?code:'';
-    if(isSpecific){const cfg=specificTemplates[code];const needs=testElementNeeds[code]||[];$('#specificTestTitle').textContent=cfg.title;$('#specificTestHint').textContent=cfg.hint+' Elementos de configuración utilizados: '+needs.join(' · ')+'.';if(!$('#specificTestRows').children.length){let initial=Array.from({length:Math.max(3,(state.windings||[]).length)},()=>({}));if(code==='BUSHING'){const configured=(state.windings||[]).flatMap(w=>w.terminals||[]).filter(t=>t.has_capacitive_bushing).map(t=>({terminal:t.code||'',serial:t.bushing?.serial_number||''}));if(configured.length)initial=configured;}renderSpecificRows(initial,code);}}
+    if(isSpecific){const cfg=specificTemplates[code];const needs=testElementNeeds[code]||[];$('#specificTestTitle').textContent=cfg.title;$('#specificTestHint').textContent=cfg.hint+' Elementos de configuración utilizados: '+needs.join(' · ')+'.';if(!$('#specificTestRows').children.length){
+        let initial=Array.from({length:Math.max(1,(state.windings||[]).length)},()=>({}));
+        if(code==='WINDING_RESISTANCE')initial=(state.windings||[]).map(w=>({winding:w.name||'',tap:'',phase:''}));
+        if(code==='INSULATION_RESISTANCE'){const points=contextOptionsForField(code,'point')||[];initial=points.map(([point])=>({point}));}
+        if(code==='EXCITATION'){const terminals=configuredTerminalOptions(false);initial=terminals.map(([phase])=>({tap:'',phase,frequency_hz:String(transformer.frequency_hz||state.frequency_hz||'')}));}
+        if(code==='BUSHING'){const configured=configuredTerminalOptions(true).map(([terminal])=>({terminal,serial:''}));if(configured.length)initial=configured;}
+        if(code==='CAPACITANCE')initial=configuredTerminalOptions(false).map(([point])=>({point}));
+        renderSpecificRows(initial,code);
+      }}
 
     if(isTtr && !$('#ttrRows').children.length){
       const taps=configuredTapOptions();
