@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.5.41
+- Añade columna Estado calculada en el historial: Completo, Incompleto o En borrador, sin crear columnas ni modificar registros en MySQL.
+- Añade filtro de historial por estado y mantiene el filtro de texto por prueba y responsable.
+
 ## 1.5.40
 - Corrige iteraciones DOM en las pestañas, acciones del historial y lectura de celdas de ensayos; evita que la navegación se interrumpa antes de consultar la API.
 
