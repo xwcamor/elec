@@ -3,7 +3,7 @@
 Aplicación web independiente para configurar transformadores y registrar pruebas eléctricas. Es un prototipo PHP + MySQL pensado para ejecutarse localmente con Laragon.
 
 ## Versión
-**1.5.95**
+**1.5.104**
 
 ## Funcionalidades
 
@@ -121,3 +121,8 @@ Esta lista queda como guía para la siguiente ronda de pruebas funcionales. Marc
 - [ ] Revisar en el navegador que no haya errores JavaScript y comprobar el flujo completo de alta, edición, guardado y reapertura.
 
 **Criterio de cierre:** todos los puntos anteriores comprobados con datos de prueba en Laragon/MySQL, sin alterar registros reales.
+
+
+## Catálogo contextual de ensayos
+
+Los formularios de ensayos específicos toman sus opciones de la configuración eléctrica vigente al iniciar el registro: bobinados, bornes, bushings capacitivos y posiciones TAP. Las listas no deben inventar bobinados o posiciones que no existan en la configuración. Si se edita un ensayo histórico, se utiliza su fotografía de configuración guardada cuando está disponible. Al actualizar un ensayo existente, el servidor conserva su versión y fotografía originales.
