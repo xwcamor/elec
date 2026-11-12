@@ -1,3 +1,15 @@
+## Flujo de inicio explícito y autoguardado (v1.5.79)
+- [ ] Abrir «Nueva ejecución» y comprobar que no se crea ninguna fila en `eh_test_executions`.
+- [ ] Seleccionar ensayos y completar datos generales sin pulsar «Iniciar prueba»; comprobar que el historial y la BD siguen sin cambios.
+- [ ] Intentar iniciar sin fecha, responsable, supervisor o sin seleccionar ensayos; comprobar que la validación impide crear el registro y muestra el aviso correspondiente.
+- [ ] Pulsar «Iniciar prueba» con los datos generales y al menos un ensayo; comprobar que se crea exactamente una ejecución con estado `EN_PROCESO`.
+- [ ] Modificar campos y comprobar que aparece «Cambios pendientes» y luego «Guardado»; verificar que se actualiza el mismo ID y no se duplica la ejecución.
+- [ ] Cambiar de etapa y salir de un campo; comprobar que los cambios pendientes se envían para guardar.
+- [ ] Simular un fallo de conexión durante el autoguardado; comprobar que aparece el estado de error y que se puede reintentar con «Guardar ahora».
+- [ ] Volver a registros antes de iniciar; confirmar que se advierte que la preparación no guardada se descartará y comprobar que no queda un registro vacío.
+- [ ] Completar todos los ensayos y pulsar «Finalizar prueba»; comprobar que el mismo registro cambia a `COMPLETADA`.
+- [ ] Abrir una ejecución existente, editarla y comprobar que se conserva su ID y que el autoguardado no crea una ejecución adicional.
+
 # Verificación manual del piloto
 
 ## Interfaz
