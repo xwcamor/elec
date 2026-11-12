@@ -1907,3 +1907,17 @@ body.config-focus .config-save-hint{display:none!important}
  .winding-data-section .plan-test-meta-grid{grid-template-columns:1fr!important}
  .config-panel[data-panel="windings"] .config-section-title h3{font-size:18px!important}
 }
+
+
+/* v1.5.138 · Estados de bobinados como texto y separación de la tarjeta de datos. */
+.winding-accordion-summary .winding-summary-status{
+ display:block!important;min-width:0!important;padding:0!important;border:0!important;border-radius:0!important;
+ background:transparent!important;font-size:11px!important;font-weight:650!important;line-height:1.35!important;white-space:nowrap!important;
+}
+.winding-accordion-summary .winding-summary-status[data-state="complete"]{color:#43845f!important}
+.winding-accordion-summary .winding-summary-status[data-state="incomplete"]{color:#a16a18!important}
+.winding-data-section.plan-test-meta-card{margin:12px 14px 14px!important}
+.config-stepper>.config-view-tab[data-state="complete"]>.plan-step-number{
+ border-color:#b9e2c7!important;background:#e8f6ed!important;color:#167346!important;box-shadow:none!important;
+}
+@media(max-width:760px){.winding-data-section.plan-test-meta-card{margin:10px 8px 12px!important}}
