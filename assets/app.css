@@ -882,3 +882,31 @@ body.config-focus .config-panel .form-grid input[readonly]:focus{border-color:#e
 .plan-results-accordion-content{padding:14px 2px 2px}
 .plan-results-accordion:not([open]) .plan-results-accordion-content{display:none}
 @media(max-width:560px){.plan-results-accordion-head{gap:8px;padding:11px}.plan-results-accordion-copy>b{font-size:13px}.plan-results-accordion-copy>small{font-size:10px}.plan-results-accordion-status{font-size:10px;padding:4px 7px}}
+
+/* Lista de acordeones individuales: eliminar estilos heredados de navegación por pestañas */
+.plan-results-title{position:relative;padding-right:160px}
+.plan-results-title .plan-results-accordion-status{position:absolute;right:0;top:8px}
+.plan-test-card{margin:0 0 12px;border:1px solid #d7e1e9;border-radius:10px;overflow:hidden;background:#fff}
+.plan-test-card[hidden]{display:none!important}
+.plan-test-card[data-state="complete"]{border-color:#b6d9c0}
+.plan-test-card[data-state="incomplete"]{border-color:#e8bd6e}
+.plan-test-card[data-state="empty"]{border-color:#d5dde5}
+.plan-test-card-head{display:flex;align-items:center;gap:12px;padding:14px 16px;min-height:64px;cursor:pointer;list-style:none;background:#f7f9fb}
+.plan-test-card-head::-webkit-details-marker{display:none}
+.plan-test-card[data-state="complete"]>.plan-test-card-head{background:#f0f8f2}
+.plan-test-card[data-state="incomplete"]>.plan-test-card-head{background:#fff7e8}
+.plan-test-card[data-state="empty"]>.plan-test-card-head{background:#f4f6f8}
+.plan-test-index{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;border-radius:9px;background:#e8eef3;color:#52687c;font-size:12px;font-weight:800}
+.plan-test-card[data-state="complete"] .plan-test-index{background:#d9efdf;color:#237044}
+.plan-test-card[data-state="incomplete"] .plan-test-index{background:#ffe8bd;color:#8a570a}
+.plan-test-heading{display:grid;gap:4px;flex:1;min-width:0}
+.plan-test-heading>b{font-size:14px;color:#29435c}
+.plan-test-heading>small{font-size:11px;color:#73869a}
+.plan-card-state{font-size:11px;font-weight:750;white-space:nowrap}
+.plan-card-state[data-state="complete"]{color:#267447}
+.plan-card-state[data-state="incomplete"]{color:#95600d}
+.plan-card-state[data-state="empty"]{color:#68798a}
+.plan-card-chevron{font-size:18px;color:#718397;transition:transform .18s}
+.plan-test-card[open]>.plan-test-card-head .plan-card-chevron{transform:rotate(180deg)}
+.plan-test-body{padding:14px 16px}
+@media(max-width:560px){.plan-results-title{padding-right:0}.plan-results-title .plan-results-accordion-status{position:static;display:inline-flex;margin-top:6px}.plan-test-card-head{gap:8px;padding:11px}.plan-test-heading>b{font-size:12px}.plan-card-state{font-size:10px}}
