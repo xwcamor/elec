@@ -3,29 +3,29 @@
   const $=s=>document.querySelector(s);
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const catalog=[
-    ['TTR','Relación de transformación','TAP, relación teórica y error por fase'],
-    ['POWER_FACTOR','Factor de potencia y capacitancia','Seis modos de ensayo, FP medido/corregido y capacitancia'],
-    ['EXCITATION','Corriente de excitación','Tensión, corriente, fase, pérdidas y reactancia'],
-    ['WINDING_RESISTANCE','Resistencia de devanados','AT/BT, corriente DC y resistencia referida a 75 °C'],
-    ['INSULATION_RESISTANCE','Resistencia de aislamiento','Tres configuraciones y lecturas por tiempo'],
-    ['BUSHING','FP y capacitancia de bushings','Placa y medición individual por borne'],
-    ['SFRA','SFRA','Tres configuraciones y comparación de curvas'],
-    ['ARRESTER','Pararrayos AT / MT','Tensión, corriente, pérdidas y capacitancia'],
-    ['PROTECTIONS','Protecciones propias','Accesorios, contactos y verificación'],
-    ['CAPACITANCE','Capacitancia complementaria','Puntos y conexiones adicionales']
+    ['TTR','Relación de transformación','TAP, relación teórica y error porcentual por fase'],
+    ['POWER_FACTOR','Factor de potencia del transformador','Modo, tensión, FP medido/corregido y capacitancia'],
+    ['EXCITATION','Corriente de excitación','TAP, fase, tensión/frecuencia, corriente y pérdidas'],
+    ['WINDING_RESISTANCE','Resistencia de devanados','Secciones AT/BT, corriente de prueba y resistencia a 75 °C'],
+    ['INSULATION_RESISTANCE','Resistencia de aislamiento','Tres puntos y lecturas a 15, 30, 45 y 60 segundos'],
+    ['BUSHING','FP y capacitancia de bushings','Borne, serie, placa y medición individual'],
+    ['SFRA','SFRA','Tres conexiones y comparación de curvas'],
+    ['ARRESTER','Pararrayos AT / MT','Fase, salidas, modo GST, pérdidas y capacitancia'],
+    ['PROTECTIONS','Protecciones propias','Ítem, accesorio, bornes, contacto, condición y ajuste'],
+    ['CAPACITANCE','Capacitancia complementaria (fuera de LAP)','Ensayo adicional no incluido como bloque independiente en LAP']
   ];
   const templates={
-    WINDING_RESISTANCE:{prefix:'WR',cols:[['section','Devanado (AT / BT)'],['tap','TAP'],['phase','Fase / conexión'],['test_current_a','I de prueba (A)'],['dc_current_a','I DC medida (A)'],['dc_voltage_v','V DC (V)'],['time_s','Tiempo (s)'],['resistance_measured_ohm','Resistencia medida (Ω)'],['resistance_referred_75c_ohm','Resistencia referida 75 °C (Ω)'],['deviation_percent','Desviación (%)'],['fluctuation_percent','Fluctuación (%)'],['slope_a_s','Pendiente (A/s)'],['temperature_c','Temperatura (°C)'],['result','Resultado comparativo'],['notes','Observación']]},
-    INSULATION_RESISTANCE:{prefix:'IR',cols:[['point','Configuración / punto'],['applied_voltage_kv','Voltaje aplicado (kV)'],['reading_15s','R a 15 s'],['reading_30s','R a 30 s'],['reading_45s','R a 45 s'],['reading_1min','R a 1 min'],['absorption_index','Índice de absorción'],['reading_unit','Unidad de resistencia'],['result','Resultado'],['notes','Observación']]},
-    POWER_FACTOR:{prefix:'PF',cols:[['measurement','Modo de medición'],['test_mode','Modo del equipo (GST / GSTg-A / UST-A)'],['sweep','Barrido'],['test_voltage_v','Tensión de prueba (V)'],['frequency_hz','Frecuencia (Hz)'],['output_voltage_v','V de salida (V)'],['output_current_a','I de salida (A)'],['power_loss_w','Pérdidas (W)'],['power_factor_measured','FP medido (%)'],['power_factor_corrected_20c','FP corregido a 20 °C (%)'],['capacitance_nf','Capacitancia (nF)'],['evaluation','Resultado'],['notes','Observación']]},
-    EXCITATION:{prefix:'EXC',cols:[['tap','TAP'],['phase','Fase'],['test_voltage_kv','Tensión de prueba (kV)'],['frequency_hz','Frecuencia (Hz)'],['output_voltage_v','V de salida (V)'],['output_current_a','I de salida (A)'],['current_phase_deg','Ángulo de corriente (°)'],['losses_w','Pérdidas (W)'],['reactance_ohm','Reactancia (Ω)'],['result','Resultado'],['notes','Observación']]},
-    BUSHING:{prefix:'BUSH',cols:[['terminal','Borne'],['serial','Serie'],['test_voltage_kv','Tensión de prueba (kV)'],['power_factor_plate','FP de placa (%)'],['power_factor_measured','FP medido (%)'],['evaluation','Evaluación FP'],['capacitance_plate_pf','Capacitancia de placa (pF)'],['capacitance_measured_pf','Capacitancia medida (pF)'],['variation_percent','Variación (%)'],['result','Resultado capacitancia'],['notes','Observación']]},
-    SFRA:{prefix:'SFRA',cols:[['connection','Configuración'],['tap','TAP'],['file_reference','Archivo / curva de campo'],['reference_curve','Curva de referencia (fábrica)'],['comparison_result','Resultado de comparación'],['result','Evaluación'],['notes','Observación']]},
-    ARRESTER:{prefix:'ARR',cols:[['section','Sección (AT / MT)'],['phase','Fase'],['output_voltage_kv','V de salida (kV)'],['output_current_ma','I de salida (mA)'],['test_mode','Modo de prueba'],['losses_w','Pérdidas medidas (W)'],['capacitance_pf','Capacitancia medida (pF)'],['result','Resultado'],['notes','Observación']]},
+    WINDING_RESISTANCE:{prefix:'WR',cols:[['section','Devanado (AT / BT)'],['tap','TAP'],['phase','Fase / conexión'],['test_current_a','I de prueba (A)'],['temperature_c','Temperatura medida (°C)'],['resistance_measured_ohm','Resistencia medida (Ω)'],['resistance_referred_75c_ohm','Resistencia referida 75 °C (Ω)'],['result','Resultado comparativo'],['notes','Observación']]},
+    INSULATION_RESISTANCE:{prefix:'IR',cols:[['point','Punto de aplicación'],['applied_voltage_kv','Voltaje aplicado (kV)'],['reading_15s','R a 15 s'],['reading_30s','R a 30 s'],['reading_45s','R a 45 s'],['reading_1min','R a 1 min'],['absorption_index','Índice de absorción'],['reading_unit','Unidad de resistencia'],['result','Resultado'],['notes','Observación']]},
+    POWER_FACTOR:{prefix:'PF',cols:[['measurement','Modo de medición'],['test_voltage_v','Tensión de prueba'],['power_factor_measured','FP medido'],['power_factor_corrected_20c','FP corregido a 20 °C'],['capacitance_nf','Capacitancia (nF)'],['evaluation','Evaluación manual'],['notes','Observación']]},
+    EXCITATION:{prefix:'EXC',cols:[['tap','TAP'],['phase','Fase'],['test_voltage_kv','Tensión de prueba (kV)'],['frequency_hz','Frecuencia (Hz)'],['output_current_a','Corriente de excitación'],['losses_w','Pérdidas'],['result','Resultado manual'],['notes','Observación']]},
+    BUSHING:{prefix:'BUSH',cols:[['terminal','Borne'],['serial','Serie'],['test_voltage_kv','Tensión de prueba'],['power_factor_plate','FP de placa'],['power_factor_measured','FP medido'],['capacitance_plate_pf','Capacitancia de placa (pF)'],['capacitance_measured_pf','Capacitancia medida (pF)'],['variation_percent','Variación (%)'],['result','Resultado capacitancia'],['notes','Observación']]},
+    SFRA:{prefix:'SFRA',cols:[['connection','Configuración'],['tap','TAP'],['file_reference','Archivo / curva de campo'],['reference_curve','Curva de referencia (fábrica)'],['comparison_result','Resultado de comparación'],['result','Evaluación manual'],['notes','Observación']]},
+    ARRESTER:{prefix:'ARR',cols:[['section','Sección (AT / MT)'],['phase','Fase'],['output_voltage_kv','V. salida (unidad del equipo)'],['output_current_ma','I. salida (unidad del equipo)'],['test_mode','Modo (GST)'],['losses_w','Pérdidas medidas'],['capacitance_pf','Capacitancia medida'],['result','Resultado manual'],['notes','Observación']]},
     PROTECTIONS:{prefix:'PROT',cols:[['item','Ítem'],['accessory','Accesorio'],['terminals','Bornes'],['contact','Contacto'],['condition','Condición'],['setpoint','Ajuste'],['result','Resultado'],['notes','Observación']]},
     CAPACITANCE:{prefix:'CAP',cols:[['point','Punto / borne'],['connection','Conexión de prueba'],['test_voltage_kv','Tensión de prueba (kV)'],['capacitance_nf','Capacitancia (nF)'],['frequency_hz','Frecuencia (Hz)'],['temperature_c','Temperatura (°C)'],['result','Resultado'],['notes','Observación']]}
   };
-  let items=[],editingId=null,sessionId=null;
+  let items=[],editingId=null,sessionId=null,activeTestIndex=0,currentPlanStep='shared';
   let autoSaveTimer=null,savePromise=null,savePending=false,editRevision=0,savedRevision=0;
   function hasUnsavedChanges(){return editRevision>savedRevision;}
   function setSaveStatus(message,state){
@@ -70,38 +70,19 @@
   }
   function defaults(code){
     if(code==='TTR'){const t=transformer(),n=Math.max(5,Number(t.num_taps||0));return Array.from({length:Math.min(n,100)},(_,i)=>({tap:String(i+1)}));}
-    if(code==='POWER_FACTOR')return [{measurement:'CH+CHL',test_voltage_v:'10000'},{measurement:'CH',test_voltage_v:'10000'},{measurement:'CHL',test_voltage_v:'10000'},{measurement:'CL+CLH',test_voltage_v:'5000'},{measurement:'CL',test_voltage_v:'5000'},{measurement:'CLH',test_voltage_v:'5000'}];
+    if(code==='POWER_FACTOR')return ['CH+CHL','CH','CHL','CL+CLH','CL','CLH'].map(measurement=>({measurement}));
     if(code==='INSULATION_RESISTANCE')return ['AT-BT','AT-Masa','BT-Masa'].map(point=>({point}));
     if(code==='WINDING_RESISTANCE')return [{section:'AT',phase:'U-0',test_current_a:'5'},{section:'AT',phase:'V-0',test_current_a:'5'},{section:'AT',phase:'W-0',test_current_a:'5'},{section:'BT',phase:'u-v',test_current_a:'16'},{section:'BT',phase:'v-w',test_current_a:'16'},{section:'BT',phase:'w-u',test_current_a:'16'}];
-    if(code==='EXCITATION')return [1,14,27].flatMap(tap=>['U-0','V-0','W-0'].map(phase=>({tap:String(tap),phase})));
+    if(code==='EXCITATION')return ['U-0','V-0','W-0'].map(phase=>({phase}));
     if(code==='BUSHING'){
       const config=bridge.getElectricalConfig();
       const terminals=(config?.windings||[]).flatMap(w=>w.terminals||[]).filter(t=>t.has_capacitive_bushing).map(t=>({terminal:t.code||'',serial:t.bushing?.serial_number||''}));
       return terminals.length?terminals:['1U','1V','1W','1N'].map(terminal=>({terminal}));
     }
-    if(code==='SFRA')return [{connection:'AT vs BT (abierto)',tap:'1'},{connection:'BT vs AT (abierto)',tap:'1'},{connection:'AT vs BT (cortocircuito)',tap:'1'}];
+    if(code==='SFRA')return [{connection:'AT vs BT (abierto)'},{connection:'BT vs AT (abierto)'},{connection:'AT vs BT (corto circuito)'}];
     if(code==='ARRESTER')return [...['1U','1V','1W'].map(phase=>({section:'AT',phase,test_mode:'GST'})),...['2U','2V','2W','2N'].map(phase=>({section:'MT',phase,test_mode:'GST'}))];
-    if(code==='PROTECTIONS')return [
-      {item:'1',accessory:'RELÉ BUCHHOLZ',terminals:'D:1 - D:2',contact:'3 - 4',condition:'ALARMA'},
-      {item:'1',accessory:'RELÉ BUCHHOLZ',terminals:'D:13 - D:14',contact:'1 - 2',condition:'DISPARO'},
-      {item:'2',accessory:'VÁLVULA DE SEGURIDAD DEL TRANSFORMADOR',terminals:'D:15 - D:16',contact:'11 - 14',condition:'DISPARO'},
-      {item:'3',accessory:'VÁLVULA DE SEGURIDAD DEL CONMUTADOR',terminals:'D:41 - D:42',contact:'6 - 4',condition:'DISPARO'},
-      {item:'4',accessory:'RELÉ DE PROTECCIÓN DEL CONMUTADOR BAJO CARGA',terminals:'D:43 - D:44',contact:'1 - 2',condition:'DISPARO'},
-      {item:'5',accessory:'INDICADOR DE TEMPERATURA DEL ACEITE',terminals:'D:23 - D:24',contact:'11 - 14',condition:'VENTILACIÓN FORZADA'},
-      {item:'5',accessory:'INDICADOR DE TEMPERATURA DEL ACEITE',terminals:'D:7 - D:8',contact:'21 - 24',condition:'ALARMA',setpoint:'70 °C'},
-      {item:'5',accessory:'INDICADOR DE TEMPERATURA DEL ACEITE',terminals:'D:17 - D:18',contact:'31 - 34',condition:'DISPARO',setpoint:'75 °C'},
-      {item:'6',accessory:'INDICADOR DE TEMPERATURA DEL DEVANADO AT',terminals:'D:27 - D:28',contact:'11 - 14',condition:'VENTILACIÓN FORZADA'},
-      {item:'6',accessory:'INDICADOR DE TEMPERATURA DEL DEVANADO AT',terminals:'D:11 - D:12',contact:'21 - 24',condition:'ALARMA'},
-      {item:'6',accessory:'INDICADOR DE TEMPERATURA DEL DEVANADO AT',terminals:'D:21 - D:22',contact:'31 - 34',condition:'DISPARO'},
-      {item:'7',accessory:'INDICADOR DE TEMPERATURA DEL DEVANADO BT',terminals:'D:25 - D:26',contact:'11 - 14',condition:'VENTILACIÓN FORZADA'},
-      {item:'7',accessory:'INDICADOR DE TEMPERATURA DEL DEVANADO BT',terminals:'D:9 - D:10',contact:'21 - 24',condition:'ALARMA',setpoint:'75 °C'},
-      {item:'7',accessory:'INDICADOR DE TEMPERATURA DEL DEVANADO BT',terminals:'D:17 - D:18',contact:'31 - 34',condition:'DISPARO',setpoint:'80 °C'},
-      {item:'8',accessory:'INDICADOR DE NIVEL DE ACEITE DEL TRANSFORMADOR',terminals:'D:5 - D:6',contact:'8 - 9',condition:'ALARMA',setpoint:'MÍNIMO'},
-      {item:'8',accessory:'INDICADOR DE NIVEL DE ACEITE DEL TRANSFORMADOR',terminals:'D:3 - D:4',contact:'5 - 6',condition:'ALARMA',setpoint:'MÁXIMO'},
-      {item:'9',accessory:'INDICADOR DE NIVEL DE ACEITE DEL CONMUTADOR',terminals:'D:39 - D:40',contact:'8 - 9',condition:'ALARMA',setpoint:'MÍNIMO'},
-      {item:'9',accessory:'INDICADOR DE NIVEL DE ACEITE DEL CONMUTADOR',terminals:'D:37 - D:38',contact:'5 - 6',condition:'ALARMA',setpoint:'MÁXIMO'}
-    ];
-    return [{},{},{}];
+    if(code==='PROTECTIONS')return [{}];
+    return [{},{}];
   }
   function rowsFromMeasurements(code,ms){
     const prefix=code==='TTR'?'TTR':(templates[code]?.prefix||code),data={};
@@ -110,31 +91,36 @@
     if(code==='INSULATION_RESISTANCE'&&rows.some(r=>r.from||r.to||r.time||r.reading)){
       const grouped={};rows.forEach(r=>{const k=[r.from||'',r.to||'',r.voltage||'',r.unit||'',r.reading_unit||''].join('|');const g=grouped[k]||(grouped[k]={point:[r.from,r.to].filter(Boolean).join(' - '),applied_voltage_kv:r.voltage||'',reading_unit:r.reading_unit||r.unit||''});const t=String(r.time||'').toLowerCase().replace(/['’]/g,'');if(t==='15'||t==='15s')g.reading_15s=r.reading||'';if(t==='30'||t==='30s')g.reading_30s=r.reading||'';if(t==='45'||t==='45s')g.reading_45s=r.reading||'';if(t==='1'||t==='1m'||t==='60'||t==='60s')g.reading_1min=r.reading||'';});rows=Object.values(grouped);
     }
-    if(code==='POWER_FACTOR')rows=rows.map(r=>({...r,measurement:r.measurement||r.point||'',test_voltage_v:r.test_voltage_v||r.test_voltage||'',power_factor_measured:r.power_factor_measured||r.power_factor||'',capacitance_nf:r.capacitance_nf||r.capacitance||''}));
+    if(code==='POWER_FACTOR')rows=rows.map(r=>({...r,measurement:r.measurement||r.point||'',test_voltage_v:r.test_voltage_v||r.test_voltage||'',power_factor_measured:r.power_factor_measured||r.power_factor||'',power_factor_corrected_20c:r.power_factor_corrected_20c||r.power_factor_corrected||'',capacitance_nf:r.capacitance_nf||r.capacitance||''}));
     if(code==='BUSHING')rows=rows.map(r=>({...r,terminal:r.terminal||r.point||'',serial:r.serial||r.serial_number||'',power_factor_measured:r.power_factor_measured||r.power_factor||'',capacitance_measured_pf:r.capacitance_measured_pf||r.capacitance||''}));
+    if(code==='WINDING_RESISTANCE')rows=rows.map(r=>({...r,section:r.section||r.winding||'',phase:r.phase||r.terminal_pair||'',temperature_c:r.temperature_c||r.temperature||'',resistance_measured_ohm:r.resistance_measured_ohm||r.resistance||'',resistance_referred_75c_ohm:r.resistance_referred_75c_ohm||r.resistance_referred_75c||''}));
     return rows.map(r=>normalize(code,r));
   }
   function measurementsFromRows(item){
     const prefix=item.code==='TTR'?'TTR':(templates[item.code]?.prefix||item.code),out=[];
-    (item.rows||[]).map(r=>normalize(item.code,r)).forEach((row,i)=>columns(item.code).forEach(([key])=>{const v=row[key];if(v!==''&&v!==null&&v!==undefined)out.push({parameter:prefix+'|'+(item.code==='TTR'?(row.tap||i+1):(i+1))+'|'+key,value:String(v),unit:'',notes:''});}));
+    (item.rows||[]).map(r=>normalize(item.code,r)).forEach((row,i)=>{
+      Object.entries(row).forEach(([key,value])=>{
+        if(value!==''&&value!==null&&value!==undefined)out.push({parameter:prefix+'|'+(item.code==='TTR'?(row.tap||i+1):(i+1))+'|'+key,value:String(value),unit:'',notes:''});
+      });
+    });
     return out;
   }
   function makeItem(code,old){old=old||{};return {id:old.id||null,code,name:typeName(code),status:old.status||'BORRADOR',standard_reference:old.standard_reference||'',equipment_name:old.equipment_name||'',equipment_brand:old.equipment_brand||'',equipment_model:old.equipment_model||'',equipment_serial:old.equipment_serial||'',observations:old.observations||'',rows:old.rows||defaults(code)};}
   const requiredByTest={
     TTR:['tap','at','bt','U','V','W','result'],
-    POWER_FACTOR:['measurement','test_voltage_v','power_factor_measured','power_factor_corrected_20c','evaluation'],
-    EXCITATION:['tap','phase','test_voltage_kv','output_voltage_v','output_current_a','result'],
-    WINDING_RESISTANCE:['section','tap','phase','test_current_a','resistance_measured_ohm','resistance_referred_75c_ohm','result'],
-    INSULATION_RESISTANCE:['point','applied_voltage_kv','reading_15s','reading_30s','reading_45s','reading_1min','result'],
-    BUSHING:['terminal','test_voltage_kv','power_factor_plate','power_factor_measured','evaluation','capacitance_plate_pf','capacitance_measured_pf','variation_percent','result'],
-    SFRA:['connection','comparison_result','result'],
-    ARRESTER:['section','phase','output_voltage_kv','output_current_ma','test_mode','losses_w','capacitance_pf','result'],
+    POWER_FACTOR:['measurement','test_voltage_v','power_factor_measured','power_factor_corrected_20c'],
+    EXCITATION:['tap','phase','test_voltage_kv','frequency_hz','output_current_a','losses_w'],
+    WINDING_RESISTANCE:['section','tap','phase','test_current_a','temperature_c','resistance_measured_ohm','resistance_referred_75c_ohm'],
+    INSULATION_RESISTANCE:['point','applied_voltage_kv','reading_15s','reading_30s','reading_45s','reading_1min'],
+    BUSHING:['terminal','serial','test_voltage_kv','power_factor_plate','power_factor_measured','capacitance_plate_pf','capacitance_measured_pf','variation_percent'],
+    SFRA:['connection','tap','result'],
+    ARRESTER:['section','phase','output_voltage_kv','output_current_ma','test_mode','losses_w','capacitance_pf'],
     PROTECTIONS:['accessory','terminals','contact','condition','result'],
-    CAPACITANCE:['point','connection','test_voltage_kv','capacitance_nf','result']
+    CAPACITANCE:['point','connection','test_voltage_kv','capacitance_nf']
   };
-  const requiredEquipment=['equipment_name','equipment_brand','equipment_model','equipment_serial'];
+  const requiredEquipment=[];
   const equipmentLabels={equipment_name:'equipo',equipment_brand:'marca del equipo',equipment_model:'modelo',equipment_serial:'serie'};
-  const generalLabels={date:'fecha de la visita',operator:'responsable / técnico'};
+  const generalLabels={date:'fecha de la prueba',operator:'responsable / técnico'};
   function isFilled(value){return value!==null&&value!==undefined&&String(value).trim()!=='';}
   function requiredValueFilled(key,value){
     if(['result','evaluation'].includes(key)&&String(value??'').trim().toUpperCase()==='PENDIENTE')return false;
@@ -226,11 +212,14 @@
     const selectionState=items.length?'complete':'missing';
     const resultMetrics=m.perItem.map(entry=>entry.metrics);
     const resultsState=!items.length?'missing':(resultMetrics.every(metric=>metric.complete)?'complete':(resultMetrics.some(metric=>metric.anyData)?'partial':'missing'));
-    const states={shared:sharedState,selection:selectionState,results:resultsState};
+    const reviewState=m.complete?'complete':(items.length?'partial':'missing');
+    const states={shared:sharedState,selection:selectionState,results:resultsState,review:reviewState};
     Object.entries(states).forEach(([key,state])=>{
       const step=$('#planStepper [data-plan-step="'+key+'"]');
       if(!step)return;
       step.dataset.state=state;
+      step.classList.toggle('active',key===currentPlanStep);
+      if(key===currentPlanStep)step.setAttribute('aria-current','step');else step.removeAttribute('aria-current');
       const number=step.querySelector('.plan-step-number');
       if(number)number.dataset.state=state;
     });
@@ -247,6 +236,7 @@
     const shared=$('#planSharedStatus');
     if(shared){shared.classList.toggle('is-complete',m.general.length===0);shared.classList.toggle('is-pending',m.general.length>0);shared.textContent=m.general.length?'Pendiente: '+m.general.join(' · '):'Datos generales completos';}
     updatePlanStepper(m);
+    renderPlanReview();
   }
   function refreshPlanFeedback(){
     items.forEach((item,index)=>{
@@ -259,7 +249,46 @@
     renderPicker();
   }
 
-    function renderPicker(){
+    const planStepKeys=['shared','selection','results','review'];
+  const planStepLabels={shared:'Datos generales',selection:'Selección de ensayos',results:'Mediciones',review:'Resumen'};
+  function setPlanStep(step){
+    if(!planStepKeys.includes(step))return;
+    if((step==='results'||step==='review')&&!items.length){toast('Añade al menos un ensayo antes de continuar.',true);step='selection';}
+    currentPlanStep=step;
+    document.querySelectorAll('#planPage [data-plan-panel]').forEach(panel=>{panel.hidden=panel.dataset.planPanel!==step;});
+    document.querySelectorAll('#planStepper [data-plan-step]').forEach(button=>{
+      const active=button.dataset.planStep===step;
+      button.classList.toggle('active',active);
+      if(active)button.setAttribute('aria-current','step');else button.removeAttribute('aria-current');
+    });
+    const index=planStepKeys.indexOf(step),back=$('#planStepBack'),next=$('#planStepNext'),hint=$('#planStepHint');
+    if(back)back.disabled=index===0;
+    if(next)next.textContent=step==='review'?'Guardar plan':'Continuar';
+    if(hint)hint.textContent='Etapa '+(index+1)+' de 4 · '+planStepLabels[step];
+    if(step==='review')renderPlanReview();
+  }
+  function movePlanStep(offset){
+    const current=planStepKeys.indexOf(currentPlanStep),next=Math.max(0,Math.min(planStepKeys.length-1,current+offset));
+    if(next>=2&&!items.length){toast('Selecciona al menos un ensayo para continuar.',true);setPlanStep('selection');return;}
+    setPlanStep(planStepKeys[next]);
+  }
+  function renderPlanReview(){
+    const host=$('#planReviewSummary');if(!host)return;
+    const m=planMetrics();
+    const rows=items.map((item,index)=>{
+      const metrics=itemMetrics(item),label=metrics.complete?'Completo':(metrics.anyData?'En curso':'Pendiente');
+      return '<li><span class="plan-review-index">'+String(index+1).padStart(2,'0')+'</span><div><b>'+esc(item.name)+'</b><small>'+item.rows.length+' fila(s) · '+metrics.percent+'% de campos mínimos</small></div><strong data-state="'+metrics.state+'">'+label+'</strong></li>';
+    }).join('');
+    host.innerHTML='<div class="plan-review-metrics"><div><b>'+items.length+'</b><span>Ensayos</span></div><div><b>'+m.percent+'%</b><span>Avance general</span></div><div><b>'+m.missing.length+'</b><span>Pendientes</span></div></div><ul class="plan-review-list">'+rows+'</ul><p class="plan-review-note">'+(m.complete?'Los datos mínimos están completos. Puedes guardar el registro.':'Puedes guardar como borrador y continuar después. Los campos pendientes se conservan.')+'</p>'+(m.missing.length?'<details class="plan-review-pending"><summary>Ver datos pendientes</summary><ul>'+m.missing.slice(0,12).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></details>':'');
+  }
+  function renderTestNav(){
+    const host=$('#planTestNav');if(!host)return;
+    host.innerHTML=items.map((item,index)=>{
+      const metrics=itemMetrics(item),status=metrics.complete?'Completo':(metrics.anyData?metrics.percent+'%':'Por llenar');
+      return '<button type="button" class="plan-test-tab '+(index===activeTestIndex?'active':'')+'" data-plan-test-index="'+index+'" aria-pressed="'+(index===activeTestIndex?'true':'false')+'"><span>'+String(index+1).padStart(2,'0')+'</span><b>'+esc(item.name)+'</b><small>'+status+'</small></button>';
+    }).join('');
+  }
+  function renderPicker(){
     const select=$('#planTestTypeSelect'),add=$('#addPlanTest');
     const available=catalog.filter(t=>!items.some(x=>x.code===t[0]));
     const previous=select.value;
@@ -276,7 +305,8 @@
   }
   function renderCards(){
     const host=$('#planTestCards');
-    if(!items.length){host.innerHTML='<div class="empty-state">Selecciona pruebas para que aparezcan aquí sus formularios.</div>';return;}
+    if(!items.length){host.innerHTML='<div class="empty-state">Selecciona pruebas para que aparezcan aquí sus formularios.</div>';$('#planTestNav').innerHTML='';return;}
+    activeTestIndex=Math.max(0,Math.min(activeTestIndex,items.length-1));
     host.innerHTML=items.map((item,idx)=>{
       const fieldList=columns(item.code),required=requiredByTest[item.code]||[],metrics=itemMetrics(item);
       const head='<tr>'+fieldList.map(f=>'<th>'+esc(f[1])+(required.includes(f[0])?'<i class="required-mark" title="Campo requerido">*</i>':'')+'</th>').join('')+'</tr>';
@@ -317,22 +347,28 @@
         '<details class="plan-optional-details plan-observation-details"><summary><span>Observaciones del ensayo</span><small>Notas e incidencias</small></summary><label class="plan-test-observations"><textarea data-meta="observations" rows="2" placeholder="Resultados, incidencias y comentarios">'+esc(item.observations)+'</textarea></label></details>'+
         '<div class="plan-card-actions"><button type="button" class="text-action" data-remove-test="'+idx+'">Retirar este ensayo</button></div></div></details>';
     }).join('');
+    host.querySelectorAll('[data-test-index]').forEach(card=>{
+      const active=Number(card.dataset.testIndex)===activeTestIndex;
+      card.hidden=!active;
+      if(active)card.open=true;
+    });
+    renderTestNav();
     items.forEach((item,index)=>{const card=host.querySelector('[data-test-index="'+index+'"]');if(card)refreshFieldStyles(card,item,itemMetrics(item));});
   }
-  function render(){renderPicker();renderCards();renderPlanFeedback();}
+  function render(){renderPicker();renderCards();renderPlanFeedback();renderPlanReview();}
   function clear(){
     if(autoSaveTimer)clearTimeout(autoSaveTimer);
-    items=[];editingId=null;sessionId=null;savePending=false;editRevision=0;savedRevision=0;
+    items=[];editingId=null;sessionId=null;activeTestIndex=0;currentPlanStep='shared';savePending=false;editRevision=0;savedRevision=0;
     const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());$('#planDate').value=d.toISOString().slice(0,16);
     ['planOperator','planSupervisor','planOilTemp','planAmbientTemp','planHumidity','planObservations'].forEach(id=>$('#'+id).value='');
-    $('#planTitle').textContent='Nuevo plan de pruebas';
+    $('#planTitle').textContent='Nuevo registro de pruebas';
     $('#saveTestPlan').innerHTML='<svg><use href="#i-check"/></svg>Guardar ahora';
     setSaveStatus('Se guardará automáticamente al modificar datos','idle');
     render();
   }
   function start(code){
     if(bridge.canRunTests&&!bridge.canRunTests()){toast(bridge.testAccessReason?.()||'Primero guarda la Configuración eléctrica.',true);return;}
-    clear();if(code)items.push(makeItem(code));render();bridge.showPage('planPage');
+    clear();if(code){items.push(makeItem(code));activeTestIndex=0;}render();bridge.showPage('planPage');setPlanStep(code?'results':'shared');
     if(code)markPlanChanged(350);
   }
   function toggle(code){
@@ -340,7 +376,8 @@
     if(index>=0){
       if(items.length===1){toast('El plan debe conservar al menos una prueba.',true);return;}
       items.splice(index,1);
-    }else items.push(makeItem(code));
+    }else {items.push(makeItem(code));activeTestIndex=items.length-1;}
+    activeTestIndex=Math.max(0,Math.min(activeTestIndex,items.length-1));
     render();markPlanChanged(350);
   }
   async function flushPlanBeforeLeave(){
@@ -385,10 +422,10 @@
         if(items.length<loaded.length)toast('Este registro tenía ensayos repetidos; sus mediciones se reunieron en un solo formulario por tipo de prueba.');
       }else if(x.test_code&&x.test_code!=='PLAN')items=[makeItem(x.test_code,{status:x.status,standard_reference:x.standard_reference,equipment_name:x.equipment_name,equipment_brand:x.equipment_brand,equipment_model:x.equipment_model,equipment_serial:x.equipment_serial,rows:rowsFromMeasurements(x.test_code,x.measurements||[])})];
       editRevision=0;savedRevision=0;
-      render();$('#planTitle').textContent='Plan de pruebas #'+editingId;
+      activeTestIndex=0;render();$('#planTitle').textContent='Registro de pruebas #'+editingId;
       $('#saveTestPlan').innerHTML='<svg><use href="#i-check"/></svg>Guardar ahora';
       setSaveStatus('Datos guardados · puedes continuar completando el plan','saved');
-      bridge.showPage('planPage');
+      bridge.showPage('planPage');setPlanStep('results');
     }catch(e){toast(e.message,true);}
   }
 
@@ -504,8 +541,15 @@
   $('#saveTestPlan').addEventListener('click',saveNow);
   $('#planStepper').addEventListener('click',e=>{
     const step=e.target.closest('[data-plan-step]');
-    if(!step)return;
-    document.getElementById(step.dataset.target)?.scrollIntoView({behavior:'smooth',block:'start'});
+    if(step)setPlanStep(step.dataset.planStep);
+  });
+  $('#planStepBack').addEventListener('click',()=>movePlanStep(-1));
+  $('#planStepNext').addEventListener('click',()=>currentPlanStep==='review'?saveNow():movePlanStep(1));
+  $('#planTestNav').addEventListener('click',e=>{
+    const tab=e.target.closest('[data-plan-test-index]');
+    if(!tab)return;
+    activeTestIndex=Number(tab.dataset.planTestIndex);
+    renderCards();refreshPlanFeedback();
   });
   $('#addPlanTest').addEventListener('click',()=>{
     const code=$('#planTestTypeSelect').value;
@@ -516,14 +560,14 @@
       renderPicker();
       return;
     }
-    items.push(makeItem(code));
+    items.push(makeItem(code));activeTestIndex=items.length-1;
     render();markPlanChanged(350);
   });
   $('#planTestCards').addEventListener('click',e=>{
     const del=e.target.closest('[data-remove-test]');
     if(del){
       if(items.length===1){toast('El plan debe conservar al menos una prueba.',true);return;}
-      items.splice(Number(del.dataset.removeTest),1);render();markPlanChanged(350);return;
+      const removedIndex=Number(del.dataset.removeTest);items.splice(removedIndex,1);activeTestIndex=Math.min(activeTestIndex,items.length-1);render();markPlanChanged(350);return;
     }
     const add=e.target.closest('[data-add-row]');
     if(add){items[Number(add.dataset.addRow)]?.rows.push({});renderCards();refreshPlanFeedback();markPlanChanged(350);}

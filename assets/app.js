@@ -11,28 +11,28 @@
   var activeExecutionMode = 'new';
   var activeSpecificCode = '';
   const specificTemplates={
-    WINDING_RESISTANCE:{title:'Resistencia de devanados',hint:'Una fila por toma y fase. Incluye corriente, tensión y tiempo DC, resistencia medida, desviación y resistencia referida a 75 °C, como en la hoja de referencia.',prefix:'WR',cols:[['winding','Bobinado (AT/BT)'],['tap','Tap'],['terminal_pair','Bornes / conexión'],['phase','Fase'],['current','I DC (A)'],['dc_voltage_v','V DC (V)'],['time_s','Tiempo (s)'],['resistance','R medida (Ω)'],['resistance_deviation_percent','Desviación R (%)'],['resistance_referred_75c','R referida 75 °C (Ω)'],['fluctuation_percent','Fluctuación (%)'],['slope_a_s','Pendiente (A/s)'],['temperature','Temperatura (°C)'],['unit','Unidad'],['notes','Observación']]},
-    INSULATION_RESISTANCE:{title:'Resistencia de aislamiento',hint:'Registra las tres configuraciones de ensayo y las lecturas a 15 s, 30 s, 45 s y 1 min. El índice de absorción se calcula como R(1 min) / R(30 s).',prefix:'IR',cols:[['point','Punto de aplicación'],['applied_voltage_kv','Voltaje aplicado (kV)'],['reading_15s','Resistencia a 15 s'],['reading_30s','Resistencia a 30 s'],['reading_45s','Resistencia a 45 s'],['reading_1min','Resistencia a 1 min'],['absorption_index','Índice de absorción'],['reading_unit','Unidad de lectura'],['notes','Observación']]},
-    CAPACITANCE:{title:'Capacitancia',hint:'Registra punto de prueba, configuración y capacitancia medida.',prefix:'CAP',cols:[['point','Punto / borne'],['connection','Conexión de prueba'],['test_voltage','Tensión de prueba'],['capacitance','Capacitancia'],['unit','Unidad'],['frequency','Frecuencia'],['temperature','Temperatura °C'],['notes','Observación']]},
-    POWER_FACTOR:{title:'Factor de potencia del transformador',hint:'Campos de la plantilla: bloque, modo de prueba, tensión y frecuencia, tensión/corriente de salida, pérdidas, FP medido, FP corregido a 20 °C y capacitancia.',prefix:'PF',cols:[['block','Bloque / sección'],['measurement','Medición (CH+CHL, CH, CHL, CL+CLH...)'],['test_mode','Modo (GST, GSTg-A, UST-A)'],['sweep','Barrido'],['test_voltage_v','Tensión de prueba (V)'],['frequency_hz','Frecuencia (Hz)'],['output_voltage_v','V de salida (V)'],['output_current_a','I de salida (A)'],['power_loss_w','Pérdidas (W)'],['power_factor_measured','FP medido'],['power_factor_corrected_20c','FP corregido a 20 °C'],['capacitance_nf','Capacitancia (nF)'],['global_correction_enabled','Usar factor global de corrección'],['global_correction_factor','Factor de corrección'],['evaluation','Evaluación'],['notes','Observación']]},
-    EXCITATION:{title:'Corriente de excitación',hint:'Una fila por tap y fase. La plantilla registra tensión de salida, corriente, ángulo de fase, pérdidas y reactancia; la hoja de protocolo resume corriente de excitación y pérdidas.',prefix:'EXC',cols:[['tap','Tap'],['phase','Fase (U-0 / V-0 / W-0)'],['test_voltage_kv','Tensión aplicada (kV)'],['frequency_hz','Frecuencia (Hz)'],['voltage','V de salida (V)'],['current','I de salida (A)'],['current_phase_degrees','Ángulo de corriente (°)'],['power','Pérdidas (W)'],['reactance_ohm','Reactancia (Ω)'],['unit','Unidad / referencia'],['notes','Observación']]},
-    BUSHING:{title:'Factor de potencia y capacitancia de bushings',hint:'Una fila por borne. Registra serie, tensión, FP de placa y medido, capacitancia de placa y medida, y variación.',prefix:'BUSH',cols:[['terminal','Borne'],['serial','Serie'],['test_voltage','Tensión de prueba (kV)'],['power_factor_plate','FP de placa'],['power_factor','FP medido'],['capacitance_plate','Capacitancia de placa (pF)'],['capacitance','Capacitancia medida (pF)'],['variation_percent','Variación (%)'],['test_mode','Modo de prueba'],['dissipation','Factor de disipación'],['cap_unit','Unidad C'],['notes','Observación']]},
-    SFRA:{title:'Análisis de respuesta al barrido de frecuencia (SFRA)',hint:'El protocolo contempla tres conexiones: AT–BT abierto, BT–AT abierto y AT–BT en cortocircuito. Adjunta o referencia la curva exportada y documenta la comparación campo/planta.',prefix:'SFRA',cols:[['connection','Conexión / configuración'],['tap','Tap'],['file_reference','Archivo de curva / referencia'],['comparison_reference','Curva de referencia (fábrica)'],['comparison_result','Resultado de comparación'],['evaluation','Evaluación'],['instrument','Equipo'],['notes','Observación']]},
-    ARRESTER:{title:'Prueba de pararrayos (AT / MT)',hint:'La plantilla separa pararrayos AT y MT. Registra fase, tensión y corriente de salida, modo GST, pérdidas y capacitancia medida.',prefix:'ARR',cols:[['section','Sección (AT/MT)'],['phase','Fase / borne'],['output_voltage_v','V de salida (V)'],['output_current_a','I de salida (A)'],['test_mode','Modo de prueba (GST)'],['losses_measured_w','Pérdidas medidas (W)'],['capacitance_measured_pf','Capacitancia medida (pF)'],['evaluation','Evaluación'],['notes','Observación']]},
-    PROTECTIONS:{title:'Verificación de protecciones propias',hint:'Registra cada accesorio y contacto probado, condición (alarma/disparo/ventilación), ajuste, resultado y observación, según el protocolo de referencia.',prefix:'PROT',cols:[['accessory','Accesorio'],['terminals','Bornes'],['contact','Contacto'],['condition','Condición'],['setpoint','Ajuste'],['result','Resultado'],['notes','Observación']]}
+    WINDING_RESISTANCE:{title:'Resistencia de devanados',hint:'Campos LAP: secciones AT/BT, TAP, fase o par de bornes, corriente de prueba, temperatura medida y resistencias medida/referida a 75 °C.',prefix:'WR',cols:[['winding','Bobinado (AT/BT)'],['tap','TAP'],['phase','Fase / conexión'],['test_current_a','I de prueba (A)'],['temperature','Temperatura medida (°C)'],['resistance','Resistencia medida (Ω)'],['resistance_referred_75c','Resistencia referida 75 °C (Ω)'],['notes','Observación']]},
+    INSULATION_RESISTANCE:{title:'Resistencia de aislamiento',hint:'Tres puntos LAP: AT-BT, AT-Masa y BT-Masa. Registra voltaje aplicado, lecturas a 15 s, 30 s, 45 s y 1 min.',prefix:'IR',cols:[['point','Punto de aplicación'],['applied_voltage_kv','Voltaje aplicado (kV)'],['reading_15s','Resistencia a 15 s'],['reading_30s','Resistencia a 30 s'],['reading_45s','Resistencia a 45 s'],['reading_1min','Resistencia a 1 min'],['absorption_index','Índice de absorción'],['reading_unit','Unidad de lectura'],['notes','Observación']]},
+    CAPACITANCE:{title:'Capacitancia complementaria',hint:'Ensayo adicional; no aparece como bloque independiente en el protocolo LAP.',prefix:'CAP',cols:[['point','Punto / borne'],['connection','Conexión de prueba'],['test_voltage','Tensión de prueba'],['capacitance','Capacitancia'],['unit','Unidad'],['frequency','Frecuencia'],['temperature','Temperatura °C'],['notes','Observación']]},
+    POWER_FACTOR:{title:'Factor de potencia del transformador',hint:'Campos LAP: modo, tensión de prueba, FP medido, FP corregido a 20 °C y capacitancia. La capacitancia no se exige en todos los modos.',prefix:'PF',cols:[['measurement','Modo de medición'],['test_voltage_v','Tensión de prueba'],['power_factor_measured','FP medido'],['power_factor_corrected_20c','FP corregido a 20 °C'],['capacitance_nf','Capacitancia (nF)'],['notes','Observación']]},
+    EXCITATION:{title:'Corriente de excitación',hint:'Campos LAP por TAP y fase: tensión de prueba, frecuencia, corriente de excitación y pérdidas; no se fuerzan ángulo ni reactancia.',prefix:'EXC',cols:[['tap','TAP'],['phase','Fase (U-0 / V-0 / W-0)'],['test_voltage_kv','Tensión de prueba (kV)'],['frequency_hz','Frecuencia (Hz)'],['current','Corriente de excitación'],['power','Pérdidas'],['notes','Observación']]},
+    BUSHING:{title:'Factor de potencia y capacitancia de bushings',hint:'Campos LAP por borne: serie, tensión de prueba, FP de placa/medido, capacitancia de placa/medida y variación.',prefix:'BUSH',cols:[['terminal','Borne'],['serial','Serie'],['test_voltage','Tensión de prueba'],['power_factor_plate','FP de placa'],['power_factor','FP medido'],['capacitance_plate','Capacitancia de placa (pF)'],['capacitance','Capacitancia medida (pF)'],['variation_percent','Variación (%)'],['notes','Observación']]},
+    SFRA:{title:'Análisis de respuesta al barrido de frecuencia (SFRA)',hint:'Tres configuraciones LAP: AT–BT abierto, BT–AT abierto y AT–BT en cortocircuito. Documenta curva de campo y comparación con fábrica.',prefix:'SFRA',cols:[['connection','Configuración'],['tap','TAP'],['file_reference','Archivo / curva de campo'],['comparison_reference','Curva de referencia (fábrica)'],['comparison_result','Resultado de comparación'],['evaluation','Evaluación manual'],['notes','Observación']]},
+    ARRESTER:{title:'Prueba de pararrayos (AT / MT)',hint:'Campos LAP: fase, V. salida, I. salida, modo GST, pérdidas y capacitancia. La unidad de salida debe registrarse según el equipo.',prefix:'ARR',cols:[['section','Sección (AT/MT)'],['phase','Fase / borne'],['output_voltage_v','V. salida (unidad del equipo)'],['output_current_a','I. salida (unidad del equipo)'],['test_mode','Modo de prueba (GST)'],['losses_measured_w','Pérdidas medidas'],['capacitance_measured_pf','Capacitancia medida'],['evaluation','Evaluación manual'],['notes','Observación']]},
+    PROTECTIONS:{title:'Verificación de protecciones propias',hint:'Campos LAP: ítem, accesorio, bornes, contacto, condición, ajuste, resultado y observación. No se precargan contactos de otro transformador.',prefix:'PROT',cols:[['item','Ítem'],['accessory','Accesorio'],['terminals','Bornes'],['contact','Contacto'],['condition','Condición'],['setpoint','Ajuste'],['result','Resultado'],['notes','Observación']]}
   };
 
   var testCatalog = [
     ['TTR','Relación de transformación','Taps, relación teórica/medida y error por fase'],
-    ['CAPACITANCE','Capacitancia','Registro de capacitancia por punto de prueba'],
-    ['POWER_FACTOR','Factor de potencia del transformador','FP medido/corregido, pérdidas y capacitancia'],
-    ['EXCITATION','Corriente de excitación','Corriente, ángulo, pérdidas y reactancia por fase'],
+    ['CAPACITANCE','Capacitancia complementaria','Ensayo adicional, no incluido como bloque independiente en LAP'],
+    ['POWER_FACTOR','Factor de potencia del transformador','Modo, tensión, FP medido/corregido y capacitancia'],
+    ['EXCITATION','Corriente de excitación','TAP, fase, tensión/frecuencia, corriente y pérdidas'],
     ['WINDING_RESISTANCE','Resistencia de devanados','Medición DC y resistencia referida a 75 °C'],
     ['INSULATION_RESISTANCE','Resistencia de aislamiento','Lecturas por tiempo e índice de absorción'],
     ['SFRA','SFRA','Tres configuraciones de barrido y comparación de curvas'],
     ['BUSHING','Bushings capacitivos','FP y capacitancia de placa/medidos por borne'],
-    ['ARRESTER','Pararrayos AT / MT','Pérdidas y capacitancia por fase'],
-    ['PROTECTIONS','Protecciones propias','Accesorios, contactos, ajustes y resultados']
+    ['ARRESTER','Pararrayos AT / MT','V. salida, I. salida, GST, pérdidas y capacitancia'],
+    ['PROTECTIONS','Protecciones propias','Ítem, accesorio, bornes, contacto, condición y ajuste']
   ];
 
   const blankTerminal = (code, phase = '', type = 'Fase') => ({code, phase, type, has_capacitive_bushing: false, bushing: {serial_number:'',manufacturer:'',model:'',rated_voltage_kv:'',capacitance_pf:'',power_factor_percent:'',notes:''}});
@@ -859,6 +859,21 @@
       const n1=raw1===''?NaN:Number(raw1);
       out.absorption_index=raw30!==''&&raw1!==''&&Number.isFinite(n30)&&n30!==0&&Number.isFinite(n1)?String(n1/n30):'';
     }
+    if(code==='WINDING_RESISTANCE'){
+      out.phase=out.phase||out.terminal_pair||'';
+      out.winding=out.winding||out.section||'';
+      out.resistance=out.resistance||out.resistance_measured_ohm||'';
+      out.resistance_referred_75c=out.resistance_referred_75c||out.resistance_referred_75c_ohm||'';
+    }
+    if(code==='POWER_FACTOR'){
+      out.power_factor_measured=out.power_factor_measured||out.power_factor||'';
+      out.power_factor_corrected_20c=out.power_factor_corrected_20c||out.power_factor_corrected||'';
+    }
+    if(code==='BUSHING'){
+      const plate=Number(String(out.capacitance_plate??'').replace(',','.'));
+      const measured=Number(String(out.capacitance??'').replace(',','.'));
+      out.variation_percent=Number.isFinite(plate)&&plate>0&&String(out.capacitance??'').trim()!==''?String(Math.abs(measured-plate)*100/plate):(out.variation_percent||'');
+    }
     return out;
   }
   function specificRowsFromMeasurements(ms,code){
@@ -882,28 +897,31 @@
       });
       list=Object.values(grouped);
     }
-    if(code==='POWER_FACTOR')list=list.map(r=>({...r,measurement:r.measurement||r.point||'',test_mode:r.test_mode||r.mode||'',test_voltage_v:r.test_voltage_v||r.test_voltage||'',capacitance_nf:r.capacitance_nf||r.capacitance||'',power_factor_measured:r.power_factor_measured||r.power_factor||'',output_current_a:r.output_current_a||r.current||'',notes:r.notes||''}));
-    if(code==='BUSHING')list=list.map(r=>({...r,power_factor:r.power_factor||r.power_factor_measured||'',capacitance:r.capacitance||r.capacitance_measured||'',test_voltage:r.test_voltage||r.test_voltage_kv||'',serial:r.serial||r.serial_number||''}));
+    if(code==='POWER_FACTOR')list=list.map(r=>({...r,measurement:r.measurement||r.point||'',test_voltage_v:r.test_voltage_v||r.test_voltage||'',power_factor_measured:r.power_factor_measured||r.power_factor||'',power_factor_corrected_20c:r.power_factor_corrected_20c||r.power_factor_corrected||'',capacitance_nf:r.capacitance_nf||r.capacitance||'',notes:r.notes||''}));
+    if(code==='WINDING_RESISTANCE')list=list.map(r=>({...r,winding:r.winding||r.section||'',phase:r.phase||r.terminal_pair||'',resistance:r.resistance||r.resistance_measured_ohm||'',resistance_referred_75c:r.resistance_referred_75c||r.resistance_referred_75c_ohm||''}));
+    if(code==='EXCITATION')list=list.map(r=>({...r,current:r.current||r.output_current_a||'',power:r.power||r.losses_w||''}));
+    if(code==='BUSHING')list=list.map(r=>({...r,power_factor:r.power_factor||r.power_factor_measured||'',capacitance:r.capacitance||r.capacitance_measured_pf||'',test_voltage:r.test_voltage||r.test_voltage_kv||'',serial:r.serial||r.serial_number||''}));
     return list.map(r=>normalizeSpecificRow(code,r));
   }
   function renderSpecificRows(rows,code){
     const cfg=specificTemplates[code];if(!cfg)return;
     $('#specificTestHead').innerHTML='<tr>'+cfg.cols.map(c=>'<th>'+esc(c[1])+'</th>').join('')+'</tr>';
     $('#specificTestRows').innerHTML=(rows||[]).map((raw,i)=>{
-      const row=normalizeSpecificRow(code,raw);
+      const row=normalizeSpecificRow(code,raw),visible=new Set(cfg.cols.map(c=>c[0]));
+      const legacy=Object.entries(row).filter(([key])=>!visible.has(key)).map(([key,value])=>'<input type="hidden" class="specific-legacy-cell" data-key="'+esc(key)+'" value="'+esc(value??'')+'">').join('');
       return '<tr>'+cfg.cols.map(([key],c)=>{
         const readonly=key==='absorption_index'?' readonly title="R a 1 min / R a 30 s"':'';
         return '<td><input class="specific-cell" data-r="'+i+'" data-c="'+c+'" value="'+esc(row[key]??'')+'"'+readonly+'></td>';
-      }).join('')+'</tr>';
+      }).join('')+legacy+'</tr>';
     }).join('');
   }
   function collectSpecificRows(){
     const cfg=specificTemplates[activeSpecificCode];if(!cfg)return[];
-    return $$('#specificTestRows tr').map(tr=>{const o={};$$('.specific-cell',tr).forEach((e,i)=>o[cfg.cols[i][0]]=e.value);return normalizeSpecificRow(activeSpecificCode,o);}).filter(r=>Object.entries(r).some(([k,v])=>k!=='absorption_index'&&String(v).trim()!==''));
+    return $('#specificTestRows tr').map(tr=>{const o={};$('.specific-cell',tr).forEach((e,i)=>o[cfg.cols[i][0]]=e.value);$('.specific-legacy-cell',tr).forEach(e=>o[e.dataset.key]=e.value);return normalizeSpecificRow(activeSpecificCode,o);}).filter(r=>Object.entries(r).some(([k,v])=>k!=='absorption_index'&&String(v).trim()!==''));
   }
   function specificToMeasurements(){
     const cfg=specificTemplates[activeSpecificCode],out=[];if(!cfg)return out;
-    collectSpecificRows().forEach((r,i)=>cfg.cols.forEach(([k])=>{if(r[k]!==''&&r[k]!==null&&r[k]!==undefined)out.push({parameter:cfg.prefix+'|'+(i+1)+'|'+k,value:String(r[k]),unit:'',notes:''});}));
+    collectSpecificRows().forEach((r,i)=>Object.entries(r).forEach(([k,v])=>{if(v!==''&&v!==null&&v!==undefined)out.push({parameter:cfg.prefix+'|'+(i+1)+'|'+k,value:String(v),unit:'',notes:''});}));
     return out;
   }
   function toggleTestTemplate(){

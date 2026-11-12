@@ -3,7 +3,7 @@
 Aplicación web independiente para configurar transformadores y registrar pruebas eléctricas. Es un prototipo PHP + MySQL pensado para ejecutarse localmente con Laragon.
 
 ## Versión
-**1.5.31**
+**1.5.32**
 
 ## Funcionalidades
 
@@ -14,10 +14,11 @@ Aplicación web independiente para configurar transformadores y registrar prueba
 - Configuración de conmutadores y posiciones de taps.
 - Grillas tipo Excel: edición, navegación con teclado, pegado TSV desde Excel y copia de tablas.
 - Versionado de configuraciones eléctricas.
-- Catálogo de ocho pruebas: TTR, capacitancia, factor de potencia, excitación, resistencia de devanados, resistencia de aislamiento, SFRA y bushings.
+- Catálogo LAP: TTR, factor de potencia, excitación, resistencia de devanados, aislamiento, bushings, SFRA, pararrayos y protecciones; capacitancia complementaria permanece como ensayo adicional.
 - Registro de ejecuciones con fecha/hora, responsable, equipo, condiciones ambientales, observaciones y mediciones.
 - Historial por transformador, edición y eliminación de visitas con sus mediciones, y panel de análisis de ejecuciones.
-- Plantillas específicas para TTR y los protocolos que ya están implementados en el prototipo.
+- Formularios alineados con los encabezados LAP; cuando el libro no fija un criterio numérico, la evaluación queda para revisión técnica manual.
+- Registro por etapas: datos generales, selección de ensayos, mediciones de un ensayo a la vez y resumen.
 
 ## Requisitos
 
@@ -47,8 +48,8 @@ Las tablas propias del prototipo usan el prefijo `eh_`. La configuración y las 
 1. Abre el prototipo y selecciona un transformador mediante el selector superior o el buscador; usa «Crear trafo» para registrar uno nuevo.
 2. Entra a **Configuración eléctrica** y completa los pasos de datos generales, bobinados/bornes y conmutadores/taps.
 3. Revisa y guarda una versión de la configuración.
-4. Entra a **Pruebas eléctricas** y pulsa **Nueva ejecución** o elige un tipo de prueba.
-5. Completa la fecha real del ensayo, los datos del registro y las mediciones; guarda para añadirlo al historial.
+4. Entra a **Pruebas eléctricas** y pulsa **Registrar pruebas** o elige un tipo de ensayo.
+5. Completa los datos generales, selecciona los ensayos y registra las mediciones en las cuatro etapas del asistente; guarda para añadirlo al historial.
 6. Abre una visita existente desde el historial para revisar o editar ese registro; también puedes eliminarla con confirmación.
 
 Cada ejecución tiene su propio identificador. Editar una ejecución existente no debe crear otra ni sobrescribir registros de fechas distintas.
