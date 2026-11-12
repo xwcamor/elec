@@ -708,7 +708,7 @@
     testExecutions.forEach(x=>{
       const d=new Date(String(x.executed_at||'').replace(' ','T'));
       if(!Number.isNaN(d.getTime())){const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');monthly.set(k,(monthly.get(k)||0)+1);}
-      const names=x.plan_tests?.length?x.plan_tests:[{name:x.test_name||typeName(x.test_code),code:x.test_code}];
+      const names=x.plan_tests?.length?x.plan_tests:(x.test_code==='PLAN'?[]:[{name:x.test_name||typeName(x.test_code),code:x.test_code}]);
       names.forEach(t=>{const name=t.name||typeName(t.code);types.set(name,(types.get(name)||0)+1);});
     });
     const keys=[...monthly.keys()].sort().slice(-8),max=Math.max(1,...keys.map(k=>monthly.get(k)));
