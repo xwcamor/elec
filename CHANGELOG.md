@@ -1,3 +1,8 @@
+## 1.5.53
+- Elimina el aviso dinámico «Pendiente: responsable / técnico · supervisor» de la sección de datos compartidos.
+- Retira el subtítulo «Condiciones ambientales · Temperaturas y humedad durante los ensayos»; los campos ambientales permanecen visibles sin encabezado redundante.
+- Actualiza la caché de recursos.
+
 ## 1.5.52
 - Retira el acordeón de «Condiciones ambientales» y deja temperatura del aceite, temperatura ambiente, humedad y observaciones visibles dentro de Datos compartidos.
 - Elimina el mensaje «Datos generales completos»; la banda de estado solo aparece cuando faltan datos obligatorios.
