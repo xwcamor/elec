@@ -197,25 +197,55 @@
     el.classList.add('show'); window.clearTimeout(toast.timer); toast.timer = window.setTimeout(() => el.classList.remove('show'), 3100);
   }
   function esc(value) { return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function getWindingProgress(){
+    const issues=validateConfiguration().filter(message=>/bobinado|borne/i.test(message));
+    const complete=state.windings.length>0&&state.windings.every(w=>{
+      const name=String(w.name||'').trim(),code=String(w.code||'').trim();
+      const voltage=Number(w.voltage_kv),connection=String(w.connection_type||'').trim();
+      const terminals=(w.terminals||[]).filter(t=>String(t.code||'').trim()||String(t.phase||'').trim()||t.has_capacitive_bushing);
+      return name!==''&&code!==''&&Number.isFinite(voltage)&&voltage>0&&connection!==''&&
+        terminals.length>0&&terminals.every(t=>String(t.code||'').trim()!==''&&String(t.phase||'').trim()!=='');
+    })&&issues.length===0;
+    return {complete,issues};
+  }
+  function getTapProgress(){
+    const tapData=state.tap_changers.length>0;
+    const issues=validateConfiguration().filter(message=>/conmutador|posición/i.test(message));
+    const complete=tapData&&state.tap_changers.every(c=>{
+      const positions=Array.isArray(c.positions)?c.positions:[];
+      const numbers=positions.map(p=>Number(p.position_no));
+      return !!state.windings[c.winding_index]&&positions.length>0&&
+        positions.every(p=>String(p.position_no??'').trim()!==''&&Number.isInteger(Number(p.position_no))&&Number(p.position_no)>0)&&
+        new Set(numbers).size===numbers.length;
+    })&&issues.length===0;
+    const expected=String(transformer.tap_type||'').trim()!==''||Number(transformer.num_taps||0)>0;
+    return {complete,expected,optional:!tapData&&!expected,issues};
+  }
   function showPanel(tab) {
+    if(!['windings','taps','review'].includes(tab))return;
+    const winding=getWindingProgress(),tap=getTapProgress();
+    if(tab!=='windings'&&!winding.complete){
+      toast(winding.issues[0]||'Completa los datos obligatorios de bobinados y bornes antes de continuar.',true);
+      tab='windings';
+    }else if(tab==='review'&&!tap.complete&&!tap.optional){
+      toast(tap.issues[0]||'Completa los conmutadores y sus posiciones de TAP antes de revisar.',true);
+      tab='taps';
+    }
     selectedTab = tab;
-    $$('.config-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-    $$('.config-panel').forEach(p => p.classList.toggle('hidden', p.dataset.panel !== tab));
+    $('.config-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    $('.config-panel').forEach(p => p.classList.toggle('hidden', p.dataset.panel !== tab));
     if (tab === 'review') renderReview();
   }
   function syncTransformerNominals(){
+    // Los datos nominales pertenecen a la ficha del transformador, no a esta configuración.
     if(transformer.phase_count!==null&&transformer.phase_count!==undefined&&transformer.phase_count!=='')state.phase_count=Number(transformer.phase_count);
     if(transformer.vector_group!==undefined)state.vector_group=String(transformer.vector_group||'');
     if(transformer.frequency_hz!==null&&transformer.frequency_hz!==undefined&&transformer.frequency_hz!=='')state.frequency_hz=transformer.frequency_hz;
-    $('#phaseCount').value=String(state.phase_count||'');
-    $('#phaseCountDisplay').value=Number(state.phase_count)===1?'Monofásico':(Number(state.phase_count)===3?'Trifásico':'No definido en ficha');
-    $('#vectorGroup').value=state.vector_group||'';
-    $('#frequency').value=state.frequency_hz??'';
   }
   function openConfig() {
     syncTransformerNominals();
     showOnlyMain('configPage');
-    showPanel('general');
+    showPanel('windings');
     updateCounts();
     refreshConfigStepIndicators();
   }
@@ -226,8 +256,6 @@
   $$('.config-tab').forEach(b => b.addEventListener('click', () => showPanel(b.dataset.tab)));
   $$('[data-prev]').forEach(b => b.addEventListener('click', () => showPanel(b.dataset.prev)));
   syncTransformerNominals();
-  $('#generalNotes').value = state.notes || '';
-  $('#generalNotes').addEventListener('input',()=>{state.notes=$('#generalNotes').value;markDirty();});
 
   function addWinding(data = {}) {
     const suffix = state.windings.length + 1;
@@ -437,38 +465,10 @@
   }
 
   function refreshConfigStepIndicators(){
-    const phase=Number($('#phaseCount').value),frequency=Number($('#frequency').value);
-    const vector=String($('#vectorGroup').value||'').trim();
-    const generalComplete=[1,3].includes(phase)&&vector!==''&&Number.isFinite(frequency)&&frequency>0;
-    const generalState=generalComplete?'complete':'partial';
-
-    const windingIssues=validateConfiguration().filter(message=>/bobinado|borne/i.test(message));
-    const windingData=state.windings.length>0;
-    const windingsComplete=windingData&&state.windings.every(w=>{
-      const name=String(w.name||'').trim(),code=String(w.code||'').trim();
-      const voltage=Number(w.voltage_kv),connection=String(w.connection_type||'').trim();
-      const terminals=(w.terminals||[]).filter(t=>String(t.code||'').trim()||String(t.phase||'').trim()||t.has_capacitive_bushing);
-      return name!==''&&code!==''&&Number.isFinite(voltage)&&voltage>0&&connection!==''&&
-        terminals.length>0&&terminals.every(t=>String(t.code||'').trim()!==''&&String(t.phase||'').trim()!=='');
-    })&&windingIssues.length===0;
-    const duplicateWindingData=windingIssues.some(message=>/repetid/i.test(message));
-    const windingsState=windingsComplete?'complete':(!windingData||duplicateWindingData?'missing':'partial');
-
-    const tapData=state.tap_changers.length>0;
-    const tapIssues=validateConfiguration().filter(message=>/conmutador|posición/i.test(message));
-    const tapsComplete=tapData&&state.tap_changers.every(c=>{
-      const positions=Array.isArray(c.positions)?c.positions:[];
-      const numbers=positions.map(p=>Number(p.position_no));
-      return !!state.windings[c.winding_index]&&positions.length>0&&
-        positions.every(p=>String(p.position_no??'').trim()!==''&&Number.isInteger(Number(p.position_no))&&Number(p.position_no)>0)&&
-        new Set(numbers).size===numbers.length;
-    })&&tapIssues.length===0;
-    const tapsExpected=String(transformer.tap_type||'').trim()!==''||Number(transformer.num_taps||0)>0;
-    const tapsState=!tapData?(tapsExpected?'missing':'optional'):(tapsComplete?'complete':'partial');
-
-    const reviewComplete=generalComplete&&windingsComplete&&(tapsState==='optional'||tapsComplete);
-    const reviewState=reviewComplete?'complete':(windingData||vector||state.tap_changers.length?'partial':'missing');
-    const configHasProgress=!!vector||windingData||tapData;
+    const winding=getWindingProgress();
+    const tap=getTapProgress();
+    const reviewComplete=winding.complete&&(tap.complete||tap.optional);
+    const configHasProgress=state.windings.length>0||state.tap_changers.length>0;
     const configNavState=reviewComplete?'complete':(configHasProgress?'partial':'missing');
     const configNavIndicator=$('#configNavState');
     if(configNavIndicator){
@@ -476,12 +476,10 @@
       configNavIndicator.hidden=configNavState==='complete';
       configNavIndicator.setAttribute('aria-label',configNavState==='missing'?'Configuración sin configurar':configNavState==='partial'?'Configuración incompleta':'Configuración completa');
     }
-
     const steps=[
-      ['general',generalState,generalComplete?'Completo':'Revisar datos'],
-      ['windings',windingsState,windingsComplete?'Completo':(windingData?'Incompleto':'Agregar bobinados')],
-      ['taps',tapsState,tapsState==='optional'?'No aplica':(tapsComplete?'Completo':(!tapData?'Agregar conmutador':'Revisar posiciones'))],
-      ['review',reviewState,reviewComplete?'Listo para revisar':'Pendiente']
+      ['windings',winding.complete?'complete':(state.windings.length?'partial':'missing'),winding.complete?'Completo':(state.windings.length?'Revisar datos':'Agregar bobinados')],
+      ['taps',tap.optional?'optional':(tap.complete?'complete':(state.tap_changers.length?'partial':'missing')),tap.optional?'No aplica':(tap.complete?'Completo':(state.tap_changers.length?'Revisar posiciones':'Agregar conmutador'))],
+      ['review',reviewComplete?'complete':(configHasProgress?'partial':'missing'),reviewComplete?'Listo para guardar':'Pendiente']
     ];
     steps.forEach(([key,status,label])=>{
       const button=document.querySelector('.config-tab[data-tab="'+key+'"]');
@@ -496,6 +494,7 @@
       badge.textContent=label;
     });
   }
+
   function renderReview(){
     const terminals=state.windings.reduce((n,w)=>n+w.terminals.length,0),bushings=state.windings.reduce((n,w)=>n+w.terminals.filter(t=>t.has_capacitive_bushing).length,0),taps=state.tap_changers.reduce((n,c)=>n+c.positions.length,0);
     $('#reviewSummary').innerHTML=`<div class="review-stat"><small>Bobinados</small><strong>${state.windings.length}</strong><span>Configurados</span></div><div class="review-stat"><small>Bornes</small><strong>${terminals}</strong><span>Terminales</span></div><div class="review-stat"><small>Bushings capacitivos</small><strong>${bushings}</strong><span>Identificados</span></div><div class="review-stat"><small>Conmutadores</small><strong>${state.tap_changers.length}</strong><span>Configurados</span></div><div class="review-stat"><small>Posiciones de tap</small><strong>${taps}</strong><span>Registradas</span></div><div class="review-stat"><small>Grupo vectorial</small><strong>${esc(state.vector_group||'—')}</strong><span>${esc(state.phase_count)} fase(s) · ${esc(state.frequency_hz)} Hz</span></div>`+
@@ -505,7 +504,7 @@
   }
 
   function collectPayload(){
-    return {transformer_key:transformer.key,phase_count:Number($('#phaseCount').value||3),vector_group:$('#vectorGroup').value.trim(),frequency_hz:$('#frequency').value,notes:$('#generalNotes').value,windings:state.windings.map(w=>({...w,terminals:w.terminals.filter(t=>String(t.code||'').trim()!=='').map(t=>({...t,bushing:t.bushing||{}}))})),tap_changers:state.tap_changers};
+    return {transformer_key:transformer.key,phase_count:Number(state.phase_count||3),vector_group:String(state.vector_group||''),frequency_hz:state.frequency_hz??'',notes:state.notes||'',windings:state.windings.map(w=>({...w,terminals:w.terminals.filter(t=>String(t.code||'').trim()!=='').map(t=>({...t,bushing:t.bushing||{}}))})),tap_changers:state.tap_changers};
   }
   function validateConfiguration(){
     const errors=[];const codes=new Set();
