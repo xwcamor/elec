@@ -228,10 +228,6 @@
     const tapData=state.tap_changers.length>0;
     const expectedCount=Number(transformer.num_taps||0);
     const issues=validateConfiguration().filter(message=>/conmutador|posición/i.test(message));
-    if(expectedCount>0)state.tap_changers.forEach((changer,index)=>{
-      const actual=Array.isArray(changer.positions)?changer.positions.length:0;
-      if(actual!==expectedCount)issues.push('El conmutador '+(index+1)+' tiene '+actual+' posiciones; la ficha técnica indica '+expectedCount+'. Ajusta las filas para continuar.');
-    });
     const complete=tapData&&state.tap_changers.every(c=>{
       const positions=Array.isArray(c.positions)?c.positions:[];
       const numbers=positions.map(p=>Number(p.position_no));
@@ -445,8 +441,28 @@
     const typeNode=$('#tapSourceType'),countNode=$('#tapSourceCount'),note=$('#tapSourceNote');
     if(typeNode)typeNode.textContent=typeLabel;
     if(countNode)countNode.textContent=Number.isInteger(count)&&count>0?count+' posiciones':'Pendiente';
-    if(note)note.textContent=count>0?'Cada conmutador debe contener exactamente '+count+' posiciones. Si cambias este valor en la ficha, tendrás que ajustar las filas antes de guardar una nueva versión.':'Debes registrar una cantidad de TAP mayor que cero en la ficha del transformador.';
+    const mismatched=count>0&&state.tap_changers.some(c=>(c.positions||[]).length!==count);
+    const syncButton=$('#syncTapPositions');
+    if(syncButton)syncButton.classList.toggle('hidden',!mismatched);
+    if(note)note.textContent=count>0?(mismatched?'La ficha indica '+count+' posiciones, pero hay conmutadores con una cantidad diferente. Sincroniza las filas para preparar una nueva versión; se conservarán las posiciones existentes cuando sea posible.':'Las posiciones de los conmutadores coinciden con la cantidad indicada en la ficha técnica.'):'Debes registrar una cantidad de TAP mayor que cero en la ficha del transformador.';
   }
+  function syncTapPositionsToFicha(){
+    const count=Number(transformer.num_taps||0);
+    if(!Number.isInteger(count)||count<1||count>150){toast('La ficha técnica debe indicar entre 1 y 150 posiciones TAP.',true);return;}
+    const affected=state.tap_changers.filter(c=>(c.positions||[]).length>count);
+    const hasData=affected.some(c=>c.positions.slice(count).some(p=>p.is_neutral||String(p.notes||'').trim()||String(p.label||'').trim()!==('Tap '+(c.positions.indexOf(p)+1))||String(p.position_no??'')!==String(c.positions.indexOf(p)+1)||String(p.voltage_kv??'').trim()||String(p.percent_change??'').trim()));
+    if(hasData&&!confirm('Al sincronizar se quitarán las posiciones que superen '+count+'. Hay datos en esas filas. Las versiones guardadas no se modificarán. ¿Deseas continuar?'))return;
+    state.tap_changers.forEach(c=>{
+      const previous=Array.isArray(c.positions)?c.positions:[];
+      c.positions=Array.from({length:count},(_,i)=>previous[i]||({position_no:i+1,label:'Tap '+(i+1),voltage_kv:'',percent_change:'',is_neutral:false,notes:''}));
+      c.min_position=1;c.max_position=count;
+      if(Number(c.neutral_position)>count)c.neutral_position='';
+      if(Number(c.current_position)>count)c.current_position='';
+    });
+    renderTapChangers();updateCounts();markDirty();updateTapSourceSummary();refreshConfigStepIndicators();
+    toast('Conmutadores sincronizados a '+count+' posiciones. Guarda para crear una nueva versión.');
+  }
+  $('#syncTapPositions')?.addEventListener('click',syncTapPositionsToFicha);
   $('#editTapMetadata')?.addEventListener('click',()=>openTapCountEditor());
   updateTapSourceSummary();
   function renderTapChangers(){
