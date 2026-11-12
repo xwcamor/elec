@@ -5,6 +5,10 @@ Aplicación web independiente para configurar transformadores y registrar prueba
 ## Versión
 **1.5.145**
 
+## Estándar de diseño y metodología
+
+La guía obligatoria para cualquier IA o desarrollador que modifique la interfaz está en [docs/DISENO-UI.md](docs/DISENO-UI.md). Define el sistema visual compartido, tokens, tipografía, espaciados, tarjetas, formularios, steps, acordeones, acciones destructivas y el proceso de revisión. Las instrucciones para agentes están en [AGENTS.md](AGENTS.md) y la skill de design engineering en [.agents/skills/emil-design-eng/SKILL.md](.agents/skills/emil-design-eng/SKILL.md).
+
 ## Arquitectura de procesos
 
 - **Configuración eléctrica** y **Pruebas eléctricas** se inicializan en scripts JavaScript independientes.
