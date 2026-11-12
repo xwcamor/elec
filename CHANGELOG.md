@@ -6,6 +6,7 @@
 - Permite revisar datos pendientes y deshabilita la confirmación hasta que los datos generales y todos los ensayos estén completos.
 - El servidor valida que un registro confirmado tenga ensayos, mediciones, responsable y supervisor.
 - Actualiza historial, filtros, estadísticas, mensajes y acciones para usar la terminología acordada.
+- Los borradores guardados antes de seleccionar ensayos aparecen como registros sin ensayos, sin contarse como un procedimiento en el historial o las estadísticas.
 
 ## 1.5.73
 - Cambia el título del paso 2 a «Ensayos a realizar».
