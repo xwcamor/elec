@@ -1,3 +1,11 @@
+## v1.5.145
+- Separa Configuración eléctrica y Pruebas eléctricas en módulos JavaScript independientes.
+- Configuración conserva el estado exclusivo de bobinados, bornes, conmutadores, TAP y versiones.
+- Pruebas eléctricas mantiene catálogo, formularios, mediciones, historial y ejecuciones en un módulo independiente.
+- El módulo de pruebas recibe snapshots de configuración de solo lectura y cada ejecución conserva su contexto al iniciarse.
+- El asistente de pruebas conserva su bridge propio; no accede al estado mutable de configuración.
+- Amplía CI para validar sintaxis del módulo nuevo en ramas de refactor.
+
 ## v1.5.144
 - Corrige la declaración del selector múltiple en JavaScript que impedía analizar y ejecutar el módulo completo.
 - Corrige la expresión regular usada para normalizar asteriscos existentes en etiquetas obligatorias.
