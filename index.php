@@ -76,7 +76,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.134">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.135">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body>
@@ -370,7 +370,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       </nav>
       <div class="config-main">
         <section class="config-panel hidden" data-panel="windings">
-          <div class="panel-heading config-panel-heading"><div><h3>Bobinados y bornes</h3></div><div class="config-heading-actions"><button class="btn" id="copyWindings"><svg><use href="#i-copy"/></svg>Copiar</button><button class="btn primary" id="addWinding"><svg><use href="#i-plus"/></svg>Agregar bobinado</button></div></div>
+          <div class="panel-heading config-panel-heading"><div class="config-section-title"><h3>Bobinados y bornes</h3><p id="windingOverviewMeta">0 bobinados · 0 completos · 0 por completar</p></div><div class="config-heading-actions"><button class="btn primary" id="addWinding"><svg><use href="#i-plus"/></svg>Agregar bobinado</button></div></div>
           <div id="windingsContainer" class="windings-container"></div>
           <div class="panel-footer config-panel-footer"><span></span><button class="btn primary" type="button" data-next="taps">Continuar <span>→</span></button></div>
         </section>
@@ -464,7 +464,7 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.134"></script>
+<script src="./assets/app.js?v=1.5.135"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="./assets/plan.js?v=1.5.127"></script>
 </body></html>
