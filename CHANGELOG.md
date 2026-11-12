@@ -1,3 +1,9 @@
+## v1.5.110
+- Encabezados de factor de potencia: «Factor de Potencia medido (%)» y «Factor de Potencia corregido (%)».
+- Los seis modos iniciales ahora se pueden reducir; solo se impide eliminar la última fila.
+- Selector de unidad en el encabezado «Capacitancia medida»: pF, nF, µF, mF y F. Cambia la presentación calculada desde el valor fuente en F sin alterar el valor canónico ni la fórmula.
+- La observación automática considera todas las filas que permanezcan en el ensayo.
+
 ## v1.5.109
 - Elimina el campo «Norma / referencia» de la sección Equipo y referencia.
 - Hace obligatorios para todos los ensayos: equipo, marca, modelo y número de serie; estos cuatro campos se incluyen en el avance y en las validaciones para continuar y confirmar el registro.
