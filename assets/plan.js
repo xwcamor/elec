@@ -405,13 +405,21 @@
       card.hidden=!active;
       if(active)card.open=true;
     });
+    const accordion=$('#planResultsAccordion'),meta=$('#planResultsAccordionMeta'),statusNode=$('#planResultsAccordionStatus');
+    const states=items.map(item=>itemMetrics(item));
+    const complete=states.filter(metric=>metric.complete).length;
+    const incomplete=states.filter(metric=>metric.anyData&&!metric.complete).length;
+    const unstarted=states.length-complete-incomplete;
+    if(meta)meta.textContent=items.length+' '+(items.length===1?'ensayo seleccionado':'ensayos seleccionados')+' · '+complete+' completos · '+(incomplete+unstarted)+' por completar';
+    if(statusNode){statusNode.textContent=incomplete+unstarted===0?'Todos completos':(incomplete+unstarted)+' pendientes';statusNode.dataset.state=incomplete?'incomplete':(unstarted?'unstarted':'complete');}
+    if(accordion&&accordion.dataset.userToggled!=='1')accordion.open=(incomplete+unstarted)>0;
     renderTestNav();
     items.forEach((item,index)=>{const card=host.querySelector('[data-test-index="'+index+'"]');if(card)refreshFieldStyles(card,item,itemMetrics(item));});
   }
   function render(){renderPicker();renderCards();renderPlanFeedback();renderPlanReview();}
   function clear(){
     if(autoSaveTimer)clearTimeout(autoSaveTimer);
-    items=[];editingId=null;sessionId=null;activeTestIndex=0;currentPlanStep='shared';savePending=false;editRevision=0;savedRevision=0;
+    items=[];editingId=null;sessionId=null;activeTestIndex=0;currentPlanStep='shared';savePending=false;editRevision=0;savedRevision=0;const resultsAccordion=$('#planResultsAccordion');if(resultsAccordion){resultsAccordion.dataset.userToggled='0';resultsAccordion.open=true;}
     const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());$('#planDate').value=d.toISOString().slice(0,16);
     ['planOperator','planSupervisor','planOilTemp','planAmbientTemp','planHumidity','planObservations'].forEach(id=>$('#'+id).value='');
     $('#planTitle').textContent='Nuevo registro de pruebas';
@@ -598,6 +606,7 @@
   });
   $('#planStepBack').addEventListener('click',()=>movePlanStep(-1));
   $('#planStepNext').addEventListener('click',()=>currentPlanStep==='review'?saveNow():movePlanStep(1));
+  $('#planResultsAccordion summary').addEventListener('click',()=>{$('#planResultsAccordion').dataset.userToggled='1';});
   $('#planTestNav').addEventListener('click',e=>{
     const tab=e.target.closest('[data-plan-test-index]');
     if(!tab)return;
