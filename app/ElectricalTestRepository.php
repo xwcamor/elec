@@ -9,7 +9,7 @@ class ElectricalTestRepository
         $sql = "SELECT e.id, e.executed_at, e.status, e.operator_name, e.equipment_name,
                        e.standard_reference,
                        COALESCE(t.code, 'PLAN') AS test_code,
-                       COALESCE(t.name, 'Plan de pruebas') AS test_name,
+                       COALESCE(t.name, 'Registro de pruebas') AS test_name,
                        COALESCE(d.measurement_count,0) AS measurement_count, d.payload_json
                 FROM eh_test_executions e
                 LEFT JOIN eh_test_types t ON t.id=e.test_type_id
@@ -69,7 +69,7 @@ class ElectricalTestRepository
             ['BUSHING', 'Bushings capacitivos', 8],
             ['ARRESTER', 'Pararrayos AT / MT', 9],
             ['PROTECTIONS', 'Protecciones propias', 10],
-            ['PLAN', 'Plan de pruebas', 11],
+            ['PLAN', 'Registro de pruebas', 11],
         ];
         $sync = $this->pdo->prepare('INSERT INTO eh_test_types (code, name, display_order) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), display_order=VALUES(display_order)');
         foreach ($defaults as $row) $sync->execute($row);
@@ -90,7 +90,7 @@ class ElectricalTestRepository
         $typeSt->execute([$code]); $type=$typeSt->fetch();
         if(!$type) throw new InvalidArgumentException('El tipo de prueba no existe en el catálogo.');
         $status=strtoupper((string)($p['status']??'BORRADOR'));
-        if(!in_array($status,['BORRADOR','COMPLETADA'],true)) $status='BORRADOR';
+        if(!in_array($status,['BORRADOR','EN_PROCESO','COMPLETADA'],true)) $status='BORRADOR';
         $measurements=$p['measurements']??[];
         if(!is_array($measurements)) $measurements=[];
         if(count($measurements)>2000) throw new InvalidArgumentException('La grilla admite hasta 2,000 filas por ejecución.');
@@ -108,7 +108,7 @@ class ElectricalTestRepository
         $plan = $p['plan'] ?? null;
         if (is_array($plan)) {
             $tests = $plan['tests'] ?? [];
-            if (!is_array($tests) || count($tests) > 20) throw new InvalidArgumentException('Un plan admite hasta 20 pruebas.');
+            if (!is_array($tests) || count($tests) > 20) throw new InvalidArgumentException('Un registro admite hasta 20 ensayos.');
             $safeTests = [];
             $seenTestCodes = [];
             foreach ($tests as $test) {
@@ -116,7 +116,7 @@ class ElectricalTestRepository
                 $testCode = strtoupper(trim((string)($test['code'] ?? '')));
                 if ($testCode === '' || $testCode === 'PLAN') continue;
                 if (isset($seenTestCodes[$testCode])) {
-                    throw new InvalidArgumentException('La prueba '.$testCode.' ya está incluida en este plan. Cada tipo de prueba solo puede agregarse una vez por visita.');
+                    throw new InvalidArgumentException('El ensayo '.$testCode.' ya está incluido en este registro. Cada tipo de ensayo solo puede agregarse una vez por jornada.');
                 }
                 $seenTestCodes[$testCode] = true;
                 $testMeasurements = $test['measurements'] ?? [];
@@ -135,7 +135,13 @@ class ElectricalTestRepository
                     'measurements'=>$testMeasurements
                 ];
             }
-            if (!$safeTests) throw new InvalidArgumentException('El plan debe incluir por lo menos una prueba.');
+            if ($status === 'COMPLETADA') {
+                if (!$safeTests) throw new InvalidArgumentException('No se puede completar un registro sin ensayos.');
+                foreach ($safeTests as $test) {
+                    if (($test['status'] ?? 'BORRADOR') !== 'COMPLETADA') throw new InvalidArgumentException('Todos los ensayos deben estar completos antes de confirmar el registro.');
+                }
+                if (trim((string)($p['operator_name'] ?? '')) === '' || trim((string)($p['supervisor_name'] ?? '')) === '') throw new InvalidArgumentException('Completa el responsable y el supervisor antes de confirmar el registro.');
+            }
             $storedPayload['plan'] = ['version'=>1,'session_id'=>substr(trim((string)($plan['session_id'] ?? '')),0,80) ?: null,'tests'=>$safeTests];
         }
         $payload=json_encode($storedPayload,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
