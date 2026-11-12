@@ -1,3 +1,10 @@
+## 1.5.56
+- Elimina por completo las pestañas de selección rápida de ensayos en el paso 03.
+- Elimina el acordeón exterior que envolvía todos los formularios.
+- Muestra todos los ensayos seleccionados como acordeones individuales, cada uno con su estado y color.
+- Los ensayos incompletos se expanden por defecto; los completos aparecen contraídos. Se conserva el estado abierto/cerrado del usuario durante las actualizaciones del formulario.
+- Actualiza la caché de recursos.
+
 ## 1.5.55
 - Convierte «03 · Formularios de prueba / Resultados por ensayo» en un acordeón general que contiene las pestañas y los formularios individuales.
 - El acordeón se abre por defecto si existe algún ensayo pendiente y se cierra si todos están completos.
