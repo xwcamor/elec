@@ -101,6 +101,42 @@ try {
         if (!$item) json_response(['ok' => false, 'message' => 'No se encontró el registro solicitado.'], 404);
         json_response(['ok' => true, 'item' => $item]);
     }
+    if ($action === 'test-pdf' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        $autoload = __DIR__ . '/vendor/autoload.php';
+        if (!is_file($autoload)) {
+            json_response([
+                'ok'=>false,
+                'message'=>'Dompdf no está instalado en este entorno.',
+                'detail'=>'Ejecuta composer require dompdf/dompdf en la carpeta del proyecto y vuelve a intentarlo.'
+            ], 500);
+        }
+        require_once $autoload;
+        if (!class_exists('Dompdf\\Dompdf')) {
+            json_response(['ok'=>false,'message'=>'No se encontró la clase Dompdf. Verifica la instalación de Composer.'], 500);
+        }
+        $payload = json_decode(file_get_contents('php://input'), true);
+        $html = is_array($payload) ? (string)($payload['html'] ?? '') : '';
+        if ($html === '' || strlen($html) > 8 * 1024 * 1024) {
+            json_response(['ok'=>false,'message'=>'El contenido del informe está vacío o supera el límite permitido.'], 422);
+        }
+        $options = new \\Dompdf\\Options();
+        $options->set('isRemoteEnabled', false);
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('defaultFont', 'DejaVu Sans');
+        $pdf = new \\Dompdf\\Dompdf($options);
+        $pdf->loadHtml($html, 'UTF-8');
+        $pdf->setPaper('A4', 'portrait');
+        $pdf->render();
+        $output = $pdf->output();
+        while (ob_get_level() > 0) { ob_end_clean(); }
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: attachment; filename="ELEC-registro.pdf"');
+        header('Content-Length: ' . strlen($output));
+        header('Cache-Control: private, no-store, max-age=0');
+        echo $output;
+        exit;
+    }
+
     if ($action === 'test-save' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $payload = json_decode(file_get_contents('php://input'), true) ?: [];
         $key = trim((string)($payload['transformer_key'] ?? ''));
