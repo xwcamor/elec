@@ -3,7 +3,7 @@
 Aplicación web independiente para configurar transformadores y registrar pruebas eléctricas. Es un prototipo PHP + MySQL pensado para ejecutarse localmente con Laragon.
 
 ## Versión
-**1.5.34**
+**1.5.35**
 
 ## Funcionalidades
 
@@ -16,7 +16,7 @@ Aplicación web independiente para configurar transformadores y registrar prueba
 - Versionado de configuraciones eléctricas.
 - Catálogo LAP: TTR, factor de potencia, excitación, resistencia de devanados, aislamiento, bushings, SFRA, pararrayos y protecciones; capacitancia complementaria permanece como ensayo adicional.
 - Registro de ejecuciones con fecha/hora, responsable, equipo, condiciones ambientales, observaciones y mediciones.
-- Historial por transformador, edición y eliminación de visitas con sus mediciones, y panel de análisis de ejecuciones.
+- Historial de visitas por transformador, edición y eliminación de planes con sus mediciones, y panel de estadísticas de ejecuciones.
 - Formularios alineados con los encabezados LAP; cuando el libro no fija un criterio numérico, la evaluación queda para revisión técnica manual.
 - Registro por etapas: datos generales, selección de ensayos, mediciones de un ensayo a la vez y resumen.
 
@@ -41,7 +41,7 @@ Aplicación web independiente para configurar transformadores y registrar prueba
 
 Edita `config/database.php`. El prototipo detecta la clave primaria y nombres habituales de columnas de `transformers`. Si tu esquema utiliza nombres diferentes, revisa los candidatos de columnas en `app/TransformerRepository.php` y la opción `transformers_primary_key`.
 
-Las tablas propias del prototipo usan el prefijo `eh_`. La configuración y las ejecuciones se guardan separadas de la tabla original `transformers`. El campo legado `transformers.num_taps` se consulta como referencia; no se utiliza para reemplazar el detalle de posiciones.
+Las tablas propias del prototipo usan el prefijo `eh_`. La configuración y las ejecuciones se guardan separadas del registro maestro `transformers`. El campo legado `transformers.num_taps` se consulta como referencia; no se utiliza para reemplazar el detalle de posiciones.
 
 ## Uso
 
@@ -50,7 +50,7 @@ Las tablas propias del prototipo usan el prefijo `eh_`. La configuración y las 
 3. Revisa y guarda una versión de la configuración.
 4. Entra a **Pruebas eléctricas** y pulsa **Registrar pruebas** o elige un tipo de ensayo.
 5. Completa los datos generales, selecciona los ensayos y registra las mediciones en las cuatro etapas del asistente; guarda para añadirlo al historial.
-6. Abre una ejecución existente desde el historial para revisar o editar ese registro; también puedes eliminarla con confirmación.
+6. Abre un plan existente desde el historial para revisar o editar ese registro; también puedes eliminarla con confirmación.
 
 Cada ejecución tiene su propio identificador. Editar una ejecución existente no debe crear otra ni sobrescribir registros de fechas distintas.
 
