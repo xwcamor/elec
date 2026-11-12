@@ -1,3 +1,8 @@
+## v1.5.91
+- Simplifica la grilla de posiciones TAP: elimina las columnas de tensión (kV) y variación (%).
+- Actualiza la ayuda de pegado desde Excel y la acción «Copiar tabla» para usar únicamente Posición, Etiqueta, Neutro y Observaciones.
+- Los campos históricos de tensión y variación se conservan en los datos almacenados; dejan de mostrarse en la grilla.
+
 ## v1.5.90
 - Simplifica la grilla de bornes/bushings: elimina de la captura visible fabricante, modelo, tensión de placa, capacitancia de placa y FP de placa.
 - Ajusta «Copiar bornes» para exportar únicamente las columnas que permanecen visibles.
