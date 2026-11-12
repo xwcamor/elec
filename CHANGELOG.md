@@ -1,3 +1,8 @@
+## v1.5.147
+- Define tokens CSS para la escala de espaciado y gutters compartidos.
+- Iguala el inicio vertical de Pruebas eléctricas y su formulario con Configuración eléctrica, eliminando el offset superior adicional.
+- Documenta medidas de página, padding, márgenes, gaps y alineación de encabezados/acciones para ambos módulos.
+
 ## v1.5.146
 - Alinea el estado de guardado/autoguardado del registro de pruebas a la izquierda del botón «Volver a registros», siguiendo el patrón de Configuración eléctrica.
 - Homologa la barra de acciones del asistente de pruebas con el componente compartido `toolbar-actions`.
