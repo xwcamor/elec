@@ -1,3 +1,8 @@
+## 1.5.70
+- Compacta el stepper: los conectores ahora llegan directamente a los círculos y reflejan el progreso completado/activo.
+- Reorganiza los encabezados de las etapas en dos líneas principales: título y descripción alineados verticalmente, con el identificador pequeño encima.
+- En pantallas pequeñas, el encabezado vuelve a una columna para conservar legibilidad.
+
 ## 1.5.69
 - Unifica la navegación numérica, el contenido de cada etapa y las acciones en una sola superficie de asistente.
 - Mejora la jerarquía visual del stepper, con conectores, estados claros y foco azul para la etapa activa.
