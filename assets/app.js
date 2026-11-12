@@ -662,15 +662,16 @@
   function typeName(code){return (testCatalog.find(x=>x[0]===code)||[])[1]||code||'Prueba';}
   function formatExecutionDate(value){if(!value)return '—';const d=new Date(String(value).replace(' ','T'));return Number.isNaN(d.getTime())?value:d.toLocaleString('es-PE',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});}
   function testStats(){
-    const visits=testExecutions.length;
-    const included=testExecutions.reduce((n,x)=>n+(x.plan_tests?.length||(x.test_code==='PLAN'?0:1)),0);
-    const types=new Set(testExecutions.flatMap(x=>(x.plan_tests||[]).map(t=>t.code).concat(x.test_code==='PLAN'?[]:[x.test_code])));
+    const total=testExecutions.length;
+    const counts={COMPLETE:0,INCOMPLETE:0,DRAFT:0};
+    testExecutions.forEach(execution=>{const status=executionDisplayStatus(execution).code;counts[status]=(counts[status]||0)+1;});
     const last=testExecutions[0]?.executed_at;
     $('#testStats').innerHTML=
-      '<div class="test-stat"><small>Ejecuciones registradas</small><strong>'+visits+'</strong><span>Planes de ensayos guardados</span></div>'+
-      '<div class="test-stat"><small>Ensayos incluidos</small><strong>'+included+'</strong><span>Pruebas en todas las visitas</span></div>'+
-      '<div class="test-stat"><small>Tipos utilizados</small><strong>'+types.size+'</strong><span>De '+testCatalog.length+' disponibles</span></div>'+
-      '<div class="test-stat"><small>Última ejecución</small><strong class="test-stat-date">'+(last?esc(formatExecutionDate(last)):'Sin registros')+'</strong><span>Fecha de realización</span></div>';
+      '<div class="test-stat"><small>Registros guardados</small><strong>'+total+'</strong><span>Planes de pruebas eléctricas</span></div>'+
+      '<div class="test-stat"><small>Completos</small><strong>'+counts.COMPLETE+'</strong><span>Todos los ensayos finalizados</span></div>'+
+      '<div class="test-stat"><small>Pendientes</small><strong>'+counts.INCOMPLETE+'</strong><span>Con ensayos por completar</span></div>'+
+      '<div class="test-stat"><small>Borradores</small><strong>'+counts.DRAFT+'</strong><span>Sin ensayos finalizados</span></div>'+
+      '<div class="test-stat"><small>Último registro</small><strong class="test-stat-date">'+(last?esc(formatExecutionDate(last)):'Sin registros')+'</strong><span>Fecha de realización</span></div>';
   }
   function renderTestTypes(){
     const host=$('#testTypeGrid');
@@ -681,7 +682,7 @@
     testStats();
     const latest=testExecutions[0]?.executed_at;
     const host=$('#testSummaryLatest');
-    if(host)host.innerHTML='<span>Última ejecución</span><strong>'+(latest?esc(formatExecutionDate(latest)):'Sin registros')+'</strong>';
+    if(host)host.innerHTML='<span>Último registro</span><strong>'+(latest?esc(formatExecutionDate(latest)):'Sin registros')+'</strong>';
   }
 
   function renderHistoricalAnalytics(){
