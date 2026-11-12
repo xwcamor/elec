@@ -500,7 +500,6 @@
     const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());$('#planDate').value=d.toISOString().slice(0,16);
     ['planOperator','planSupervisor','planOilTemp','planAmbientTemp','planHumidity','planObservations'].forEach(id=>$('#'+id).value='');
     $('#planTitle').textContent='Nuevo registro de pruebas';
-    if($('#saveTestPlan')){ $('#saveTestPlan').textContent='Guardar ahora'; $('#saveTestPlan').hidden=true; }
     setSaveStatus('Preparación · todavía no se guarda','idle');
     render();
   }
@@ -564,7 +563,6 @@
       }else if(x.test_code&&x.test_code!=='PLAN')items=[makeItem(x.test_code,{status:x.status,standard_reference:x.standard_reference,equipment_name:x.equipment_name,equipment_brand:x.equipment_brand,equipment_model:x.equipment_model,equipment_serial:x.equipment_serial,rows:rowsFromMeasurements(x.test_code,x.measurements||[])})];
       editRevision=0;savedRevision=0;
       activeTestIndex=0;render();$('#planTitle').textContent='Registro de pruebas #'+editingId;
-      if($('#saveTestPlan')){ $('#saveTestPlan').textContent='Guardar ahora'; $('#saveTestPlan').hidden=false; }
       setSaveStatus(String(x.status||'').toUpperCase()==='COMPLETADA'?'Registro completado · al editarlo volverá a En proceso':'Cambios guardados · puedes continuar el registro','saved');
       bridge.showPage('planPage');setPlanStep(items.length?'results':'shared');
     }catch(e){toast(e.message,true);}
@@ -639,8 +637,6 @@
         setSaveStatus('No se pudo guardar · revisa la conexión y vuelve a intentar','error');
         if(!automatic)toast(error.message,true);
         return false;
-      }finally{
-      }
     })();
     savePromise=operation;
     let result=false;
