@@ -299,8 +299,8 @@
   }
   $('#addWinding').addEventListener('click', () => addWinding());
   $('#copyWindings')?.addEventListener('click',()=>copyGrid([
-    ['Bobinado','Tensión kV','Conexión','¿Tiene neutro?'],
-    ...state.windings.map(w=>[w.name,w.voltage_kv,w.connection_type,w.has_neutral?'Sí':'No'])
+    ['Bobinado','Tensión kV'],
+    ...state.windings.map(w=>[w.name,w.voltage_kv])
   ].map(r=>r.join('\t')).join('\n')));
   function renderWindings() {
     const host = $('#windingsContainer');
@@ -312,15 +312,13 @@
       <details class="winding-card winding-accordion" data-winding="${wi}" ${wi===0?'open':''}>
         <summary class="winding-accordion-summary">
           <span class="winding-index">${String(wi+1).padStart(2,'0')}</span>
-          <span class="winding-summary-main"><strong>${esc(w.name||'Bobinado sin nombre')}</strong><small>${esc(w.voltage_kv||'—')} kV · ${esc(w.connection_type||'Conexión pendiente')}</small></span>
+          <span class="winding-summary-main"><strong>${esc(w.name||'Bobinado sin nombre')}</strong><small>${esc(w.voltage_kv||'—')} kV</small></span>
           <span class="winding-summary-count">${w.terminals.length} bornes</span><span class="accordion-chevron">⌄</span>
         </summary>
         <div class="winding-accordion-body">
           <div class="winding-card-head"><div class="winding-head-fields">
             <input aria-label="Nombre bobinado" data-wfield="name" value="${esc(w.name)}" placeholder="Nombre bobinado">
             <input class="w-voltage" aria-label="Tensión kV" data-wfield="voltage_kv" type="text" inputmode="decimal" value="${esc(w.voltage_kv)}" placeholder="kV">
-            <select aria-label="Conexión" data-wfield="connection_type">${['','Estrella (Y)','Estrella con neutro (YN)','Triángulo (D)','Zig-zag (Z)','Monofásico','Autotransformador'].map(v=>`<option ${w.connection_type===v?'selected':''} value="${esc(v)}">${v || 'Conexión...'}</option>`).join('')}</select>
-            <label class="check-inline">¿Tiene neutro?<select data-wfield="has_neutral"><option value="0" ${!w.has_neutral?'selected':''}>No</option><option value="1" ${w.has_neutral?'selected':''}>Sí</option></select></label>
           </div><button class="delete-btn" data-remove-winding="${wi}" title="Eliminar bobinado"><svg><use href="#i-trash"/></svg></button></div>
           <section class="terminal-section">
             <div class="terminal-section-heading">
@@ -580,7 +578,7 @@
   function renderReview(){
     const terminals=state.windings.reduce((n,w)=>n+w.terminals.length,0),bushings=state.windings.reduce((n,w)=>n+w.terminals.filter(t=>t.has_capacitive_bushing).length,0),taps=state.tap_changers.reduce((n,c)=>n+c.positions.length,0);
     $('#reviewSummary').innerHTML=`<div class="review-stat"><small>Bobinados</small><strong>${state.windings.length}</strong><span>Configurados</span></div><div class="review-stat"><small>Bornes</small><strong>${terminals}</strong><span>Terminales</span></div><div class="review-stat"><small>Bushings capacitivos</small><strong>${bushings}</strong><span>Identificados</span></div><div class="review-stat"><small>Conmutadores</small><strong>${state.tap_changers.length}</strong><span>Configurados</span></div><div class="review-stat"><small>Posiciones de tap</small><strong>${taps}</strong><span>Registradas</span></div><div class="review-stat"><small>Datos de placa · referencia</small><strong>${esc(state.vector_group||'—')}</strong><span>${esc(state.phase_count)} fase(s) · ${esc(state.frequency_hz)} Hz</span></div>`+
-      state.windings.map((w,i)=>`<div class="review-winding"><h4>${i+1}. ${esc(w.name)} · ${esc(w.voltage_kv||'—')} kV · ${esc(w.connection_type||'Conexión pendiente')}</h4><p>${esc(w.terminals.length)} bornes</p><div class="review-tags">${w.terminals.map(t=>`<span>${esc(t.code||'Sin código')} · ${esc(t.phase||'—')}${t.has_capacitive_bushing?' · C1':''}</span>`).join('')}</div></div>`).join('');
+      state.windings.map((w,i)=>`<div class="review-winding"><h4>${i+1}. ${esc(w.name)} · ${esc(w.voltage_kv||'—')} kV</h4><p>${esc(w.terminals.length)} bornes</p><div class="review-tags">${w.terminals.map(t=>`<span>${esc(t.code||'Sin código')} · ${esc(t.phase||'—')}${t.has_capacitive_bushing?' · C1':''}</span>`).join('')}</div></div>`).join('');
     $('#versionBadge').textContent='Versión '+(state.version_no||0);
     $('#versionList').innerHTML=(state.versions||[]).length?state.versions.map(v=>`<div class="version-row"><b>Versión ${v.version_no}</b><span>${esc(v.created_at||'')}</span></div>`).join(''):'<div class="empty-history">Todavía no hay versiones guardadas.</div>';
   }
@@ -597,7 +595,7 @@
       else if(codes.has(code))errors.push(`El código de bobinado ${code} está repetido.`);else codes.add(code);
       const voltage=Number(w.voltage_kv);
       if(!Number.isFinite(voltage)||voltage<=0)errors.push(`Indica una tensión nominal válida para el bobinado ${w.name||wi+1}.`);
-      if(!String(w.connection_type||'').trim())errors.push(`Selecciona la conexión del bobinado ${w.name||wi+1}.`);
+      
       const terminalCodes=new Set();
       const activeTerminals=(w.terminals||[]).filter(t=>String(t.code||'').trim()||String(t.phase||'').trim()||t.has_capacitive_bushing);
       if(!activeTerminals.length)errors.push(`Agrega al menos un borne al bobinado ${w.name||wi+1}.`);
