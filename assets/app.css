@@ -285,7 +285,7 @@
 .analytics-card{margin:0;background:#fff;border:1px solid #e1e6eb;border-radius:8px}
 .analytics-heading h3{font-size:15px}
 .analytics-heading p{font-size:10px;line-height:1.5}
-.plan-toolbar-actions{display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+.plan-toolbar-actions{display:flex;flex-direction:row;align-items:center;justify-content:flex-end;gap:12px}
 .plan-save-status{display:inline-flex;align-items:center;gap:7px;color:#728398;font-size:9px;line-height:1.35;text-align:right}
 .plan-save-status i{display:inline-block;width:8px;height:8px;border-radius:50%;background:#9ba8b5;flex:none}
 .plan-save-status[data-state="pending"]{color:#9a6d1d}.plan-save-status[data-state="pending"] i{background:#d39b35}
@@ -296,10 +296,10 @@
 @media(max-width:760px){
  .test-view-switcher{width:100%}.test-view-tab{flex:1;justify-content:center;padding:9px 7px;font-size:9px}
  .test-history-head{align-items:stretch;flex-direction:column}.test-filter{width:100%}
- .plan-toolbar-actions{align-items:stretch}.plan-toolbar-actions .toolbar-actions{justify-content:flex-end}
+ .plan-toolbar-actions{align-items:stretch}.plan-toolbar-actions{justify-content:flex-end;flex-wrap:wrap}
  .plan-save-status{text-align:left}
 }
-@media(max-width:430px){.plan-toolbar-actions .toolbar-actions{flex-wrap:wrap}.test-view-tab{gap:5px}}
+@media(max-width:430px){.plan-toolbar-actions{flex-wrap:wrap}.test-view-tab{gap:5px}}
 
 /* v1.5.20 · Estado de configuración y bloqueo de pruebas */
 .side-nav button.nav-action{min-width:0}
