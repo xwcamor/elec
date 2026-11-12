@@ -81,7 +81,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.35">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.36">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -325,10 +325,11 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
     </section>
     <section class="execution-card plan-step-panel" id="planSelectionSection" data-plan-panel="selection" hidden>
       <div class="execution-card-title"><span class="eyebrow">02 · SELECCIÓN DE ENSAYOS</span><h3>¿Qué pruebas vas a registrar?</h3><p>Selecciona una o varias. Cada prueba genera su propio formulario con los campos del protocolo de referencia.</p></div>
-      <div class="plan-test-add">
-        <label for="planTestTypeSelect">Tipo de ensayo<select id="planTestTypeSelect"></select></label>
-        <button class="btn primary" id="addPlanTest" type="button"><svg><use href="#i-plus"/></svg>Añadir ensayo</button>
+      <div class="plan-test-picker-head">
+        <div><strong>Selecciona los ensayos que necesitas</strong><small>Marca una o varias pruebas. Puedes cambiar la selección cuando quieras.</small></div>
+        <span id="planPickerCount" class="plan-picker-count">0 seleccionados</span>
       </div>
+      <div id="planTestPicker" class="plan-test-picker" role="group" aria-label="Catálogo de ensayos"></div>
       <div class="plan-selection-status" id="planSelectionStatus" aria-live="polite">Aún no has añadido ensayos al plan.</div>
     </section>
     <section class="execution-card plan-tests-section plan-step-panel" id="planResultsSection" data-plan-panel="results" hidden>
@@ -465,6 +466,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.35"></script>
-<script src="./assets/plan.js?v=1.5.35"></script>
+<script src="./assets/app.js?v=1.5.36"></script>
+<script src="./assets/plan.js?v=1.5.36"></script>
 </body></html>
