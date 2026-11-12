@@ -259,9 +259,27 @@
 
     const planStepKeys=['shared','selection','results','review'];
   const planStepLabels={shared:'Datos generales',selection:'Selección de ensayos',results:'Mediciones',review:'Resumen'};
+  function firstIncompleteTest(){
+    return items.findIndex(item=>!itemMetrics(item).complete);
+  }
   function setPlanStep(step){
     if(!planStepKeys.includes(step))return;
     if((step==='results'||step==='review')&&!items.length){toast('Añade al menos un ensayo antes de continuar.',true);step='selection';}
+    // No se permite abandonar Resultados por ensayo hasta completar todos los
+    // campos obligatorios de cada prueba seleccionada. El guardado automático
+    // de borradores sigue habilitado para no perder avances.
+    if(step==='review'&&currentPlanStep==='results'){
+      const incomplete=firstIncompleteTest();
+      if(incomplete>=0){
+        const item=items[incomplete],metrics=itemMetrics(item);
+        activeTestIndex=incomplete;
+        renderCards();
+        refreshPlanFeedback();
+        const firstMissing=metrics.missing[0]||'Completa los campos obligatorios y sus mediciones.';
+        toast('No puedes continuar todavía. Falta completar «'+item.name+'»: '+firstMissing+'.',true);
+        return false;
+      }
+    }
     currentPlanStep=step;
     document.querySelectorAll('#planPage [data-plan-panel]').forEach(panel=>{panel.hidden=panel.dataset.planPanel!==step;});
     document.querySelectorAll('#planStepper [data-plan-step]').forEach(button=>{
@@ -274,6 +292,7 @@
     if(next)next.textContent=step==='review'?'Guardar plan':'Continuar';
     if(hint)hint.textContent='Etapa '+(index+1)+' de 4 · '+planStepLabels[step];
     if(step==='review')renderPlanReview();
+    return true;
   }
   function movePlanStep(offset){
     const current=planStepKeys.indexOf(currentPlanStep),next=Math.max(0,Math.min(planStepKeys.length-1,current+offset));
