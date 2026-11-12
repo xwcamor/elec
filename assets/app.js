@@ -744,12 +744,15 @@
     const tests=Array.isArray(execution.plan_tests)?execution.plan_tests:[];
     const overall=String(execution.status||'').trim().toUpperCase();
     if(!tests.length){
-      return overall==='COMPLETADA'?{code:'COMPLETE',label:'Completo',className:'done'}:{code:'DRAFT',label:'En borrador',className:'draft'};
+      if(overall==='COMPLETADA')return {code:'COMPLETE',label:'Completado',className:'done'};
+      if(overall==='EN_PROCESO')return {code:'INCOMPLETE',label:'En proceso',className:'incomplete'};
+      return {code:'DRAFT',label:'Borrador',className:'draft'};
     }
     const completed=tests.filter(test=>String(test.status||'').trim().toUpperCase()==='COMPLETADA').length;
     if(overall==='COMPLETADA'&&completed===tests.length){
-      return {code:'COMPLETE',label:'Completo',className:'done'};
+      return {code:'COMPLETE',label:'Completado',className:'done'};
     }
+    if(overall==='EN_PROCESO')return {code:'INCOMPLETE',label:'En proceso',className:'incomplete'};
     const hasStarted=tests.some(test=>test.has_data===true||String(test.status||'').trim().toUpperCase()==='COMPLETADA');
     if(hasStarted){
       return {code:'INCOMPLETE',label:'En proceso',className:'incomplete'};
