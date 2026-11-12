@@ -443,7 +443,7 @@ window.PILOT = <?=json_encode([
         <label>Año de fabricación<input name="year" id="editTrafoYear" inputmode="numeric"></label>
         <label>Marca<input name="brand" id="editTrafoBrand"></label>
         <label>Tipo de conmutador<select name="tap_type" id="editTrafoTapType"><option value="">Seleccionar</option><option>DETC</option><option>OLTC</option></select></label>
-        <label>Número de taps<input name="num_taps" id="editTrafoNumTaps" inputmode="numeric"></label>
+        <label id="editTrafoNumTapsField">Número de taps<input name="num_taps" id="editTrafoNumTaps" inputmode="numeric"></label>
         <label>Grupo vectorial<input name="vector_group" id="editTrafoVector" placeholder="Ej. Yd11"></label>
         <label class="wide">Ubicación / Subestación<input name="location" id="editTrafoLocation"></label>
         <div class="edit-section-title">Datos de placa y características nominales</div>
