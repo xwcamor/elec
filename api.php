@@ -29,10 +29,29 @@ try {
         $key = trim((string)($_GET['key'] ?? ''));
         $transformer = $transformers->find($key);
         if (!$transformer) json_response(['ok' => false, 'message' => 'No se encontró el transformador en la tabla transformers.'], 404);
-        $hasSchema = $pdo->query("SHOW TABLES LIKE 'eh_electrical_configs'")->fetch();
-        $config = $hasSchema ? $configs->get($transformer['key']) : null;
-        $hasTestSchema = $pdo->query("SHOW TABLES LIKE 'eh_test_execution_data'")->fetch();
-        json_response(['ok' => true, 'transformer' => $transformer, 'config' => $config, 'schemaReady' => (bool)$hasSchema, 'testsSchemaReady' => (bool)$hasTestSchema]);
+        $requiredConfigTables = [
+            'eh_electrical_configs', 'eh_windings', 'eh_terminals', 'eh_bushings',
+            'eh_tap_changers', 'eh_tap_positions', 'eh_electrical_config_versions'
+        ];
+        $tableCheck = $pdo->prepare('SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ? LIMIT 1');
+        $missingConfigTables = [];
+        foreach ($requiredConfigTables as $tableName) {
+            $tableCheck->execute([$tableName]);
+            if (!$tableCheck->fetchColumn()) $missingConfigTables[] = $tableName;
+        }
+        $schemaReady = count($missingConfigTables) === 0;
+        $requiredTestTables = ['eh_test_types', 'eh_test_executions', 'eh_test_execution_data'];
+        $missingTestTables = [];
+        foreach ($requiredTestTables as $tableName) {
+            $tableCheck->execute([$tableName]);
+            if (!$tableCheck->fetchColumn()) $missingTestTables[] = $tableName;
+        }
+        $config = $schemaReady ? $configs->get($transformer['key']) : null;
+        json_response([
+            'ok' => true, 'transformer' => $transformer, 'config' => $config,
+            'schemaReady' => $schemaReady, 'missingConfigTables' => $missingConfigTables,
+            'testsSchemaReady' => count($missingTestTables) === 0, 'missingTestTables' => $missingTestTables
+        ]);
     }
     if ($action === 'transformer-update' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $payload = json_decode(file_get_contents('php://input'), true) ?: [];
@@ -54,7 +73,9 @@ try {
         ];
         $missingConfigTables = [];
         foreach ($requiredConfigTables as $tableName) {
-            if (!$pdo->query("SHOW TABLES LIKE " . $pdo->quote($tableName))->fetchColumn()) {
+            $tableCheck = $pdo->prepare('SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ? LIMIT 1');
+            $tableCheck->execute([$tableName]);
+            if (!$tableCheck->fetchColumn()) {
                 $missingConfigTables[] = $tableName;
             }
         }
