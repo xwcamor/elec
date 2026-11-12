@@ -232,8 +232,8 @@
       tab='taps';
     }
     selectedTab = tab;
-    $('.config-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-    $('.config-panel').forEach(p => p.classList.toggle('hidden', p.dataset.panel !== tab));
+    $$('.config-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    $$('.config-panel').forEach(p => p.classList.toggle('hidden', p.dataset.panel !== tab));
     if (tab === 'review') renderReview();
   }
   function syncTransformerNominals(){
@@ -253,7 +253,7 @@
 
   $('#openConfig').addEventListener('click', e => {e.preventDefault();openConfig();});
   $('#backOverview').addEventListener('click', backOverview);
-  $$('.config-tab').forEach(b => b.addEventListener('click', () => showPanel(b.dataset.tab)));
+  $$$('.config-tab').forEach(b => b.addEventListener('click', () => showPanel(b.dataset.tab)));
   $$('[data-prev]').forEach(b => b.addEventListener('click', () => showPanel(b.dataset.prev)));
   syncTransformerNominals();
 
