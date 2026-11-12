@@ -81,7 +81,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.61">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.62">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -325,7 +325,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       </div>
     </section>
     <section class="execution-card plan-step-panel" id="planSelectionSection" data-plan-panel="selection" hidden>
-      <div class="execution-card-title"><span class="eyebrow">02 · SELECCIÓN DE ENSAYOS</span><h3>¿Qué pruebas vas a registrar?</h3><p>Selecciona una o varias. Cada prueba genera su propio formulario con los campos del protocolo de referencia.</p></div>
+      
       <div class="plan-test-picker-head">
         <div><strong>Selecciona los ensayos que necesitas</strong><small>Marca una o varias pruebas. Puedes cambiar la selección cuando quieras.</small></div>
         <span id="planPickerCount" class="plan-picker-count">0 seleccionados</span>
@@ -472,6 +472,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.61"></script>
-<script src="./assets/plan.js?v=1.5.61"></script>
+<script src="./assets/app.js?v=1.5.62"></script>
+<script src="./assets/plan.js?v=1.5.62"></script>
 </body></html>
