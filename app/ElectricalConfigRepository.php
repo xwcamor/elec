@@ -188,7 +188,7 @@ class ElectricalConfigRepository
                 if ($rawPosition === '') continue;
                 if (!ctype_digit($rawPosition) || (int)$rawPosition < 1) throw new InvalidArgumentException('Las posiciones de TAP deben ser enteros positivos.');
                 $positionNo = (int)$rawPosition;
-                if (isset($positions[$positionNo])) throw new InvalidArgumentException('La posición '.$positionNo.' está duplicada en '.$changer['name'].'.');
+                if (isset($positions[$positionNo])) throw new InvalidArgumentException('La posición '.$positionNo.' está duplicada en '.($changer['name'] ?? 'el conmutador').'.');
                 $positions[$positionNo] = true;
             }
         }
