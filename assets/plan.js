@@ -726,6 +726,34 @@
     if(['planDate','planOperator','planSupervisor'].includes(e.target.id))refreshPlanFeedback();
     markPlanChanged();
   });
+  // Navegación tipo hoja de cálculo en todas las tablas del plan.
+  $('#planTestCards').addEventListener('keydown',e=>{
+    const cell=e.target.closest('.plan-cell');if(!cell||cell.readOnly)return;
+    const card=cell.closest('[data-test-index]');if(!card)return;
+    const item=items[Number(card.dataset.testIndex)];if(!item)return;
+    const fields=columns(item.code),row=Number(cell.dataset.row),col=fields.findIndex(([key])=>key===cell.dataset.col);
+    if(col<0)return;
+    let nextRow=row,nextCol=col,handled=true;
+    if(e.key==='Enter'||e.key==='ArrowDown')nextRow++;
+    else if(e.key==='ArrowUp')nextRow--;
+    else if(e.key==='ArrowRight'){
+      if(cell instanceof HTMLInputElement&&cell.selectionStart!==cell.value.length)return;
+      nextCol++;
+    }else if(e.key==='ArrowLeft'){
+      if(cell instanceof HTMLInputElement&&cell.selectionStart!==0)return;
+      nextCol--;
+    }else if(e.key==='Tab')nextCol+=e.shiftKey?-1:1;
+    else handled=false;
+    if(!handled)return;
+    e.preventDefault();
+    if(nextCol>=fields.length){nextCol=0;nextRow++;}
+    if(nextCol<0){nextCol=fields.length-1;nextRow=Math.max(0,nextRow-1);}
+    nextRow=Math.max(0,nextRow);
+    while(nextRow>=item.rows.length)item.rows.push({});
+    renderCards();refreshPlanFeedback();
+    const target=$('#planTestCards [data-test-index="'+Number(card.dataset.testIndex)+'"] [data-row="'+nextRow+'"][data-col="'+fields[nextCol][0]+'"]');
+    target?.focus();
+  });
   $('#planTestCards').addEventListener('paste',e=>{
     const cell=e.target.closest('.plan-cell');if(!cell||cell.readOnly)return;
     const text=(e.clipboardData||window.clipboardData).getData('text');if(!text.includes('\t')&&!text.includes('\n'))return;
