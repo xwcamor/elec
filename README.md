@@ -3,7 +3,7 @@
 Aplicación web independiente para configurar transformadores y registrar pruebas eléctricas. Es un prototipo PHP + MySQL pensado para ejecutarse localmente con Laragon.
 
 ## Versión
-**1.5.32**
+**1.5.34**
 
 ## Funcionalidades
 
@@ -50,7 +50,7 @@ Las tablas propias del prototipo usan el prefijo `eh_`. La configuración y las 
 3. Revisa y guarda una versión de la configuración.
 4. Entra a **Pruebas eléctricas** y pulsa **Registrar pruebas** o elige un tipo de ensayo.
 5. Completa los datos generales, selecciona los ensayos y registra las mediciones en las cuatro etapas del asistente; guarda para añadirlo al historial.
-6. Abre una visita existente desde el historial para revisar o editar ese registro; también puedes eliminarla con confirmación.
+6. Abre una ejecución existente desde el historial para revisar o editar ese registro; también puedes eliminarla con confirmación.
 
 Cada ejecución tiene su propio identificador. Editar una ejecución existente no debe crear otra ni sobrescribir registros de fechas distintas.
 
