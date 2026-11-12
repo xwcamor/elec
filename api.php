@@ -67,14 +67,11 @@ try {
             'eh_electrical_configs', 'eh_windings', 'eh_terminals', 'eh_bushings',
             'eh_tap_changers', 'eh_tap_positions', 'eh_electrical_config_versions'
         ];
-        $missingConfigTables = [];
-        foreach ($requiredConfigTables as $tableName) {
-            $tableCheck = $pdo->prepare('SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ? LIMIT 1');
-            $tableCheck->execute([$tableName]);
-            if (!$tableCheck->fetchColumn()) {
-                $missingConfigTables[] = $tableName;
-            }
-        }
+        $placeholders = implode(',', array_fill(0, count($requiredConfigTables), '?'));
+        $tableCheck = $pdo->prepare('SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name IN (' . $placeholders . ')');
+        $tableCheck->execute($requiredConfigTables);
+        $existingTables = array_fill_keys($tableCheck->fetchAll(PDO::FETCH_COLUMN), true);
+        $missingConfigTables = array_values(array_filter($requiredConfigTables, static fn($name) => !isset($existingTables[$name])));
         if ($missingConfigTables) {
             json_response([
                 'ok'=>false,
