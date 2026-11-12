@@ -1,3 +1,8 @@
+## v1.5.130
+- El indicador de Configuración eléctrica muestra únicamente los tres círculos numerados, sin títulos, contadores ni conectores.
+- Corrige la navegación de los paneles: utiliza selectores de colección para actualizar todos los botones y mostrar el panel correspondiente. Antes se intentaba iterar el resultado de querySelector, lo que impedía abrir el contenido.
+- Actualiza la caché de recursos.
+
 ## v1.5.129
 - Corrige el colapso visual del segundo paso de Configuración eléctrica reemplazando la distribución de columnas por una fila flex con conectores de ancho fijo.
 - Garantiza que los tres pasos conserven espacio para el círculo, título, contador y estado en escritorio y móvil.
