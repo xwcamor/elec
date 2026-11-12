@@ -720,20 +720,38 @@
   }
   $$('[data-test-view]').forEach(button=>button.addEventListener('click',()=>setTestWorkspaceView(button.dataset.testView)));
 
+  function executionDisplayStatus(execution){
+    const tests=Array.isArray(execution.plan_tests)?execution.plan_tests:[];
+    const overall=String(execution.status||'').trim().toUpperCase();
+    if(!tests.length){
+      return overall==='COMPLETADA'?{code:'COMPLETE',label:'Completo',className:'done'}:{code:'DRAFT',label:'En borrador',className:'draft'};
+    }
+    const completed=tests.filter(test=>String(test.status||'').trim().toUpperCase()==='COMPLETADA').length;
+    if(overall==='COMPLETADA'&&completed===tests.length){
+      return {code:'COMPLETE',label:'Completo',className:'done'};
+    }
+    if(completed>0){
+      return {code:'INCOMPLETE',label:'Incompleto',className:'incomplete'};
+    }
+    return {code:'DRAFT',label:'En borrador',className:'draft'};
+  }
   function renderTestHistory(){
     testStats();renderTestTypes();
     if(!$('#testAnalyticsPanel')?.classList.contains('hidden'))renderHistoricalAnalytics();
     const q=($('#testHistoryFilter')?.value||'').trim().toLocaleLowerCase();
+    const statusFilter=$('#testHistoryStatusFilter')?.value||'ALL';
     const filtered=testExecutions.filter(x=>{
       const names=(x.plan_tests||[]).map(t=>t.name||typeName(t.code)).join(' ')||(x.test_name||typeName(x.test_code));
-      return names.toLocaleLowerCase().includes(q)||(x.operator_name||'').toLocaleLowerCase().includes(q);
+      const matchesText=names.toLocaleLowerCase().includes(q)||(x.operator_name||'').toLocaleLowerCase().includes(q);
+      return matchesText&&(statusFilter==='ALL'||executionDisplayStatus(x).code===statusFilter);
     });
     $('#testHistoryBody').innerHTML=filtered.length?filtered.map(x=>{
       const names=x.plan_tests?.length?x.plan_tests.map(t=>t.name||typeName(t.code)):[x.test_name||typeName(x.test_code)];
       const measurementCount=Number(x.measurement_count||0);
       const detail=x.plan_tests?.length?names.length+' ensayos · '+measurementCount+' valores':measurementCount+' valores';
-      return '<tr><td><b>'+esc(formatExecutionDate(x.executed_at))+'</b><small>Ejecución #'+esc(x.id)+'</small></td><td><b>'+esc(names.join(' · '))+'</b></td><td>'+esc(x.operator_name||'—')+'</td><td>'+esc(detail)+'</td><td><div class="test-row-actions"><button class="btn small" data-open-execution="'+x.id+'" title="Continuar completando esta ejecución">Abrir plan</button><button class="btn small danger test-delete-button" data-delete-execution="'+x.id+'" title="Eliminar ejecución" aria-label="Eliminar ejecución #'+x.id+'"><svg><use href="#i-trash"/></svg>Eliminar</button></div></td></tr>';
-    }).join(''):'<tr><td colspan="5" class="test-empty">'+(testHistoryLoadError?'No se pudo consultar el historial: '+esc(testHistoryLoadError):(testExecutions.length?'No hay registros que coincidan con el filtro.':'No hay registros para este transformador. Los planes se ordenan por fecha de visita, del más reciente al más antiguo.'))+'</td></tr>';
+      const state=executionDisplayStatus(x);
+      return '<tr><td><b>'+esc(formatExecutionDate(x.executed_at))+'</b><small>Ejecución #'+esc(x.id)+'</small></td><td><b>'+esc(names.join(' · '))+'</b></td><td>'+esc(x.operator_name||'—')+'</td><td><span class="execution-status '+state.className+'">'+state.label+'</span></td><td>'+esc(detail)+'</td><td><div class="test-row-actions"><button class="btn small" data-open-execution="'+x.id+'" title="Continuar completando esta ejecución">Abrir plan</button><button class="btn small danger test-delete-button" data-delete-execution="'+x.id+'" title="Eliminar ejecución" aria-label="Eliminar ejecución #'+x.id+'"><svg><use href="#i-trash"/></svg>Eliminar</button></div></td></tr>';
+    }).join(''):'<tr><td colspan="6" class="test-empty">'+(testHistoryLoadError?'No se pudo consultar el historial: '+esc(testHistoryLoadError):(testExecutions.length?'No hay registros que coincidan con el filtro.':'No hay registros para este transformador. Los planes se ordenan por fecha de visita, del más reciente al más antiguo.'))+'</td></tr>';
     $$('[data-open-execution]').forEach(b=>b.addEventListener('click',()=>openExistingExecution(Number(b.dataset.openExecution))));
     $$('[data-delete-execution]').forEach(button=>button.addEventListener('click',async()=>{
       const id=Number(button.dataset.deleteExecution);
@@ -763,6 +781,7 @@
     }));
   }
   $('#testHistoryFilter').addEventListener('input',renderTestHistory);
+  $('#testHistoryStatusFilter').addEventListener('change',renderTestHistory);
   let testHistoryLoadPromise=null;
   let testHistoryLoadError='';
   async function loadTestHistory(){
