@@ -503,7 +503,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .plan-sheet td{background:#fff}
 .plan-cell{background:#fff!important;color:#334b60;font-size:9px}
 .plan-cell.is-filled{background:#fff!important;color:#334b60}
-.plan-cell.is-missing{background:#fff9f0!important;box-shadow:inset 0 0 0 1px #ead6ae!important}
+.plan-cell.is-missing{background:#fff0cf!important;box-shadow:inset 0 0 0 1px #e7bd68!important}
 .plan-cell.calculated{background:#f2f5f7!important;color:#536e82}
 .plan-sheet tr[data-row-state="complete"] td,.plan-sheet tr[data-row-state="partial"] td{background:#fff}
 .plan-sheet tr[data-row-state="complete"] .plan-cell.is-filled{background:#fff!important}
