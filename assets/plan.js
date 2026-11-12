@@ -756,10 +756,10 @@
     if(e.key==='Enter'||e.key==='ArrowDown')nextRow++;
     else if(e.key==='ArrowUp')nextRow--;
     else if(e.key==='ArrowRight'){
-      if(cell instanceof HTMLInputElement&&cell.selectionStart!==cell.value.length)return;
+      if(!cell.readOnly&&cell instanceof HTMLInputElement&&cell.selectionStart!==cell.value.length)return;
       nextCol++;
     }else if(e.key==='ArrowLeft'){
-      if(cell instanceof HTMLInputElement&&cell.selectionStart!==0)return;
+      if(!cell.readOnly&&cell instanceof HTMLInputElement&&cell.selectionStart!==0)return;
       nextCol--;
     }else if(e.key==='Tab')nextCol+=e.shiftKey?-1:1;
     else handled=false;
