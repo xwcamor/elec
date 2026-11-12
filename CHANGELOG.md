@@ -1,3 +1,6 @@
+## 1.5.67
+- Corrige un fragmento residual `ion>` que quedó visible al retirar el panel de avance del plan.
+
 ## 1.5.66
 - Simplifica el aviso al intentar pasar al resumen con ensayos incompletos: ahora muestra únicamente el nombre de la prueba pendiente.
 
