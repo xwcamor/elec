@@ -219,9 +219,9 @@
     const complete=state.windings.length>0&&state.windings.every(w=>{
       const name=String(w.name||'').trim(),code=String(w.code||'').trim();
       const voltage=Number(w.voltage_kv);
-      const terminals=(w.terminals||[]).filter(t=>String(t.code||'').trim()||String(t.phase||'').trim()||t.has_capacitive_bushing);
+      const terminals=Array.isArray(w.terminals)?w.terminals:[];
       return name!==''&&code!==''&&Number.isFinite(voltage)&&voltage>0&&
-        terminals.length>0&&terminals.every(t=>String(t.code||'').trim()!==''&&String(t.phase||'').trim()!=='');
+        terminals.length>0&&terminals.every(t=>String(t.code||'').trim()!=='');
     })&&issues.length===0;
     return {complete,issues};
   }
@@ -318,8 +318,8 @@
         </summary>
         <div class="winding-accordion-body">
           <div class="winding-card-head"><div class="winding-head-fields">
-            <input aria-label="Nombre bobinado" data-wfield="name" value="${esc(w.name)}" placeholder="Nombre bobinado">
-            <input class="w-voltage" aria-label="Tensión kV" data-wfield="voltage_kv" type="text" inputmode="decimal" value="${esc(w.voltage_kv)}" placeholder="kV">
+            <input aria-label="Nombre bobinado" data-wfield="name" value="${esc(w.name)}" placeholder="Nombre bobinado" required>
+            <input class="w-voltage" aria-label="Tensión kV" data-wfield="voltage_kv" type="text" inputmode="decimal" value="${esc(w.voltage_kv)}" placeholder="kV" required>
           </div><button class="delete-btn" data-remove-winding="${wi}" title="Eliminar bobinado"><svg><use href="#i-trash"/></svg></button></div>
           <section class="terminal-section">
             <div class="terminal-section-heading">
