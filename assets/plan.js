@@ -84,7 +84,7 @@
   }
   function powerFactorObservation(rows){
     const statuses=(rows||[]).map(row=>normalize('POWER_FACTOR',row).status);
-    if(statuses.length===6&&statuses.every(s=>s==='CORRECTO'))return 'Los valores obtenidos están dentro de lo recomendado según la cláusula 7.2.14 de la norma IEEE Std C57.152-2013. Los valores son aceptables.';
+    if(statuses.length===6&&statuses.every(s=>s==='CORRECTO'))return 'Los valores obtenidos están dentro de lo recomendado según la cláusula 7.2.14 de la norma IEEE Std C57. 152 - 2013. Los valores son aceptables.';
     if(statuses.some(s=>s==='OBSERVADO'))return 'Se encontraron valores observados';
     return 'Pendiente de completar las seis mediciones del ensayo.';
   }
