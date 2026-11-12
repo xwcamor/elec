@@ -271,7 +271,9 @@
     const next=$('#planStepNext');
     if(next){
       const blocked=(currentPlanStep==='shared'&&m.general.length>0)||(currentPlanStep==='selection'&&items.length===0)||(currentPlanStep==='review'&&!m.complete);
-      next.disabled=blocked;
+      // Mantener el botón accionable: la navegación valida y muestra el aviso
+      // correspondiente en lugar de bloquear el clic silenciosamente.
+      next.disabled=false;
       next.title=blocked?(currentPlanStep==='shared'?'Completa fecha, responsable/técnico y supervisor.':currentPlanStep==='selection'?'Selecciona al menos un ensayo.':'Completa todos los campos obligatorios de cada ensayo.'):'';
     }
     renderPlanReview();
