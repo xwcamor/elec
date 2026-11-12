@@ -323,7 +323,7 @@
           </div><button class="delete-btn" data-remove-winding="${wi}" title="Eliminar bobinado"><svg><use href="#i-trash"/></svg></button></div>
           <section class="terminal-section">
             <div class="terminal-section-heading">
-              <div class="terminal-section-title"><strong>Bornes y terminales</strong><small data-winding-stats="${wi}">${w.terminals.length} registros · ${w.terminals.filter(t=>t.has_capacitive_bushing).length} elementos capacitivos</small></div>
+              <div class="terminal-section-title"><strong>Bornes y terminales</strong><small data-winding-stats="${wi}">${w.terminals.filter(t=>!(t._draft&&!String(t.code||'').trim()&&!t.has_capacitive_bushing)).length} bornes · ${w.terminals.filter(t=>t.has_capacitive_bushing).length} capacitivos</small></div>
               <div class="sheet-tools"><button type="button" data-add-terminal="${wi}">+ Fila</button><button type="button" data-copy-terminals="${wi}">Copiar bornes</button></div>
             </div>
             <div class="terminal-section-content">
@@ -535,7 +535,7 @@
   function refreshWindingCounters(){
     $$('[data-winding-stats]').forEach(el=>{
       const i=Number(el.dataset.windingStats),w=state.windings[i];
-      if(w)el.textContent=`${w.terminals.length} registros · ${w.terminals.filter(t=>t.has_capacitive_bushing).length} bushings capacitivos`;
+      if(w)el.textContent=`${w.terminals.filter(t=>!(t._draft&&!String(t.code||'').trim()&&!t.has_capacitive_bushing)).length} bornes · ${w.terminals.filter(t=>t.has_capacitive_bushing).length} capacitivos`;
     });
   }
 
