@@ -1,3 +1,9 @@
+## v1.5.94
+- Presenta cada bobinado como un acordeón independiente con resumen de nombre, código, tensión, conexión y cantidad de bornes.
+- Agrupa bornes/terminales en un segundo acordeón dentro de cada bobinado para distinguir claramente ambos niveles.
+- Mantiene edición de campos, grillas, pegado desde Excel, copia y acciones existentes.
+- Añade al README una lista de pruebas funcionales pendientes para ejecutar posteriormente en Laragon/MySQL.
+
 ## v1.5.93
 - Corrige el desajuste entre cantidad TAP de la ficha técnica y filas del conmutador: deja de bloquear el avance solo por diferencias de cantidad.
 - Añade acción explícita para sincronizar las filas de los conmutadores con la ficha técnica.
