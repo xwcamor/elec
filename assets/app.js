@@ -147,7 +147,9 @@
       min_position:c.min_position ?? '', max_position:c.max_position ?? '', neutral_position:c.neutral_position ?? '', current_position:c.current_position ?? '', notes:c.notes || '',
       positions:(c.positions || []).map(p => ({position_no:p.position_no,label:p.label || '',voltage_kv:p.voltage_kv ?? '',percent_change:p.percent_change ?? '',is_neutral:Number(p.is_neutral || 0)===1,notes:p.notes || ''}))
     }));
-    return {phase_count:Number(config.phase_count || 3),vector_group:config.vector_group || transformer.vector_group || '',frequency_hz:config.frequency_hz ?? 60,notes:config.notes || '',version_no:Number(config.version_no || 0),windings,tap_changers:tapChangers,versions:Array.isArray(config.versions) ? config.versions : []};
+    const phaseSource=transformer.phase_count!==null&&transformer.phase_count!==undefined&&transformer.phase_count!==''?transformer.phase_count:(config.phase_count||3);
+    const frequencySource=transformer.frequency_hz!==null&&transformer.frequency_hz!==undefined&&transformer.frequency_hz!==''?transformer.frequency_hz:(config.frequency_hz??60);
+    return {phase_count:Number(phaseSource),vector_group:String(transformer.vector_group||config.vector_group||''),frequency_hz:frequencySource,notes:config.notes || '',version_no:Number(config.version_no || 0),windings,tap_changers:tapChangers,versions:Array.isArray(config.versions) ? config.versions : []};
   }
 
   function hasSavedElectricalConfiguration(){
@@ -201,7 +203,17 @@
     $$('.config-panel').forEach(p => p.classList.toggle('hidden', p.dataset.panel !== tab));
     if (tab === 'review') renderReview();
   }
+  function syncTransformerNominals(){
+    if(transformer.phase_count!==null&&transformer.phase_count!==undefined&&transformer.phase_count!=='')state.phase_count=Number(transformer.phase_count);
+    if(transformer.vector_group!==undefined)state.vector_group=String(transformer.vector_group||'');
+    if(transformer.frequency_hz!==null&&transformer.frequency_hz!==undefined&&transformer.frequency_hz!=='')state.frequency_hz=transformer.frequency_hz;
+    $('#phaseCount').value=String(state.phase_count||'');
+    $('#phaseCountDisplay').value=Number(state.phase_count)===1?'Monofásico':(Number(state.phase_count)===3?'Trifásico':'No definido en ficha');
+    $('#vectorGroup').value=state.vector_group||'';
+    $('#frequency').value=state.frequency_hz??'';
+  }
   function openConfig() {
+    syncTransformerNominals();
     showOnlyMain('configPage');
     showPanel('general');
     updateCounts();
@@ -213,11 +225,9 @@
   $('#backOverview').addEventListener('click', backOverview);
   $$('.config-tab').forEach(b => b.addEventListener('click', () => showPanel(b.dataset.tab)));
   $$('[data-prev]').forEach(b => b.addEventListener('click', () => showPanel(b.dataset.prev)));
-  $('#phaseCount').value = String(state.phase_count || 3);
-  $('#vectorGroup').value = state.vector_group || '';
-  $('#frequency').value = state.frequency_hz ?? 60;
+  syncTransformerNominals();
   $('#generalNotes').value = state.notes || '';
-  ['phaseCount','vectorGroup','frequency','generalNotes'].forEach(id => $('#'+id).addEventListener('input', () => {state.phase_count=Number($('#phaseCount').value);state.vector_group=$('#vectorGroup').value;state.frequency_hz=$('#frequency').value;state.notes=$('#generalNotes').value;markDirty();}));
+  $('#generalNotes').addEventListener('input',()=>{state.notes=$('#generalNotes').value;markDirty();});
 
   function addWinding(data = {}) {
     const suffix = state.windings.length + 1;
