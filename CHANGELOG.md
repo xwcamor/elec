@@ -1,3 +1,8 @@
+## v1.5.108
+- Renombra el encabezado «Capacitancia fuente (F)» a «Capacitancia», conservando el dato interno en F para el cálculo de nF.
+- La flecha abajo y Enter ya no crean filas automáticamente al llegar al final de la tabla; la creación de filas queda en el botón «+ Fila».
+- Los ensayos completos permanecen abiertos y editables; al modificar un resultado no se cierra automáticamente el formulario.
+
 ## v1.5.107
 - Corrige navegación por teclado en el plan: ahora se puede entrar y salir de las celdas calculadas «Capacitancia medida» y «Estado» sin quedar atrapado.
 - Factor de potencia: unidades explícitas en encabezados: tensión de prueba (V), FP medido (%) y FP corregido (%), sin mostrar 20 °C en el título.
