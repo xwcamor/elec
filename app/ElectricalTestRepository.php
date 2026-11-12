@@ -138,7 +138,9 @@ class ElectricalTestRepository
             if ($status === 'COMPLETADA') {
                 if (!$safeTests) throw new InvalidArgumentException('No se puede completar un registro sin ensayos.');
                 foreach ($safeTests as $test) {
-                    if (($test['status'] ?? 'BORRADOR') !== 'COMPLETADA') throw new InvalidArgumentException('Todos los ensayos deben estar completos antes de confirmar el registro.');
+                    if (($test['status'] ?? 'BORRADOR') !== 'COMPLETADA' || empty($test['measurements'])) {
+                        throw new InvalidArgumentException('Todos los ensayos deben tener sus mediciones completas antes de confirmar el registro.');
+                    }
                 }
                 if (trim((string)($p['operator_name'] ?? '')) === '' || trim((string)($p['supervisor_name'] ?? '')) === '') throw new InvalidArgumentException('Completa el responsable y el supervisor antes de confirmar el registro.');
             }
