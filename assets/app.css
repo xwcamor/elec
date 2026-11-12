@@ -1055,3 +1055,73 @@ body.config-focus .config-panel .form-grid input[readonly]:focus{border-color:#e
   .plan-wizard-shell>.plan-step-panel{animation:none}
   .plan-wizard-shell>.plan-stepper .plan-step-number{transition:none}
 }
+
+
+/* v1.5.70 · Encabezados en dos líneas y conectores compactos */
+.plan-wizard-shell>.plan-stepper{
+  grid-template-columns:40px minmax(24px,1fr) 40px minmax(24px,1fr) 40px minmax(24px,1fr) 40px;
+  max-width:100%;
+  padding:14px clamp(20px,7vw,112px);
+  column-gap:0;
+}
+.plan-wizard-shell>.plan-stepper .plan-step{
+  width:40px;
+  min-width:40px;
+  padding:0;
+}
+.plan-wizard-shell>.plan-stepper .plan-step-connector{
+  width:100%;
+  height:2px;
+  margin:0;
+  background:#e7edf2;
+  transition:background-color .2s ease;
+}
+.plan-wizard-shell>.plan-stepper .plan-step-connector[data-state="complete"]{background:#45a875}
+.plan-wizard-shell>.plan-stepper .plan-step-connector[data-state="active"]{background:#2c80bd}
+.plan-wizard-shell>.plan-step-panel .execution-card-title{
+  display:grid;
+  grid-template-columns:minmax(0,1.15fr) minmax(240px,.85fr);
+  align-items:center;
+  column-gap:32px;
+  row-gap:5px;
+  margin-bottom:22px;
+}
+.plan-wizard-shell>.plan-step-panel .execution-card-title>.eyebrow{
+  grid-column:1/-1;
+  margin:0;
+  align-self:end;
+}
+.plan-wizard-shell>.plan-step-panel .execution-card-title h3{
+  grid-column:1;
+  grid-row:2;
+  align-self:center;
+  margin:0;
+  line-height:1.25;
+}
+.plan-wizard-shell>.plan-step-panel .execution-card-title p{
+  grid-column:2;
+  grid-row:2;
+  align-self:center;
+  margin:0;
+  max-width:480px;
+  line-height:1.55;
+}
+@media(max-width:760px){
+  .plan-wizard-shell>.plan-stepper{
+    grid-template-columns:34px minmax(12px,1fr) 34px minmax(12px,1fr) 34px minmax(12px,1fr) 34px;
+    padding:10px 12px;
+  }
+  .plan-wizard-shell>.plan-stepper .plan-step{width:34px;min-width:34px}
+  .plan-wizard-shell>.plan-stepper .plan-step-number{width:34px;height:34px;flex-basis:34px}
+  .plan-wizard-shell>.plan-step-panel .execution-card-title{
+    grid-template-columns:1fr;
+    row-gap:7px;
+    margin-bottom:17px;
+  }
+  .plan-wizard-shell>.plan-step-panel .execution-card-title>.eyebrow{grid-column:1}
+  .plan-wizard-shell>.plan-step-panel .execution-card-title h3,
+  .plan-wizard-shell>.plan-step-panel .execution-card-title p{
+    grid-column:1;
+    grid-row:auto;
+  }
+}
