@@ -1,3 +1,8 @@
+## v1.5.151
+- Elimina las etiquetas redundantes «HISTORIAL DE REGISTROS» y «LECTURA VISUAL»; conserva los títulos descriptivos.
+- Refuerza con selector explícito el separador horizontal del encabezado principal de Pruebas eléctricas para igualarlo al de Configuración.
+- Actualiza la guía para incluir los tres encabezados: Configuración, vista principal de Pruebas y formulario de Registro.
+
 ## v1.5.150
 - Añade el separador inferior estándar al encabezado de la vista Resumen de Pruebas eléctricas.
 - Normaliza la jerarquía de color de las pestañas: solo la activa usa el acento; las inactivas son neutras.
