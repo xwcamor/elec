@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 1.5.39
+- Actualiza los identificadores de caché de CSS y JavaScript a 1.5.39 para evitar que el navegador reutilice recursos antiguos y mantener sincronizada la carga del historial.
+
 ## 1.5.38
 - El paso «Resultados por ensayo» bloquea el avance al resumen mientras exista al menos un ensayo con campos obligatorios o filas incompletas.
 - Al intentar continuar, se enfoca automáticamente el primer ensayo pendiente y se informa el primer dato faltante.
