@@ -23,20 +23,15 @@ try {
         'eh_electrical_configs', 'eh_windings', 'eh_terminals', 'eh_bushings',
         'eh_tap_changers', 'eh_tap_positions', 'eh_electrical_config_versions'
     ];
-    $tableCheck = $pdo->prepare('SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ? LIMIT 1');
-    $missingConfigTables = [];
-    foreach ($requiredConfigTables as $tableName) {
-        $tableCheck->execute([$tableName]);
-        if (!$tableCheck->fetchColumn()) $missingConfigTables[] = $tableName;
-    }
-    $schemaReady = count($missingConfigTables) === 0;
-
     $requiredTestTables = ['eh_test_types','eh_test_executions','eh_test_execution_data'];
-    $missingTestTables = [];
-    foreach ($requiredTestTables as $tableName) {
-        $tableCheck->execute([$tableName]);
-        if (!$tableCheck->fetchColumn()) $missingTestTables[] = $tableName;
-    }
+    $allRequiredTables = array_merge($requiredConfigTables, $requiredTestTables);
+    $placeholders = implode(',', array_fill(0, count($allRequiredTables), '?'));
+    $tableCheck = $pdo->prepare('SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name IN (' . $placeholders . ')');
+    $tableCheck->execute($allRequiredTables);
+    $existingTables = array_fill_keys($tableCheck->fetchAll(PDO::FETCH_COLUMN), true);
+    $missingConfigTables = array_values(array_filter($requiredConfigTables, static fn($name) => !isset($existingTables[$name])));
+    $missingTestTables = array_values(array_filter($requiredTestTables, static fn($name) => !isset($existingTables[$name])));
+    $schemaReady = count($missingConfigTables) === 0;
     $testsSchemaReady = count($missingTestTables) === 0;
     if ($schemaReady) {
         $configRepo = new ElectricalConfigRepository($pdo);
