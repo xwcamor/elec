@@ -81,7 +81,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.51">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.52">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -316,15 +316,15 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
         <label><span>Responsable / técnico <i class="required-mark">*</i></span><input id="planOperator" placeholder="Nombre del técnico" required aria-required="true"></label>
         <label><span>Supervisor <i class="required-mark">*</i></span><input id="planSupervisor" placeholder="Nombre del supervisor" required aria-required="true"></label>
       </div>
-      <details class="plan-optional-details" open>
-        <summary><span>Condiciones ambientales</span><small>Temperaturas, humedad y observaciones</small></summary>
+      <div class="plan-environment-fields">
+        <div class="plan-environment-heading"><b>Condiciones ambientales</b><span>Temperaturas y humedad durante los ensayos.</span></div>
         <div class="form-grid execution-meta-grid plan-shared-grid">
           <label>Temperatura del aceite (°C)<input id="planOilTemp" inputmode="decimal" placeholder="Ej. 35.5"></label>
           <label>Temperatura ambiente (°C)<input id="planAmbientTemp" inputmode="decimal" placeholder="Ej. 22"></label>
           <label>Humedad relativa (%)<input id="planHumidity" inputmode="decimal" placeholder="Ej. 74"></label>
         </div>
         <label class="plan-shared-notes">Observaciones generales<textarea id="planObservations" rows="2" placeholder="Condiciones del servicio, ubicación e incidencias generales..."></textarea></label>
-      </details>
+      </div>
     </section>
     <section class="execution-card plan-step-panel" id="planSelectionSection" data-plan-panel="selection" hidden>
       <div class="execution-card-title"><span class="eyebrow">02 · SELECCIÓN DE ENSAYOS</span><h3>¿Qué pruebas vas a registrar?</h3><p>Selecciona una o varias. Cada prueba genera su propio formulario con los campos del protocolo de referencia.</p></div>
@@ -469,6 +469,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.51"></script>
-<script src="./assets/plan.js?v=1.5.51"></script>
+<script src="./assets/app.js?v=1.5.52"></script>
+<script src="./assets/plan.js?v=1.5.52"></script>
 </body></html>
