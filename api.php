@@ -109,8 +109,10 @@ try {
         $payload = json_decode(file_get_contents('php://input'), true) ?: [];
         $key = trim((string)($payload['transformer_key'] ?? ''));
         if (!$transformers->find($key)) json_response(['ok'=>false,'message'=>'No se identificó el transformador en transformers. Búscalo y selecciónalo antes de guardar.'], 422);
+        // Garantiza que exista el tipo PLAN antes de persistir un plan de visita.
+        $tests->types();
         $result = $tests->save($payload);
-        json_response(['ok' => true, 'message' => 'Registro de prueba guardado.', 'result' => $result]);
+        json_response(['ok' => true, 'message' => 'Plan de pruebas guardado.', 'result' => $result]);
     }
     if ($action === 'test-delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $payload = json_decode(file_get_contents('php://input'), true) ?: [];
