@@ -1225,8 +1225,15 @@
   $('#specificTestRows')?.addEventListener('keydown',e=>{
     const el=e.target.closest('.specific-cell');if(!el||!activeSpecificCode)return;
     const max=specificTemplates[activeSpecificCode].cols.length;let r=+el.dataset.r,c=+el.dataset.c;
-    if(e.key==='Enter'||e.key==='ArrowDown'){e.preventDefault();r++;}else if(e.key==='ArrowUp'){e.preventDefault();r--;}else if(e.key==='Tab'){e.preventDefault();c+=e.shiftKey?-1:1;if(c>=max){c=0;r++;}if(c<0){c=max-1;r=Math.max(0,r-1);}}else return;
-    const rows=collectSpecificRows();while(r>=rows.length)rows.push({});renderSpecificRows(rows,activeSpecificCode);$(`#specificTestRows [data-r="${r}"][data-c="${c}"]`)?.focus();
+    if(e.key==='Enter'||e.key==='ArrowDown'){e.preventDefault();r++;}
+    else if(e.key==='ArrowUp'){e.preventDefault();r--;}
+    else if(e.key==='ArrowRight'&&(!(el instanceof HTMLInputElement)||el.selectionStart===el.value.length)){e.preventDefault();c++;}
+    else if(e.key==='ArrowLeft'&&(!(el instanceof HTMLInputElement)||el.selectionStart===0)){e.preventDefault();c--;}
+    else if(e.key==='Tab'){e.preventDefault();c+=e.shiftKey?-1:1;}
+    else return;
+    if(c>=max){c=0;r++;}if(c<0){c=max-1;r=Math.max(0,r-1);}r=Math.max(0,r);
+    const rows=collectSpecificRows();while(r>=rows.length)rows.push({});
+    renderSpecificRows(rows,activeSpecificCode);$(`#specificTestRows [data-r="${r}"][data-c="${c}"]`)?.focus();
   });
   $('#executionType').addEventListener('change',()=>{toggleTestTemplate();});
   $('#ttrAddRows').addEventListener('click',()=>{
@@ -1255,8 +1262,13 @@
     let r=Number(el.dataset.r),c=Number(el.dataset.c);
     if(e.key==='Enter'||e.key==='ArrowDown'){e.preventDefault();r++;}
     else if(e.key==='ArrowUp'){e.preventDefault();r--;}
-    else if(e.key==='Tab'){e.preventDefault();c+=e.shiftKey?-1:1;if(c>10){c=0;r++;}if(c<0){c=10;r=Math.max(0,r-1);}while([3,5,7,9].includes(c)){c+=e.shiftKey?-1:1;}}
+    else if(e.key==='ArrowRight'&&(!(el instanceof HTMLInputElement)||el.selectionStart===el.value.length)){e.preventDefault();c++;}
+    else if(e.key==='ArrowLeft'&&(!(el instanceof HTMLInputElement)||el.selectionStart===0)){e.preventDefault();c--;}
+    else if(e.key==='Tab'){e.preventDefault();c+=e.shiftKey?-1:1;}
     else return;
+    if(c>10){c=0;r++;}if(c<0){c=10;r=Math.max(0,r-1);}r=Math.max(0,r);
+    while([3,5,7,9].includes(c))c++;
+    if(c>10){c=0;r++;}
     const rows=collectTtrRows();while(r>=rows.length)rows.push({tap:rows.length+1});renderTtrRows(rows);
     $(`#ttrRows [data-r="${r}"][data-c="${c}"]`)?.focus();
   });
