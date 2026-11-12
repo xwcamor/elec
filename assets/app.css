@@ -818,3 +818,9 @@ body.test-form-focus .plan-tests-section{scroll-margin-top:84px}
 .test-attention-copy span{font-size:10px;color:#82909c;overflow-wrap:anywhere}
 .test-attention-empty{padding:17px 0;color:#688071;font-size:11px}
 @media(max-width:650px){.test-attention-row{grid-template-columns:minmax(0,1fr) auto;gap:8px}.test-attention-row .btn{grid-column:1/-1;justify-self:start}}
+
+/* Configuración: mantener acciones visibles y evitar que el stepper las cubra */
+body.config-focus .config-toolbar{position:sticky;top:0;z-index:70}
+body.config-focus .config-sidebar{position:relative;top:auto;z-index:1}
+body.config-focus .config-panel .form-grid input[readonly]{background:#f6f8fa;color:#536a7d;border-color:#e1e7ec;cursor:default}
+body.config-focus .config-panel .form-grid input[readonly]:focus{border-color:#e1e7ec;box-shadow:none}
