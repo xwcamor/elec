@@ -81,7 +81,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.50">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.51">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -309,10 +309,10 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       <div class="plan-progress-main"><strong>Preparando resumen de avance…</strong></div>
     </section>
     <section class="execution-card plan-shared-card plan-step-panel" id="planSharedSection" data-plan-panel="shared">
-      <div class="execution-card-title"><span class="eyebrow">01 · DATOS COMPARTIDOS</span><h3>Datos de la visita y condiciones ambientales</h3><p>Se ingresan una sola vez y se comparten con todos los ensayos del plan.</p></div>
-      <div class="execution-date-card plan-date-inline"><div class="date-emblem"><svg><use href="#i-calendar"/></svg></div><div class="date-copy"><strong>Fecha y hora de las pruebas</strong><small>Fecha real de realización de los ensayos.</small></div><label class="execution-date-field"><span>Realizada el <i class="required-mark">*</i></span><input id="planDate" type="datetime-local" required aria-required="true"></label></div>
-      <div class="plan-shared-status is-pending" id="planSharedStatus" aria-live="polite">Pendiente: fecha de la visita · responsable / técnico</div>
-      <div class="plan-core-grid">
+      <div class="execution-card-title"><span class="eyebrow">01 · DATOS COMPARTIDOS</span><h3>Datos de realización y condiciones ambientales</h3><p>Se ingresan una sola vez y se comparten con todos los ensayos del plan.</p></div>
+      <div class="plan-shared-status is-pending" id="planSharedStatus" aria-live="polite">Pendiente: fecha de realización · responsable / técnico · supervisor</div>
+      <div class="plan-core-grid plan-realization-grid">
+        <label class="execution-date-field"><span>Realizada el <i class="required-mark">*</i></span><input id="planDate" type="datetime-local" required aria-required="true"></label>
         <label><span>Responsable / técnico <i class="required-mark">*</i></span><input id="planOperator" placeholder="Nombre del técnico" required aria-required="true"></label>
         <label><span>Supervisor <i class="required-mark">*</i></span><input id="planSupervisor" placeholder="Nombre del supervisor" required aria-required="true"></label>
       </div>
@@ -469,6 +469,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.50"></script>
-<script src="./assets/plan.js?v=1.5.50"></script>
+<script src="./assets/app.js?v=1.5.51"></script>
+<script src="./assets/plan.js?v=1.5.51"></script>
 </body></html>
