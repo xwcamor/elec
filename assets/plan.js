@@ -27,7 +27,7 @@
   };
   let items=[],editingId=null,sessionId=null,activeTestIndex=0,currentPlanStep='shared';
   let autoSaveTimer=null,savePromise=null,savePending=false,editRevision=0,savedRevision=0;
-  function hasUnsavedChanges(){return editRevision>savedRevision;}
+  function hasUnsavedChanges(){return editingId!==null&&editRevision>savedRevision;}
   function setSaveStatus(message,state){
     const node=$('#planSaveStatus');if(!node)return;
     node.dataset.state=state||'idle';
@@ -35,7 +35,8 @@
   }
   function scheduleAutoSave(delay){
     if(autoSaveTimer)clearTimeout(autoSaveTimer);
-    // Guardar también el borrador antes de seleccionar ensayos.
+    // La preparación es temporal: nunca crea registros en segundo plano.
+    if(editingId===null){setSaveStatus('Preparación · todavía no se guarda','idle');return;}
     if(!$('#planDate').value){setSaveStatus('Falta la fecha de realización para guardar','warning');return;}
     setSaveStatus('Cambios pendientes · se guardarán automáticamente','pending');
     autoSaveTimer=setTimeout(()=>savePlan(true),delay??900);
@@ -349,7 +350,8 @@
     });
     const index=planStepKeys.indexOf(step),back=$('#planStepBack'),next=$('#planStepNext'),hint=$('#planStepHint');
     if(back){back.hidden=index===0;back.disabled=index===0;back.textContent=step==='review'?'Volver a resultados':'Anterior';}
-    if(next)next.textContent=step==='results'?'Revisar registro':(step==='review'?'Confirmar registro':'Continuar');
+    if(next)next.textContent=step==='results'?'Revisar registro':(step==='review'?'Finalizar prueba':'Continuar');
+    if(editingId!==null&&hasUnsavedChanges())scheduleAutoSave(200);
     if(hint)hint.textContent='Paso '+(index+1)+' de 4';
     renderPlanFeedback();
     if(step==='review')renderPlanReview();
@@ -468,14 +470,14 @@
     const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());$('#planDate').value=d.toISOString().slice(0,16);
     ['planOperator','planSupervisor','planOilTemp','planAmbientTemp','planHumidity','planObservations'].forEach(id=>$('#'+id).value='');
     $('#planTitle').textContent='Nuevo registro de pruebas';
-    if($('#saveTestPlan'))$('#saveTestPlan').innerHTML='<svg><use href="#i-check"/></svg>Guardar cambios';
-    setSaveStatus('Se guardará automáticamente al modificar datos','idle');
+    if($('#saveTestPlan'))$('#saveTestPlan').textContent='Iniciar prueba';
+    setSaveStatus('Preparación · todavía no se guarda','idle');
     render();
   }
   function start(code){
     if(bridge.canRunTests&&!bridge.canRunTests()){toast(bridge.testAccessReason?.()||'Primero guarda la Configuración eléctrica.',true);return;}
     clear();if(code){items.push(makeItem(code));activeTestIndex=0;}render();bridge.showPage('planPage');setPlanStep(code?'results':'shared');
-    if(code)markPlanChanged(350);
+    setSaveStatus('Preparación · todavía no se guarda','idle');
   }
   function toggle(code){
     const index=items.findIndex(x=>x.code===code);
@@ -488,6 +490,9 @@
   }
   async function flushPlanBeforeLeave(){
     if(autoSaveTimer)clearTimeout(autoSaveTimer);
+    if(editingId===null){
+      return editRevision===0||window.confirm('Esta preparación todavía no se ha iniciado y no está guardada. ¿Deseas salir y descartar los datos?');
+    }
     for(let attempt=0;attempt<3&&hasUnsavedChanges()&&items.length;attempt++){
       if(autoSaveTimer)clearTimeout(autoSaveTimer);
       const saved=await savePlan(true);
@@ -529,14 +534,20 @@
       }else if(x.test_code&&x.test_code!=='PLAN')items=[makeItem(x.test_code,{status:x.status,standard_reference:x.standard_reference,equipment_name:x.equipment_name,equipment_brand:x.equipment_brand,equipment_model:x.equipment_model,equipment_serial:x.equipment_serial,rows:rowsFromMeasurements(x.test_code,x.measurements||[])})];
       editRevision=0;savedRevision=0;
       activeTestIndex=0;render();$('#planTitle').textContent='Registro de pruebas #'+editingId;
-      if($('#saveTestPlan'))$('#saveTestPlan').innerHTML='<svg><use href="#i-check"/></svg>Guardar cambios';
+      if($('#saveTestPlan'))$('#saveTestPlan').textContent='Guardar ahora';
       setSaveStatus(String(x.status||'').toUpperCase()==='COMPLETADA'?'Registro completado · al editarlo volverá a En proceso':'Cambios guardados · puedes continuar el registro','saved');
       bridge.showPage('planPage');setPlanStep(items.length?'results':'shared');
     }catch(e){toast(e.message,true);}
   }
 
-  async function savePlan(automatic,confirmCompletion){
+  async function savePlan(automatic,confirmCompletion,startRequested){
     if(savePromise){savePending=true;return savePromise;}
+    if(editingId===null&&!startRequested){
+      setSaveStatus('Preparación · pulsa «Iniciar prueba» para crear el registro','idle');
+      if(!automatic)toast('Primero inicia la prueba. La preparación todavía no se guarda.',true);
+      return false;
+    }
+    if(confirmCompletion&&editingId===null){toast('Primero pulsa «Iniciar prueba» para crear el registro.',true);return false;}
     const seenCodes=new Set();
     const duplicate=items.find(item=>{
       const code=String(item.code||'').trim().toUpperCase();
@@ -570,7 +581,7 @@
     const hasWork=items.some(item=>itemMetrics(item).anyData||!!(item.standard_reference||item.equipment_name||item.equipment_brand||item.equipment_model||item.equipment_serial||item.observations))||!!($('#planOperator').value.trim()||$('#planSupervisor').value.trim()||$('#planOilTemp').value||$('#planAmbientTemp').value||$('#planHumidity').value||$('#planObservations').value.trim());
     const payload={
       id:editingId,transformer_key:transformer().key,test_code:'PLAN',
-      executed_at:date,status:confirmCompletion?'COMPLETADA':(hasWork?'EN_PROCESO':'BORRADOR'),
+      executed_at:date,status:confirmCompletion?'COMPLETADA':(startRequested?'EN_PROCESO':(hasWork?'EN_PROCESO':'BORRADOR')),
       operator_name:$('#planOperator').value,supervisor_name:$('#planSupervisor').value,
       oil_temperature_c:$('#planOilTemp').value,ambient_temperature_c:$('#planAmbientTemp').value,
       relative_humidity_percent:$('#planHumidity').value,observations:$('#planObservations').value,
@@ -591,16 +602,17 @@
         editingId=Number(data.result.id);
         savedRevision=revisionAtStart;
         $('#planTitle').textContent='Registro de pruebas #'+editingId;
-        setSaveStatus(confirmCompletion?'Registro completado':(complete?'Todos los ensayos completos · confirma el registro':(hasWork?'Cambios guardados automáticamente':'Borrador guardado automáticamente')),'saved');
+        if(startRequested){setSaveStatus('Prueba iniciada · autoguardado activo','saved');if(btn)btn.textContent='Guardar ahora';toast('Prueba iniciada · Registro #'+editingId+'. Los cambios se guardarán automáticamente.');}
+        else setSaveStatus(confirmCompletion?'Registro completado':(complete?'Todos los ensayos completos · confirma el registro':'Cambios guardados automáticamente'),'saved');
         if(confirmCompletion){toast('Registro de pruebas #'+editingId+' completado correctamente.');await bridge.reloadTestHistory();bridge.showPage('testPage');}
-        else if(!automatic){toast(hasWork?'Cambios guardados. Puedes continuar completando el registro.':'Borrador guardado.');}
+        else if(!automatic&&!startRequested){toast('Cambios guardados.');}
         return true;
       }catch(error){
         setSaveStatus('No se pudo guardar · revisa la conexión y vuelve a intentar','error');
         if(!automatic)toast(error.message,true);
         return false;
       }finally{
-        if(btn){btn.disabled=false;btn.innerHTML='<svg><use href="#i-check"/></svg>Guardar cambios';}
+        if(btn){btn.disabled=false;btn.textContent=editingId===null?'Iniciar prueba':'Guardar ahora';}
       }
     })();
     savePromise=operation;
@@ -616,9 +628,14 @@
     }
     return result;
   }
+  async function startPlan(){
+    if(editingId!==null)return saveNow(false);
+    if(!validatePlanStep('shared')||!validatePlanStep('selection'))return false;
+    return savePlan(false,false,true);
+  }
   async function saveNow(confirmCompletion){
     if(autoSaveTimer)clearTimeout(autoSaveTimer);
-    return savePlan(false,!!confirmCompletion);
+    return savePlan(false,!!confirmCompletion,false);
   }
   document.addEventListener('click',e=>{
     const target=e.target instanceof Element?e.target:null;if(!target)return;
@@ -635,7 +652,8 @@
     if(editBtn)edit(Number(editBtn.dataset.openExecution));else if(pick)start(pick.dataset.newTest);else start(null);
   },true);
   $('#cancelPlan').addEventListener('click',leavePlan);
-  $('#saveTestPlan')?.addEventListener('click',saveNow);
+  $('#saveTestPlan')?.addEventListener('click',()=>editingId===null?startPlan():saveNow(false));
+  $('#planPage').addEventListener('focusout',()=>{if(editingId!==null&&hasUnsavedChanges())scheduleAutoSave(250);});
   $('#planStepper').addEventListener('click',e=>{
     const step=e.target.closest('[data-plan-step]');
     if(step)setPlanStep(step.dataset.planStep);
