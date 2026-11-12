@@ -33,6 +33,8 @@ jobs:
           node --check assets/app.js
           node --check assets/electrical-tests.js
           node --check assets/plan.js
+      - name: Module boundaries
+        run: python tests/check-module-boundaries.py
       - name: PHP syntax
         run: |
           find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
