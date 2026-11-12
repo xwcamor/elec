@@ -1,3 +1,10 @@
+## v1.5.136
+- Reduce el tamaño del título «Bobinados y bornes» para equilibrarlo con el resto del formulario.
+- Elimina el rótulo redundante «Conexiones del bobinado» sobre la grilla de bornes.
+- Convierte «Datos del bobinado» en una tarjeta con cabecera visual igual a «Equipo y referencia» en Pruebas eléctricas.
+- Mueve «Quitar bobinado» al pie de la tarjeta, separado por una línea horizontal.
+- Corrige los selectores de colección del resumen y estado de bobinados: ahora recorren todos los elementos y la validación inicial se actualiza al abrir, sin esperar al guardado.
+
 ## v1.5.135
 - Amplía el título «Bobinados y bornes» y añade un subtítulo dinámico con total, completos y pendientes.
 - Elimina la acción redundante «Copiar» del encabezado del módulo.
