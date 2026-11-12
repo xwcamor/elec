@@ -76,7 +76,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.122">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.123">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body>
@@ -350,15 +350,15 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 
   <section class="config-page hidden" id="configPage">
     <div class="config-toolbar">
-      <div><div class="breadcrumbs">Transformador <span>/</span> Configuración eléctrica</div><h2>Configuración eléctrica</h2><p>Configura bobinados, bornes, bushings y conmutadores. Las fases, tensión nominal, grupo vectorial y frecuencia se consultan desde la ficha del transformador.</p></div>
+      <div><div class="breadcrumbs">Transformador <span>/</span> Configuración eléctrica</div><h2>Configuración eléctrica</h2><p>Configura los bobinados, bornes y conmutadores del transformador.</p></div>
       <div class="toolbar-actions"><span class="save-status" id="saveStatus"><i></i>Sin guardar</span><button class="btn" id="backOverview">Volver a detalles</button></div>
     </div>
     <div class="config-alert <?= $dbMessage === '' ? 'hidden' : '' ?>" id="dbAlert" role="status"><svg><use href="#i-info"/></svg><span><?=h($dbMessage)?></span></div>
     <div class="config-layout">
-      <nav class="config-sidebar" aria-label="Etapas de configuración">
-        <button class="config-tab active" type="button" data-tab="windings"><span class="tab-number">01</span><span><b>Bobinados y bornes</b><small><em id="windingCount">0</em> bobinados configurados</small></span></button>
-        <button class="config-tab" type="button" data-tab="taps"><span class="tab-number">02</span><span><b>Conmutadores y TAP</b><small><em id="tapCount">0</em> posiciones registradas</small></span></button>
-        <button class="config-tab" type="button" data-tab="review"><span class="tab-number">03</span><span><b>Revisión y versiones</b><small>Verificar antes de guardar</small></span></button>
+      <nav class="test-view-switcher config-view-switcher" role="tablist" aria-label="Secciones de configuración eléctrica">
+        <button class="test-view-tab config-view-tab active" type="button" data-tab="windings" role="tab" aria-selected="true"><svg><use href="#i-zap"/></svg>Bobinados y bornes <span class="config-tab-meta" id="windingCount">0</span></button>
+        <button class="test-view-tab config-view-tab" type="button" data-tab="taps" role="tab" aria-selected="false"><svg><use href="#i-settings"/></svg>Conmutadores y TAP <span class="config-tab-meta" id="tapCount">0</span></button>
+        <button class="test-view-tab config-view-tab" type="button" data-tab="review" role="tab" aria-selected="false"><svg><use href="#i-file"/></svg>Revisión y versiones</button>
       </nav>
       <div class="config-main">
         <section class="config-panel hidden" data-panel="windings">
@@ -458,8 +458,8 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.122"></script>
+<script src="./assets/app.js?v=1.5.123"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="./assets/plan.js?v=1.5.122"></script>
+<script src="./assets/plan.js?v=1.5.123"></script>
 </body></html>
 0
