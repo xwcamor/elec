@@ -270,7 +270,7 @@
     updatePlanStepper(m);
     const next=$('#planStepNext');
     if(next){
-      const blocked=(currentPlanStep==='shared'&&m.general.length>0)||(currentPlanStep==='selection'&&items.length===0)||(currentPlanStep==='review'&&!m.complete);
+      const blocked=(currentPlanStep==='shared'&&m.general.length>0)||(currentPlanStep==='selection'&&items.length===0)||(currentPlanStep==='results'&&(!items.length||items.some(item=>!itemMetrics(item).complete)));
       // Mantener el botón accionable: la navegación valida y muestra el aviso
       // correspondiente en lugar de bloquear el clic silenciosamente.
       next.disabled=false;
@@ -294,19 +294,50 @@
   function firstIncompleteTest(){
     return items.findIndex(item=>!itemMetrics(item).complete);
   }
-  function setPlanStep(step){
-    if(!planStepKeys.includes(step))return;
-    if((step==='results'||step==='review')&&!items.length){toast('Añade al menos un ensayo antes de continuar.',true);step='selection';}
-    if(currentPlanStep==='shared'&&step!=='shared'&&generalMissing().length){
+  function validatePlanStep(step){
+    if(step==='shared'){
       const missing=generalMissing();
-      const ids={ 'fecha de la prueba':'planDate', 'responsable / técnico':'planOperator', 'supervisor':'planSupervisor' };
-      $('#'+(ids[missing[0]]||'planDate'))?.focus();
-      toast('Completa los datos obligatorios: '+missing.join(', ')+'.',true);
+      if(missing.length){
+        const ids={ 'fecha de la prueba':'planDate', 'responsable / técnico':'planOperator', 'supervisor':'planSupervisor' };
+        $('#'+(ids[missing[0]]||'planDate'))?.focus();
+        toast('Completa los datos obligatorios: '+missing.join(', ')+'.',true);
+        return false;
+      }
+    }
+    if(step==='selection'&&!items.length){
+      toast('Selecciona al menos un ensayo antes de continuar.',true);
       return false;
     }
-    // No se permite abandonar Resultados por ensayo hasta completar todos los
-    // campos obligatorios de cada prueba seleccionada. El guardado automático
-    // de borradores sigue habilitado para no perder avances.
+    if(step==='results'){
+      const pending=items.filter(item=>!itemMetrics(item).complete);
+      if(!items.length){
+        toast('Selecciona al menos un ensayo antes de continuar.',true);
+        return false;
+      }
+      if(pending.length){
+        const names=pending.slice(0,3).map(item=>item.name);
+        const extra=pending.length>3?' y '+(pending.length-3)+' más':'';
+        toast('Completa los ensayos pendientes: '+names.join(', ')+extra+'.',true);
+        const first=firstIncompleteTest();
+        if(first>=0)$('#planTestCards [data-test-index="'+first+'"]')?.scrollIntoView({behavior:'smooth',block:'center'});
+        return false;
+      }
+    }
+    return true;
+  }
+  function setPlanStep(step){
+    if(!planStepKeys.includes(step))return false;
+    const currentIndex=planStepKeys.indexOf(currentPlanStep);
+    const targetIndex=planStepKeys.indexOf(step);
+    if(targetIndex>currentIndex+1){
+      toast('Avanza paso a paso. Completa «'+planStepLabels[currentPlanStep]+'» antes de abrir otra etapa.',true);
+      return false;
+    }
+    if(targetIndex>currentIndex&&!validatePlanStep(currentPlanStep))return false;
+    if((step==='results'||step==='review')&&!items.length){
+      toast('Añade al menos un ensayo antes de continuar.',true);
+      step='selection';
+    }
     currentPlanStep=step;
     document.querySelectorAll('#planPage [data-plan-panel]').forEach(panel=>{panel.hidden=panel.dataset.planPanel!==step;});
     document.querySelectorAll('#planStepper [data-plan-step]').forEach(button=>{
