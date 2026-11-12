@@ -1,3 +1,9 @@
+## 1.5.64
+- Se elimina el panel de alerta y porcentaje de avance para reducir la carga visual del plan.
+- El botón «Continuar» queda deshabilitado mientras falten fecha, responsable/técnico o supervisor.
+- La validación también bloquea la navegación directa entre etapas si faltan datos obligatorios.
+- Se conserva la validación de ensayos incompletos antes de pasar al resumen.
+
 ## 1.5.63
 - Se elimina el texto descriptivo «Instrumento, marca, modelo, serie y norma» del encabezado de las tarjetas «Equipo y referencia».
 - Se conservan los campos y sus etiquetas para registrar norma, equipo, marca, modelo y número de serie.
