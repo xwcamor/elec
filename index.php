@@ -351,48 +351,35 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
   <section class="config-page hidden" id="configPage">
     <div class="config-toolbar">
       <div><div class="breadcrumbs">Transformador <span>/</span> Configuración eléctrica</div><h2>Configuración eléctrica</h2><p>Define la estructura física y eléctrica que utilizarán las pruebas del transformador.</p></div>
-      <div class="toolbar-actions"><span class="save-status" id="saveStatus"><i></i>Sin guardar</span><button class="btn" id="backOverview">Volver a detalles</button><button class="btn primary" id="saveConfig"><svg><use href="#i-check"/></svg>Guardar configuración</button></div>
+      <div class="toolbar-actions"><span class="save-status" id="saveStatus"><i></i>Sin guardar</span><button class="btn" id="backOverview">Volver a detalles</button></div>
     </div>
     <div class="config-alert <?= $dbMessage === '' ? 'hidden' : '' ?>" id="dbAlert" role="status"><svg><use href="#i-info"/></svg><span><?=h($dbMessage)?></span></div>
     <div class="config-layout">
-      <nav class="config-sidebar" aria-label="Pasos de configuración">
-        <button class="config-tab active" data-tab="general"><span class="tab-number">01</span><span><b>Datos generales</b><small>Fases y grupo vectorial</small></span></button>
-        <button class="config-tab" data-tab="windings"><span class="tab-number">02</span><span><b>Bobinados y bornes</b><small><em id="windingCount">0</em> bobinados configurados</small></span></button>
-        <button class="config-tab" data-tab="taps"><span class="tab-number">03</span><span><b>Conmutadores y taps</b><small><em id="tapCount">0</em> posiciones registradas</small></span></button>
-        <button class="config-tab" data-tab="review"><span class="tab-number">04</span><span><b>Resumen y versiones</b><small>Revisión antes de guardar</small></span></button>
+      <nav class="config-sidebar" aria-label="Etapas de configuración">
+        <button class="config-tab active" type="button" data-tab="windings"><span class="tab-number">01</span><span><b>Bobinados y bornes</b><small><em id="windingCount">0</em> bobinados configurados</small></span></button>
+        <button class="config-tab" type="button" data-tab="taps"><span class="tab-number">02</span><span><b>Conmutadores y TAP</b><small><em id="tapCount">0</em> posiciones registradas</small></span></button>
+        <button class="config-tab" type="button" data-tab="review"><span class="tab-number">03</span><span><b>Revisión y versiones</b><small>Verificar antes de guardar</small></span></button>
       </nav>
       <div class="config-main">
-        <section class="config-panel" data-panel="general">
-          <div class="panel-heading"><div><span class="eyebrow">PASO 01</span><h3>Datos eléctricos generales</h3><p>Información común del sistema de bobinados.</p></div></div>
-          <div class="form-grid">
-            <label>Tipo de transformador<input id="phaseCountDisplay" type="text" readonly><input id="phaseCount" type="hidden"><small>Dato tomado de la ficha del transformador.</small></label>
-            <label>Grupo vectorial nominal<input id="vectorGroup" type="text" readonly><small>Dato de placa tomado de la ficha del transformador.</small></label>
-            <label>Frecuencia nominal<input id="frequency" type="text" readonly><small>Hz · Dato tomado de la ficha del transformador.</small></label>
-            <label>Observaciones generales<input id="generalNotes" placeholder="Notas de configuración, placa o diseño..."><small>Información de referencia.</small></label>
-          </div>
-          <div class="callout"><svg><use href="#i-info"/></svg><div><b>El grupo vectorial y las conexiones de los bobinados son datos distintos.</b><p>El grupo vectorial se consulta desde la ficha del transformador; aquí defines las conexiones y bornes reales de cada bobinado.</p></div></div>
-          <div class="panel-footer"><button class="btn primary" data-next="windings">Continuar a bobinados <span>→</span></button></div>
-        </section>
-
         <section class="config-panel hidden" data-panel="windings">
-          <div class="panel-heading"><div><span class="eyebrow">PASO 02</span><h3>Bobinados y bornes</h3><p>Agrega cada bobinado y configura sus terminales. Puedes copiar los bobinados o pegar tablas desde Excel con Ctrl+V. No existe un límite fijo de bobinados o bornes.</p></div><button class="btn" id="copyWindings"><svg><use href="#i-copy"/></svg>Copiar bobinados</button><button class="btn primary" id="addWinding"><svg><use href="#i-plus"/></svg>Agregar bobinado</button></div>
+          <div class="panel-heading"><div><span class="eyebrow">ETAPA 01</span><h3>Bobinados y bornes</h3><p>Agrega cada bobinado y configura sus terminales. Puedes copiar los bobinados o pegar tablas desde Excel con Ctrl+V. No existe un límite fijo de bobinados o bornes.</p></div><button class="btn" id="copyWindings"><svg><use href="#i-copy"/></svg>Copiar bobinados</button><button class="btn primary" id="addWinding"><svg><use href="#i-plus"/></svg>Agregar bobinado</button></div>
           <div id="windingsContainer" class="windings-container"></div>
           <div class="callout compact"><svg><use href="#i-info"/></svg><div><b>Bornes capacitivos</b><p>Marca el borne cuando tenga bushing capacitivo. La ficha del bushing se asociará al terminal para reutilizarlo en su futura prueba.</p></div></div>
-          <div class="panel-footer"><button class="btn" data-prev="general">← Anterior</button><span>Usa las celdas como Excel: flechas, Tab, Enter y pegado de rangos.</span><button class="btn primary" data-next="taps">Continuar a taps <span>→</span></button></div>
+          <div class="panel-footer"><span>Usa las celdas como Excel: flechas, Tab, Enter y pegado de rangos.</span><button class="btn primary" type="button" data-next="taps">Continuar a conmutadores <span>→</span></button></div>
         </section>
 
         <section class="config-panel hidden" data-panel="taps">
-          <div class="panel-heading"><div><span class="eyebrow">PASO 03</span><h3>Conmutadores y posiciones de tap</h3><p>Asocia cada conmutador al bobinado correspondiente y registra las posiciones de placa.</p></div><button class="btn primary" id="addTapChanger"><svg><use href="#i-plus"/></svg>Agregar conmutador</button></div>
+          <div class="panel-heading"><div><span class="eyebrow">ETAPA 02</span><h3>Conmutadores y posiciones de TAP</h3><p>Asocia cada conmutador al bobinado correspondiente y registra las posiciones de placa.</p></div><button class="btn primary" id="addTapChanger"><svg><use href="#i-plus"/></svg>Agregar conmutador</button></div>
           <div id="tapChangersContainer" class="tap-changers-container"></div>
-          <div class="panel-footer"><button class="btn" data-prev="windings">← Anterior</button><span>Las posiciones pueden pegarse directamente desde Excel.</span><button class="btn primary" data-next="review">Revisar configuración <span>→</span></button></div>
+          <div class="panel-footer"><button class="btn" type="button" data-prev="windings">← Volver a bobinados</button><span>Las posiciones pueden pegarse directamente desde Excel.</span><button class="btn primary" type="button" data-next="review">Revisar configuración <span>→</span></button></div>
         </section>
 
         <section class="config-panel hidden" data-panel="review">
-          <div class="panel-heading"><div><span class="eyebrow">PASO 04</span><h3>Resumen de configuración</h3><p>Comprueba los datos antes de guardar la versión actual.</p></div><span class="review-badge">Previsualización</span></div>
+          <div class="panel-heading"><div><span class="eyebrow">ETAPA 03</span><h3>Revisión de configuración</h3><p>Comprueba los datos antes de guardar la versión actual.</p></div><span class="review-badge">Previsualización</span></div>
           <div id="reviewSummary" class="review-summary"></div>
           <div class="version-history"><div class="history-heading"><div><h4>Versiones guardadas</h4><p>La configuración previa se conserva como fotografía histórica.</p></div><span id="versionBadge" class="version-badge">Versión 0</span></div><div id="versionList"><div class="empty-history">Todavía no hay versiones guardadas.</div></div></div>
-          <div class="callout"><svg><use href="#i-info"/></svg><div><b>Qué se guarda</b><p>Datos eléctricos generales, bobinados, bornes, bushings y posiciones de los conmutadores.</p></div></div>
-          <div class="panel-footer"><button class="btn" data-prev="taps">← Anterior</button><span>Al guardar se crea una nueva versión de configuración.</span><span class="config-save-hint">Usa «Guardar configuración» en la parte superior para crear la versión.</span></div>
+          <div class="callout"><svg><use href="#i-info"/></svg><div><b>Qué se guarda</b><p>Bobinados, bornes, fichas de bushings capacitivos, conmutadores y posiciones de TAP. Los datos nominales se toman de la ficha del transformador.</p></div></div>
+          <div class="panel-footer review-save-footer"><button class="btn" type="button" data-prev="taps">← Volver a conmutadores</button><span>Al guardar se crea una nueva versión de configuración.</span><button class="btn primary" type="button" id="saveConfig"><svg><use href="#i-check"/></svg>Guardar configuración</button></div>
         </section>
       </div>
     </div>
