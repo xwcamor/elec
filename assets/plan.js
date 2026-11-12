@@ -258,9 +258,10 @@
       const number=step.querySelector('.plan-step-number');
       if(number)number.dataset.state=state;
     });
-    $('#planStepper .plan-step-connector').forEach((line,index)=>{
-      const previous=states[planStepKeys[index]];
-      line.dataset.state=previous==='complete'?'complete':(planStepKeys[index]===currentPlanStep?'active':'pending');
+    const stepKeys=['shared','selection','results','review'];
+    document.querySelectorAll('#planStepper .plan-step-connector').forEach((line,index)=>{
+      const previous=states[stepKeys[index]];
+      line.dataset.state=previous==='complete'?'complete':(stepKeys[index]===currentPlanStep?'active':'pending');
     });
   }
   function renderPlanFeedback(){
