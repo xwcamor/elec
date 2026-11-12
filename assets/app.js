@@ -250,12 +250,12 @@
       tab='taps';
     }
     selectedTab = tab;
-    $('.config-view-tab').forEach(b => {
+    $($'.config-view-tab').forEach(b => {
       const active=b.dataset.tab===tab;
       b.classList.toggle('active',active);
       if(active)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');
     });
-    $('.config-panel').forEach(p => p.classList.toggle('hidden', p.dataset.panel !== tab));
+    $($'.config-panel').forEach(p => p.classList.toggle('hidden', p.dataset.panel !== tab));
     if (tab === 'review') renderReview();
   }
   function syncTransformerNominals(){
