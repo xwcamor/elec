@@ -72,3 +72,16 @@ Antes de terminar una modificación de interfaz:
 
 ## Formato de revisión visual
 Cuando encuentres defectos, presenta una tabla con columnas Antes, Después y Motivo. Sé selectivo y directo. Si una parte ya está bien, no la cambies solo para dejar tu huella.
+
+## Estándar visual de ELEC
+
+La fuente de verdad para tokens, tipografía, espaciado, componentes compartidos, estados de steps, acordeones, ubicación de acciones destructivas y metodología de cambios es `docs/DISENO-UI.md`. Es obligatorio leerlo y aplicarlo antes de editar estilos o formularios. No dupliques ni contradigas sus reglas; si una regla necesita cambiar, actualiza primero la documentación y luego los componentes.
+
+En especial:
+- Configuración eléctrica y Pruebas eléctricas deben compartir el mismo lenguaje visual.
+- Los títulos usan tinta oscura; el azul se reserva para acciones y selección.
+- Tarjetas equivalentes comparten padding, borde, radio y cabecera.
+- Steps pendientes muestran número; los completados muestran check; el activo se distingue claramente.
+- Las acciones destructivas de acordeones se ubican al final del contenido expandido, tras un divisor y con confirmación.
+- Sticky no es el comportamiento predeterminado; no introducirlo sin necesidad funcional y aprobación.
+- No apilar overrides CSS: corregir tokens o componentes compartidos y retirar reglas obsoletas.
