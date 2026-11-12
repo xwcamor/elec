@@ -152,7 +152,7 @@
       has_neutral: Number(w.has_neutral || 0) === 1 || w.has_neutral === true,
       conductor_material: w.conductor_material || '',
       notes: w.notes || '',
-      terminals: (w.terminals || []).map(t => ({
+      terminals: (w.terminals || []).filter(t => String(t.terminal_code || t.code || '').trim() !== '').map(t => ({
         code: t.terminal_code || t.code || '', phase: t.phase_code || t.phase || '', type: (t.terminal_type || t.type || 'Fase') === 'Terciario' ? 'Fase' : (t.terminal_type || t.type || 'Fase'),
         has_capacitive_bushing: Number(t.has_capacitive_bushing || 0) === 1 || t.has_capacitive_bushing === true,
         bushing: {serial_number:t.serial_number || '',manufacturer:t.bushing_manufacturer || '',model:t.bushing_model || '',rated_voltage_kv:t.rated_voltage_kv ?? '',capacitance_pf:t.capacitance_pf ?? '',power_factor_percent:t.power_factor_percent ?? '',notes:t.bushing_notes || ''}
