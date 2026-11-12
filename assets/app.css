@@ -918,3 +918,33 @@ body.config-focus .config-panel .form-grid input[readonly]:focus{border-color:#e
 .plan-test-meta-card-head small{font-size:10px;color:#8998a6}
 .plan-test-meta-card .plan-test-meta-grid{padding:10px 12px}
 @media(max-width:560px){.plan-test-meta-card-head{align-items:flex-start;flex-direction:column;gap:3px}}
+
+
+/* v1.5.68 · Stepper progresivo numérico */
+.plan-stepper{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:0;
+  padding:10px 16px;
+  min-height:66px;
+}
+.plan-stepper .plan-step-connector{display:none}
+.plan-step{
+  justify-content:center;
+  min-height:44px;
+  width:100%;
+  padding:4px;
+  border:1px solid transparent;
+  background:transparent;
+}
+.plan-step:hover{background:transparent}
+.plan-step.active{border-color:transparent;background:transparent}
+.plan-step-number{
+  width:38px;height:38px;flex:0 0 38px;
+  font-size:12px;
+}
+.plan-step:focus-visible{outline:2px solid #5c9bc8;outline-offset:3px}
+@media(max-width:760px){
+  .plan-stepper{grid-template-columns:repeat(4,minmax(0,1fr));gap:0;padding:7px 8px;min-height:56px}
+  .plan-step{min-height:40px;padding:3px}
+  .plan-step-number{width:32px;height:32px;flex-basis:32px;font-size:11px}
+}
