@@ -1,3 +1,8 @@
+## v1.5.97
+- Elimina los campos editables Tipo y Accionamiento de cada conmutador; se conservan internamente los valores existentes para no alterar datos ni compatibilidad.
+- Retira el indicador «Origen: Base de datos» de la tarjeta de ficha técnica.
+- Simplifica el mensaje de confirmación de guardado: muestra versión guardada sin mencionar MySQL.
+
 ## v1.5.96
 - Bobinados: cada acordeón se puede abrir o cerrar independientemente; ya no se cierra automáticamente al abrir otro.
 - Conmutadores: adopta la misma estructura visual jerárquica, con un acordeón independiente por conmutador y un subacordeón para sus posiciones TAP.
