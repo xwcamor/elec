@@ -851,6 +851,30 @@
     const labels={measurement:'Modo de prueba',test_voltage:'Tensión de prueba',test_voltage_v:'Tensión de prueba',power_factor_measured:'Factor de potencia medido',power_factor_corrected_20c:'Factor de potencia corregido',capacitance_source_f:'Capacitancia',capacitance_measured:'Capacitancia medida',status:'Estado',tap:'TAP',at:'AT',bt:'BT',theoretical:'Relación teórica',U:'Medida U',V:'Medida V',W:'Medida W',errU:'Error U',errV:'Error V',errW:'Error W',result:'Resultado',notes:'Observación',phase:'Fase',frequency_hz:'Frecuencia',excitation_current:'Corriente de excitación',losses:'Pérdidas',section:'Sección',test_current_a:'Corriente de prueba',temperature_c:'Temperatura',resistance_measured:'Resistencia medida',resistance_referred_75c:'Resistencia referida a 75 °C',point:'Punto de prueba',applied_voltage_kv:'Tensión aplicada',reading_15s:'Lectura 15 s',reading_30s:'Lectura 30 s',reading_45s:'Lectura 45 s',reading_1min:'Lectura 1 min',absorption_index:'Índice de absorción',terminal:'Borne',serial:'Serie',power_factor_plate:'FP de placa',capacitance_plate:'Capacitancia de placa',variation_percent:'Variación',connection:'Conexión',comparison_result:'Comparación',output_voltage:'Tensión de salida',output_current:'Corriente de salida',test_mode:'Modo de prueba',losses_measured:'Pérdidas medidas',accessory:'Accesorio',terminals:'Terminales',contact:'Contacto',condition:'Condición',capacitance_nf:'Capacitancia',test_voltage_kv:'Tensión de prueba'};
     return labels[key]||String(key||'').replace(/_/g,' ').replace(/\\b\\w/g,c=>c.toUpperCase());
   }
+  function buildSpecificReportTable(code,measurements,capacitanceUnit='nF'){
+    const cfg=specificTemplates[code];
+    if(!cfg)return buildReportMeasurementTable(measurements);
+    const rows=specificRowsFromMeasurements(measurements,code);
+    if(!rows.length)return '<p class="muted">No hay mediciones registradas para este ensayo.</p>';
+    const unit=['pF','nF','µF','mF','F'].includes(capacitanceUnit)?capacitanceUnit:'nF';
+    const factors={pF:1e3,nF:1,µF:1e-3,mF:1e-6,F:1e-9};
+    const columns=cfg.cols.map(([key,label])=>{
+      if(code==='POWER_FACTOR'&&key==='capacitance_measured')return ['capacitance_measured', 'Capacitancia medida ('+unit+')'];
+      return [key,label];
+    });
+    return '<table class="specific-report-table"><thead><tr>'+columns.map(([,label])=>'<th>'+esc(label)+'</th>').join('')+'</tr></thead><tbody>'+
+      rows.map(raw=>{
+        const row=normalizeSpecificRow(code,raw);
+        return '<tr>'+columns.map(([key])=>{
+          let value=row[key]??'—';
+          if(code==='POWER_FACTOR'&&key==='capacitance_measured'&&String(value).trim()!==''){
+            const number=Number(String(value).replace(',','.'));
+            value=Number.isFinite(number)?(number*factors[unit]).toFixed(6):value;
+          }
+          return '<td>'+esc(value)+'</td>';
+        }).join('')+'</tr>';
+      }).join('')+'</tbody></table>';
+  }
   function buildReportMeasurementTable(measurements){
     const rows=(Array.isArray(measurements)?measurements:[]).filter(m=>m&&((m.parameter||'')!==''||(m.value||'')!==''||(m.notes||'')!==''));
     if(!rows.length)return '<p class="muted">No hay mediciones registradas para este ensayo.</p>';
@@ -876,7 +900,7 @@
         return '<section class="test"><div class="test-title"><div><small>ENSAYO '+String(index+1).padStart(2,'0')+'</small><h2>'+esc(test.name||typeName(test.code))+'</h2></div><strong>'+esc(String(test.status||'BORRADOR').replace(/_/g,' '))+'</strong></div>'+
           (standard?'<p class="equipment"><b>Norma / referencia:</b> '+esc(standard)+'</p>':'')+
           (equipment?'<p class="equipment"><b>Equipo:</b> '+esc(equipment)+'</p>':'')+
-          buildReportMeasurementTable(measurements)+
+          (specificTemplates[test.code]?buildSpecificReportTable(test.code,measurements,test.capacitance_unit||'nF'):buildReportMeasurementTable(measurements))+
           (test.observations?'<div class="observation"><b>Observaciones del ensayo</b><p>'+esc(test.observations).replace(/\\n/g,'<br>')+'</p></div>':'')+'</section>';
       }).join('');
       const status=String(x.status||'BORRADOR').replace(/_/g,' ');
