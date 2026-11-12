@@ -1,3 +1,7 @@
+## v1.5.109
+- Elimina el campo «Norma / referencia» de la sección Equipo y referencia.
+- Hace obligatorios para todos los ensayos: equipo, marca, modelo y número de serie; estos cuatro campos se incluyen en el avance y en las validaciones para continuar y confirmar el registro.
+
 ## v1.5.108
 - Renombra el encabezado «Capacitancia fuente (F)» a «Capacitancia», conservando el dato interno en F para el cálculo de nF.
 - La flecha abajo y Enter ya no crean filas automáticamente al llegar al final de la tabla; la creación de filas queda en el botón «+ Fila».
