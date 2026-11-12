@@ -1,3 +1,8 @@
+## 1.5.52
+- Retira el acordeón de «Condiciones ambientales» y deja temperatura del aceite, temperatura ambiente, humedad y observaciones visibles dentro de Datos compartidos.
+- Elimina el mensaje «Datos generales completos»; la banda de estado solo aparece cuando faltan datos obligatorios.
+- Actualiza los identificadores de caché.
+
 ## 1.5.51
 - Reubica «Realizada el» junto a «Responsable / técnico» y «Supervisor» en una fila de tres columnas.
 - Elimina la tarjeta independiente de fecha para reducir altura y equilibrar la sección de datos compartidos.
