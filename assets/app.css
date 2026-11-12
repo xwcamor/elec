@@ -910,3 +910,11 @@ body.config-focus .config-panel .form-grid input[readonly]:focus{border-color:#e
 .plan-test-card[open]>.plan-test-card-head .plan-card-chevron{transform:rotate(180deg)}
 .plan-test-body{padding:14px 16px}
 @media(max-width:560px){.plan-results-title{padding-right:0}.plan-results-title .plan-results-accordion-status{position:static;display:inline-flex;margin-top:6px}.plan-test-card-head{gap:8px;padding:11px}.plan-test-heading>b{font-size:12px}.plan-card-state{font-size:10px}}
+
+/* Equipo y referencia: tarjeta siempre visible en cada ensayo */
+.plan-test-meta-card{margin:10px 0;border:1px solid #dfe7ed;border-radius:8px;background:#fbfcfd;overflow:hidden}
+.plan-test-meta-card-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:9px 12px;border-bottom:1px solid #e8edf1}
+.plan-test-meta-card-head b{font-size:11px;color:#40566b}
+.plan-test-meta-card-head small{font-size:10px;color:#8998a6}
+.plan-test-meta-card .plan-test-meta-grid{padding:10px 12px}
+@media(max-width:560px){.plan-test-meta-card-head{align-items:flex-start;flex-direction:column;gap:3px}}
