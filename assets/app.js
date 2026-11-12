@@ -715,7 +715,7 @@
       button.setAttribute('aria-selected',active?'true':'false');
     });
     if(view==='summary')renderTestSummary();
-    if(view==='table')renderTestHistory();
+    if(view==='table'){renderTestHistory();loadTestHistory();}
     if(view==='graph')renderHistoricalAnalytics();
   }
   $$('[data-test-view]').forEach(button=>button.addEventListener('click',()=>setTestWorkspaceView(button.dataset.testView)));
@@ -733,7 +733,7 @@
       const measurementCount=Number(x.measurement_count||0);
       const detail=x.plan_tests?.length?names.length+' ensayos · '+measurementCount+' valores':measurementCount+' valores';
       return '<tr><td><b>'+esc(formatExecutionDate(x.executed_at))+'</b><small>Ejecución #'+esc(x.id)+'</small></td><td><b>'+esc(names.join(' · '))+'</b></td><td>'+esc(x.operator_name||'—')+'</td><td>'+esc(detail)+'</td><td><div class="test-row-actions"><button class="btn small" data-open-execution="'+x.id+'" title="Continuar completando esta ejecución">Abrir plan</button><button class="btn small danger test-delete-button" data-delete-execution="'+x.id+'" title="Eliminar ejecución" aria-label="Eliminar ejecución #'+x.id+'"><svg><use href="#i-trash"/></svg>Eliminar</button></div></td></tr>';
-    }).join(''):'<tr><td colspan="5" class="test-empty">'+(testExecutions.length?'No hay registros que coincidan con el filtro.':'Aún no hay ejecuciones registradas. Selecciona un tipo de prueba para comenzar.')+'</td></tr>';
+    }).join(''):'<tr><td colspan="5" class="test-empty">'+(testHistoryLoadError?'No se pudo consultar el historial: '+esc(testHistoryLoadError):(testExecutions.length?'No hay registros que coincidan con el filtro.':'No hay registros para este transformador. Los planes se ordenan por fecha de visita, del más reciente al más antiguo.'))+'</td></tr>';
     $('[data-open-execution]').forEach(b=>b.addEventListener('click',()=>openExistingExecution(Number(b.dataset.openExecution))));
     $('[data-delete-execution]').forEach(button=>button.addEventListener('click',async()=>{
       const id=Number(button.dataset.deleteExecution);
@@ -763,21 +763,42 @@
     }));
   }
   $('#testHistoryFilter').addEventListener('input',renderTestHistory);
+  let testHistoryLoadPromise=null;
+  let testHistoryLoadError='';
   async function loadTestHistory(){
-    if(PILOT.demo){testExecutions=[];renderTestHistory();return;}
-    if(!PILOT.testsSchemaReady){testExecutions=[];renderTestHistory();toast('Importa database/schema.sql para habilitar el historial de ejecuciones.',true);return;}
-    try{
-      // Sincroniza primero el catálogo: el listado no debe competir con la creación del tipo PLAN.
-      const catalogResponse=await fetch(api('action=test-types'));
-      const catalogData=await readApiResponse(catalogResponse);
-      if(catalogData.items?.length){
-        testCatalog.splice(0,testCatalog.length,...catalogData.items.filter(x=>x.code!=='PLAN').map(x=>[x.code,x.name,'Datos de ensayo']));
+    if(testHistoryLoadPromise)return testHistoryLoadPromise;
+    if(PILOT.demo){testExecutions=[];testHistoryLoadError='Selecciona un transformador real para consultar su historial.';renderTestHistory();return;}
+    if(!PILOT.testsSchemaReady){testExecutions=[];testHistoryLoadError='Faltan las tablas del módulo de pruebas eléctricas.';renderTestHistory();toast('Importa database/schema.sql para habilitar el historial de ejecuciones.',true);return;}
+    const operation=(async()=>{
+      try{
+        const key=String(transformer.key||PILOT.transformer?.key||'').trim();
+        if(!key)throw new Error('No se pudo identificar el transformador seleccionado para consultar el historial.');
+
+        // El historial es la fuente principal. No debe depender de que el catálogo responda.
+        const listResponse=await fetch(api('action=test-list&key='+encodeURIComponent(key)),{cache:'no-store'});
+        const listData=await readApiResponse(listResponse);
+        if(!Array.isArray(listData.items))throw new Error('El servidor no devolvió una lista válida de registros.');
+        testExecutions=listData.items;
+        testHistoryLoadError='';
+        renderTestHistory();
+
+        // El catálogo solo enriquece los nombres; si falla, no ocultamos los registros guardados.
+        try{
+          const catalogResponse=await fetch(api('action=test-types'),{cache:'no-store'});
+          const catalogData=await readApiResponse(catalogResponse);
+          if(Array.isArray(catalogData.items)&&catalogData.items.length){
+            testCatalog.splice(0,testCatalog.length,...catalogData.items.filter(x=>x.code!=='PLAN').map(x=>[x.code,x.name,'Datos de ensayo']));
+            renderTestHistory();
+          }
+        }catch(catalogError){console.warn('No se pudo actualizar el catálogo de ensayos:',catalogError);}
+      }catch(e){
+        testHistoryLoadError=e.message||'No se pudo cargar el historial.';
+        renderTestHistory();
+        toast(testHistoryLoadError,true);
       }
-      const listResponse=await fetch(api('action=test-list&key='+encodeURIComponent(transformer.key)));
-      const listData=await readApiResponse(listResponse);
-      testExecutions=listData.items||[];
-      renderTestHistory();
-    }catch(e){testExecutions=[];renderTestHistory();toast(e.message,true);}
+    })();
+    testHistoryLoadPromise=operation;
+    try{await operation;}finally{if(testHistoryLoadPromise===operation)testHistoryLoadPromise=null;}
   }
   function clearExecutionForm(){
     activeExecutionId=null;activeExecutionMode='new';activeSpecificCode='';if($('#specificTestRows'))$('#specificTestRows').innerHTML='';
