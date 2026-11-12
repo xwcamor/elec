@@ -1,3 +1,9 @@
+## v1.5.143
+- Unifica el asterisco rojo para todos los campos con atributo required en Configuración eléctrica, Pruebas eléctricas y formularios.
+- Añade el indicador a encabezados de columnas dinámicas declaradas como obligatorias.
+- Los formularios generados dinámicamente reciben el indicador automáticamente sin duplicar asteriscos existentes.
+- No modifica reglas de validación ni convierte campos opcionales en obligatorios.
+
 ## v1.5.142
 - Corrige el marcado HTML del texto de estado del stepper: cada etiqueta ahora cierra correctamente como elemento strong.
 - Recupera la distribución horizontal y alineación de los tres indicadores circulares sin modificar la lógica ni los colores de validación.
