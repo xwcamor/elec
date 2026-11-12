@@ -1,3 +1,9 @@
+## v1.5.102
+- Retira de la edición de bobinados los campos «Conexión» y «¿Tiene neutro?».
+- Simplifica el resumen del bobinado y «Copiar bobinados» para mostrar únicamente nombre y tensión.
+- Elimina la validación que exigía seleccionar una conexión en esta pantalla.
+- Los valores históricos de conexión y neutro se conservan en los datos internos y no se eliminan de la base de datos.
+
 ## v1.5.101
 - Convierte «Bornes y terminales» en una sección fija dentro de cada bobinado; deja de comportarse como acordeón.
 - Reorganiza el encabezado con el contador de registros y acciones «+ Fila» / «Copiar bornes» alineadas.
