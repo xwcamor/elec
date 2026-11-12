@@ -208,7 +208,6 @@
     if(metrics.complete)card.open=false;
     else if(state==='incomplete')card.open=true;
     refreshFieldStyles(card,item,metrics);
-    refreshResultsSummary();
   }
   function refreshFieldStyles(card,item,metrics){
     card.querySelectorAll('.plan-cell').forEach(input=>{
@@ -277,17 +276,13 @@
       next.disabled=false;
       next.title=blocked?(currentPlanStep==='shared'?'Completa fecha, responsable/técnico y supervisor.':currentPlanStep==='selection'?'Selecciona al menos un ensayo.':'Completa todos los campos obligatorios de cada ensayo.'):'';
     }
-    renderPlanReview();
+    refreshResultsSummary();
+    if(currentPlanStep==='review')renderPlanReview();
   }
   function refreshPlanFeedback(){
-    items.forEach((item,index)=>{
-      const card=$('#planTestCards [data-test-index="'+index+'"]');
-      const metrics=itemMetrics(item);
-      item.status=metrics.complete?'COMPLETADA':'BORRADOR';
-      if(card)refreshFieldStyles(card,item,metrics);
-    });
+    // Cada campo actualiza su propia tarjeta; evita reconstruir el catálogo
+    // y recorrer todas las grillas en cada pulsación.
     renderPlanFeedback();
-    renderPicker();
   }
 
     const planStepKeys=['shared','selection','results','review'];
