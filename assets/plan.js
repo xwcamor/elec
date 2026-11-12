@@ -329,11 +329,13 @@
     if(!planStepKeys.includes(step))return false;
     const currentIndex=planStepKeys.indexOf(currentPlanStep);
     const targetIndex=planStepKeys.indexOf(step);
-    if(targetIndex>currentIndex+1){
-      toast('Avanza paso a paso. Completa «'+planStepLabels[currentPlanStep]+'» antes de abrir otra etapa.',true);
-      return false;
+    // Permite abrir cualquier etapa posterior cuando todas las etapas
+    // anteriores superan su validación, sin exigir clics repetidos en Continuar.
+    if(targetIndex>currentIndex){
+      for(let index=0;index<targetIndex;index++){
+        if(!validatePlanStep(planStepKeys[index]))return false;
+      }
     }
-    if(targetIndex>currentIndex&&!validatePlanStep(currentPlanStep))return false;
     if((step==='results'||step==='review')&&!items.length){
       toast('Añade al menos un ensayo antes de continuar.',true);
       step='selection';
