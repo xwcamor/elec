@@ -204,7 +204,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
     </div>
     <div class="test-view-switcher" role="tablist" aria-label="Secciones de pruebas eléctricas">
       <button class="test-view-tab active" type="button" id="showTestSummary" data-test-view="summary" role="tab" aria-selected="true" aria-controls="testSummaryPanel"><svg><use href="#i-grid"/></svg>Resumen</button>
-      <button class="test-view-tab" type="button" id="showTestTable" data-test-view="table" role="tab" aria-selected="false" aria-controls="testHistoryPanel"><svg><use href="#i-file"/></svg>Historial</button>
+      <button class="test-view-tab" type="button" id="showTestTable" data-test-view="table" role="tab" aria-selected="false" aria-controls="testHistoryPanel"><svg><use href="#i-file"/></svg>Registros</button>
       <button class="test-view-tab" type="button" id="showTestGraph" data-test-view="graph" role="tab" aria-selected="false" aria-controls="testAnalyticsPanel"><svg><use href="#i-activity"/></svg>Gráfico</button>
     </div>
     <section id="testSummaryPanel" class="test-view-panel" role="tabpanel" aria-labelledby="showTestSummary">
@@ -220,7 +220,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
     </section>
     <section id="testHistoryPanel" class="test-view-panel hidden" role="tabpanel" aria-labelledby="showTestTable">
       <div class="test-history-card">
-        <div class="test-history-head"><div><span class="eyebrow">HISTORIAL DE PRUEBAS ELÉCTRICAS</span><h3>Pruebas eléctricas registradas</h3><p>Consulta los registros de pruebas eléctricas y abre uno para revisar o completar sus resultados.</p></div><div class="test-history-controls"><label class="test-status-filter"><span>Estado</span><select id="testHistoryStatusFilter"><option value="ALL">Todos</option><option value="COMPLETE">Completo</option><option value="INCOMPLETE">En proceso</option><option value="DRAFT">En borrador</option></select></label><div class="test-filter"><svg><use href="#i-search"/></svg><input id="testHistoryFilter" placeholder="Filtrar por ensayo o responsable..."></div></div></div>
+        <div class="test-history-head"><div><span class="eyebrow">HISTORIAL DE REGISTROS</span><h3>Registros de pruebas eléctricas</h3><p>Consulta los registros de pruebas eléctricas y abre uno para revisar o completar sus resultados.</p></div><div class="test-history-controls"><label class="test-status-filter"><span>Estado</span><select id="testHistoryStatusFilter"><option value="ALL">Todos</option><option value="COMPLETE">Completo</option><option value="INCOMPLETE">En proceso</option><option value="DRAFT">En borrador</option></select></label><div class="test-filter"><svg><use href="#i-search"/></svg><input id="testHistoryFilter" placeholder="Filtrar por ensayo o responsable..."></div></div></div>
         <div class="test-table-wrap"><table class="test-history-table"><thead><tr><th>Fecha de realización</th><th>Ensayos incluidos</th><th>N.º de ensayos</th><th>Responsable</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="testHistoryBody"><tr><td colspan="6" class="test-empty">Aún no hay registros. Crea un registro para iniciar una jornada de pruebas.</td></tr></tbody></table></div>
       </div>
     </section>
