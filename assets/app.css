@@ -1861,3 +1861,29 @@ body.config-focus .config-save-hint{display:none!important}
 [id^="tap-grid-"] .sheet-row-delete{width:26px;height:26px;display:inline-grid;place-items:center;padding:0;border:0;background:transparent;color:#bd4c4c}
 [id^="tap-grid-"] .sheet-row-delete:hover{background:#fff0f0;border-radius:5px}
 [id^="tap-grid-"] .sheet-row-delete svg{width:14px;height:14px}
+
+
+/* v1.5.135 · Jerarquía del módulo de bobinados alineada al encabezado de resultados. */
+.config-panel[data-panel="windings"] .config-panel-heading{
+ align-items:center!important;justify-content:space-between!important;gap:16px!important;
+ padding-bottom:15px!important;margin-bottom:16px!important;
+}
+.config-panel[data-panel="windings"] .config-section-title{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0}
+.config-panel[data-panel="windings"] .config-section-title h3{font-size:23px!important;line-height:1.2!important;font-weight:760!important;letter-spacing:-.035em!important;color:#21374f!important;margin:0!important}
+.config-panel[data-panel="windings"] .config-section-title p{font-size:12px!important;line-height:1.45!important;color:#718398!important;margin:0!important}
+.config-panel[data-panel="windings"] .config-heading-actions{width:auto!important;flex:0 0 auto}
+.winding-accordion[data-state="complete"]>.winding-accordion-summary{background:#f7f9fb!important}
+.winding-accordion[data-state="incomplete"]>.winding-accordion-summary{background:#fff7e8!important}
+.winding-accordion[data-state="complete"] .winding-index{background:#e8eef3!important;color:#52687c!important}
+.winding-accordion[data-state="incomplete"] .winding-index{background:#ffe8bd!important;color:#8a570a!important}
+.winding-accordion-summary .winding-summary-status[data-state="complete"]{
+ border-color:#dce5ed!important;background:#eef2f5!important;color:#647789!important;
+}
+.winding-accordion-summary .winding-summary-status[data-state="incomplete"]{
+ border-color:#f0d9ad!important;background:#fff0d2!important;color:#95600d!important;
+}
+@media(max-width:760px){
+ .config-panel[data-panel="windings"] .config-panel-heading{align-items:flex-start!important;flex-wrap:wrap}
+ .config-panel[data-panel="windings"] .config-section-title h3{font-size:20px!important}
+ .config-panel[data-panel="windings"] .config-heading-actions{width:100%!important;justify-content:flex-end}
+}
