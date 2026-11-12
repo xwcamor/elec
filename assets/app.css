@@ -1288,3 +1288,31 @@ body.config-focus .config-panel .form-grid input[readonly]:focus{border-color:#e
   .plan-wizard-shell>.plan-step-panel .plan-test-picker-head>div>strong{font-size:17px}
   .plan-wizard-shell>.plan-step-panel .plan-test-picker-head>div>small{font-size:12px}
 }
+
+
+/* v1.5.87 · Interacciones discretas y jerarquía visual del resumen */
+.module-mark{
+  width:68px;height:68px;flex:0 0 68px;
+  display:grid;place-items:center;
+  border:1px solid #d8e5ef;border-radius:14px;
+  background:linear-gradient(145deg,#f5f9fc,#eaf2f8);
+  color:#356d96;font-size:12px;font-weight:800;letter-spacing:.04em;
+}
+.module-mark.muted{background:#f5f6f7;border-color:#e4e8ec;color:#8996a3}
+.btn,.icon-btn,.nav-action,.test-view-tab,.plan-picker-option,.plan-test-card-head,.plan-step{
+  transition:background-color .16s ease,border-color .16s ease,color .16s ease,box-shadow .16s ease,transform .16s ease;
+}
+.btn:not(:disabled):active,.icon-btn:not(:disabled):active{transform:translateY(1px)}
+.btn:focus-visible,.icon-btn:focus-visible,.nav-action:focus-visible,
+.test-view-tab:focus-visible,.plan-picker-option:focus-within,.plan-step:focus-visible{
+  outline:2px solid #5a9bd0;outline-offset:2px;
+}
+.plan-test-card{transition:border-color .18s ease,box-shadow .18s ease}
+.plan-test-card[open]{border-color:#cbd9e5;box-shadow:0 5px 18px rgba(31,55,78,.055)}
+.plan-picker-option:hover{border-color:#9dbbd3;background:#f8fbfd}
+.plan-cell:focus-visible{outline:2px solid #3988db!important;outline-offset:-2px}
+@media(prefers-reduced-motion:reduce){
+  .module-mark,.btn,.icon-btn,.nav-action,.test-view-tab,.plan-picker-option,.plan-test-card-head,.plan-step,.plan-cell{
+    animation:none!important;transition:none!important;scroll-behavior:auto!important;
+  }
+}
