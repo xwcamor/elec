@@ -125,3 +125,13 @@
 - [ ] Completar el primer ensayo y dejar incompleta una fila del segundo; debe bloquearse y enfocar el segundo.
 - [ ] Completar todas las filas y datos requeridos de todos los ensayos; debe permitir avanzar al Resumen.
 - [ ] Confirmar que el guardado automático conserva borradores aunque el avance esté bloqueado.
+
+
+## v1.5.145 — aislamiento de procesos
+- [ ] Abrir Configuración eléctrica y editar un bobinado sin guardar; comprobar que no se crea ni modifica ningún registro de pruebas.
+- [ ] Guardar una nueva versión de configuración y confirmar que el historial de pruebas existentes permanece intacto.
+- [ ] Iniciar una prueba y verificar que toma una instantánea de la configuración vigente.
+- [ ] Cambiar de transformador y confirmar que una nueva ejecución toma el contexto del transformador seleccionado.
+- [ ] Editar una ejecución histórica y comprobar que solo se actualiza su ID y sus mediciones.
+- [ ] Verificar que el asistente de pruebas no puede modificar el objeto interno de Configuración eléctrica.
+- [ ] Ejecutar `node --check assets/app.js`, `node --check assets/electrical-tests.js` y `node --check assets/plan.js`.
