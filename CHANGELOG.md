@@ -1,3 +1,7 @@
+## 1.5.65
+- Se oculta el resumen «ensayo(s) en el plan · completos» al agregar pruebas; se conserva el mensaje inicial cuando aún no hay ensayos.
+- Se simplifica el encabezado de selección a «Selecciona los ensayos».
+
 ## 1.5.64
 - Se elimina el panel de alerta y porcentaje de avance para reducir la carga visual del plan.
 - El botón «Continuar» queda deshabilitado mientras falten fecha, responsable/técnico o supervisor.
