@@ -77,11 +77,11 @@
     $('#editTransformerStatus').textContent='';$('#transformerEditModal').classList.remove('hidden');$('#editTrafoCode').focus();
   }
   function openTapCountEditor(){
+    openTransformerEditor();
     setTransformerFormMode('tap');
     $('#editTrafoNumTaps').value=transformer.num_taps??'';
     $('#editTransformerStatus').textContent='';
     $('#transformerEditModal').classList.add('tap-count-only');
-    $('#transformerEditModal').classList.remove('hidden');
     $('#editTrafoNumTaps').focus();
   }
   function openTransformerCreate(){
