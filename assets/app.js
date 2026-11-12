@@ -342,7 +342,6 @@
     host.querySelectorAll('[data-wfield]').forEach(el=>{el.addEventListener('input',e=>{const card=e.target.closest('[data-winding]'),i=Number(card.dataset.winding),key=e.target.dataset.wfield;if(key==='name'||key==='voltage_kv'){state.windings[i][key]=e.target.value;const summary=card.querySelector('.winding-summary-main');if(summary)summary.innerHTML='<strong>'+esc(state.windings[i].name||'Bobinado sin nombre')+'</strong><small>'+esc(state.windings[i].voltage_kv||'—')+' kV</small>';refreshWindingCounters();markDirty();}});el.addEventListener('change',e=>{const card=e.target.closest('[data-winding]');const i=Number(card.dataset.winding);const key=e.target.dataset.wfield;state.windings[i][key]=key==='has_neutral'?e.target.value==='1':(key==='voltage_kv'?normalizeNumeric(e.target.value):e.target.value);if(key==='voltage_kv')e.target.value=state.windings[i][key];const summary=card.querySelector('.winding-summary-main');if(summary)summary.innerHTML='<strong>'+esc(state.windings[i].name||'Bobinado sin nombre')+'</strong><small>'+esc(state.windings[i].voltage_kv||'—')+' kV</small>';refreshWindingCounters();markDirty();});});
     host.querySelectorAll('[data-remove-winding]').forEach(b=>b.addEventListener('click',()=>{const i=Number(b.dataset.removeWinding);if(!confirm('¿Eliminar este bobinado y sus bornes de la configuración actual?'))return;state.windings.splice(i,1);state.tap_changers=state.tap_changers.filter(c=>c.winding_index!==i).map(c=>({...c,winding_index:c.winding_index>i?c.winding_index-1:c.winding_index}));renderWindings();renderTapChangers();updateCounts();markDirty();}));
     host.querySelectorAll('[data-add-terminal]').forEach(b=>b.addEventListener('click',()=>{const i=Number(b.dataset.addTerminal),row=blankTerminal('');row._draft=true;state.windings[i].terminals.push(row);renderWindings({openIndex:i});refreshWindingCounters();}));
-    host.querySelectorAll('[data-copy-terminals]').forEach(b=>b.addEventListener('click',()=>copyGrid([['Borne','¿Capacitivo?'],...state.windings[Number(b.dataset.copyTerminals)].terminals.map(t=>[t.code,t.has_capacitive_bushing?'Sí':'No'])].map(r=>r.join('\t')).join('\n'))));
     state.windings.forEach((w,i)=>buildGrid($('#terminal-grid-'+i),w.terminals,[
       {key:'code',label:'Borne',type:'text',maxLength:20,uppercase:true,required:true},{key:'has_capacitive_bushing',label:'¿Capacitivo?',type:'yesno'},{key:'_delete',label:'',type:'delete'}
     ],(row,key,value)=>{if(key==='has_capacitive_bushing'){row[key]=!!value;if(!row[key])row.bushing={serial_number:'',manufacturer:'',model:'',rated_voltage_kv:'',capacitance_pf:'',power_factor_percent:'',notes:''};}else if(['serial_number','manufacturer','model','rated_voltage_kv','capacitance_pf','power_factor_percent','notes'].includes(key)){if(String(value).trim()!=='')row.has_capacitive_bushing=true;row.bushing[key]=value;}else if(key==='code'){row.code=String(value||'').trim().toUpperCase();const match=row.code.match(/^([UVWABC])(?:[-/]?\d+)?$/);if(match){row.phase=match[1];row.type='Fase';}else if(/^N(?:[-/]?\d+)?$/.test(row.code)){row.phase='N';row.type='Neutro';}else row.code=row.code;}else row[key]=value;row._draft=false;markDirty();refreshWindingCounters();},removed=>{const hasContent=!!(String(removed?.code||'').trim()||removed?.has_capacitive_bushing);if(hasContent)markDirty();refreshWindingCounters();}));
@@ -432,17 +431,6 @@
     });
     rerender();markDirty();toast('Bloque pegado en la tabla.');
   }
-  async function copyGrid(text){
-    try{
-      if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(text);}
-      else{
-        const area=document.createElement('textarea');area.value=text;area.style.position='fixed';area.style.opacity='0';document.body.appendChild(area);area.select();
-        const ok=document.execCommand('copy');area.remove();if(!ok)throw new Error('El navegador bloqueó el portapapeles.');
-      }
-      toast('Datos copiados. Puedes pegarlos en Excel o en otra tabla.');
-    }catch(e){toast('No se pudo copiar. Revisa los permisos del portapapeles del navegador.',true);}
-  }
-
   function addTapChanger() {
     if(!state.windings.length){toast('Primero configura al menos un bobinado.',true);showPanel('windings');return;}
     const count = Number(transformer.num_taps || 0);
