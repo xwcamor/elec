@@ -1,3 +1,8 @@
+## v1.5.114
+- Cada ensayo comienza en una hoja nueva al imprimir o guardar el informe como PDF.
+- Los ensayos extensos pueden continuar automáticamente en páginas adicionales; no se recortan ni se fuerzan a caber en una sola hoja.
+- Las filas de las tablas evitan dividirse entre páginas y los encabezados de tabla se repiten cuando hay continuación.
+
 ## v1.5.113
 - La exportación PDF conserva la estructura de las grillas específicas: encabezados originales y una fila por medición, en lugar de convertir cada campo en una fila separada.
 - Factor de potencia: el PDF muestra modo, tensión, FP medido/corregido, capacitancia fuente, capacitancia medida y estado en sus columnas originales.
