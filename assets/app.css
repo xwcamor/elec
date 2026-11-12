@@ -1488,3 +1488,22 @@ body.config-focus .config-save-hint{display:none!important}
 .tap-meta label{display:flex;flex-direction:column;gap:6px}
 .tap-meta label input,.tap-meta label select{width:100%;min-width:0}
 @media(max-width:760px){.config-stepper{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:6px}.config-stepper .plan-step{min-height:48px;gap:7px;padding:6px 5px}.config-stepper .plan-step-number{width:27px;height:27px;flex-basis:27px}.config-stepper .plan-step-copy b{font-size:9px}.config-stepper .plan-step-copy small{font-size:7px}.config-stepper .plan-step-connector{display:none}.config-panel-heading{align-items:flex-start;flex-wrap:wrap}.config-heading-actions{width:100%;justify-content:flex-end}.winding-head-fields{width:100%}.config-panel-footer{gap:8px}}
+
+
+/* v1.5.128 · Fuerza la visibilidad y distribución del contenido de los tres pasos. */
+.config-stepper{width:100%;grid-template-columns:minmax(0,1fr) 34px minmax(0,1fr) 34px minmax(0,1fr);align-items:center}
+.config-stepper>.config-view-tab{display:flex!important;align-items:center;justify-content:flex-start;min-width:0;overflow:visible}
+.config-stepper>.config-view-tab>.plan-step-number{flex:0 0 30px}
+.config-stepper>.config-view-tab>.plan-step-copy{display:flex!important;flex:1 1 auto;flex-direction:column;gap:3px;min-width:0;visibility:visible!important;opacity:1!important}
+.config-stepper>.config-view-tab>.plan-step-copy>b{display:block!important;color:#263f55!important;font-size:14px;line-height:1.25;font-weight:750;visibility:visible!important;opacity:1!important}
+.config-stepper>.config-view-tab>.plan-step-copy>small{display:block!important;font-size:12px;line-height:1.35;visibility:visible!important;opacity:1!important}
+.config-stepper>.config-view-tab[data-tab="taps"]>.plan-step-copy>b{color:#263f55!important}
+.config-stepper>.config-view-tab[data-tab="taps"]>.plan-step-copy>#tapCount{color:#177245}
+.config-stepper .plan-step-connector{width:100%;min-width:18px}
+@media(max-width:760px){
+ .config-stepper{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+ .config-stepper>.config-view-tab{gap:7px;padding:6px 5px}
+ .config-stepper>.config-view-tab>.plan-step-number{flex-basis:27px;width:27px;height:27px}
+ .config-stepper>.config-view-tab>.plan-step-copy>b{font-size:10px;white-space:normal}
+ .config-stepper>.config-view-tab>.plan-step-copy>small{font-size:8px;white-space:normal}
+}
