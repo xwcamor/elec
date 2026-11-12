@@ -23,18 +23,19 @@ try {
         'eh_electrical_configs', 'eh_windings', 'eh_terminals', 'eh_bushings',
         'eh_tap_changers', 'eh_tap_positions', 'eh_electrical_config_versions'
     ];
+    $tableCheck = $pdo->prepare('SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ? LIMIT 1');
     $missingConfigTables = [];
     foreach ($requiredConfigTables as $tableName) {
-        $check = $pdo->query("SHOW TABLES LIKE " . $pdo->quote($tableName))->fetchColumn();
-        if (!$check) $missingConfigTables[] = $tableName;
+        $tableCheck->execute([$tableName]);
+        if (!$tableCheck->fetchColumn()) $missingConfigTables[] = $tableName;
     }
     $schemaReady = count($missingConfigTables) === 0;
 
     $requiredTestTables = ['eh_test_types','eh_test_executions','eh_test_execution_data'];
     $missingTestTables = [];
     foreach ($requiredTestTables as $tableName) {
-        $check = $pdo->query("SHOW TABLES LIKE " . $pdo->quote($tableName))->fetchColumn();
-        if (!$check) $missingTestTables[] = $tableName;
+        $tableCheck->execute([$tableName]);
+        if (!$tableCheck->fetchColumn()) $missingTestTables[] = $tableName;
     }
     $testsSchemaReady = count($missingTestTables) === 0;
     if ($schemaReady) {
