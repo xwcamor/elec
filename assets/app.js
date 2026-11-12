@@ -250,8 +250,12 @@
       tab='taps';
     }
     selectedTab = tab;
-    $$('.config-view-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-    $$('.config-panel').forEach(p => p.classList.toggle('hidden', p.dataset.panel !== tab));
+    $('.config-view-tab').forEach(b => {
+      const active=b.dataset.tab===tab;
+      b.classList.toggle('active',active);
+      if(active)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');
+    });
+    $('.config-panel').forEach(p => p.classList.toggle('hidden', p.dataset.panel !== tab));
     if (tab === 'review') renderReview();
   }
   function syncTransformerNominals(){
@@ -320,9 +324,9 @@
         </summary>
         <div class="winding-accordion-body">
           <div class="winding-card-head"><div class="winding-head-fields">
-            <input aria-label="Nombre bobinado" data-wfield="name" value="${esc(w.name)}" placeholder="Nombre bobinado" required>
-            <input class="w-voltage" aria-label="Tensión kV" data-wfield="voltage_kv" type="text" inputmode="decimal" value="${esc(w.voltage_kv)}" placeholder="kV" required>
-          </div><button class="delete-btn" data-remove-winding="${wi}" title="Eliminar bobinado"><svg><use href="#i-trash"/></svg></button></div>
+            <label class="config-field"><span>Nombre del bobinado <i class="required-mark">*</i></span><input aria-label="Nombre bobinado" data-wfield="name" value="${esc(w.name)}" placeholder="Ej. Bobinado AT" required></label>
+            <label class="config-field"><span>Tensión del bobinado (kV) <i class="required-mark">*</i></span><input class="w-voltage" aria-label="Tensión kV" data-wfield="voltage_kv" type="text" inputmode="decimal" value="${esc(w.voltage_kv)}" placeholder="Ej. 220" required></label>
+          </div><button type="button" class="text-remove" data-remove-winding="${wi}">Quitar bobinado</button></div>
           <section class="terminal-section">
             <div class="terminal-section-heading">
               <div class="terminal-section-title"><strong>Bornes y terminales</strong><small data-winding-stats="${wi}">${w.terminals.filter(t=>!(t._draft&&!String(t.code||'').trim()&&!t.has_capacitive_bushing)).length} bornes · ${w.terminals.filter(t=>t.has_capacitive_bushing).length} capacitivos</small></div>
@@ -493,10 +497,10 @@
         </summary>
         <div class="tap-accordion-body">
           <div class="tap-card-head"><div class="tap-meta">
-            <label>Nombre<input data-cfield="name" value="${esc(c.name)}"></label>
-            <label>Bobinado asociado<select data-cfield="winding_index">${state.windings.map((w,i)=>`<option value="${i}" ${Number(c.winding_index)===i?'selected':''}>${esc(w.name||w.code||'Bobinado '+(i+1))}</option>`).join('')}</select></label>
-            <label>Posición mínima<input data-cfield="min_position" type="number" value="${esc(c.min_position)}"></label><label>Posición máxima<input data-cfield="max_position" type="number" value="${esc(c.max_position)}"></label><label>Neutro<input data-cfield="neutral_position" type="number" value="${esc(c.neutral_position)}"></label><label>Actual<input data-cfield="current_position" type="number" value="${esc(c.current_position)}"></label>
-          </div><button class="delete-btn" data-remove-changer="${ci}" title="Eliminar conmutador"><svg><use href="#i-trash"/></svg></button></div>
+            <label><span>Nombre del conmutador</span><input data-cfield="name" value="${esc(c.name)}" placeholder="Ej. CTC / DETC"></label>
+            <label><span>Bobinado asociado</span><select data-cfield="winding_index">${state.windings.map((w,i)=>`<option value="${i}" ${Number(c.winding_index)===i?'selected':''}>${esc(w.name||w.code||'Bobinado '+(i+1))}</option>`).join('')}</select></label>
+            <label><span>Posición mínima</span><input data-cfield="min_position" type="number" value="${esc(c.min_position)}"></label><label><span>Posición máxima</span><input data-cfield="max_position" type="number" value="${esc(c.max_position)}"></label><label><span>Posición neutra</span><input data-cfield="neutral_position" type="number" value="${esc(c.neutral_position)}"></label><label><span>Posición actual</span><input data-cfield="current_position" type="number" value="${esc(c.current_position)}"></label>
+          </div><button type="button" class="text-remove" data-remove-changer="${ci}">Quitar conmutador</button></div>
           <details class="tap-positions-accordion" open>
             <summary><span>Posiciones de TAP</span><small>${c.positions.length} posiciones registradas</small><span class="accordion-chevron">⌄</span></summary>
             <div class="tap-card-body"><div class="table-caption"><strong>Posiciones de tap / datos de placa</strong><div class="sheet-tools"><button data-generate-taps="${ci}">Generar filas</button><button data-add-tap-row="${ci}">+ Fila</button><button data-copy-taps="${ci}">Copiar tabla</button></div></div><div class="sheet-wrap" id="tap-grid-${ci}"></div><div class="sheet-hint">Puedes pegar las columnas Posición, Etiqueta, Neutro y Observaciones.</div></div>
@@ -542,9 +546,10 @@
   }
 
   function updateCounts(){
-    $('#windingCount').textContent=state.windings.length;
+    $('#windingCount').textContent=state.windings.length+' '+(state.windings.length===1?'bobinado':'bobinados');
     refreshWindingCounters();
-    $('#tapCount').textContent=state.tap_changers.reduce((sum,c)=>sum+c.positions.length,0);
+    const positions=state.tap_changers.reduce((sum,c)=>sum+c.positions.length,0);
+    $('#tapCount').textContent=positions+' '+(positions===1?'posición':'posiciones');
     refreshConfigStepIndicators();
   }
 
@@ -569,8 +574,10 @@
       const button=document.querySelector('.config-view-tab[data-tab="'+key+'"]');
       if(!button)return;
       button.dataset.state=status;
+      button.setAttribute('aria-current',button.dataset.tab===selectedTab?'step':'false');
+      const statusText=button.querySelector('.config-step-status');
+      if(statusText)statusText.textContent=label;
       button.title=label;
-      button.setAttribute('aria-label',button.textContent.trim()+' · '+label);
     });
   }
 
