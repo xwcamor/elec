@@ -1,3 +1,9 @@
+## 1.5.61
+- Recalcula el resumen global de ensayos en tiempo real al editar cualquier campo, no solo al reconstruir los formularios.
+- Actualiza inmediatamente el indicador «Todos completos» o la cantidad de pendientes y su estado visual.
+- Mantiene sincronizados el resumen global, los estados individuales y los porcentajes.
+- Actualiza la caché de recursos.
+
 ## 1.5.60
 - Actualiza en vivo el estado de cada acordeón de prueba al editar datos de equipo, referencia o medición.
 - El indicador cambia inmediatamente entre «Completo», «Faltan datos» y «Sin iniciar», junto con el porcentaje y el color.
