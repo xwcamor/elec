@@ -855,8 +855,8 @@ body.config-focus .config-panel .form-grid input[readonly]:focus{border-color:#e
 .plan-test-tab>span{font-size:11px;min-width:19px}
 .plan-test-tab>b{font-size:12px;line-height:1.3;white-space:normal;text-align:left}
 .plan-test-tab>small{font-size:11px;font-weight:700;white-space:nowrap}
-.plan-test-tab.is-complete{background:#eff9f2;border-color:#a8d7b8;color:#1c633a}
-.plan-test-tab.is-complete>span,.plan-test-tab.is-complete>small{color:#257a49}
+.plan-test-tab.is-complete{background:#f5f7f9;border-color:#d5dde5;color:#526579}
+.plan-test-tab.is-complete>span,.plan-test-tab.is-complete>small{color:#647789}
 .plan-test-tab.is-incomplete{background:#fff3db;border-color:#e8b961;color:#80500b}
 .plan-test-tab.is-incomplete>span,.plan-test-tab.is-incomplete>small{color:#95600d}
 .plan-test-tab.is-unstarted{background:#f5f7f9;border-color:#cfd7df;color:#5b6a79}
@@ -876,7 +876,7 @@ body.config-focus .config-panel .form-grid input[readonly]:focus{border-color:#e
 .plan-results-accordion-copy>b{font-size:15px;color:#29435c}
 .plan-results-accordion-copy>small{font-size:11px;color:#7b8b9b}
 .plan-results-accordion-status{font-size:11px;font-weight:700;padding:5px 9px;border-radius:20px;background:#fff2d8;color:#885a10;white-space:nowrap}
-.plan-results-accordion-status[data-state="complete"]{background:#eaf6ee;color:#267447}
+.plan-results-accordion-status[data-state="complete"]{background:#eef1f4;color:#657586}
 .plan-results-accordion-status[data-state="unstarted"]{background:#eef1f4;color:#657586}
 .plan-results-accordion-chevron{font-size:20px;line-height:1;color:#718397;transition:transform .18s}
 .plan-results-accordion[open] .plan-results-accordion-chevron{transform:rotate(180deg)}
@@ -889,26 +889,32 @@ body.config-focus .config-panel .form-grid input[readonly]:focus{border-color:#e
 .plan-results-title .plan-results-accordion-status{position:absolute;right:0;top:8px}
 .plan-test-card{margin:0 0 12px;border:1px solid #d7e1e9;border-radius:10px;overflow:hidden;background:#fff}
 .plan-test-card[hidden]{display:none!important}
-.plan-test-card[data-state="complete"]{border-color:#b6d9c0}
+.plan-test-card[data-state="complete"]{border-color:#d7e1e9}
 .plan-test-card[data-state="incomplete"]{border-color:#e8bd6e}
 .plan-test-card[data-state="empty"]{border-color:#d5dde5}
 .plan-test-card-head{display:flex;align-items:center;gap:12px;padding:14px 16px;min-height:64px;cursor:pointer;list-style:none;background:#f7f9fb}
 .plan-test-card-head::-webkit-details-marker{display:none}
-.plan-test-card[data-state="complete"]>.plan-test-card-head{background:#f0f8f2}
+.plan-test-card[data-state="complete"]>.plan-test-card-head{background:#f7f9fb}
 .plan-test-card[data-state="incomplete"]>.plan-test-card-head{background:#fff7e8}
 .plan-test-card[data-state="empty"]>.plan-test-card-head{background:#f4f6f8}
 .plan-test-index{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;border-radius:9px;background:#e8eef3;color:#52687c;font-size:12px;font-weight:800}
-.plan-test-card[data-state="complete"] .plan-test-index{background:#d9efdf;color:#237044}
+.plan-test-card[data-state="complete"] .plan-test-index{background:#e8eef3;color:#52687c}
 .plan-test-card[data-state="incomplete"] .plan-test-index{background:#ffe8bd;color:#8a570a}
 .plan-test-heading{display:grid;gap:4px;flex:1;min-width:0}
 .plan-test-heading>b{font-size:14px;color:#29435c}
 .plan-test-heading>small{font-size:11px;color:#73869a}
 .plan-card-state{font-size:11px;font-weight:750;white-space:nowrap}
-.plan-card-state[data-state="complete"]{color:#267447}
+.plan-card-state[data-state="complete"]{color:#647789}
 .plan-card-state[data-state="incomplete"]{color:#95600d}
 .plan-card-state[data-state="empty"]{color:#68798a}
 .plan-card-chevron{font-size:18px;color:#718397;transition:transform .18s}
 .plan-test-card[open]>.plan-test-card-head .plan-card-chevron{transform:rotate(180deg)}
+/* Los datos capturados no se resaltan en verde: el verde queda reservado para validaciones técnicas explícitas. */
+.plan-test-card[data-state="complete"] .plan-test-meta-card input,
+.plan-test-card[data-state="complete"] .plan-test-meta-card select,
+.plan-test-card[data-state="complete"] .plan-test-meta-card textarea{
+  background:#fff!important;border-color:#dce3e9!important;color:#26384d!important;
+}
 .plan-test-body{padding:14px 16px}
 @media(max-width:560px){.plan-results-title{padding-right:0}.plan-results-title .plan-results-accordion-status{position:static;display:inline-flex;margin-top:6px}.plan-test-card-head{gap:8px;padding:11px}.plan-test-heading>b{font-size:12px}.plan-card-state{font-size:10px}}
 
