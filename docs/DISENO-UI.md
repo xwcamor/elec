@@ -55,24 +55,44 @@ Usar variables CSS centralizadas. Los valores pueden evolucionar mediante una de
 - Evitar que títulos, etiquetas y descripciones compitan por atención.
 - Unidades como kV, A, %, nF y °C deben permanecer visibles.
 
-### Espaciado
+### Espaciado y alineación
 
-Usar una escala base de múltiplos de 4 px:
+Usar una escala base de múltiplos de 4 px. Estos valores son tokens del producto y deben reutilizarse; no elegir márgenes o paddings al ojo.
 
-`4, 8, 12, 16, 20, 24, 32` px.
-
-| Contexto | Valor base |
+| Token | Valor |
 |---|---:|
-| Padding de tarjeta principal | 20–24 px |
+| `--ui-space-1` | 4 px |
+| `--ui-space-2` | 8 px |
+| `--ui-space-3` | 12 px |
+| `--ui-space-4` | 16 px |
+| `--ui-space-5` | 20 px |
+| `--ui-space-6` | 24 px |
+| `--ui-space-7` | 32 px |
+
+| Contexto | Estándar |
+|---|---:|
+| Margen horizontal de página (escritorio) | 24 px |
+| Margen horizontal de página (móvil) | 12 px |
+| Padding de tarjeta principal | 20 px |
 | Padding de tarjeta secundaria | 16 px |
 | Cabecera de tarjeta | 12–16 px |
 | Padding de formulario | 16–20 px |
 | Separación entre campos | 12–16 px |
 | Separación entre tarjetas | 16 px |
-| Separación entre secciones | 24 px |
+| Separación entre secciones principales | 24 px |
 | Separación icono-texto | 8 px |
+| Separación entre título y descripción | 4–8 px |
+| Separación entre encabezado y contenido | 16 px |
 
-Los componentes pueden adaptarse a móvil conservando la escala. No introducir valores arbitrarios sin motivo.
+Reglas de layout:
+- Configuración eléctrica, Pruebas eléctricas y el formulario de registro usan el mismo ancho de página y gutter: 24 px en escritorio y 12 px en móvil.
+- Sus encabezados usan el mismo componente visual `.config-toolbar`, la misma altura/alineación vertical, el mismo padding horizontal y el mismo espaciado entre título, descripción y acciones.
+- El contenido principal comienza con el mismo ritmo vertical. No añadir padding-top o margin-top exclusivo a un módulo sin una razón funcional documentada.
+- Los botones y enlaces de acción del encabezado se alinean en una misma fila, centrados verticalmente y anclados al mismo borde derecho. La cantidad de acciones no debe desplazar el grupo fuera de esa línea.
+- Las barras de navegación/steps de cada módulo pueden tener distinta función, pero deben compartir el mismo gutter, alineación inicial, separación respecto al encabezado y ritmo de espaciado.
+- Para separar elementos hermanos, preferir `gap` en el contenedor antes que márgenes individuales acumulados.
+- El margen exterior controla la distancia entre componentes; el padding controla el espacio interno. No usar ambos para resolver la misma separación.
+- Los componentes pueden adaptarse a móvil conservando la escala. No introducir valores arbitrarios sin motivo.
 
 ### Bordes, radios y controles
 
