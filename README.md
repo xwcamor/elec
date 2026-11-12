@@ -3,7 +3,7 @@
 Aplicación web independiente para configurar transformadores y registrar pruebas eléctricas. Es un prototipo PHP + MySQL pensado para ejecutarse localmente con Laragon.
 
 ## Versión
-**1.5.88**
+**1.5.89**
 
 ## Funcionalidades
 
@@ -11,7 +11,7 @@ Aplicación web independiente para configurar transformadores y registrar prueba
 - Alta de nuevos transformadores desde el botón «Crear trafo» del topbar, compatible con las columnas reconocidas de la tabla configurada.
 - Edición de datos principales del transformador cuando la estructura de la tabla lo permite.
 - Configuración eléctrica: fases, grupo vectorial, frecuencia, bobinados, bornes y fichas de bushings capacitivos.
-- Configuración de conmutadores y posiciones de taps.
+- Configuración de conmutadores y posiciones de taps, con lectura del tipo/cantidad desde la ficha técnica y validación de correspondencia.
 - Grillas tipo Excel: edición, navegación con teclado, pegado TSV desde Excel y copia de tablas.
 - Versionado de configuraciones eléctricas.
 - Catálogo LAP: TTR, factor de potencia, excitación, resistencia de devanados, aislamiento, bushings, SFRA, pararrayos y protecciones; capacitancia complementaria permanece como ensayo adicional.
