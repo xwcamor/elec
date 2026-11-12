@@ -1,3 +1,7 @@
+## v1.5.103
+- Corrige validación del servidor: guardar bobinados ya no exige «Conexión», campo retirado de la interfaz en 1.5.102.
+- Se mantiene la columna histórica connection_type como opcional; no se elimina ni modifica información previa.
+
 ## v1.5.102
 - Retira de la edición de bobinados los campos «Conexión» y «¿Tiene neutro?».
 - Simplifica el resumen del bobinado y «Copiar bobinados» para mostrar únicamente nombre y tensión.
