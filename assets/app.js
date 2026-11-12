@@ -1081,7 +1081,14 @@
     for(let i=0;i<5;i++)rows.push({tap:start+i});
     renderTtrRows(rows);
   });
-  $('#ttrRows').addEventListener('input',e=>{if(!e.target.matches('.ttr-cell')||[3,5,7,9].includes(Number(e.target.dataset.c)))return;const rows=collectTtrRows();renderTtrRows(rows);const r=Number(e.target.dataset.r),c=Number(e.target.dataset.c);$(`#ttrRows [data-r="${r}"][data-c="${c}"]`)?.focus();});
+  $('#ttrRows').addEventListener('input',e=>{
+    if(!e.target.matches('.ttr-cell')||[3,5,7,9].includes(Number(e.target.dataset.c)))return;
+    const row=e.target.closest('tr');if(!row)return;
+    const cells=$$('.ttr-cell',row);
+    const values={tap:cells[0]?.value||'',at:cells[1]?.value||'',bt:cells[2]?.value||'',theoretical:'',U:cells[4]?.value||'',errU:'',V:cells[6]?.value||'',errV:'',W:cells[8]?.value||'',errW:'',notes:cells[10]?.value||''};
+    const calculated=ttrCalc(values);
+    [[3,'theoretical'],[5,'errU'],[7,'errV'],[9,'errW']].forEach(([index,key])=>{if(cells[index])cells[index].value=calculated[key]||'';});
+  });
   $('#ttrRows').addEventListener('paste',e=>{
     const cell=e.target.closest('.ttr-cell');if(!cell)return;
     const text=(e.clipboardData||window.clipboardData).getData('text');if(!text.includes('\t')&&!text.includes('\n'))return;
