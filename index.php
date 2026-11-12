@@ -81,7 +81,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.42">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.43">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -218,7 +218,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
     <section id="testHistoryPanel" class="test-view-panel hidden" role="tabpanel" aria-labelledby="showTestTable">
       <div class="test-history-card">
         <div class="test-history-head"><div><span class="eyebrow">HISTORIAL DE VISITAS</span><h3>Historial de visitas</h3><p>Una fila por visita. Abre un registro para consultar o continuar completando sus datos.</p></div><div class="test-history-controls"><label class="test-status-filter"><span>Estado</span><select id="testHistoryStatusFilter"><option value="ALL">Todos</option><option value="COMPLETE">Completo</option><option value="INCOMPLETE">Incompleto</option><option value="DRAFT">En borrador</option></select></label><div class="test-filter"><svg><use href="#i-search"/></svg><input id="testHistoryFilter" placeholder="Filtrar por prueba o responsable..."></div></div></div>
-        <div class="test-table-wrap"><table class="test-history-table"><thead><tr><th>Fecha de visita</th><th>Pruebas incluidas</th><th>Responsable</th><th>Estado</th><th>Datos registrados</th><th>Acción</th></tr></thead><tbody id="testHistoryBody"><tr><td colspan="6" class="test-empty">Aún no hay registros. Selecciona una prueba para crear tu primer plan.</td></tr></tbody></table></div>
+        <div class="test-table-wrap"><table class="test-history-table"><thead><tr><th>Fecha de visita</th><th>Pruebas incluidas</th><th>Datos registrados</th><th>Responsable</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="testHistoryBody"><tr><td colspan="6" class="test-empty">Aún no hay registros. Selecciona una prueba para crear tu primer plan.</td></tr></tbody></table></div>
       </div>
     </section>
     <section id="testAnalyticsPanel" class="test-view-panel hidden" role="tabpanel" aria-labelledby="showTestGraph">
@@ -466,6 +466,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.42"></script>
-<script src="./assets/plan.js?v=1.5.42"></script>
+<script src="./assets/app.js?v=1.5.43"></script>
+<script src="./assets/plan.js?v=1.5.43"></script>
 </body></html>
