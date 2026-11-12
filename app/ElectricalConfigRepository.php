@@ -179,7 +179,6 @@ class ElectricalConfigRepository
                 if (isset($terminalCodes[$terminalCode])) throw new InvalidArgumentException('El borne '.$terminalCode.' está repetido en '.$name.'.');
                 $terminalCodes[$terminalCode] = true;
             }
-            if ($activeTerminals === 0) throw new InvalidArgumentException('Agrega al menos un borne al bobinado '.$name.'.');
         }
         foreach ($changers as $cIndex => $changer) {
             if (!is_array($changer)) throw new InvalidArgumentException('Hay un conmutador con datos inválidos.');
