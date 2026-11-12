@@ -46,7 +46,7 @@
     catch (_) { throw new Error('El servidor PHP no devolvió JSON. Revisa la ruta /pe/api.php y los errores de PHP en Laragon. Respuesta: ' + raw.slice(0,180)); }
     if (!response.ok || data.ok === false) {
       const message = data.message || ('Error HTTP ' + response.status);
-      const detail = data.detail ? '\\nDetalle técnico: ' + data.detail : '';
+      const detail = data.detail ? '\nDetalle técnico: ' + data.detail : '';
       throw new Error(message + detail);
     }
     return data;
