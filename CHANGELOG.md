@@ -1,3 +1,9 @@
+## v1.5.89
+- La configuración eléctrica exige una cantidad de TAP mayor que cero en la ficha del transformador antes de entrar.
+- La etapa de conmutadores muestra el tipo detectado (DETC/OLTC) y la cantidad de posiciones como datos de solo lectura provenientes de la base de datos.
+- Añade acceso directo para modificar tipo y cantidad desde la ficha técnica, sin duplicar esos datos en la configuración eléctrica.
+- Valida que cada conmutador tenga exactamente la cantidad de posiciones indicada en la ficha antes de revisar y guardar una nueva versión.
+
 ## v1.5.88
 - Elimina la etapa «Datos eléctricos generales»: fases, grupo vectorial y frecuencia se toman de la ficha del transformador y dejan de presentarse como campos configurables.
 - Reduce el asistente a tres etapas: Bobinados y bornes, Conmutadores y TAP, y Revisión y versiones.
