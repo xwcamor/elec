@@ -847,6 +847,47 @@
     }
     return {code:'DRAFT',label:'Borrador',className:'draft'};
   }
+  function reportFieldLabel(key){
+    const labels={measurement:'Modo de prueba',test_voltage:'Tensión de prueba',test_voltage_v:'Tensión de prueba',power_factor_measured:'Factor de potencia medido',power_factor_corrected_20c:'Factor de potencia corregido',capacitance_source_f:'Capacitancia',capacitance_measured:'Capacitancia medida',status:'Estado',tap:'TAP',at:'AT',bt:'BT',theoretical:'Relación teórica',U:'Medida U',V:'Medida V',W:'Medida W',errU:'Error U',errV:'Error V',errW:'Error W',result:'Resultado',notes:'Observación',phase:'Fase',frequency_hz:'Frecuencia',excitation_current:'Corriente de excitación',losses:'Pérdidas',section:'Sección',test_current_a:'Corriente de prueba',temperature_c:'Temperatura',resistance_measured:'Resistencia medida',resistance_referred_75c:'Resistencia referida a 75 °C',point:'Punto de prueba',applied_voltage_kv:'Tensión aplicada',reading_15s:'Lectura 15 s',reading_30s:'Lectura 30 s',reading_45s:'Lectura 45 s',reading_1min:'Lectura 1 min',absorption_index:'Índice de absorción',terminal:'Borne',serial:'Serie',power_factor_plate:'FP de placa',capacitance_plate:'Capacitancia de placa',variation_percent:'Variación',connection:'Conexión',comparison_result:'Comparación',output_voltage:'Tensión de salida',output_current:'Corriente de salida',test_mode:'Modo de prueba',losses_measured:'Pérdidas medidas',accessory:'Accesorio',terminals:'Terminales',contact:'Contacto',condition:'Condición',capacitance_nf:'Capacitancia',test_voltage_kv:'Tensión de prueba'};
+    return labels[key]||String(key||'').replace(/_/g,' ').replace(/\\b\\w/g,c=>c.toUpperCase());
+  }
+  function buildReportMeasurementTable(measurements){
+    const rows=(Array.isArray(measurements)?measurements:[]).filter(m=>m&&((m.parameter||'')!==''||(m.value||'')!==''||(m.notes||'')!==''));
+    if(!rows.length)return '<p class="muted">No hay mediciones registradas para este ensayo.</p>';
+    return '<table><thead><tr><th>Fila</th><th>Medición / parámetro</th><th>Resultado</th><th>Unidad</th><th>Observación</th></tr></thead><tbody>'+rows.map(m=>{
+      const parts=String(m.parameter||'').split('|'),rowRef=parts.length>=3?parts[1]:'—',key=parts.length>=3?parts.slice(2).join('|'):String(m.parameter||'Dato');
+      return '<tr><td>'+esc(rowRef)+'</td><td>'+esc(reportFieldLabel(key))+'</td><td>'+esc(m.value??'—')+'</td><td>'+esc(m.unit||'—')+'</td><td>'+esc(m.notes||'—')+'</td></tr>';
+    }).join('')+'</tbody></table>';
+  }
+  async function exportExecutionPdf(id){
+    const printWindow=window.open('','_blank');
+    if(!printWindow){toast('Permite las ventanas emergentes para exportar el informe.',true);return;}
+    printWindow.document.write('<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Preparando informe...</title></head><body>Preparando informe...</body></html>');
+    try{
+      const response=await fetch(api('action=test-get&key='+encodeURIComponent(transformer.key)+'&id='+encodeURIComponent(id)),{cache:'no-store'});
+      const data=await readApiResponse(response),x=data.item||{};
+      const tests=Array.isArray(x.plan?.tests)&&x.plan.tests.length?x.plan.tests:[{code:x.test_code,name:x.test_name||typeName(x.test_code),status:x.status,equipment_name:x.equipment_name,equipment_brand:x.equipment_brand,equipment_model:x.equipment_model,equipment_serial:x.equipment_serial,observations:x.observations,measurements:x.measurements||[]}];
+      const t=transformer||{};
+      const meta=(label,value)=>'<div class="meta"><small>'+label+'</small><b>'+esc(value||'—')+'</b></div>';
+      const testHtml=tests.map((test,index)=>{
+        const equipment=[test.equipment_name,test.equipment_brand,test.equipment_model,test.equipment_serial].filter(Boolean).join(' · ');
+        return '<section class="test"><div class="test-title"><div><small>ENSAYO '+String(index+1).padStart(2,'0')+'</small><h2>'+esc(test.name||typeName(test.code))+'</h2></div><strong>'+esc(test.status||'BORRADOR')+'</strong></div>'+
+          (equipment?'<p class="equipment"><b>Equipo:</b> '+esc(equipment)+'</p>':'')+
+          buildReportMeasurementTable(test.measurements)+
+          (test.observations?'<div class="observation"><b>Observaciones del ensayo</b><p>'+esc(test.observations).replace(/\\n/g,'<br>')+'</p></div>':'')+'</section>';
+      }).join('');
+      const status=String(x.status||'BORRADOR').replace(/_/g,' ');
+      const html='<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Informe de pruebas #'+esc(x.id||id)+'</title><style>'+
+        '*{box-sizing:border-box}body{font:12px/1.45 Arial,sans-serif;color:#1f2937;margin:28px}h1{font-size:22px;margin:0 0 4px;color:#17365d}h2{font-size:16px;margin:3px 0 0}.sub{color:#64748b;margin:0 0 20px}.top{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #1e4b75;padding-bottom:14px}.tag{border:1px solid #cbd5e1;border-radius:6px;padding:7px 10px;font-weight:bold}.section{margin:18px 0}.section h3{font-size:13px;color:#1e4b75;margin:0 0 8px;border-bottom:1px solid #dbe3ec;padding-bottom:5px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.meta{border:1px solid #e2e8f0;padding:8px;border-radius:5px;min-height:48px}.meta small{display:block;color:#64748b;font-size:10px;margin-bottom:3px}.test{margin:20px 0;page-break-inside:avoid}.test-title{display:flex;justify-content:space-between;align-items:center;background:#f1f5f9;padding:10px;border:1px solid #dbe3ec;border-radius:5px}.test-title small{color:#64748b;font-weight:bold;letter-spacing:.08em}.test-title strong{font-size:10px;border:1px solid #cbd5e1;padding:5px 8px;border-radius:4px}.equipment{margin:8px 0;color:#475569}table{width:100%;border-collapse:collapse;margin-top:9px;font-size:10px}th{background:#eaf0f6;text-align:left;color:#334155}th,td{border:1px solid #d8e0e8;padding:6px;vertical-align:top}tr{page-break-inside:avoid}.observation{margin-top:10px;border-left:3px solid #6b8eae;background:#f8fafc;padding:8px}.observation p{margin:4px 0 0;white-space:normal}.muted{color:#64748b;font-style:italic}.footer{border-top:1px solid #dbe3ec;margin-top:24px;padding-top:8px;color:#64748b;font-size:9px;display:flex;justify-content:space-between}@media print{body{margin:14mm}.test{page-break-inside:auto}.test-title{break-after:avoid}button{display:none}}'+
+        '</style></head><body><header class="top"><div><h1>Informe de pruebas eléctricas</h1><p class="sub">Registro #'+esc(x.id||id)+' · '+esc(formatExecutionDate(x.executed_at))+'</p></div><div class="tag">'+esc(status)+'</div></header>'+
+        '<section class="section"><h3>Identificación del transformador</h3><div class="grid">'+meta('Código',t.code||t.key)+meta('Marca',t.brand)+meta('Modelo / descripción',t.name)+meta('Potencia',t.power)+meta('Tensión',t.voltage)+meta('Grupo vectorial',t.vector_group)+'</div></section>'+
+        '<section class="section"><h3>Datos del registro</h3><div class="grid">'+meta('Fecha de ejecución',formatExecutionDate(x.executed_at))+meta('Responsable / técnico',x.operator_name)+meta('Supervisor',x.supervisor_name)+meta('Temperatura de aceite',x.oil_temperature_c===null?'—':x.oil_temperature_c+' °C')+meta('Temperatura ambiente',x.ambient_temperature_c===null?'—':x.ambient_temperature_c+' °C')+meta('Humedad relativa',x.relative_humidity_percent===null?'—':x.relative_humidity_percent+' %')+'</div></section>'+
+        '<section class="section"><h3>Ensayos y resultados</h3>'+testHtml+'</section>'+
+        (x.observations?'<section class="section observation"><b>Observaciones generales</b><p>'+esc(x.observations)+'</p></section>':'')+
+        '<div class="footer"><span>ELEC · Informe generado desde el registro de pruebas</span><span>Registro #'+esc(x.id||id)+'</span></div><script>window.addEventListener("load",function(){setTimeout(function(){window.print()},350)});<\\/script></body></html>';
+      printWindow.document.open();printWindow.document.write(html);printWindow.document.close();
+    }catch(error){printWindow.close();toast('No se pudo exportar el registro: '+(error.message||error),true);}
+  }
   function renderTestHistory(){
     testStats();renderTestTypes();
     if(!$('#testAnalyticsPanel')?.classList.contains('hidden'))renderHistoricalAnalytics();
@@ -861,10 +902,11 @@
       const names=x.plan_tests?.length?x.plan_tests.map(t=>t.name||typeName(t.code)):(x.test_code==='PLAN'?[]:[x.test_name||typeName(x.test_code)]);
       const testCount=names.length;
       const state=executionDisplayStatus(x);
-      return '<tr><td><b>'+esc(formatExecutionDate(x.executed_at))+'</b></td><td><b>'+esc(names.join(' · ')||'Sin ensayos seleccionados')+'</b></td><td>'+testCount+'</td><td>'+esc(x.operator_name||'—')+'</td><td><span class="execution-status '+state.className+'">'+state.label+'</span></td><td><div class="test-row-actions"><button class="btn small" data-open-execution="'+x.id+'" title="Abrir este registro">Abrir registro</button><button class="btn small danger test-delete-button" data-delete-execution="'+x.id+'" title="Eliminar registro" aria-label="Eliminar registro #'+x.id+'"><svg><use href="#i-trash"/></svg>Eliminar</button></div></td></tr>';
+      return '<tr><td><b>'+esc(formatExecutionDate(x.executed_at))+'</b></td><td><b>'+esc(names.join(' · ')||'Sin ensayos seleccionados')+'</b></td><td>'+testCount+'</td><td>'+esc(x.operator_name||'—')+'</td><td><span class="execution-status '+state.className+'">'+state.label+'</span></td><td><div class="test-row-actions"><button class="btn small" data-open-execution="'+x.id+'" title="Abrir este registro">Abrir registro</button><button class="btn small" data-export-execution="'+x.id+'" title="Exportar informe PDF">Exportar PDF</button><button class="btn small danger test-delete-button" data-delete-execution="'+x.id+'" title="Eliminar registro" aria-label="Eliminar registro #'+x.id+'"><svg><use href="#i-trash"/></svg>Eliminar</button></div></td></tr>';
     }).join(''):'<tr><td colspan="6" class="test-empty">'+(testHistoryLoadError?'No se pudo consultar el historial: '+esc(testHistoryLoadError):(testExecutions.length?'No hay registros que coincidan con el filtro.':'No hay registros para este transformador. Los registros se ordenan por fecha, del más reciente al más antiguo.'))+'</td></tr>';
 
-    $$('[data-delete-execution]').forEach(button=>button.addEventListener('click',async()=>{
+    $('[data-export-execution]').forEach(button=>button.addEventListener('click',()=>exportExecutionPdf(Number(button.dataset.exportExecution))));
+    $('[data-delete-execution]').forEach(button=>button.addEventListener('click',async()=>{
       const id=Number(button.dataset.deleteExecution);
       const visit=testExecutions.find(item=>Number(item.id)===id);
       if(!id||!visit)return;
