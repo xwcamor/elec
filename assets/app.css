@@ -1989,3 +1989,19 @@ body.config-focus .config-field input[required]:placeholder-shown:focus{backgrou
  .config-layout .sheet-tools{flex-wrap:wrap}
  .config-layout .winding-accordion-summary .winding-summary-status{white-space:normal!important;text-align:right}
 }
+
+
+/* v1.5.143 · Indicador rojo uniforme para campos obligatorios en toda la aplicación. */
+.required-mark,
+.config-layout .required-mark,
+.plan-core-grid label .required-mark{
+ color:#dc2626!important;
+ font-style:normal!important;
+ font-weight:800!important;
+ font-size:1em!important;
+ line-height:1!important;
+ margin-left:3px!important;
+ display:inline!important;
+ vertical-align:baseline!important;
+}
+.config-layout .sheet-table th .required-mark{margin-left:3px!important}
