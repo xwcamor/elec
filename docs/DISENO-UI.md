@@ -34,6 +34,8 @@ Usar variables CSS centralizadas. Los valores pueden evolucionar mediante una de
 | `--ui-danger` | `#B94A48` | Eliminación y errores |
 
 - Azul para acciones y selección, no para todos los títulos.
+- En pestañas de navegación, solo la pestaña activa usa el color de acento; las inactivas usan texto neutro y el hover no debe mantener un azul llamativo.
+- Las etiquetas de contexto/eyebrow usan texto secundario neutro; no deben competir con títulos ni simular enlaces.
 - Títulos en tinta oscura; no convertir cada encabezado en un elemento azul.
 - Rojo solo para errores o acciones destructivas.
 - Verde y ámbar siempre acompañados de texto o iconografía; nunca comunicar estado solo por color.
