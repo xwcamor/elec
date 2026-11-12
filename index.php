@@ -76,7 +76,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.150">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.151">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body>
@@ -216,13 +216,13 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
     </section>
     <section id="testHistoryPanel" class="test-view-panel hidden" role="tabpanel" aria-labelledby="showTestTable">
       <div class="test-history-card">
-        <div class="test-history-head"><div><span class="eyebrow">HISTORIAL DE REGISTROS</span><h3>Registros de pruebas eléctricas</h3><p>Consulta los registros de pruebas eléctricas y abre uno para revisar o completar sus resultados.</p></div><div class="test-history-controls"><label class="test-status-filter"><span>Estado</span><select id="testHistoryStatusFilter"><option value="ALL">Todos</option><option value="COMPLETE">Completado</option><option value="INCOMPLETE">En proceso</option><option value="DRAFT">Borrador</option></select></label><div class="test-filter"><svg><use href="#i-search"/></svg><input id="testHistoryFilter" placeholder="Filtrar por ensayo o responsable..."></div></div></div>
+        <div class="test-history-head"><div><h3>Registros de pruebas eléctricas</h3><p>Consulta los registros de pruebas eléctricas y abre uno para revisar o completar sus resultados.</p></div><div class="test-history-controls"><label class="test-status-filter"><span>Estado</span><select id="testHistoryStatusFilter"><option value="ALL">Todos</option><option value="COMPLETE">Completado</option><option value="INCOMPLETE">En proceso</option><option value="DRAFT">Borrador</option></select></label><div class="test-filter"><svg><use href="#i-search"/></svg><input id="testHistoryFilter" placeholder="Filtrar por ensayo o responsable..."></div></div></div>
         <div class="test-table-wrap"><table class="test-history-table"><thead><tr><th>Fecha de realización</th><th>Ensayos incluidos</th><th>N.º de ensayos</th><th>Responsable</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="testHistoryBody"><tr><td colspan="6" class="test-empty">Aún no hay registros. Crea un registro para iniciar una jornada de pruebas.</td></tr></tbody></table></div>
       </div>
     </section>
     <section id="testAnalyticsPanel" class="test-view-panel hidden" role="tabpanel" aria-labelledby="showTestGraph">
       <section class="analytics-card" aria-label="Evolución histórica">
-        <div class="analytics-heading"><div><span class="eyebrow">LECTURA VISUAL</span><h3>Actividad de ensayos</h3><p>Compara la cantidad de registros por mes y la distribución de los ensayos.</p></div><span class="analytics-period" id="analyticsPeriod">—</span></div>
+        <div class="analytics-heading"><div><h3>Actividad de ensayos</h3><p>Compara la cantidad de registros por mes y la distribución de los ensayos.</p></div><span class="analytics-period" id="analyticsPeriod">—</span></div>
         <div class="analytics-grid">
           <div class="analytics-chart-panel"><b>Registros creados por mes</b><div id="monthlyExecutionChart" class="analytics-chart"></div></div>
           <div class="analytics-chart-panel"><b>Distribución por tipo de ensayo</b><div id="testTypeAnalytics" class="type-analytics"></div></div>
