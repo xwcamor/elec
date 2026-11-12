@@ -1,3 +1,9 @@
+## v1.5.133
+- En la cabecera de cada bobinado, sustituye el contador de bornes por el estado «Completo» o «Pendiente».
+- Mantiene la cantidad de bornes y capacitivos en el encabezado de la sección «Bornes y terminales».
+- Cambia el número de bobinado al estilo neutral usado en las tarjetas de ensayos.
+- Separa nombre y tensión en una sección blanca titulada «Datos del bobinado», con campos alineados como los metadatos del formulario de pruebas.
+
 ## v1.5.132
 - Integra el indicador de pasos y el panel del formulario dentro de una sola tarjeta continua, eliminando la separación entre secciones.
 - Reduce los círculos a 44 px en escritorio, siguiendo la escala del stepper del formulario de pruebas.
