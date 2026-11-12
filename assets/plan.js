@@ -360,12 +360,26 @@
   async function ensureExecutionStarted(){
     if(editingId!==null)return true;
     if(!items.length){toast('Selecciona al menos un ensayo antes de iniciar la prueba.',true);setPlanStep('selection');return false;}
-    const accepted=window.confirm(
-      'Vas a iniciar una ejecución de prueba eléctrica.\\n\\n' +
-      'Se creará un registro en la base de datos con los ensayos seleccionados. ' +
-      'A partir de ese momento, los cambios se guardarán automáticamente.\\n\\n' +
-      '¿Deseas iniciar la prueba ahora?'
-    );
+    const message='Se creará el registro de esta ejecución con los ensayos seleccionados. Desde la confirmación, los cambios se guardarán automáticamente.';
+    let accepted=false;
+    if(window.Swal){
+      const result=await window.Swal.fire({
+        icon:'info',
+        title:'¿Crear registro y continuar?',
+        text:message,
+        showCancelButton:true,
+        confirmButtonText:'Confirmar y continuar',
+        cancelButtonText:'Volver a revisar',
+        reverseButtons:true,
+        focusCancel:true,
+        allowOutsideClick:false,
+        customClass:{popup:'trafodex-confirm-modal',confirmButton:'trafodex-confirm-button',cancelButton:'trafodex-cancel-button'},
+        buttonsStyling:true
+      });
+      accepted=!!result.isConfirmed;
+    }else{
+      accepted=window.confirm(message+'\\n\\n¿Confirmas la creación del registro y el inicio del autoguardado?');
+    }
     if(!accepted)return false;
     const started=await startPlan();
     return !!started&&editingId!==null;
@@ -486,7 +500,7 @@
     const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());$('#planDate').value=d.toISOString().slice(0,16);
     ['planOperator','planSupervisor','planOilTemp','planAmbientTemp','planHumidity','planObservations'].forEach(id=>$('#'+id).value='');
     $('#planTitle').textContent='Nuevo registro de pruebas';
-    if($('#saveTestPlan'))$('#saveTestPlan').textContent='Iniciar prueba';
+    if($('#saveTestPlan')){ $('#saveTestPlan').textContent='Guardar ahora'; $('#saveTestPlan').hidden=true; }
     setSaveStatus('Preparación · todavía no se guarda','idle');
     render();
   }
@@ -550,7 +564,7 @@
       }else if(x.test_code&&x.test_code!=='PLAN')items=[makeItem(x.test_code,{status:x.status,standard_reference:x.standard_reference,equipment_name:x.equipment_name,equipment_brand:x.equipment_brand,equipment_model:x.equipment_model,equipment_serial:x.equipment_serial,rows:rowsFromMeasurements(x.test_code,x.measurements||[])})];
       editRevision=0;savedRevision=0;
       activeTestIndex=0;render();$('#planTitle').textContent='Registro de pruebas #'+editingId;
-      if($('#saveTestPlan'))$('#saveTestPlan').textContent='Guardar ahora';
+      if($('#saveTestPlan')){ $('#saveTestPlan').textContent='Guardar ahora'; $('#saveTestPlan').hidden=false; }
       setSaveStatus(String(x.status||'').toUpperCase()==='COMPLETADA'?'Registro completado · al editarlo volverá a En proceso':'Cambios guardados · puedes continuar el registro','saved');
       bridge.showPage('planPage');setPlanStep(items.length?'results':'shared');
     }catch(e){toast(e.message,true);}
@@ -618,7 +632,7 @@
         editingId=Number(data.result.id);
         savedRevision=revisionAtStart;
         $('#planTitle').textContent='Registro de pruebas #'+editingId;
-        if(startRequested){setSaveStatus('Prueba iniciada · autoguardado activo','saved');if(btn)btn.textContent='Guardar ahora';toast('Prueba iniciada · Registro #'+editingId+'. Los cambios se guardarán automáticamente.');}
+        if(startRequested){setSaveStatus('Registro creado · autoguardado activo','saved');if(btn){btn.textContent='Guardar ahora';btn.hidden=false;}toast('Registro #'+editingId+' creado. El autoguardado está activo.');}
         else setSaveStatus(confirmCompletion?'Registro completado':(complete?'Todos los ensayos completos · confirma el registro':'Cambios guardados automáticamente'),'saved');
         if(confirmCompletion){toast('Registro de pruebas #'+editingId+' completado correctamente.');await bridge.reloadTestHistory();bridge.showPage('testPage');}
         else if(!automatic&&!startRequested){toast('Cambios guardados.');}
@@ -628,7 +642,7 @@
         if(!automatic)toast(error.message,true);
         return false;
       }finally{
-        if(btn){btn.disabled=false;btn.textContent=editingId===null?'Iniciar prueba':'Guardar ahora';}
+        if(btn){btn.disabled=false;btn.textContent='Guardar ahora';btn.hidden=editingId===null;}
       }
     })();
     savePromise=operation;
@@ -668,7 +682,7 @@
     if(editBtn)edit(Number(editBtn.dataset.openExecution));else if(pick)start(pick.dataset.newTest);else start(null);
   },true);
   $('#cancelPlan').addEventListener('click',leavePlan);
-  $('#saveTestPlan')?.addEventListener('click',()=>editingId===null?startPlan():saveNow(false));
+  $('#saveTestPlan')?.addEventListener('click',()=>{if(editingId!==null)saveNow(false);});
   $('#planPage').addEventListener('focusout',()=>{if(editingId!==null&&hasUnsavedChanges())scheduleAutoSave(250);});
   $('#planStepper').addEventListener('click',async e=>{
     const step=e.target.closest('[data-plan-step]');
