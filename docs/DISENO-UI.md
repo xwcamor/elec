@@ -145,6 +145,14 @@ La acción debe permanecer visible al final del contenido incluso cuando la secc
 
 ## 7. Encabezados, navegación y comportamiento sticky
 
+### Estado y acción de retorno en barras de herramientas
+- Cuando un encabezado muestre un estado contextual (guardado, autoguardado, error o advertencia) junto a una acción de retorno, el estado se coloca **inmediatamente a la izquierda del botón**.
+- Usar una sola fila de acciones compartida: `toolbar-actions`. No apilar el estado encima del botón en escritorio.
+- Reutilizar el mismo tamaño de texto, indicador circular, separación y alineación que el estado de Configuración eléctrica (`.save-status`).
+- En pantallas estrechas, permitir que la fila envuelva elementos si es necesario, sin superponer ni ocultar el estado o el botón.
+- El estado debe seguir siendo accesible mediante `aria-live` y no debe depender solo del color.
+
+
 - Encabezado de página: título, descripción breve y acciones principales alineadas; sin ocupar altura excesiva.
 - El encabezado de Configuración eléctrica y el de Pruebas eléctricas usan el mismo patrón.
 - No fijar encabezados, stepper, tarjetas ni botones al viewport por defecto.
