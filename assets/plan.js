@@ -244,7 +244,7 @@
       '<div class="plan-color-legend"><span><i class="legend-filled"></i> Verde: dato registrado</span><span><i class="legend-missing"></i> Ámbar: falta completar</span><span><i class="legend-calculated"></i> Gris: cálculo automático</span></div>';
     ['planDate','planOperator','planSupervisor'].forEach(id=>{const field=$('#'+id);if(!field)return;const missing=!isFilled(field.value);field.classList.toggle('is-missing',missing);field.classList.remove('is-filled');field.closest('label')?.classList.toggle('meta-pending',missing);field.closest('label')?.classList.remove('meta-complete');});
     const shared=$('#planSharedStatus');
-    if(shared){shared.classList.toggle('is-complete',m.general.length===0);shared.classList.toggle('is-pending',m.general.length>0);shared.textContent=m.general.length?'Pendiente: '+m.general.join(' · '):'Datos generales completos';}
+    if(shared){const pending=m.general.length>0;shared.classList.toggle('is-pending',pending);shared.classList.remove('is-complete');shared.hidden=!pending;shared.textContent=pending?'Pendiente: '+m.general.join(' · '):'';}
     updatePlanStepper(m);
     renderPlanReview();
   }
