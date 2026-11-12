@@ -217,9 +217,9 @@
     const issues=validateConfiguration().filter(message=>/bobinado|borne/i.test(message));
     const complete=state.windings.length>0&&state.windings.every(w=>{
       const name=String(w.name||'').trim(),code=String(w.code||'').trim();
-      const voltage=Number(w.voltage_kv),connection=String(w.connection_type||'').trim();
+      const voltage=Number(w.voltage_kv);
       const terminals=(w.terminals||[]).filter(t=>String(t.code||'').trim()||String(t.phase||'').trim()||t.has_capacitive_bushing);
-      return name!==''&&code!==''&&Number.isFinite(voltage)&&voltage>0&&connection!==''&&
+      return name!==''&&code!==''&&Number.isFinite(voltage)&&voltage>0&&
         terminals.length>0&&terminals.every(t=>String(t.code||'').trim()!==''&&String(t.phase||'').trim()!=='');
     })&&issues.length===0;
     return {complete,issues};
@@ -333,7 +333,7 @@
           </section>
         </div>
       </details>`).join('');
-    host.querySelectorAll('[data-wfield]').forEach(el=>el.addEventListener('change', e=>{const card=e.target.closest('[data-winding]');const i=Number(card.dataset.winding);const key=e.target.dataset.wfield;state.windings[i][key]=key==='has_neutral'?e.target.value==='1':(key==='voltage_kv'?normalizeNumeric(e.target.value):e.target.value);if(key==='voltage_kv')e.target.value=state.windings[i][key];const summary=e.target.closest('.winding-card').querySelector('.winding-summary-main');if(summary)summary.innerHTML='<strong>'+esc(state.windings[i].name||'Bobinado sin nombre')+'</strong><small>'+esc(state.windings[i].voltage_kv||'—')+' kV · '+esc(state.windings[i].connection_type||'Conexión pendiente')+'</small>';markDirty();}));
+    host.querySelectorAll('[data-wfield]').forEach(el=>el.addEventListener('change', e=>{const card=e.target.closest('[data-winding]');const i=Number(card.dataset.winding);const key=e.target.dataset.wfield;state.windings[i][key]=key==='has_neutral'?e.target.value==='1':(key==='voltage_kv'?normalizeNumeric(e.target.value):e.target.value);if(key==='voltage_kv')e.target.value=state.windings[i][key];const summary=e.target.closest('.winding-card').querySelector('.winding-summary-main');if(summary)summary.innerHTML='<strong>'+esc(state.windings[i].name||'Bobinado sin nombre')+'</strong><small>'+esc(state.windings[i].voltage_kv||'—')+' kV</small>';markDirty();}));
     host.querySelectorAll('[data-remove-winding]').forEach(b=>b.addEventListener('click',()=>{const i=Number(b.dataset.removeWinding);if(!confirm('¿Eliminar este bobinado y sus bornes de la configuración actual?'))return;state.windings.splice(i,1);state.tap_changers=state.tap_changers.filter(c=>c.winding_index!==i).map(c=>({...c,winding_index:c.winding_index>i?c.winding_index-1:c.winding_index}));renderWindings();renderTapChangers();updateCounts();markDirty();}));
     host.querySelectorAll('[data-add-terminal]').forEach(b=>b.addEventListener('click',()=>{const i=Number(b.dataset.addTerminal);state.windings[i].terminals.push(blankTerminal(''));renderWindings();markDirty();}));
     host.querySelectorAll('[data-copy-terminals]').forEach(b=>b.addEventListener('click',()=>copyGrid([['Borne','Fase','Tipo','¿Bushing capacitivo?','Notas bushing'],...state.windings[Number(b.dataset.copyTerminals)].terminals.map(t=>[t.code,t.phase,t.type,t.has_capacitive_bushing?'Sí':'No',t.bushing.notes])].map(r=>r.join('\t')).join('\n'))));
