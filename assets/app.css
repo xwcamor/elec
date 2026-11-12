@@ -832,3 +832,10 @@ body.config-focus .config-panel .form-grid input[readonly]:focus{border-color:#e
 .plan-core-grid input:not(.is-missing),.execution-date-field input:not(.is-missing){border-color:#dce3e9;background:#fff;color:#26384d}
 .plan-core-grid label .required-mark{color:#c17b16;font-style:normal;font-weight:900;display:inline}
 .plan-core-grid label>span{display:inline}
+
+/* Datos de realización en una sola fila: fecha, técnico y supervisor */
+.plan-core-grid.plan-realization-grid{grid-template-columns:repeat(3,minmax(0,1fr));max-width:none;gap:12px;padding:0 1px 12px}
+.plan-realization-grid .execution-date-field{display:flex;flex-direction:column;gap:5px;font-size:10px;color:#526579;font-weight:650}
+.plan-realization-grid input{height:35px;min-width:0}
+@media(max-width:760px){.plan-core-grid.plan-realization-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.plan-core-grid.plan-realization-grid{grid-template-columns:1fr}}
