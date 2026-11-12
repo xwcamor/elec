@@ -948,3 +948,110 @@ body.config-focus .config-panel .form-grid input[readonly]:focus{border-color:#e
   .plan-step{min-height:40px;padding:3px}
   .plan-step-number{width:32px;height:32px;flex-basis:32px;font-size:11px}
 }
+
+
+/* v1.5.69 · Asistente unificado y stepper integrado */
+.plan-wizard-shell{
+  overflow:hidden;
+  border:1px solid #dce5ed;
+  border-radius:14px;
+  background:#fff;
+  box-shadow:0 5px 22px rgba(31,55,78,.055);
+}
+.plan-wizard-shell>.plan-stepper{
+  position:relative;
+  display:grid;
+  grid-template-columns:repeat(7,minmax(0,1fr));
+  align-items:center;
+  gap:0;
+  min-height:76px;
+  margin:0;
+  padding:14px clamp(18px,5vw,72px);
+  border:0;
+  border-bottom:1px solid #e8edf2;
+  border-radius:0;
+  background:linear-gradient(180deg,#fff 0%,#fbfcfe 100%);
+  box-shadow:none;
+}
+.plan-wizard-shell>.plan-stepper .plan-step{
+  position:relative;
+  z-index:1;
+  grid-column:span 1;
+  justify-content:center;
+  min-height:44px;
+  margin:0 auto;
+  padding:3px;
+  border:0;
+  background:transparent;
+}
+.plan-wizard-shell>.plan-stepper .plan-step:hover,
+.plan-wizard-shell>.plan-stepper .plan-step.active{background:transparent;border:0}
+.plan-wizard-shell>.plan-stepper .plan-step-number{
+  width:40px;height:40px;flex-basis:40px;
+  border:1px solid #dce4eb;
+  background:#f3f6f8;
+  color:#8291a0;
+  font-size:12px;
+  transition:background-color .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease,transform .16s ease;
+}
+.plan-wizard-shell>.plan-stepper .plan-step.active .plan-step-number{
+  border-color:#2c79b7;
+  background:#2475b2;
+  color:#fff;
+  box-shadow:0 0 0 5px rgba(36,117,178,.10);
+}
+.plan-wizard-shell>.plan-stepper .plan-step[data-state="complete"] .plan-step-number{
+  border-color:#b9e2c7;background:#e8f6ed;color:#167346;
+}
+.plan-wizard-shell>.plan-stepper .plan-step[data-state="complete"].active .plan-step-number{
+  border-color:#2475b2;background:#2475b2;color:#fff;
+}
+.plan-wizard-shell>.plan-stepper .plan-step[data-state="missing"] .plan-step-number{
+  border-color:#e7d7b8;background:#fff8eb;color:#a16a18;
+}
+.plan-wizard-shell>.plan-stepper .plan-step-connector{
+  display:block;
+  grid-column:span 1;
+  width:100%;
+  height:2px;
+  border-radius:9px;
+  background:#e7edf2;
+}
+.plan-wizard-shell>.plan-step-panel{
+  margin:0;
+  padding:26px clamp(20px,3vw,34px) 28px;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  background:#fff;
+  animation:plan-step-enter .2s cubic-bezier(.23,1,.32,1) both;
+}
+.plan-wizard-shell>.plan-step-panel[hidden]{display:none!important}
+.plan-wizard-shell>.plan-step-panel .execution-card-title h3{font-size:17px;letter-spacing:-.035em}
+.plan-wizard-shell>.plan-step-panel .execution-card-title p{font-size:11px}
+.plan-wizard-shell>.plan-step-actions{
+  margin:0;
+  padding:15px clamp(20px,3vw,34px);
+  border:0;
+  border-top:1px solid #e8edf2;
+  border-radius:0;
+  background:#fbfcfd;
+}
+.plan-wizard-shell .plan-step-actions span{font-size:10px;color:#8795a3}
+.plan-wizard-shell .plan-step-actions .btn{min-height:38px}
+.plan-wizard-shell .plan-step-actions .btn.primary{box-shadow:0 2px 5px rgba(30,100,155,.16)}
+@keyframes plan-step-enter{
+  from{opacity:.65;transform:translateY(5px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@media(max-width:760px){
+  .plan-wizard-shell{border-radius:11px}
+  .plan-wizard-shell>.plan-stepper{min-height:64px;padding:9px 10px}
+  .plan-wizard-shell>.plan-stepper .plan-step-number{width:34px;height:34px;flex-basis:34px}
+  .plan-wizard-shell>.plan-step-panel{padding:20px 15px 22px}
+  .plan-wizard-shell>.plan-step-actions{padding:12px 14px}
+}
+@media(prefers-reduced-motion:reduce){
+  .plan-wizard-shell>.plan-step-panel{animation:none}
+  .plan-wizard-shell>.plan-stepper .plan-step-number{transition:none}
+}
