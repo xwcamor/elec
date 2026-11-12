@@ -155,6 +155,21 @@ Sí se estandarizan. El separador es un elemento de jerarquía y agrupación, no
 
 No crear más variantes salvo que exista una necesidad de interacción claramente distinta. Si el contenedor ya utiliza un `border-bottom` para cumplir la misma función, no agregar además un `hr` duplicado.
 
+## 5. Padding y márgenes de formularios por steps
+
+Los formularios de los asistentes de Configuración eléctrica y Registro de pruebas deben compartir el mismo contenedor visual y el mismo ritmo de espaciado.
+
+- Padding interior de cada panel de step: **20 px en escritorio** y **16 px en móvil**.
+- Margen exterior de los paneles: **0**; el contenedor del wizard controla la separación.
+- Separación entre título/encabezado del panel y sus campos: **16 px**.
+- Separación entre campos: **16 px**.
+- Padding inferior del contenido: **16 px**; las barras de acciones mantienen el mismo gutter del panel.
+- Los pies de formulario pueden llegar al borde del contenedor solo cuando sean barras de navegación compartidas; no deben crear sangrías laterales distintas.
+- No añadir márgenes o paddings específicos a un módulo para corregir una diferencia que debe resolverse en el patrón compartido.
+- En móvil se conservan las mismas reglas con el token de 16 px y sin desbordamiento horizontal.
+
+La implementación debe reutilizar `--ui-step-panel-padding`, `--ui-step-panel-padding-mobile` y `--ui-step-panel-content-gap`. Si se cambia un valor, ambos módulos deben actualizarse juntos.
+
 ## 6. Steps: números y checks
 
 Usar el mismo patrón en todos los flujos secuenciales:
@@ -173,7 +188,7 @@ Reglas:
 - Los conectores entre pasos reflejan progreso completado.
 - No depender exclusivamente del color: usar número, check, icono y/o texto.
 
-## 6. Formularios y tarjetas
+## 8. Formularios y tarjetas
 
 - Cada campo tiene etiqueta persistente; el placeholder no reemplaza la etiqueta.
 - La unidad se coloca en la etiqueta o junto al valor de forma consistente.
@@ -184,7 +199,7 @@ Reglas:
 - Mantener alineación de columnas, alturas y espacios de controles.
 - Formularios de Configuración y Pruebas comparten la misma gramática visual aunque sus campos y estructura funcional sean distintos.
 
-## 7. Acordeones y acciones destructivas
+## 8. Acordeones y acciones destructivas
 
 Para bobinados, conmutadores u otros elementos repetibles:
 
@@ -198,7 +213,7 @@ Para bobinados, conmutadores u otros elementos repetibles:
 
 La acción debe permanecer visible al final del contenido incluso cuando la sección contenga tablas extensas; no debe ser sticky.
 
-## 8. Encabezados, navegación y comportamiento sticky
+## 9. Encabezados, navegación y comportamiento sticky
 
 ### Estado y acción de retorno en barras de herramientas
 - Cuando un encabezado muestre un estado contextual (guardado, autoguardado, error o advertencia) junto a una acción de retorno, el estado se coloca **inmediatamente a la izquierda del botón**.
@@ -214,7 +229,7 @@ La acción debe permanecer visible al final del contenido incluso cuando la secc
 - Antes de proponer sticky, demostrar que resuelve un problema de navegación real, comprobar que no tapa contenido y solicitar aprobación si cambia el comportamiento acordado.
 - Evitar barras translúcidas con blur si no aportan una ventaja clara.
 
-## 9. CSS y arquitectura de estilos
+## 10. CSS y arquitectura de estilos
 
 Organización objetivo:
 
@@ -232,7 +247,7 @@ Reglas CSS:
 - Eliminar reglas obsoletas cuando se sustituya un patrón.
 - No añadir dependencias, fuentes remotas ni recursos externos para resolver detalles cosméticos.
 
-## 10. Metodología obligatoria para cada cambio de interfaz
+## 11. Metodología obligatoria para cada cambio de interfaz
 
 1. **Inspeccionar:** leer `AGENTS.md`, esta guía y la skill de design engineering. Revisar HTML/PHP, CSS y JS afectados.
 2. **Inventariar:** identificar componentes compartidos, estados, responsive y dependencias; comprobar si el mismo componente aparece en otros módulos.
@@ -244,7 +259,7 @@ Reglas CSS:
 8. **Comprobar regresiones:** verificar navegación, guardado, autoguardado, validaciones, edición, eliminación y datos existentes cuando la pantalla afectada los utilice.
 9. **Informar:** indicar archivos cambiados, comportamiento preservado, pruebas ejecutadas y pruebas que no pudieron ejecutarse. No afirmar que se probó en Laragon si no se hizo.
 
-## 11. Criterios de aceptación visual
+## 12. Criterios de aceptación visual
 
 Una tarea de diseño no se considera terminada hasta que:
 
@@ -258,7 +273,7 @@ Una tarea de diseño no se considera terminada hasta que:
 - Focus visible, navegación por teclado y `prefers-reduced-motion` funcionan.
 - No se introducen errores de consola ni regresiones funcionales conocidas.
 
-## 12. Regla de trabajo del repositorio
+## 13. Regla de trabajo del repositorio
 
 - Trabajar directamente sobre `main`.
 - No crear ramas ni Pull Requests salvo instrucción expresa del usuario.
