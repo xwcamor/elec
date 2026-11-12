@@ -1,3 +1,9 @@
+## v1.5.96
+- Bobinados: cada acordeón se puede abrir o cerrar independientemente; ya no se cierra automáticamente al abrir otro.
+- Conmutadores: adopta la misma estructura visual jerárquica, con un acordeón independiente por conmutador y un subacordeón para sus posiciones TAP.
+- El botón eliminar de cada conmutador queda separado de los campos, en la esquina superior derecha.
+- El resumen del conmutador refleja nombre, bobinado asociado, tipo y cantidad de posiciones.
+
 ## v1.5.95
 - Corrige la alineación del botón eliminar del bobinado dentro del acordeón: queda en la parte superior derecha, separado de los campos y sin ocupar una columna incorrecta del formulario.
 
