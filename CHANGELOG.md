@@ -1,3 +1,9 @@
+## v1.5.99
+- Retira el campo «Material» de la edición de bobinados.
+- Actualiza «Copiar bobinados» para excluir el material.
+- El resumen de revisión deja de mostrar material del conductor.
+- Los valores previamente almacenados se conservan; solo se retiran de la interfaz.
+
 ## v1.5.98
 - Retira la columna «Serie bushing» de la grilla de bornes en Configuración eléctrica.
 - Actualiza «Copiar bornes» para excluir la serie y mantener correspondencia con las columnas visibles.
