@@ -1,3 +1,6 @@
+## 1.5.76
+- Evita bloquear silenciosamente el botón de avance/confirmación cuando faltan datos: permite el clic para ejecutar la validación y mostrar la alerta contextual con los campos pendientes.
+
 ## 1.5.75
 - Corrige la carga inicial del resumen: al terminar de recuperar los registros se actualizan «Registros que requieren atención» y «Actividad de ensayos» sin tener que cambiar de pestaña.
 - Refresca ambos paneles también después de enriquecer los nombres con el catálogo de ensayos.
