@@ -593,13 +593,13 @@
       ['taps',tap.optional?'optional':(tap.complete?'complete':(state.tap_changers.length?'partial':'missing')),tap.optional?'No aplica':(tap.complete?'Completo':(state.tap_changers.length?'Revisar posiciones':'Agregar conmutador'))],
       ['review',reviewComplete?'complete':(configHasProgress?'partial':'missing'),reviewComplete?'Listo para guardar':'Pendiente']
     ];
-    steps.forEach(([key,status,label])=>{
+    steps.forEach(([key,status,label],index)=>{
       const button=document.querySelector('.config-view-tab[data-tab="'+key+'"]');
       if(!button)return;
       button.dataset.state=status;
       button.setAttribute('aria-current',button.dataset.tab===selectedTab?'step':'false');
       const number=button.querySelector('.plan-step-number');
-      if(number){if(!button.dataset.stepNumber)button.dataset.stepNumber=number.textContent.trim();number.textContent=status==='complete'?'✓':button.dataset.stepNumber;}
+      if(number){button.dataset.stepNumber=String(index+1);number.textContent=status==='complete'?'✓':String(index+1);}
       const statusText=button.querySelector('.config-step-status');
       if(statusText)statusText.textContent=label;
       button.title=label;
