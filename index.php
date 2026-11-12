@@ -81,7 +81,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.44">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.45">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -208,11 +208,11 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       <button class="test-view-tab" type="button" id="showTestGraph" data-test-view="graph" role="tab" aria-selected="false" aria-controls="testAnalyticsPanel"><svg><use href="#i-activity"/></svg>Gráfico</button>
     </div>
     <section id="testSummaryPanel" class="test-view-panel" role="tabpanel" aria-labelledby="showTestSummary">
-      <div class="test-info-banner"><svg><use href="#i-info"/></svg><div><b>Un registro por visita.</b><span>Reúne los ensayos de una misma jornada en un plan, con sus mediciones, resultados y observaciones.</span></div></div>
+      <div class="test-info-banner"><svg><use href="#i-info"/></svg><div><b>Un registro por jornada.</b><span>Agrupa las pruebas eléctricas realizadas en una misma jornada, con sus mediciones, resultados y observaciones.</span></div></div>
       <div class="test-stats" id="testStats"></div>
       <div class="test-summary-intro">
         <div><span class="eyebrow">SEGUIMIENTO DEL TRANSFORMADOR</span><h3>Actividad de ensayos</h3><p>Consulta el historial o revisa la evolución sin mezclar magnitudes eléctricas distintas.</p></div>
-        <div class="test-summary-latest" id="testSummaryLatest"><span>Última visita</span><strong>Sin registros</strong></div>
+        <div class="test-summary-latest" id="testSummaryLatest"><span>Último registro</span><strong>Sin registros</strong></div>
       </div>
     </section>
     <section id="testHistoryPanel" class="test-view-panel hidden" role="tabpanel" aria-labelledby="showTestTable">
@@ -466,6 +466,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.44"></script>
-<script src="./assets/plan.js?v=1.5.44"></script>
+<script src="./assets/app.js?v=1.5.45"></script>
+<script src="./assets/plan.js?v=1.5.45"></script>
 </body></html>
