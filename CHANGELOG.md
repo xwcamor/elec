@@ -1,3 +1,7 @@
+## v1.5.126
+- Corrige definitivamente los selectores de las pestañas de configuración para usar la colección de elementos y evitar errores al iniciar o navegar.
+- Actualiza la caché de recursos frontend.
+
 ## v1.5.125
 - Corrige el uso de querySelectorAll en las pestañas horizontales de configuración para que los tres apartados se puedan seleccionar y actualizar visualmente.
 - Actualiza la versión de caché de los recursos frontend.
