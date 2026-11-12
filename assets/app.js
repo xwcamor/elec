@@ -621,7 +621,7 @@
       const d=await readApiResponse(r);
       Object.assign(transformer,d.transformer);state=normalizeConfig(d.config||{});
       PILOT.demo=false;PILOT.transformerFound=true;PILOT.schemaReady=!!d.schemaReady;PILOT.testsSchemaReady=!!d.testsSchemaReady;
-      $('#phaseCount').value=String(state.phase_count||3);$('#vectorGroup').value=state.vector_group||'';$('#frequency').value=state.frequency_hz??60;$('#generalNotes').value=state.notes||'';
+      syncTransformerNominals();
       refreshSidebarAccess();updateTransformerDisplay();
       const status=$('#pilotStatus');
       if(status){status.className='pilot-status '+(PILOT.schemaReady&&PILOT.testsSchemaReady?'ready':'warning');status.querySelector('strong').textContent=PILOT.schemaReady&&PILOT.testsSchemaReady?'Base de datos conectada':'Faltan tablas del piloto';status.querySelector('span').textContent='BD: '+(PILOT.dbName||'configurada')+' · Transformador: '+transformer.code;}
