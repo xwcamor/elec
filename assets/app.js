@@ -551,11 +551,11 @@
     el.textContent=`${total} ${total===1?'bobinado':'bobinados'} · ${complete} ${complete===1?'completo':'completos'} · ${pending} por completar`;
   }
   function refreshWindingCounters(){
-    $('[data-winding-stats]').forEach(el=>{
+    $$('[data-winding-stats]').forEach(el=>{
       const i=Number(el.dataset.windingStats),w=state.windings[i];
       if(w)el.textContent=`${w.terminals.filter(t=>!(t._draft&&!String(t.code||'').trim()&&!t.has_capacitive_bushing)).length} bornes · ${w.terminals.filter(t=>t.has_capacitive_bushing).length} capacitivos`;
     });
-    $('[data-winding-status]').forEach(el=>{
+    $$('[data-winding-status]').forEach(el=>{
       const w=state.windings[Number(el.dataset.windingStatus)];
       if(!w)return;
       const complete=isWindingComplete(w);
