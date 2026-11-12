@@ -1,3 +1,10 @@
+## 1.5.51
+- Reubica «Realizada el» junto a «Responsable / técnico» y «Supervisor» en una fila de tres columnas.
+- Elimina la tarjeta independiente de fecha para reducir altura y equilibrar la sección de datos compartidos.
+- Ajusta la cuadrícula a dos columnas en tablet y una columna en móvil.
+- Renombra el encabezado para retirar la referencia a «visita» y actualizar la fecha pendiente.
+- Actualiza la caché de recursos.
+
 ## 1.5.50
 - Corrige la posición del asterisco obligatorio de Responsable/técnico y Supervisor para que permanezca junto al texto.
 - Elimina el resaltado verde de los campos compartidos cuando están completos; solo se resaltan en ámbar los campos obligatorios pendientes.
