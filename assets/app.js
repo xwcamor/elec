@@ -646,6 +646,7 @@
   const testPage=$('#testPage'), executionPage=$('#executionPage');
   function showOnlyMain(which){
     document.body.classList.toggle('config-focus',which==='configPage');
+    document.body.classList.toggle('test-page-focus',which==='testPage');
     document.body.classList.toggle('test-form-focus',which==='executionPage'||which==='planPage');
     ['overviewPage','configPage','testPage','executionPage','planPage'].forEach(id=>$('#'+id).classList.toggle('hidden',id!==which));
   }
@@ -1134,6 +1135,7 @@
     readApiResponse: function(response){ return readApiResponse(response); },
     showPage: function(pageId){
       document.body.classList.toggle('config-focus',pageId==='configPage');
+      document.body.classList.toggle('test-page-focus',pageId==='testPage');
       document.body.classList.toggle('test-form-focus',pageId==='executionPage'||pageId==='planPage');
       ['overviewPage','configPage','testPage','executionPage','planPage'].forEach(function(id){
         const node=document.getElementById(id);if(node)node.classList.toggle('hidden',id!==pageId);
