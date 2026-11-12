@@ -293,21 +293,21 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 
   <section class="execution-page hidden" id="planPage">
     <div class="config-toolbar">
-      <div><div class="breadcrumbs">Transformador <span>/</span> Pruebas eléctricas <span>/</span> Plan</div><h2 id="planTitle">Nuevo registro de pruebas</h2><p>Organiza los datos generales, selecciona los ensayos y completa cada protocolo por separado.</p></div>
-      <div class="plan-toolbar-actions"><span id="planSaveStatus" class="plan-save-status" data-state="idle" aria-live="polite"><i></i><span>Se guardará automáticamente al modificar datos</span></span><div class="toolbar-actions"><button class="btn" id="cancelPlan">Volver al historial</button><button class="btn primary" id="saveTestPlan"><svg><use href="#i-check"/></svg>Guardar ahora</button></div></div>
+      <div><div class="breadcrumbs">Transformador <span>/</span> Pruebas eléctricas <span>/</span> Registro</div><h2 id="planTitle">Nuevo registro de pruebas</h2><p>Registra una jornada de trabajo, selecciona los ensayos y captura sus resultados.</p></div>
+      <div class="plan-toolbar-actions"><span id="planSaveStatus" class="plan-save-status" data-state="idle" aria-live="polite"><i></i><span>Se guardará automáticamente al modificar datos</span></span><div class="toolbar-actions"><button class="btn" id="cancelPlan">Volver a registros</button></div></div>
     </div>
     <div class="plan-wizard-shell">
     <nav class="plan-stepper" id="planStepper" aria-label="Etapas del registro de pruebas">
-      <button type="button" class="plan-step" data-plan-step="shared" data-state="missing" aria-current="step"><span class="plan-step-number">01</span></button>
+      <button type="button" class="plan-step" data-plan-step="shared" data-state="missing" aria-current="step"><span class="plan-step-number">1</span></button>
       <span class="plan-step-connector" aria-hidden="true"></span>
-      <button type="button" class="plan-step" data-plan-step="selection" data-state="missing"><span class="plan-step-number">02</span></button>
+      <button type="button" class="plan-step" data-plan-step="selection" data-state="missing"><span class="plan-step-number">2</span></button>
       <span class="plan-step-connector" aria-hidden="true"></span>
-      <button type="button" class="plan-step" data-plan-step="results" data-state="missing"><span class="plan-step-number">03</span></button>
+      <button type="button" class="plan-step" data-plan-step="results" data-state="missing"><span class="plan-step-number">3</span></button>
       <span class="plan-step-connector" aria-hidden="true"></span>
-      <button type="button" class="plan-step" data-plan-step="review" data-state="missing"><span class="plan-step-number">04</span></button>
+      <button type="button" class="plan-step" data-plan-step="review" data-state="missing"><span class="plan-step-number">4</span></button>
     </nav>
     <section class="execution-card plan-shared-card plan-step-panel" id="planSharedSection" data-plan-panel="shared">
-      <div class="execution-card-title"><span class="eyebrow">01 · DATOS COMPARTIDOS</span><h3>Datos de realización y condiciones ambientales</h3><p>Se ingresan una sola vez y se comparten con todos los ensayos del plan.</p></div>
+      <div class="execution-card-title"><h3>Datos generales</h3><p>Identifica la jornada y registra las condiciones en las que se realizaron los ensayos.</p></div>
       <div class="plan-core-grid plan-realization-grid">
         <label class="execution-date-field"><span>Realizada el <i class="required-mark">*</i></span><input id="planDate" type="datetime-local" required aria-required="true"></label>
         <label><span>Responsable / técnico <i class="required-mark">*</i></span><input id="planOperator" placeholder="Nombre del técnico" required aria-required="true"></label>
@@ -325,7 +325,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
     <section class="execution-card plan-step-panel" id="planSelectionSection" data-plan-panel="selection" hidden>
       
       <div class="plan-test-picker-head">
-        <div><strong>Ensayos a realizar</strong><small>Marca una o varias pruebas. Puedes cambiar la selección cuando quieras.</small></div>
+        <div><strong>Ensayos a realizar</strong><small>Selecciona uno o varios ensayos para esta jornada. Puedes modificar la selección antes de confirmar el registro.</small></div>
         <span id="planPickerCount" class="plan-picker-count">0 seleccionados</span>
       </div>
       <div id="planTestPicker" class="plan-test-picker" role="group" aria-label="Catálogo de ensayos"></div>
@@ -333,20 +333,19 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
     </section>
     <section class="execution-card plan-tests-section plan-step-panel" id="planResultsSection" data-plan-panel="results" hidden>
       <div class="execution-card-title plan-results-title">
-        <span class="eyebrow">03 · FORMULARIOS DE PRUEBA</span>
-        <h3>Resultados por ensayo</h3>
-        <p id="planResultsAccordionMeta">Ensayos seleccionados</p>
+        <h3>Registro de resultados</h3>
+        <p id="planResultsAccordionMeta">Completa las mediciones de cada ensayo seleccionado.</p>
         <span class="plan-results-accordion-status" id="planResultsAccordionStatus"></span>
       </div>
       <div id="planTestNav" hidden aria-hidden="true"></div>
       <div id="planTestCards"><div class="empty-state">Selecciona los ensayos para que aparezcan aquí sus formularios.</div></div>
     </section>
     <section class="execution-card plan-step-panel" id="planReviewSection" data-plan-panel="review" hidden>
-      <div class="execution-card-title"><span class="eyebrow">04 · RESUMEN</span><h3>Revisa el registro antes de guardarlo</h3><p>Comprueba los ensayos incluidos, el avance y los datos pendientes.</p></div>
+      <div class="execution-card-title"><h3>Revisión del registro</h3><p>Verifica los datos generales y confirma que todos los ensayos estén completos.</p></div>
       <div id="planReviewSummary"></div>
     </section>
     <div class="plan-step-actions" id="planStepActions">
-      <button class="btn" type="button" id="planStepBack" disabled>Anterior</button>
+      <button class="btn" type="button" id="planStepBack" hidden>Anterior</button>
       <span id="planStepHint">Etapa 1 de 4 · Datos generales</span>
       <button class="btn primary" type="button" id="planStepNext">Continuar</button>
     </div>
