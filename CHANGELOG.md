@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 1.5.38
+- El paso «Resultados por ensayo» bloquea el avance al resumen mientras exista al menos un ensayo con campos obligatorios o filas incompletas.
+- Al intentar continuar, se enfoca automáticamente el primer ensayo pendiente y se informa el primer dato faltante.
+- El guardado automático de borradores se mantiene activo para no perder avances incompletos.
+
+# CHANGELOG
+
 ## 1.5.37
 - El historial consulta primero los registros guardados y ya no depende de que el catálogo de ensayos responda.
 - Al abrir la pestaña Historial se vuelve a consultar MySQL, evitando mostrar una lista local desactualizada.
