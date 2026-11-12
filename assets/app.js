@@ -757,7 +757,7 @@
     if(hasStarted){
       return {code:'INCOMPLETE',label:'En proceso',className:'incomplete'};
     }
-    return {code:'DRAFT',label:'En borrador',className:'draft'};
+    return {code:'DRAFT',label:'Borrador',className:'draft'};
   }
   function renderTestHistory(){
     testStats();renderTestTypes();
@@ -773,7 +773,7 @@
       const names=x.plan_tests?.length?x.plan_tests.map(t=>t.name||typeName(t.code)):(x.test_code==='PLAN'?[]:[x.test_name||typeName(x.test_code)]);
       const testCount=names.length;
       const state=executionDisplayStatus(x);
-      return '<tr><td><b>'+esc(formatExecutionDate(x.executed_at))+'</b></td><td><b>'+esc(names.join(' · ')||'Sin ensayos seleccionados')+'</b></td><td>'+testCount+'</td><td>'+esc(x.operator_name||'—')+'</td><td><span class="execution-status '+state.className+'">'+state.label+'</span></td><td><div class="test-row-actions"><button class="btn small" data-open-execution="'+x.id+'" title="Continuar este registro">Abrir registro</button><button class="btn small danger test-delete-button" data-delete-execution="'+x.id+'" title="Eliminar registro" aria-label="Eliminar registro #'+x.id+'"><svg><use href="#i-trash"/></svg>Eliminar</button></div></td></tr>';
+      return '<tr><td><b>'+esc(formatExecutionDate(x.executed_at))+'</b></td><td><b>'+esc(names.join(' · ')||'Sin ensayos seleccionados')+'</b></td><td>'+testCount+'</td><td>'+esc(x.operator_name||'—')+'</td><td><span class="execution-status '+state.className+'">'+state.label+'</span></td><td><div class="test-row-actions"><button class="btn small" data-open-execution="'+x.id+'" title="Abrir este registro">Abrir registro</button><button class="btn small danger test-delete-button" data-delete-execution="'+x.id+'" title="Eliminar registro" aria-label="Eliminar registro #'+x.id+'"><svg><use href="#i-trash"/></svg>Eliminar</button></div></td></tr>';
     }).join(''):'<tr><td colspan="6" class="test-empty">'+(testHistoryLoadError?'No se pudo consultar el historial: '+esc(testHistoryLoadError):(testExecutions.length?'No hay registros que coincidan con el filtro.':'No hay registros para este transformador. Los registros se ordenan por fecha, del más reciente al más antiguo.'))+'</td></tr>';
 
     $$('[data-delete-execution]').forEach(button=>button.addEventListener('click',async()=>{
