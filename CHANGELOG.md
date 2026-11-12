@@ -1,3 +1,12 @@
+## v1.5.34
+- Alinea formularios de plan y ejecución individual con los protocolos LAP.
+- Elimina unidades no declaradas y campos de resultado ajenos a ciertos encabezados.
+- Retira corrientes de muestra como defaults y bornes no configurados.
+- Mantiene alias de campos antiguos para que registros históricos sigan visibles.
+- Conserva el cálculo de variación de capacitancia de bushings (<5%) sin inventar umbral de FP.
+- Corrige el stepper de cuatro etapas y compacta grillas de captura.
+- Usa «Ejecuciones» en el historial.
+
 # CHANGELOG
 
 ## 1.5.33
