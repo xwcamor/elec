@@ -42,9 +42,30 @@ try {
         json_response(['ok'=>true,'message'=>'Datos principales actualizados.','transformer'=>$result['transformer'],'updated_fields'=>$result['updated_fields'],'unsupported_fields'=>$result['unsupported_fields']]);
     }
     if ($action === 'save' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-        $payload = json_decode(file_get_contents('php://input'), true) ?: [];
+        $payload = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($payload)) json_response(['ok'=>false,'message'=>'El servidor recibió un JSON vacío o inválido.'], 400);
         $key = trim((string)($payload['transformer_key'] ?? ''));
+        if ($key === '') json_response(['ok'=>false,'message'=>'No se recibió el identificador del transformador.'], 422);
         if (!$transformers->find($key)) json_response(['ok'=>false,'message'=>'El transformador ya no se encuentra en transformers. Vuelve a buscarlo y selecciónalo.'], 422);
+
+        $requiredConfigTables = [
+            'eh_electrical_configs', 'eh_windings', 'eh_terminals', 'eh_bushings',
+            'eh_tap_changers', 'eh_tap_positions', 'eh_electrical_config_versions'
+        ];
+        $missingConfigTables = [];
+        foreach ($requiredConfigTables as $tableName) {
+            if (!$pdo->query("SHOW TABLES LIKE " . $pdo->quote($tableName))->fetchColumn()) {
+                $missingConfigTables[] = $tableName;
+            }
+        }
+        if ($missingConfigTables) {
+            json_response([
+                'ok'=>false,
+                'message'=>'No se puede guardar la configuración: faltan tablas en la base de datos.',
+                'detail'=>'Tablas faltantes: ' . implode(', ', $missingConfigTables)
+            ], 409);
+        }
+
         $result = $configs->save($key, $payload);
         json_response(['ok' => true, 'message' => 'Configuración guardada correctamente.', 'result' => $result]);
     }
