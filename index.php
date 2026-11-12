@@ -76,7 +76,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.126">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.127">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body>
@@ -355,36 +355,42 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
     </div>
     <div class="config-alert <?= $dbMessage === '' ? 'hidden' : '' ?>" id="dbAlert" role="status"><svg><use href="#i-info"/></svg><span><?=h($dbMessage)?></span></div>
     <div class="config-layout">
-      <nav class="test-view-switcher config-view-switcher" role="tablist" aria-label="Secciones de configuración eléctrica">
-        <button class="test-view-tab config-view-tab active" type="button" data-tab="windings" role="tab" aria-selected="true"><svg><use href="#i-zap"/></svg>Bobinados y bornes <span class="config-tab-meta" id="windingCount">0</span></button>
-        <button class="test-view-tab config-view-tab" type="button" data-tab="taps" role="tab" aria-selected="false"><svg><use href="#i-settings"/></svg>Conmutadores y TAP <span class="config-tab-meta" id="tapCount">0</span></button>
-        <button class="test-view-tab config-view-tab" type="button" data-tab="review" role="tab" aria-selected="false"><svg><use href="#i-file"/></svg>Revisión y versiones</button>
+      <nav class="plan-stepper config-stepper" id="configStepper" aria-label="Etapas de configuración eléctrica">
+        <button type="button" class="plan-step config-view-tab" data-tab="windings" data-state="missing" aria-current="step">
+          <span class="plan-step-number">1</span><span class="plan-step-copy"><b>Bobinados y bornes</b><small id="windingCount">0 bobinados</small><small class="config-step-status">Agregar bobinados</small></span>
+        </button>
+        <span class="plan-step-connector" aria-hidden="true"></span>
+        <button type="button" class="plan-step config-view-tab" data-tab="taps" data-state="missing">
+          <span class="plan-step-number">2</span><span class="plan-step-copy"><b>Conmutadores y TAP</b><small id="tapCount">0 posiciones</small><small class="config-step-status">Agregar conmutador</small></span>
+        </button>
+        <span class="plan-step-connector" aria-hidden="true"></span>
+        <button type="button" class="plan-step config-view-tab" data-tab="review" data-state="missing">
+          <span class="plan-step-number">3</span><span class="plan-step-copy"><b>Revisión y versiones</b><small>Validar y guardar</small><small class="config-step-status">Pendiente</small></span>
+        </button>
       </nav>
       <div class="config-main">
         <section class="config-panel hidden" data-panel="windings">
-          <div class="panel-heading"><div><span class="eyebrow">ETAPA 01</span><h3>Bobinados y bornes</h3><p>Agrega cada bobinado y configura sus terminales. Puedes copiar los bobinados o pegar tablas desde Excel con Ctrl+V. No existe un límite fijo de bobinados o bornes.</p></div><button class="btn" id="copyWindings"><svg><use href="#i-copy"/></svg>Copiar bobinados</button><button class="btn primary" id="addWinding"><svg><use href="#i-plus"/></svg>Agregar bobinado</button></div>
+          <div class="panel-heading config-panel-heading"><div><h3>Bobinados y bornes</h3></div><div class="config-heading-actions"><button class="btn" id="copyWindings"><svg><use href="#i-copy"/></svg>Copiar</button><button class="btn primary" id="addWinding"><svg><use href="#i-plus"/></svg>Agregar bobinado</button></div></div>
           <div id="windingsContainer" class="windings-container"></div>
-          <div class="callout compact"><svg><use href="#i-info"/></svg><div><b>Bornes capacitivos</b><p>Marca el borne cuando tenga bushing capacitivo. La ficha del bushing se asociará al terminal para reutilizarlo en su futura prueba.</p></div></div>
-          <div class="panel-footer"><span>Usa las celdas como Excel: flechas, Tab, Enter y pegado de rangos.</span><button class="btn primary" type="button" data-next="taps">Continuar a conmutadores <span>→</span></button></div>
+          <div class="panel-footer config-panel-footer"><span></span><button class="btn primary" type="button" data-next="taps">Continuar <span>→</span></button></div>
         </section>
 
         <section class="config-panel hidden" data-panel="taps">
-          <div class="panel-heading"><div><span class="eyebrow">ETAPA 02</span><h3>Conmutadores y posiciones de TAP</h3><p>El tipo y la cantidad de posiciones se consultan desde la ficha técnica del transformador.</p></div><button class="btn primary" id="addTapChanger"><svg><use href="#i-plus"/></svg>Agregar conmutador</button></div>
+          <div class="panel-heading config-panel-heading"><div><h3>Conmutadores y TAP</h3></div><button class="btn primary" id="addTapChanger"><svg><use href="#i-plus"/></svg>Agregar conmutador</button></div>
           <div class="tap-source-card" id="tapSourceCard">
             <div class="tap-source-heading"><span class="tap-source-icon"><svg><use href="#i-info"/></svg></span><div><strong>Datos del conmutador · ficha técnica</strong><small>Valores de solo lectura sincronizados con la tabla de transformadores.</small></div><button class="tap-source-edit" type="button" id="editTapMetadata">Modificar en ficha técnica ↗</button></div>
             <div class="tap-source-values"><div><small>Tipo detectado</small><strong id="tapSourceType">—</strong></div><div><small>Posiciones TAP registradas</small><strong id="tapSourceCount">—</strong></div></div>
             <p class="tap-source-note" id="tapSourceNote">Las posiciones de los conmutadores se comparan con la ficha técnica.</p><button class="btn primary hidden" type="button" id="syncTapPositions">Sincronizar posiciones con la ficha</button>
           </div>
           <div id="tapChangersContainer" class="tap-changers-container"></div>
-          <div class="panel-footer"><button class="btn" type="button" data-prev="windings">← Volver a bobinados</button><span>Las posiciones pueden pegarse directamente desde Excel.</span><button class="btn primary" type="button" data-next="review">Revisar configuración <span>→</span></button></div>
+          <div class="panel-footer config-panel-footer"><button class="btn" type="button" data-prev="windings">← Anterior</button><span></span><button class="btn primary" type="button" data-next="review">Continuar <span>→</span></button></div>
         </section>
 
         <section class="config-panel hidden" data-panel="review">
-          <div class="panel-heading"><div><span class="eyebrow">ETAPA 03</span><h3>Revisión de configuración</h3><p>Comprueba los datos antes de guardar la versión actual.</p></div><span class="review-badge">Previsualización</span></div>
+          <div class="panel-heading config-panel-heading"><div><h3>Revisión de configuración</h3></div><span class="review-badge">Previsualización</span></div>
           <div id="reviewSummary" class="review-summary"></div>
           <div class="version-history"><div class="history-heading"><div><h4>Versiones guardadas</h4><p>La configuración previa se conserva como fotografía histórica.</p></div><span id="versionBadge" class="version-badge">Versión 0</span></div><div id="versionList"><div class="empty-history">Todavía no hay versiones guardadas.</div></div></div>
-          <div class="callout"><svg><use href="#i-info"/></svg><div><b>Qué se guarda</b><p>Bobinados, bornes, fichas de bushings capacitivos, conmutadores y posiciones de TAP. Los datos nominales se toman de la ficha del transformador.</p></div></div>
-          <div class="panel-footer review-save-footer"><button class="btn" type="button" data-prev="taps">← Volver a conmutadores</button><span>Al guardar se crea una nueva versión de configuración.</span><button class="btn primary" type="button" id="saveConfig"><svg><use href="#i-check"/></svg>Guardar configuración</button></div>
+          <div class="panel-footer review-save-footer config-panel-footer"><button class="btn" type="button" data-prev="taps">← Anterior</button><span></span><button class="btn primary" type="button" id="saveConfig"><svg><use href="#i-check"/></svg>Guardar configuración</button></div>
         </section>
       </div>
     </div>
@@ -458,8 +464,8 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.126"></script>
+<script src="./assets/app.js?v=1.5.127"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="./assets/plan.js?v=1.5.126"></script>
+<script src="./assets/plan.js?v=1.5.127"></script>
 </body></html>
 0
