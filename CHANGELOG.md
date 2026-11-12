@@ -1,3 +1,9 @@
+## v1.5.123
+- Rediseña la navegación de Configuración eléctrica con pestañas horizontales, siguiendo el patrón visual de Pruebas eléctricas.
+- Simplifica la descripción del módulo: «Configura los bobinados, bornes y conmutadores del transformador».
+- Al agregar una fila de borne o un bobinado, conserva abierto el acordeón correspondiente y no devuelve la vista al primer bobinado.
+- Actualiza las referencias de caché de CSS y JavaScript.
+
 ## v1.5.122
 - Restaura el resaltado amarillo de las celdas obligatorias de Borne cuando están vacías, tanto al cargar como al agregar filas nuevas.
 - Al escribir un código de borne, el resaltado amarillo desaparece; si se borra el valor, vuelve a mostrarse.
