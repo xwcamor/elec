@@ -1,3 +1,10 @@
+## v1.5.79
+- Nueva ejecución inicia en modo preparación temporal: abrir el formulario, seleccionar ensayos y completar datos no crea filas en la base de datos.
+- El registro persistente se crea únicamente al pulsar «Iniciar prueba», tras validar fecha, responsable, supervisor y al menos un ensayo.
+- Después de iniciar, el autoguardado se activa con debounce, al salir de campos y al cambiar de etapa; el estado de guardado queda visible.
+- Al abandonar una preparación no iniciada, se pregunta si se desea descartar; los registros ya iniciados conservan la protección ante cambios pendientes.
+- La revisión finaliza la ejecución con «Finalizar prueba» y mantiene la validación de campos obligatorios.
+
 ## 1.5.78
 - Permite navegar directamente a una etapa posterior cuando todas las etapas anteriores ya cumplen sus validaciones.
 - Mantiene el bloqueo y los avisos cuando cualquier etapa previa tiene datos pendientes; ya no exige pulsar «Continuar» varias veces.
