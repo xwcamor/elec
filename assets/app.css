@@ -1808,3 +1808,47 @@ body.config-focus .config-save-hint{display:none!important}
  .config-panel{padding:16px 12px 0!important}
  .config-panel .panel-footer{margin-left:-12px!important;margin-right:-12px!important}
 }
+
+
+/* v1.5.133 · Bobinados: estado en cabecera y datos nominales como sección propia. */
+.winding-accordion-summary>.winding-index,
+.winding-accordion-summary .winding-index{
+ width:34px!important;height:34px!important;flex:0 0 34px!important;
+ border-radius:9px!important;
+ background:#e8eef3!important;color:#52687c!important;
+ font-size:12px!important;font-weight:800!important;
+}
+.winding-accordion-summary .winding-summary-status{
+ display:inline-flex!important;align-items:center;justify-content:center;
+ min-width:78px;padding:6px 10px;border:1px solid #e5dfe0;border-radius:999px;
+ background:#f5f6f7;color:#778592;font-size:10px;font-weight:750;white-space:nowrap;
+}
+.winding-accordion-summary .winding-summary-status[data-state="complete"]{
+ border-color:#cfe8d7;background:#edf7f0;color:#4f896b;
+}
+.winding-accordion-summary .winding-summary-status[data-state="incomplete"]{
+ border-color:#f0d9ad;background:#fff7e8;color:#95600d;
+}
+.winding-accordion-body>.winding-data-section{
+ margin:0;padding:14px 15px 16px;border-bottom:1px solid #e7edf2;background:#fff;
+}
+.winding-data-heading{
+ display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px;
+}
+.winding-data-heading>strong{font-size:13px;font-weight:750;color:#29435c}
+.winding-data-section>.winding-head-fields{
+ display:grid;grid-template-columns:repeat(2,minmax(220px,1fr));gap:12px;align-items:start;
+}
+.winding-data-section .config-field{gap:6px;color:#526579;font-size:10px;font-weight:650}
+.winding-data-section .config-field>span{font-size:10px;color:#526579}
+.winding-data-section .config-field input{
+ width:100%;height:36px;border:1px solid #dbe2e9;border-radius:6px;background:#fff;
+ padding:0 10px;color:#29435c;font:inherit;font-size:12px;
+}
+.winding-data-section .config-field input:focus{outline:2px solid rgba(43,125,190,.18);border-color:#3988c8}
+.terminal-section{margin-top:12px!important}
+@media(max-width:650px){
+ .winding-accordion-summary .winding-summary-status{min-width:0;padding:5px 7px;font-size:9px}
+ .winding-data-section>.winding-head-fields{grid-template-columns:1fr}
+ .winding-data-section{padding:12px!important}
+}
