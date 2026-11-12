@@ -1459,3 +1459,32 @@ body.config-focus .config-save-hint{display:none!important}
 .config-tab-meta{display:inline-flex;align-items:center;justify-content:center;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:#edf2f7;color:#61758a;font-size:9px;font-weight:800}
 .config-view-tab.active .config-tab-meta{background:#e8f2fb;color:#1f598b}
 @media(max-width:760px){.config-view-switcher{width:100%;display:flex;gap:3px}.config-view-tab{flex:1;justify-content:center;padding:8px 6px;font-size:9px;white-space:normal;text-align:center}.config-view-tab svg{display:none}.config-tab-meta{min-width:17px;height:17px}}
+
+/* Configuración eléctrica · mismo stepper, jerarquía y estados que el formulario de pruebas. */
+.config-stepper{grid-template-columns:minmax(0,1fr) 34px minmax(0,1fr) 34px minmax(0,1fr)}
+.config-stepper .plan-step{width:100%;border:1px solid transparent}
+.config-stepper .plan-step.active{background:#f0f7fd;border-color:#d7e8f6}
+.config-stepper .plan-step-copy small{font-size:8px}
+.config-stepper .plan-step-copy .config-step-status{font-weight:700}
+.config-stepper .plan-step[data-state="complete"] .plan-step-number{background:#e4f5e9;color:#177245;border-color:#b9e2c5}
+.config-stepper .plan-step[data-state="partial"] .plan-step-number{background:#fff3db;color:#956313;border-color:#f0d59e}
+.config-stepper .plan-step[data-state="missing"] .plan-step-number{background:#fff0ee;color:#b42318;border-color:#f2c4bf}
+.config-stepper .plan-step[data-state="complete"] .config-step-status{color:#177245}
+.config-stepper .plan-step[data-state="partial"] .config-step-status{color:#9a6717}
+.config-stepper .plan-step[data-state="missing"] .config-step-status{color:#b42318}
+.config-panel-heading{align-items:center}
+.config-panel-heading h3{margin:0}
+.config-heading-actions{display:flex;align-items:center;gap:8px}
+.config-panel-footer{justify-content:space-between}
+.config-field{display:flex;flex-direction:column;gap:6px;min-width:150px;color:#526579;font-size:10px;font-weight:650}
+.config-field>span,.tap-meta label>span{display:block;color:#526579;font-size:10px;font-weight:650}
+.config-field input{height:34px;border:1px solid #dce2e8;border-radius:5px;padding:0 10px;background:#fff;color:#26384d;font:inherit;font-size:12px;outline:none;min-width:0}
+.winding-head-fields{align-items:flex-start;gap:12px}
+.winding-head-fields .config-field{flex:1 1 180px}
+.winding-head-fields .config-field input{width:100%}
+.winding-card-head{align-items:center;flex-wrap:wrap}
+.text-remove{border:0;background:transparent;padding:6px 2px;color:#b44d4d;font:inherit;font-size:10px;font-weight:650;white-space:nowrap;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.text-remove:hover{color:#922f2f}
+.tap-meta label{display:flex;flex-direction:column;gap:6px}
+.tap-meta label input,.tap-meta label select{width:100%;min-width:0}
+@media(max-width:760px){.config-stepper{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:6px}.config-stepper .plan-step{min-height:48px;gap:7px;padding:6px 5px}.config-stepper .plan-step-number{width:27px;height:27px;flex-basis:27px}.config-stepper .plan-step-copy b{font-size:9px}.config-stepper .plan-step-copy small{font-size:7px}.config-stepper .plan-step-connector{display:none}.config-panel-heading{align-items:flex-start;flex-wrap:wrap}.config-heading-actions{width:100%;justify-content:flex-end}.winding-head-fields{width:100%}.config-panel-footer{gap:8px}}
