@@ -1391,3 +1391,23 @@ body.config-focus .config-save-hint{display:none!important}
 .winding-accordion-body>.winding-card-head>.delete-btn{flex:0 0 34px;width:34px;height:34px;display:grid;place-items:center;align-self:flex-start;margin:0;padding:0;border:1px solid #f0dada;border-radius:6px;background:#fff7f7;color:#bd4c4c}
 .winding-accordion-body>.winding-card-head>.delete-btn:hover{background:#ffeded;border-color:#e7baba;color:#a72e2e}
 @media(max-width:600px){.winding-accordion-body>.winding-card-head{gap:7px}.winding-accordion-body>.winding-card-head>.delete-btn{flex-basis:32px;width:32px;height:32px}}
+
+/* Acordeones independientes para cada conmutador */
+.tap-accordion{display:block;background:#fff;border:1px solid #dfe7ee;border-radius:9px;overflow:hidden}
+.tap-accordion>.tap-accordion-summary{list-style:none;display:flex;align-items:center;gap:11px;padding:13px 15px;cursor:pointer;background:#f7fafc;min-height:62px}
+.tap-accordion>.tap-accordion-summary::-webkit-details-marker,.tap-positions-accordion>summary::-webkit-details-marker{display:none}
+.tap-summary-main{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.tap-summary-main strong{font-size:12px;color:#263d54}
+.tap-summary-main small{font-size:10px;color:#8291a1}
+.tap-accordion[open]>.tap-accordion-summary .accordion-chevron,.tap-positions-accordion[open]>summary .accordion-chevron{transform:rotate(180deg)}
+.tap-accordion-body{padding:0 13px 13px}
+.tap-accordion-body>.tap-card-head{display:flex;align-items:flex-start;gap:12px;padding:13px 0;background:#fff;border-bottom:1px solid #edf1f4}
+.tap-accordion-body>.tap-card-head>.tap-meta{flex:1 1 auto;min-width:0;border:0;padding:0}
+.tap-accordion-body>.tap-card-head>.delete-btn{flex:0 0 34px;width:34px;height:34px;display:grid;place-items:center;align-self:flex-start;margin:0;padding:0;border:1px solid #f0dada;border-radius:6px;background:#fff7f7;color:#bd4c4c}
+.tap-accordion-body>.tap-card-head>.delete-btn:hover{background:#ffeded;border-color:#e7baba;color:#a72e2e}
+.tap-positions-accordion{border:1px solid #e2e9ef;border-radius:7px;overflow:hidden;margin-top:12px}
+.tap-positions-accordion>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:11px 12px;background:#f8fafc;cursor:pointer}
+.tap-positions-accordion>summary>span:first-child{font-size:11px;font-weight:700;color:#40566d}
+.tap-positions-accordion>summary small{font-size:9px;color:#8594a3;flex:1}
+.tap-accordion-body .tap-card-body{padding:12px}
+@media(max-width:600px){.tap-accordion>.tap-accordion-summary{gap:7px;padding:10px}.tap-accordion-body{padding:0 9px 9px}.tap-accordion-body>.tap-card-head{gap:7px}.tap-accordion-body>.tap-card-head>.delete-btn{flex-basis:32px;width:32px;height:32px}.tap-positions-accordion>summary{flex-wrap:wrap}}
