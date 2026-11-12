@@ -1,3 +1,11 @@
+## v1.5.127
+- Configuración eléctrica adopta el stepper numerado con círculos, conectores y estados del formulario de pruebas.
+- Elimina el bloque redundante «Qué se guarda» y el aviso repetitivo de bornes capacitivos.
+- Simplifica encabezados, instrucciones y botones de navegación.
+- Agrega etiquetas visibles y campos requeridos para nombre y tensión de cada bobinado; etiqueta todos los parámetros del conmutador.
+- Sustituye los botones de borrar por acciones de texto «Quitar bobinado» y «Quitar conmutador».
+- Mantiene los contadores de bobinados y posiciones en el stepper.
+
 ## v1.5.126
 - Corrige definitivamente los selectores de las pestañas de configuración para usar la colección de elementos y evitar errores al iniciar o navegar.
 - Actualiza la caché de recursos frontend.
