@@ -220,15 +220,15 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
     </section>
     <section id="testHistoryPanel" class="test-view-panel hidden" role="tabpanel" aria-labelledby="showTestTable">
       <div class="test-history-card">
-        <div class="test-history-head"><div><span class="eyebrow">HISTORIAL DE PRUEBAS ELÉCTRICAS</span><h3>Pruebas eléctricas registradas</h3><p>Consulta los registros de pruebas eléctricas y abre uno para revisar o completar sus resultados.</p></div><div class="test-history-controls"><label class="test-status-filter"><span>Estado</span><select id="testHistoryStatusFilter"><option value="ALL">Todos</option><option value="COMPLETE">Completo</option><option value="INCOMPLETE">Incompleto</option><option value="DRAFT">En borrador</option></select></label><div class="test-filter"><svg><use href="#i-search"/></svg><input id="testHistoryFilter" placeholder="Filtrar por prueba o responsable..."></div></div></div>
-        <div class="test-table-wrap"><table class="test-history-table"><thead><tr><th>Fecha de registro</th><th>Pruebas incluidas</th><th>N.º de pruebas</th><th>Responsable</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="testHistoryBody"><tr><td colspan="6" class="test-empty">Aún no hay registros. Selecciona una prueba para crear tu primer plan.</td></tr></tbody></table></div>
+        <div class="test-history-head"><div><span class="eyebrow">HISTORIAL DE PRUEBAS ELÉCTRICAS</span><h3>Pruebas eléctricas registradas</h3><p>Consulta los registros de pruebas eléctricas y abre uno para revisar o completar sus resultados.</p></div><div class="test-history-controls"><label class="test-status-filter"><span>Estado</span><select id="testHistoryStatusFilter"><option value="ALL">Todos</option><option value="COMPLETE">Completo</option><option value="INCOMPLETE">En proceso</option><option value="DRAFT">En borrador</option></select></label><div class="test-filter"><svg><use href="#i-search"/></svg><input id="testHistoryFilter" placeholder="Filtrar por ensayo o responsable..."></div></div></div>
+        <div class="test-table-wrap"><table class="test-history-table"><thead><tr><th>Fecha de realización</th><th>Ensayos incluidos</th><th>N.º de ensayos</th><th>Responsable</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="testHistoryBody"><tr><td colspan="6" class="test-empty">Aún no hay registros. Crea un registro para iniciar una jornada de pruebas.</td></tr></tbody></table></div>
       </div>
     </section>
     <section id="testAnalyticsPanel" class="test-view-panel hidden" role="tabpanel" aria-labelledby="showTestGraph">
       <section class="analytics-card" aria-label="Evolución histórica">
-        <div class="analytics-heading"><div><span class="eyebrow">LECTURA VISUAL</span><h3>Actividad de ensayos</h3><p>Compara la cantidad de visitas por mes y la distribución de los tipos de prueba.</p></div><span class="analytics-period" id="analyticsPeriod">—</span></div>
+        <div class="analytics-heading"><div><span class="eyebrow">LECTURA VISUAL</span><h3>Actividad de ensayos</h3><p>Compara la cantidad de registros por mes y la distribución de los ensayos.</p></div><span class="analytics-period" id="analyticsPeriod">—</span></div>
         <div class="analytics-grid">
-          <div class="analytics-chart-panel"><b>Visitas registradas por mes</b><div id="monthlyExecutionChart" class="analytics-chart"></div></div>
+          <div class="analytics-chart-panel"><b>Registros creados por mes</b><div id="monthlyExecutionChart" class="analytics-chart"></div></div>
           <div class="analytics-chart-panel"><b>Distribución por tipo de prueba</b><div id="testTypeAnalytics" class="type-analytics"></div></div>
         </div>
         <div class="analytics-footnote">La vista es estadística: no combina valores eléctricos distintos ni reemplaza la evaluación del protocolo de cada ensayo.</div>
