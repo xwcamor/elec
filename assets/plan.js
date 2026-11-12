@@ -35,8 +35,8 @@
   }
   function scheduleAutoSave(delay){
     if(autoSaveTimer)clearTimeout(autoSaveTimer);
-    if(!items.length){setSaveStatus('Selecciona una prueba para iniciar el guardado automático','idle');return;}
-    if(!$('#planDate').value){setSaveStatus('Falta la fecha de visita para guardar','warning');return;}
+    // Guardar también el borrador antes de seleccionar ensayos.
+    if(!$('#planDate').value){setSaveStatus('Falta la fecha de realización para guardar','warning');return;}
     setSaveStatus('Cambios pendientes · se guardarán automáticamente','pending');
     autoSaveTimer=setTimeout(()=>savePlan(true),delay??900);
   }
@@ -270,7 +270,7 @@
     updatePlanStepper(m);
     const next=$('#planStepNext');
     if(next){
-      const blocked=(currentPlanStep==='shared'&&m.general.length>0)||(currentPlanStep==='selection'&&items.length===0)||(currentPlanStep==='results'&&m.perItem.some(entry=>!entry.metrics.complete));
+      const blocked=(currentPlanStep==='shared'&&m.general.length>0)||(currentPlanStep==='selection'&&items.length===0)||(currentPlanStep==='review'&&!m.complete);
       next.disabled=blocked;
       next.title=blocked?(currentPlanStep==='shared'?'Completa fecha, responsable/técnico y supervisor.':currentPlanStep==='selection'?'Selecciona al menos un ensayo.':'Completa todos los campos obligatorios de cada ensayo.'):'';
     }
@@ -288,7 +288,7 @@
   }
 
     const planStepKeys=['shared','selection','results','review'];
-  const planStepLabels={shared:'Datos generales',selection:'Selección de ensayos',results:'Mediciones',review:'Resumen'};
+  const planStepLabels={shared:'Datos generales',selection:'Ensayos a realizar',results:'Registro de resultados',review:'Revisión del registro'};
   function firstIncompleteTest(){
     return items.findIndex(item=>!itemMetrics(item).complete);
   }
@@ -305,18 +305,6 @@
     // No se permite abandonar Resultados por ensayo hasta completar todos los
     // campos obligatorios de cada prueba seleccionada. El guardado automático
     // de borradores sigue habilitado para no perder avances.
-    if(step==='review'&&currentPlanStep==='results'){
-      const incomplete=firstIncompleteTest();
-      if(incomplete>=0){
-        const item=items[incomplete],metrics=itemMetrics(item);
-        activeTestIndex=incomplete;
-        renderCards();
-        refreshPlanFeedback();
-        const firstMissing=metrics.missing[0]||'Completa los campos obligatorios y sus mediciones.';
-        toast('Completa la prueba: '+item.name+'.',true);
-        return false;
-      }
-    }
     currentPlanStep=step;
     document.querySelectorAll('#planPage [data-plan-panel]').forEach(panel=>{panel.hidden=panel.dataset.planPanel!==step;});
     document.querySelectorAll('#planStepper [data-plan-step]').forEach(button=>{
@@ -325,9 +313,9 @@
       if(active)button.setAttribute('aria-current','step');else button.removeAttribute('aria-current');
     });
     const index=planStepKeys.indexOf(step),back=$('#planStepBack'),next=$('#planStepNext'),hint=$('#planStepHint');
-    if(back)back.disabled=index===0;
-    if(next)next.textContent=step==='review'?'Guardar plan':'Continuar';
-    if(hint)hint.textContent='Etapa '+(index+1)+' de 4 · '+planStepLabels[step];
+    if(back){back.hidden=index===0;back.disabled=index===0;back.textContent=step==='review'?'Volver a resultados':'Anterior';}
+    if(next)next.textContent=step==='results'?'Revisar registro':(step==='review'?'Confirmar registro':'Continuar');
+    if(hint)hint.textContent='Paso '+(index+1)+' de 4';
     renderPlanFeedback();
     if(step==='review')renderPlanReview();
     return true;
@@ -371,7 +359,7 @@
     }
     const count=$('#planPickerCount');
     if(count)count.textContent=items.length+' seleccionado'+(items.length===1?'':'s');
-    $('#planSelectionStatus').textContent=items.length?'':'Aún no has añadido ensayos al plan.';
+    $('#planSelectionStatus').textContent=items.length?'':'Aún no has añadido ensayos al registro.';
   }
   function changePickedTest(code,checked){
     const index=items.findIndex(item=>String(item.code).toUpperCase()===String(code).toUpperCase());
@@ -380,7 +368,7 @@
       activeTestIndex=items.length-1;
     }else if(!checked&&index>=0){
       if(items.length===1){
-        toast('El plan debe conservar al menos un ensayo. Añade otro antes de quitar este.',true);
+        toast('El registro debe conservar al menos un ensayo. Añade otro antes de retirar este.',true);
         renderPicker();
         return;
       }
@@ -445,7 +433,7 @@
     const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());$('#planDate').value=d.toISOString().slice(0,16);
     ['planOperator','planSupervisor','planOilTemp','planAmbientTemp','planHumidity','planObservations'].forEach(id=>$('#'+id).value='');
     $('#planTitle').textContent='Nuevo registro de pruebas';
-    $('#saveTestPlan').innerHTML='<svg><use href="#i-check"/></svg>Guardar ahora';
+    if($('#saveTestPlan'))$('#saveTestPlan').innerHTML='<svg><use href="#i-check"/></svg>Guardar cambios';
     setSaveStatus('Se guardará automáticamente al modificar datos','idle');
     render();
   }
@@ -506,13 +494,13 @@
       }else if(x.test_code&&x.test_code!=='PLAN')items=[makeItem(x.test_code,{status:x.status,standard_reference:x.standard_reference,equipment_name:x.equipment_name,equipment_brand:x.equipment_brand,equipment_model:x.equipment_model,equipment_serial:x.equipment_serial,rows:rowsFromMeasurements(x.test_code,x.measurements||[])})];
       editRevision=0;savedRevision=0;
       activeTestIndex=0;render();$('#planTitle').textContent='Registro de pruebas #'+editingId;
-      $('#saveTestPlan').innerHTML='<svg><use href="#i-check"/></svg>Guardar ahora';
+      if($('#saveTestPlan'))$('#saveTestPlan').innerHTML='<svg><use href="#i-check"/></svg>Guardar cambios';
       setSaveStatus('Datos guardados · puedes continuar completando el plan','saved');
-      bridge.showPage('planPage');setPlanStep('results');
+      bridge.showPage('planPage');setPlanStep(items.length?'results':'shared');
     }catch(e){toast(e.message,true);}
   }
 
-  async function savePlan(automatic){
+  async function savePlan(automatic,confirmCompletion){
     if(savePromise){savePending=true;return savePromise;}
     const seenCodes=new Set();
     const duplicate=items.find(item=>{
@@ -523,18 +511,13 @@
     if(duplicate){
       const name=duplicate.name||duplicate.code;
       setSaveStatus('Hay un ensayo duplicado en el plan','warning');
-      if(!automatic)toast('«'+name+'» ya está incluido. Cada tipo de prueba solo puede agregarse una vez por visita.',true);
+      if(!automatic)toast('«'+name+'» ya está incluido en este registro. Cada ensayo solo puede agregarse una vez por jornada.',true);
       return false;
     }
     const date=$('#planDate').value;
-    if(!items.length){
-      setSaveStatus('Selecciona al menos una prueba para guardar','warning');
-      if(!automatic)toast('Añade al menos una prueba al plan.',true);
-      return false;
-    }
     if(!date){
-      setSaveStatus('Falta la fecha de visita para guardar','warning');
-      if(!automatic)toast('Selecciona la fecha de visita.',true);
+      setSaveStatus('Falta la fecha de realización para guardar','warning');
+      if(!automatic)toast('Selecciona la fecha de realización.',true);
       return false;
     }
     const revisionAtStart=editRevision;
@@ -546,10 +529,13 @@
       equipment_model:item.equipment_model,equipment_serial:item.equipment_serial,
       observations:item.observations,measurements:measurementsFromRows(item)
     }));
-    const complete=generalMissing().length===0&&items.every(item=>itemMetrics(item).complete);
+    const metrics=planMetrics();
+    const complete=metrics.complete;
+    if(confirmCompletion&&!complete){setSaveStatus('Hay datos pendientes por completar','warning');toast('Completa todos los ensayos antes de confirmar el registro.',true);return false;}
+    const hasWork=items.some(item=>itemMetrics(item).anyData)||!!($('#planOperator').value.trim()||$('#planSupervisor').value.trim()||$('#planOilTemp').value||$('#planAmbientTemp').value||$('#planHumidity').value||$('#planObservations').value.trim());
     const payload={
       id:editingId,transformer_key:transformer().key,test_code:'PLAN',
-      executed_at:date,status:complete?'COMPLETADA':'BORRADOR',
+      executed_at:date,status:confirmCompletion?'COMPLETADA':(hasWork?'EN_PROCESO':'BORRADOR'),
       operator_name:$('#planOperator').value,supervisor_name:$('#planSupervisor').value,
       oil_temperature_c:$('#planOilTemp').value,ambient_temperature_c:$('#planAmbientTemp').value,
       relative_humidity_percent:$('#planHumidity').value,observations:$('#planObservations').value,
@@ -569,17 +555,11 @@
         if(!data.result?.id)throw new Error('El servidor no confirmó el ID del plan guardado.');
         editingId=Number(data.result.id);
         savedRevision=revisionAtStart;
-        $('#planTitle').textContent='Plan de pruebas #'+editingId;
+        $('#planTitle').textContent='Registro de pruebas #'+editingId;
         const pending=planMetrics().missing.length;
-        setSaveStatus(
-          pending?'Guardado automáticamente · faltan '+pending+' datos por completar':'Todos los datos están guardados',
-          'saved'
-        );
-        if(!automatic){
-          toast(pending
-            ?'Cambios guardados. Quedan '+pending+' datos pendientes; puedes continuar después.'
-            :'Todos los datos del plan están guardados.');
-        }
+        setSaveStatus(confirmCompletion?'Registro completado':(hasWork?'Cambios guardados automáticamente':'Borrador guardado automáticamente'),'saved');
+        if(confirmCompletion){toast('Registro de pruebas #'+editingId+' completado correctamente.');await bridge.reloadTestHistory();bridge.showPage('testPage');}
+        else if(!automatic){toast(hasWork?'Cambios guardados. Puedes continuar completando el registro.':'Borrador guardado.');}
         return true;
       }catch(error){
         setSaveStatus('No se pudo guardar · revisa la conexión y vuelve a intentar','error');
@@ -602,9 +582,9 @@
     }
     return result;
   }
-  async function saveNow(){
+  async function saveNow(confirmCompletion){
     if(autoSaveTimer)clearTimeout(autoSaveTimer);
-    return savePlan(false);
+    return savePlan(false,!!confirmCompletion);
   }
   document.addEventListener('click',e=>{
     const target=e.target instanceof Element?e.target:null;if(!target)return;
@@ -621,13 +601,13 @@
     if(editBtn)edit(Number(editBtn.dataset.openExecution));else if(pick)start(pick.dataset.newTest);else start(null);
   },true);
   $('#cancelPlan').addEventListener('click',leavePlan);
-  $('#saveTestPlan').addEventListener('click',saveNow);
+  $('#saveTestPlan')?.addEventListener('click',saveNow);
   $('#planStepper').addEventListener('click',e=>{
     const step=e.target.closest('[data-plan-step]');
     if(step)setPlanStep(step.dataset.planStep);
   });
   $('#planStepBack').addEventListener('click',()=>movePlanStep(-1));
-  $('#planStepNext').addEventListener('click',()=>{if($('#planStepNext').disabled)return;currentPlanStep==='review'?saveNow():movePlanStep(1);});
+  $('#planStepNext').addEventListener('click',()=>{if($('#planStepNext').disabled)return;currentPlanStep==='review'?saveNow(true):movePlanStep(1);});
   $('#planTestPicker').addEventListener('change',e=>{
     const input=e.target.closest('input[type="checkbox"]');
     if(!input)return;
