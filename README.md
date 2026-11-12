@@ -96,3 +96,6 @@ Consulta [CHANGELOG.md](CHANGELOG.md) para el detalle de cambios por versión.
 
 ### Límite de posiciones TAP
 La aplicación admite entre 1 y 150 posiciones TAP por conmutador. El límite se valida en interfaz, generador de filas y servidor PHP para proteger la base de datos y evitar cargas excesivas.
+
+
+La cantidad de posiciones indicada en la ficha técnica se compara con los conmutadores configurados. Si difiere, el usuario puede sincronizar las filas conservando las existentes y confirmando antes de descartar filas con datos. La sincronización afecta únicamente el borrador de configuración; las versiones y ensayos anteriores permanecen intactos.
