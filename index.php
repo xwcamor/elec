@@ -81,7 +81,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.47">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.48">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -366,14 +366,14 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       </nav>
       <div class="config-main">
         <section class="config-panel" data-panel="general">
-          <div class="panel-heading"><div><span class="eyebrow">PASO 01</span><h3>Datos eléctricos generales</h3><p>Información común del sistema de bobinados.</p></div><span class="step-state"><i></i>Configuración base</span></div>
+          <div class="panel-heading"><div><span class="eyebrow">PASO 01</span><h3>Datos eléctricos generales</h3><p>Información común del sistema de bobinados.</p></div></div>
           <div class="form-grid">
-            <label>Tipo de transformador<select id="phaseCount"><option value="1">Monofásico</option><option value="3" selected>Trifásico</option></select><small>Se utiliza para orientar la estructura de fases.</small></label>
-            <label>Grupo vectorial<input id="vectorGroup" placeholder="Ej. Yd11, YNd5, Dyn11"><small>Registrar tal como aparece en placa.</small></label>
-            <label>Frecuencia nominal<input id="frequency" type="number" step="0.1" value="60"><small>Hz</small></label>
+            <label>Tipo de transformador<input id="phaseCountDisplay" type="text" readonly><input id="phaseCount" type="hidden"><small>Dato tomado de la ficha del transformador.</small></label>
+            <label>Grupo vectorial nominal<input id="vectorGroup" type="text" readonly><small>Dato de placa tomado de la ficha del transformador.</small></label>
+            <label>Frecuencia nominal<input id="frequency" type="text" readonly><small>Hz · Dato tomado de la ficha del transformador.</small></label>
             <label>Observaciones generales<input id="generalNotes" placeholder="Notas de configuración, placa o diseño..."><small>Información de referencia.</small></label>
           </div>
-          <div class="callout"><svg><use href="#i-info"/></svg><div><b>Importante: conexiones por bobinado y grupo vectorial son datos distintos.</b><p>Se registran por separado. El grupo vectorial no se utilizará para inventar conexiones de medición: las combinaciones se definirán y validarán al desarrollar cada prueba.</p></div></div>
+          <div class="callout"><svg><use href="#i-info"/></svg><div><b>El grupo vectorial y las conexiones de los bobinados son datos distintos.</b><p>El grupo vectorial se consulta desde la ficha del transformador; aquí defines las conexiones y bornes reales de cada bobinado.</p></div></div>
           <div class="panel-footer"><button class="btn primary" data-next="windings">Continuar a bobinados <span>→</span></button></div>
         </section>
 
@@ -469,6 +469,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.47"></script>
-<script src="./assets/plan.js?v=1.5.47"></script>
+<script src="./assets/app.js?v=1.5.48"></script>
+<script src="./assets/plan.js?v=1.5.48"></script>
 </body></html>
