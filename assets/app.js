@@ -44,7 +44,11 @@
     let data;
     try { data = JSON.parse(raw); }
     catch (_) { throw new Error('El servidor PHP no devolvió JSON. Revisa la ruta /pe/api.php y los errores de PHP en Laragon. Respuesta: ' + raw.slice(0,180)); }
-    if (!response.ok || data.ok === false) throw new Error(data.message || ('Error HTTP ' + response.status));
+    if (!response.ok || data.ok === false) {
+      const message = data.message || ('Error HTTP ' + response.status);
+      const detail = data.detail ? '\\nDetalle técnico: ' + data.detail : '';
+      throw new Error(message + detail);
+    }
     return data;
   }
   const transformer = {...PILOT.transformer};
@@ -530,9 +534,27 @@
     if(!PILOT.schemaReady){toast('Importa database/schema.sql en la base de datos del sistema.',true);return;}
     const btns=[$('#saveConfig'),$('#saveConfigBottom')].filter(Boolean);btns.forEach(b=>{b.disabled=true;b.textContent='Guardando...';});
     try{
-      const response=await fetch(api('action=save'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(collectPayload())});
+      const payload=collectPayload();
+      const response=await fetch(api('action=save'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
       const result=await readApiResponse(response);
-      state.version_no=result.result.version_no;state.versions.unshift({version_no:state.version_no,created_at:new Date().toLocaleString('es-PE')});dirty=false;refreshSidebarAccess();refreshConfigStepIndicators();$('#saveStatus').classList.add('saved');$('#saveStatus').innerHTML='<i></i>Guardado';$('#versionBadge').textContent='Versión '+state.version_no;renderReview();toast('Configuración guardada como versión '+state.version_no+'.');
+      if(!result.result||!result.result.config_id||!result.result.version_no)throw new Error('MySQL no confirmó el identificador y la versión de la configuración.');
+
+      // Lectura inmediata desde MySQL: no mostrar "Guardado" hasta confirmar la persistencia.
+      const verifyResponse=await fetch(api('action=load&key='+encodeURIComponent(transformer.key)));
+      const persisted=await readApiResponse(verifyResponse);
+      const savedConfig=persisted.config;
+      if(!savedConfig||Number(savedConfig.version_no)!==Number(result.result.version_no)
+        ||(savedConfig.windings||[]).length!==payload.windings.length
+        ||(savedConfig.tap_changers||[]).length!==payload.tap_changers.length){
+        throw new Error('El servidor aceptó la operación, pero la lectura de verificación no coincide. Revisa la conexión y las tablas eh_ antes de continuar.');
+      }
+
+      state.version_no=Number(savedConfig.version_no);
+      state.versions=savedConfig.versions||state.versions||[];
+      dirty=false;refreshSidebarAccess();refreshConfigStepIndicators();
+      $('#saveStatus').classList.add('saved');$('#saveStatus').innerHTML='<i></i>Guardado';
+      $('#versionBadge').textContent='Versión '+state.version_no;renderReview();
+      toast('Configuración guardada y verificada en MySQL · versión '+state.version_no+'.');
     }catch(error){toast(error.message,true);}finally{btns.forEach(b=>{b.disabled=false;b.innerHTML='<svg><use href="#i-check"/></svg>Guardar configuración';});}
   }
   $('#saveConfig').addEventListener('click',saveConfig);$('#saveConfigBottom')?.addEventListener('click',saveConfig);
