@@ -1,3 +1,8 @@
+## 1.5.72
+- Elimina los identificadores de etapa en azul dentro de los encabezados; deja título y subtítulo alineados a la izquierda.
+- Homologa el tamaño de los cuatro indicadores numéricos y reemplaza el contorno rectangular de foco por un halo circular.
+- Alinea el resumen de resultados debajo del título, a la izquierda, manteniendo el contador de pendientes a la derecha.
+
 ## 1.5.71
 - Corrige un error JavaScript al actualizar las líneas del stepper: se reemplaza el selector de elemento único por `querySelectorAll` y se define localmente la secuencia de etapas.
 - Evita que el error interrumpa la carga y navegación de los registros.
