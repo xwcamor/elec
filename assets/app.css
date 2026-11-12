@@ -1415,3 +1415,15 @@ body.config-focus .config-save-hint{display:none!important}
 /* Datos de ficha técnica: solo dos indicadores, sin bloque de origen */
 .tap-source-values{grid-template-columns:repeat(2,minmax(0,1fr))}
 @media(max-width:640px){.tap-source-values{grid-template-columns:1fr}}
+
+/* Bornes y terminales es una sección fija, no un acordeón */
+.terminal-section{margin-top:14px;border:1px solid #dfe7ee;border-radius:8px;background:#fff;overflow:hidden}
+.terminal-section-heading{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;background:#f7f9fb;border-bottom:1px solid #e7edf2}
+.terminal-section-title{display:flex;align-items:baseline;gap:10px;min-width:0}
+.terminal-section-title strong{font-size:12px;color:#314b65}
+.terminal-section-title small{font-size:10px;color:#8493a3}
+.terminal-section-content{padding:13px 14px 12px}
+.terminal-section-content .table-caption{margin:0 0 8px}
+.terminal-section-content .sheet-wrap{width:100%;min-width:0}
+.terminal-section-content .sheet-hint{line-height:1.45}
+@media(max-width:650px){.terminal-section-heading{align-items:flex-start;flex-direction:column;gap:9px}.terminal-section-title{align-items:flex-start;flex-direction:column;gap:3px}.terminal-section-content{padding:9px}}
