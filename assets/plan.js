@@ -215,7 +215,7 @@
       const row=Number(input.dataset.row),field=input.dataset.col,required=(requiredByTest[item.code]||[]).includes(field);
       const valid=requiredValueFilled(field,input.value);
       input.classList.toggle('is-filled',valid);
-      input.classList.toggle('is-missing',required&&!valid&&metrics.rowStates[row]?.any);
+      input.classList.toggle('is-missing',required&&!valid);
       if(input.classList.contains('plan-result-select'))input.dataset.state=String(input.value||'PENDIENTE').toLowerCase();
       if(field==='result'){
         const state=String(input.value||'').trim().toUpperCase();
@@ -456,7 +456,7 @@
         const row=normalize(item.code,raw),rowMetrics=metrics.rowStates[ri]||{any:false,state:'empty'};
         return '<tr data-row-state="'+rowMetrics.state+'">'+fieldList.map(([key])=>{
           const calc=['absorption_index','theoretical','errU','errV','errW'].includes(key)||(item.code==='TTR'&&key==='result')||(item.code==='BUSHING'&&['variation_percent','result'].includes(key)),must=required.includes(key),value=row[key]??'';
-          const filled=requiredValueFilled(key,value),missing=must&&!filled&&rowMetrics.any;
+          const filled=requiredValueFilled(key,value),missing=must&&!filled;
           if(['result','evaluation'].includes(key)&&!calc){
             const options=['PENDIENTE','CONFORME','OBSERVADO','NO APLICA'],current=String(value||'PENDIENTE').toUpperCase();
             const extra=options.includes(current)?'':'<option value="'+esc(value)+'" selected>'+esc(value)+'</option>';
