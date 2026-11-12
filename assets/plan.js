@@ -357,9 +357,25 @@
     if(step==='review')renderPlanReview();
     return true;
   }
-  function movePlanStep(offset){
+  async function ensureExecutionStarted(){
+    if(editingId!==null)return true;
+    if(!items.length){toast('Selecciona al menos un ensayo antes de iniciar la prueba.',true);setPlanStep('selection');return false;}
+    const accepted=window.confirm(
+      'Vas a iniciar una ejecución de prueba eléctrica.\\n\\n' +
+      'Se creará un registro en la base de datos con los ensayos seleccionados. ' +
+      'A partir de ese momento, los cambios se guardarán automáticamente.\\n\\n' +
+      '¿Deseas iniciar la prueba ahora?'
+    );
+    if(!accepted)return false;
+    const started=await startPlan();
+    return !!started&&editingId!==null;
+  }
+  async function movePlanStep(offset){
     const current=planStepKeys.indexOf(currentPlanStep),next=Math.max(0,Math.min(planStepKeys.length-1,current+offset));
     if(next>=2&&!items.length){toast('Selecciona al menos un ensayo para continuar.',true);setPlanStep('selection');return;}
+    if(next>=2&&editingId===null){
+      if(!await ensureExecutionStarted())return;
+    }
     setPlanStep(planStepKeys[next]);
   }
   function renderPlanReview(){
@@ -654,9 +670,16 @@
   $('#cancelPlan').addEventListener('click',leavePlan);
   $('#saveTestPlan')?.addEventListener('click',()=>editingId===null?startPlan():saveNow(false));
   $('#planPage').addEventListener('focusout',()=>{if(editingId!==null&&hasUnsavedChanges())scheduleAutoSave(250);});
-  $('#planStepper').addEventListener('click',e=>{
+  $('#planStepper').addEventListener('click',async e=>{
     const step=e.target.closest('[data-plan-step]');
-    if(step)setPlanStep(step.dataset.planStep);
+    if(!step)return;
+    const target=step.dataset.planStep;
+    const targetIndex=planStepKeys.indexOf(target);
+    const currentIndex=planStepKeys.indexOf(currentPlanStep);
+    if(targetIndex>currentIndex&&targetIndex>=2&&editingId===null){
+      if(!await ensureExecutionStarted())return;
+    }
+    setPlanStep(target);
   });
   $('#planStepBack').addEventListener('click',()=>movePlanStep(-1));
   $('#planStepNext').addEventListener('click',()=>{if($('#planStepNext').disabled)return;currentPlanStep==='review'?saveNow(true):movePlanStep(1);});
