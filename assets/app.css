@@ -1507,3 +1507,53 @@ body.config-focus .config-save-hint{display:none!important}
  .config-stepper>.config-view-tab>.plan-step-copy>b{font-size:10px;white-space:normal}
  .config-stepper>.config-view-tab>.plan-step-copy>small{font-size:8px;white-space:normal}
 }
+
+
+/* v1.5.129 · Layout flex explícito para evitar que el segundo paso colapse. */
+.config-stepper{
+ display:flex!important;
+ align-items:center!important;
+ gap:8px!important;
+ width:100%;
+ min-width:0;
+}
+.config-stepper>.config-view-tab{
+ display:flex!important;
+ flex:1 1 0!important;
+ width:auto!important;
+ min-width:0!important;
+ max-width:none!important;
+ justify-content:flex-start!important;
+ align-items:center!important;
+ gap:12px!important;
+ overflow:visible!important;
+}
+.config-stepper>.plan-step-connector{
+ display:block!important;
+ flex:0 0 34px!important;
+ width:34px!important;
+ min-width:34px!important;
+ height:2px!important;
+}
+.config-stepper>.config-view-tab>.plan-step-copy{
+ display:flex!important;
+ flex:1 1 auto!important;
+ min-width:0!important;
+ width:auto!important;
+ overflow:visible!important;
+}
+.config-stepper>.config-view-tab>.plan-step-copy>b,
+.config-stepper>.config-view-tab>.plan-step-copy>small{
+ display:block!important;
+ max-width:100%;
+ overflow:visible!important;
+ white-space:normal!important;
+}
+@media(max-width:760px){
+ .config-stepper{display:flex!important;gap:5px!important;padding:6px}
+ .config-stepper>.config-view-tab{flex:1 1 0!important;gap:6px!important;padding:6px 4px}
+ .config-stepper>.plan-step-connector{display:none!important}
+ .config-stepper>.config-view-tab>.plan-step-number{flex:0 0 27px;width:27px;height:27px}
+ .config-stepper>.config-view-tab>.plan-step-copy>b{font-size:10px}
+ .config-stepper>.config-view-tab>.plan-step-copy>small{font-size:8px}
+}
