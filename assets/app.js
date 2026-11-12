@@ -368,7 +368,7 @@
       container.innerHTML = `<table class="sheet-table"><thead><tr><th>#</th>${head}</tr></thead><tbody>${body}</tbody></table>`;
       container.querySelectorAll('[data-delete-row]').forEach(button=>button.addEventListener('click',()=>{if(rows.length<=1){toast('Debe mantenerse al menos una fila.',true);return;}const removed=rows.splice(Number(button.dataset.deleteRow),1)[0];render();if(typeof onRowsChanged==='function')onRowsChanged(removed);}));
       container.querySelectorAll('.sheet-cell').forEach(cell=>{
-        cell.addEventListener('change',()=>{const r=Number(cell.dataset.row),c=Number(cell.dataset.col),key=columns[c].key,col=columns[c],raw=cell.type==='checkbox'?cell.checked:cell.value,val=['number','bushing-number'].includes(col.type)?normalizeNumeric(raw):(col.uppercase?String(raw).trim().toUpperCase():raw);if(['number','bushing-number'].includes(col.type)||col.uppercase)cell.value=val;onChange(rows[r],key,val);if(key==='code')render();});
+        cell.addEventListener('change',()=>{const r=Number(cell.dataset.row),c=Number(cell.dataset.col),key=columns[c].key,col=columns[c],raw=cell.type==='checkbox'?cell.checked:cell.value,val=['number','bushing-number'].includes(col.type)?normalizeNumeric(raw):(col.uppercase?String(raw).trim().toUpperCase():raw);if(['number','bushing-number'].includes(col.type)||col.uppercase)cell.value=val;if(col.required)cell.classList.toggle('is-required-missing',!String(val??'').trim());onChange(rows[r],key,val);if(key==='code')render();});
       });
       container.querySelectorAll('.sheet-cell').forEach(cell=>cell.addEventListener('keydown',e=>navigateGrid(e,container,rows,columns,render)));
       const table=container.querySelector('table');
@@ -380,7 +380,7 @@
       if(col.type==='check') return `<div style="display:grid;place-items:center;height:32px"><input class="sheet-cell sheet-check" type="checkbox" data-row="${ri}" data-col="${ci}" ${val?'checked':''} aria-label="${esc(col.label)}"></div>`;
       if(col.type==='yesno') return `<select class="sheet-cell sheet-select" data-row="${ri}" data-col="${ci}" aria-label="${esc(col.label)}"><option value="0" ${!val?'selected':''}>No</option><option value="1" ${val?'selected':''}>Sí</option></select>`;
       if(col.type==='select') return `<select class="sheet-cell sheet-select" data-row="${ri}" data-col="${ci}">${col.options.map(o=>`<option value="${esc(o)}" ${String(val)===o?'selected':''}>${esc(o || '—')}</option>`).join('')}</select>`;
-      return `<input class="sheet-cell" data-row="${ri}" data-col="${ci}" type="text" maxlength="${col.maxLength||120}" ${col.required?'required':''} ${col.uppercase?'style="text-transform:uppercase"':''} ${['number','bushing-number'].includes(col.type)?'inputmode="decimal" data-numeric="1"':''} value="${esc(val)}" aria-label="${esc(col.label)}">`;
+      return `<input class="sheet-cell${col.required&&!String(val??'').trim()?' is-required-missing':''}" data-row="${ri}" data-col="${ci}" type="text" maxlength="${col.maxLength||120}" ${col.required?'required':''} ${col.uppercase?'style="text-transform:uppercase"':''} ${['number','bushing-number'].includes(col.type)?'inputmode="decimal" data-numeric="1"':''} value="${esc(val)}" aria-label="${esc(col.label)}">`;
     }
     function navigateGrid(e,host,allRows,cols,rerender){
       if(!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Enter','Tab'].includes(e.key))return;
