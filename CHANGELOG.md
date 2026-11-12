@@ -1,6 +1,9 @@
-## v1.5.137
-- Corrige el refresco inicial de los indicadores de bobinados usando selectores de colección válidos; los estados se calculan al cargar la configuración, no solo después de guardar.
-- Actualiza la caché del JavaScript para que el navegador reciba la corrección.
+## v1.5.138
+- Cambia los estados de los bobinados a texto simple: «Completo» y «Faltan datos», sin badges ni fondos tipo píldora.
+- El resumen indica explícitamente cuántos bobinados tienen datos pendientes.
+- El indicador circular del stepper muestra un check verde cuando la etapa queda validada, incluso si continúa seleccionada.
+- El estado de cada bobinado y del stepper se recalcula mientras se editan los campos nominales, sin esperar a perder el foco.
+- Separa la tarjeta «Datos del bobinado» del contenedor con márgenes exteriores, siguiendo el espaciado de Pruebas eléctricas.
 
 ## v1.5.136
 - Reduce el tamaño del título «Bobinados y bornes» para equilibrarlo con el resto del formulario.
