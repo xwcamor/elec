@@ -1,3 +1,9 @@
+## v1.5.144
+- Corrige la declaración del selector múltiple en JavaScript que impedía analizar y ejecutar el módulo completo.
+- Corrige la expresión regular usada para normalizar asteriscos existentes en etiquetas obligatorias.
+- Restaura el color azul del paso activo del stepper aunque su estado de validación sea pendiente.
+- Recupera la interacción de los pasos y la carga de Configuración eléctrica.
+
 ## v1.5.143
 - Unifica el asterisco rojo para todos los campos con atributo required en Configuración eléctrica, Pruebas eléctricas y formularios.
 - Añade el indicador a encabezados de columnas dinámicas declaradas como obligatorias.
