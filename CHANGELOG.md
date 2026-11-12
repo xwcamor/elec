@@ -1,3 +1,8 @@
+## 1.5.69
+- Unifica la navegación numérica, el contenido de cada etapa y las acciones en una sola superficie de asistente.
+- Mejora la jerarquía visual del stepper, con conectores, estados claros y foco azul para la etapa activa.
+- Añade una transición breve y discreta entre etapas, respetando la preferencia de movimiento reducido.
+
 ## 1.5.68
 - Simplifica el stepper progresivo: muestra únicamente los cuatro números, sin títulos ni descripciones permanentes.
 - Los títulos y el contexto permanecen dentro del contenido de cada etapa activa.
