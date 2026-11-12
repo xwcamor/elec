@@ -677,9 +677,9 @@
     testExecutions.forEach(execution=>{const status=executionDisplayStatus(execution).code;counts[status]=(counts[status]||0)+1;});
     $('#testStats').innerHTML=
       '<div class="test-stat"><small>Registros guardados</small><strong>'+total+'</strong><span>Jornadas de pruebas</span></div>'+
-      '<div class="test-stat"><small>Completados</small><strong>'+counts.COMPLETE+'</strong><span>Todos los ensayos finalizados</span></div>'+
+      '<div class="test-stat"><small>Completados</small><strong>'+counts.COMPLETE+'</strong><span>Todos los ensayos finalizados y confirmados</span></div>'+
       '<div class="test-stat"><small>En proceso</small><strong>'+counts.INCOMPLETE+'</strong><span>Con ensayos por completar</span></div>'+
-      '<div class="test-stat"><small>Borradores</small><strong>'+counts.DRAFT+'</strong><span>Sin datos de medición</span></div>';
+      '<div class="test-stat"><small>Borradores</small><strong>'+counts.DRAFT+'</strong><span>Sin ensayos iniciados</span></div>';
   }
   function renderTestTypes(){
     const host=$('#testTypeGrid');
@@ -718,11 +718,11 @@
     else{
       const width=560,height=190,left=30,bottom=32,top=16,plotH=height-top-bottom,slot=(width-left-12)/keys.length,barW=Math.min(42,slot*.58);
       const bars=keys.map((k,i)=>{const val=monthly.get(k),h=val/max*plotH,x=left+i*slot+(slot-barW)/2,y=top+plotH-h;const label=k.slice(5)+'/'+k.slice(2,4);return `<g><rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="4" fill="#3985c8"/><text x="${x+barW/2}" y="${Math.max(11,y-5)}" text-anchor="middle" font-size="10" fill="currentColor">${val}</text><text x="${x+barW/2}" y="${height-9}" text-anchor="middle" font-size="10" fill="currentColor">${label}</text></g>`;}).join('');
-      chart.innerHTML=`<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Ejecuciones por mes">${[0,.5,1].map(v=>`<line x1="${left}" x2="${width-8}" y1="${top+plotH*(1-v)}" y2="${top+plotH*(1-v)}" stroke="#dfe6ee" stroke-dasharray="3 4"/>`).join('')}${bars}</svg>`;
+      chart.innerHTML=`<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Registros por mes">${[0,.5,1].map(v=>`<line x1="${left}" x2="${width-8}" y1="${top+plotH*(1-v)}" y2="${top+plotH*(1-v)}" stroke="#dfe6ee" stroke-dasharray="3 4"/>`).join('')}${bars}</svg>`;
     }
     const list=$('#testTypeAnalytics');
     const total=[...types.values()].reduce((a,b)=>a+b,0);
-    list.innerHTML=total?[...types.entries()].sort((a,b)=>b[1]-a[1]).map(([name,count])=>`<div class="type-analytics-row"><div><span>${esc(name)}</span><b>${count}</b></div><div class="type-analytics-track"><i style="width:${Math.round(count/total*100)}%"></i></div></div>`).join(''):'<div class="analytics-empty">Todavía no hay pruebas registradas.</div>';
+    list.innerHTML=total?[...types.entries()].sort((a,b)=>b[1]-a[1]).map(([name,count])=>`<div class="type-analytics-row"><div><span>${esc(name)}</span><b>${count}</b></div><div class="type-analytics-track"><i style="width:${Math.round(count/total*100)}%"></i></div></div>`).join(''):'<div class="analytics-empty">Todavía no hay ensayos registrados.</div>';
   }
   function setTestWorkspaceView(view){
     const panels={summary:'#testSummaryPanel',table:'#testHistoryPanel',graph:'#testAnalyticsPanel'};
@@ -773,7 +773,7 @@
       const names=x.plan_tests?.length?x.plan_tests.map(t=>t.name||typeName(t.code)):[x.test_name||typeName(x.test_code)];
       const testCount=names.length;
       const state=executionDisplayStatus(x);
-      return '<tr><td><b>'+esc(formatExecutionDate(x.executed_at))+'</b></td><td><b>'+esc(names.join(' · '))+'</b></td><td>'+testCount+'</td><td>'+esc(x.operator_name||'—')+'</td><td><span class="execution-status '+state.className+'">'+state.label+'</span></td><td><div class="test-row-actions"><button class="btn small" data-open-execution="'+x.id+'" title="Continuar este registro">Abrir registro</button><button class="btn small danger test-delete-button" data-delete-execution="'+x.id+'" title="Eliminar ejecución" aria-label="Eliminar ejecución #'+x.id+'"><svg><use href="#i-trash"/></svg>Eliminar</button></div></td></tr>';
+      return '<tr><td><b>'+esc(formatExecutionDate(x.executed_at))+'</b></td><td><b>'+esc(names.join(' · '))+'</b></td><td>'+testCount+'</td><td>'+esc(x.operator_name||'—')+'</td><td><span class="execution-status '+state.className+'">'+state.label+'</span></td><td><div class="test-row-actions"><button class="btn small" data-open-execution="'+x.id+'" title="Continuar este registro">Abrir registro</button><button class="btn small danger test-delete-button" data-delete-execution="'+x.id+'" title="Eliminar registro" aria-label="Eliminar registro #'+x.id+'"><svg><use href="#i-trash"/></svg>Eliminar</button></div></td></tr>';
     }).join(''):'<tr><td colspan="6" class="test-empty">'+(testHistoryLoadError?'No se pudo consultar el historial: '+esc(testHistoryLoadError):(testExecutions.length?'No hay registros que coincidan con el filtro.':'No hay registros para este transformador. Los registros se ordenan por fecha, del más reciente al más antiguo.'))+'</td></tr>';
 
     $$('[data-delete-execution]').forEach(button=>button.addEventListener('click',async()=>{
@@ -798,7 +798,7 @@
         toast('Registro #'+id+' eliminado correctamente.');
       }catch(error){
         button.disabled=false;
-        button.title='Eliminar ejecución';
+        button.title='Eliminar registro';
         toast(error.message,true);
       }
     }));
@@ -847,14 +847,14 @@
     ['executionOperator','executionSupervisor','executionStandard','executionEquipment','executionEquipmentBrand','executionEquipmentModel','executionEquipmentSerial','executionOilTemp','executionAmbientTemp','executionHumidity','executionObservations'].forEach(id=>$('#'+id).value='');
     $('#executionDate').value=localDateTime();
     renderMeasurementRows([{parameter:'',value:'',unit:'',notes:''},{parameter:'',value:'',unit:'',notes:''},{parameter:'',value:'',unit:'',notes:''}]);renderTtrRows([]);
-    $('#executionTitle').textContent='Nueva ejecución de prueba';
+    $('#executionTitle').textContent='Nuevo registro de pruebas';
     const saveButton=$('#saveExecution');if(saveButton)saveButton.innerHTML='<svg><use href="#i-check"/></svg>Guardar registro';
   }
   function fillTypeOptions(selected){$('#executionType').innerHTML=testCatalog.map(t=>'<option value="'+esc(t[0])+'" '+(t[0]===selected?'selected':'')+'>'+esc(t[1])+'</option>').join('');}
   function startExecution(code){
     const reason=electricalTestsBlockReason();if(reason){toast(reason,true);refreshSidebarAccess();return false;}
     clearExecutionForm();fillTypeOptions(code);toggleTestTemplate();
-    $('#executionTitle').textContent='Nueva ejecución · '+typeName(code);
+    $('#executionTitle').textContent='Nuevo registro · '+typeName(code);
     showOnlyMain('executionPage');
   }
   function renderMeasurementRows(rows){
@@ -895,7 +895,7 @@
       $('#executionEquipmentSerial').value=x.equipment_serial||'';$('#executionOilTemp').value=x.oil_temperature_c??'';
       $('#executionAmbientTemp').value=x.ambient_temperature_c??'';$('#executionHumidity').value=x.relative_humidity_percent??'';
       $('#executionObservations').value=x.observations||'';
-      $('#executionTitle').textContent='Editar ejecución #'+activeExecutionId+' · '+(x.test_name||typeName(x.test_code));
+      $('#executionTitle').textContent='Editar registro #'+activeExecutionId+' · '+(x.test_name||typeName(x.test_code));
       $('#saveExecution').innerHTML='<svg><use href="#i-check"/></svg>Actualizar registro';
       showOnlyMain('executionPage');
     }catch(e){toast(e.message,true);}
@@ -1109,7 +1109,7 @@
       if(!PILOT.testsSchemaReady)throw new Error('Prepara las tablas de pruebas eléctricas antes de guardar ejecuciones.');
       const r=await fetch(api('action=test-save'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
       const d=await readApiResponse(r);
-      toast((isEditing?'Ejecución actualizada':'Prueba guardada')+' · Registro #'+d.result.id+' · '+formatExecutionDate(d.result.executed_at));
+      toast((isEditing?'Registro actualizado':'Prueba guardada')+' · Registro #'+d.result.id+' · '+formatExecutionDate(d.result.executed_at));
       showOnlyMain('testPage');await loadTestHistory();
     }catch(e){toast(e.message,true);}
     finally{btn.disabled=false;btn.innerHTML=activeExecutionMode==='edit'?'<svg><use href="#i-check"/></svg>Actualizar registro':'<svg><use href="#i-check"/></svg>Guardar registro';}
