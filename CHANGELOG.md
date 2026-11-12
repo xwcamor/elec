@@ -1,3 +1,7 @@
+## 1.5.78
+- Permite navegar directamente a una etapa posterior cuando todas las etapas anteriores ya cumplen sus validaciones.
+- Mantiene el bloqueo y los avisos cuando cualquier etapa previa tiene datos pendientes; ya no exige pulsar «Continuar» varias veces.
+
 ## 1.5.77
 - Impone navegación secuencial: no permite saltar etapas desde el indicador y valida la etapa actual antes de avanzar.
 - Bloquea el paso 4 mientras existan ensayos incompletos en el paso 3 y muestra los nombres de los ensayos pendientes.
