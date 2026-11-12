@@ -691,6 +691,16 @@
   }
   $('#saveExecution').addEventListener('click',saveExecution);
 
+  // Inicio de una ejecución: solo el módulo de pruebas escucha esta acción.
+  document.addEventListener('click', event => {
+    const target=event.target instanceof Element?event.target:event.target?.parentElement;
+    const trigger=target?.closest('#newTestExecution');
+    if(!trigger)return;
+    event.preventDefault();
+    try{startExecution('TTR');}
+    catch(error){console.error('No se pudo iniciar el registro de pruebas:',error);toast(error.message||'No se pudo abrir el registro de pruebas.',true);}
+  });
+
 
 window.ELEC_PLAN_BRIDGE = {
     getTransformer: function(){ return configBridge.getTransformer(); },
