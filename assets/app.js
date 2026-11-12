@@ -1103,6 +1103,56 @@
     if(code==='BUSHING')list=list.map(r=>({...r,power_factor:r.power_factor||r.power_factor_measured||'',capacitance:r.capacitance||r.capacitance_measured_pf||'',test_voltage:r.test_voltage||r.test_voltage_kv||'',serial:r.serial||r.serial_number||''}));
     return list.map(r=>normalizeSpecificRow(code,r));
   }
+  // El catálogo contextualiza cada ensayo con los elementos reales de la configuración eléctrica.
+  const testElementNeeds={
+    TTR:['Bobinados AT/BT','Posiciones TAP','Mediciones por fase'],
+    WINDING_RESISTANCE:['Bobinados','Bornes o pares de bornes','Posiciones TAP cuando aplique'],
+    INSULATION_RESISTANCE:['Pares de bobinados o bobinado a masa'],
+    EXCITATION:['Posiciones TAP','Fases / bornes del bobinado'],
+    BUSHING:['Bornes con bushing capacitivo'],
+    SFRA:['Bobinados / conexiones de ensayo','Posiciones TAP'],
+    POWER_FACTOR:['Modos de conexión del ensayo','Datos de placa aplicables'],
+    CAPACITANCE:['Bornes o puntos de medición'],
+    ARRESTER:['Secciones y fases del equipo ensayado'],
+    PROTECTIONS:['Accesorios y bornes del circuito de protección']
+  };
+  function configuredTapOptions(){
+    const positions=(state.tap_changers||[]).flatMap(c=>(c.positions||[]).map(p=>String(p.position_no??'').trim()).filter(Boolean));
+    const unique=[...new Set(positions)].sort((a,b)=>Number(a)-Number(b));
+    if(unique.length)return unique.map(v=>[v,'TAP '+v]);
+    const count=Math.min(150,Math.max(0,Number(transformer.num_taps||0)));
+    return Array.from({length:count},(_,i)=>[String(i+1),'TAP '+(i+1)]);
+  }
+  function configuredWindingOptions(){
+    return (state.windings||[]).map((w,i)=>[String(w.name||('Bobinado '+(i+1))),String(w.name||('Bobinado '+(i+1)))]);
+  }
+  function configuredTerminalOptions(capacitiveOnly=false){
+    return (state.windings||[]).flatMap((w,wi)=>(w.terminals||[]).filter(t=>!capacitiveOnly||t.has_capacitive_bushing).map(t=>{
+      const code=String(t.code||'').trim(),label=(w.name||('Bobinado '+(wi+1)))+' · '+(code||'Borne sin código');
+      return [code,label];
+    })).filter(x=>x[0]);
+  }
+  function contextOptionsForField(code,key){
+    if(key==='tap')return configuredTapOptions();
+    if(key==='winding'||key==='section'&&code==='WINDING_RESISTANCE')return configuredWindingOptions();
+    if(key==='terminal'&&code==='BUSHING')return configuredTerminalOptions(true);
+    if(key==='phase'&&(code==='WINDING_RESISTANCE'||code==='EXCITATION'))return configuredTerminalOptions(false);
+    if(key==='point'&&code==='CAPACITANCE')return configuredTerminalOptions(false);
+    if(key==='point'&&code==='INSULATION_RESISTANCE'){
+      const names=configuredWindingOptions().map(x=>x[0]),pairs=[];
+      names.forEach((a,i)=>{names.slice(i+1).forEach(b=>pairs.push([a+'-'+b,a+' – '+b]));pairs.push([a+'-Masa',a+' – Masa']);});
+      names.forEach(a=>{if(!pairs.some(p=>p[0]===a+'-Masa'))pairs.push([a+'-Masa',a+' – Masa']);});
+      return pairs;
+    }
+    return null;
+  }
+  function renderContextSelect(code,key,value,rowIndex,columnIndex){
+    const options=contextOptionsForField(code,key);if(options===null)return null;
+    const placeholder=key==='tap'?'Selecciona TAP':key==='winding'||key==='section'?'Selecciona bobinado':key==='terminal'?'Selecciona borne':key==='phase'?'Selecciona borne/fase':'Selecciona punto';
+    const opts=[['',placeholder],...options].map(([v,label])=>'<option value="'+esc(v)+'" '+(String(value??'')===String(v)?'selected':'')+'>'+esc(label)+'</option>').join('');
+    const empty=options.length?'':' disabled';
+    return '<select class="specific-cell contextual-select" data-r="'+rowIndex+'" data-c="'+columnIndex+'" '+empty+'>'+opts+'</select>';
+  }
   function renderSpecificRows(rows,code){
     const cfg=specificTemplates[code];if(!cfg)return;
     $('#specificTestHead').innerHTML='<tr>'+cfg.cols.map(c=>'<th>'+esc(c[1])+'</th>').join('')+'</tr>';
@@ -1111,7 +1161,8 @@
       const legacy=Object.entries(row).filter(([key])=>!visible.has(key)).map(([key,value])=>'<input type="hidden" class="specific-legacy-cell" data-key="'+esc(key)+'" value="'+esc(value??'')+'">').join('');
       return '<tr>'+cfg.cols.map(([key],c)=>{
         const readonly=key==='absorption_index'?' readonly title="R a 1 min / R a 30 s"':(code==='BUSHING'&&['variation_percent','result'].includes(key)?' readonly title="Calculado a partir de capacitancia de placa y medida"':'');
-        return '<td><input class="specific-cell" data-r="'+i+'" data-c="'+c+'" value="'+esc(row[key]??'')+'"'+readonly+'></td>';
+        const contextual=renderContextSelect(code,key,row[key],i,c);
+        return '<td>'+(contextual||'<input class="specific-cell" data-r="'+i+'" data-c="'+c+'" value="'+esc(row[key]??'')+'"'+readonly+'>')+'</td>';
       }).join('')+legacy+'</tr>';
     }).join('');
   }
@@ -1131,11 +1182,11 @@
     $('#measurementGenericCard')?.classList.toggle('hidden',isTtr||isSpecific);
     if(activeSpecificCode!==code && $('#specificTestRows'))$('#specificTestRows').innerHTML='';
     activeSpecificCode=isSpecific?code:'';
-    if(isSpecific){const cfg=specificTemplates[code];$('#specificTestTitle').textContent=cfg.title;$('#specificTestHint').textContent=cfg.hint;if(!$('#specificTestRows').children.length){let initial=Array.from({length:Math.max(3,(state.windings||[]).length)},()=>({}));if(code==='BUSHING'){const configured=(state.windings||[]).flatMap(w=>w.terminals||[]).filter(t=>t.has_capacitive_bushing).map(t=>({terminal:t.code||'',serial:t.bushing?.serial_number||''}));if(configured.length)initial=configured;}renderSpecificRows(initial,code);}}
+    if(isSpecific){const cfg=specificTemplates[code];const needs=testElementNeeds[code]||[];$('#specificTestTitle').textContent=cfg.title;$('#specificTestHint').textContent=cfg.hint+' Elementos de configuración utilizados: '+needs.join(' · ')+'.';if(!$('#specificTestRows').children.length){let initial=Array.from({length:Math.max(3,(state.windings||[]).length)},()=>({}));if(code==='BUSHING'){const configured=(state.windings||[]).flatMap(w=>w.terminals||[]).filter(t=>t.has_capacitive_bushing).map(t=>({terminal:t.code||'',serial:t.bushing?.serial_number||''}));if(configured.length)initial=configured;}renderSpecificRows(initial,code);}}
 
     if(isTtr && !$('#ttrRows').children.length){
-      const configured=(state.tap_changers||[]).reduce((n,c)=>Math.max(n,(c.positions||[]).length),0);const count=Math.max(5,configured,Number(transformer.num_taps||0));
-      renderTtrRows(Array.from({length:Math.min(count,100)},(_,i)=>({tap:i+1})));
+      const taps=configuredTapOptions();
+      renderTtrRows(taps.map(([tap])=>({tap})));
     }
   }
 
