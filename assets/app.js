@@ -566,16 +566,11 @@
       ['review',reviewComplete?'complete':(configHasProgress?'partial':'missing'),reviewComplete?'Listo para guardar':'Pendiente']
     ];
     steps.forEach(([key,status,label])=>{
-      const button=document.querySelector('.config-tab[data-tab="'+key+'"]');
+      const button=document.querySelector('.config-view-tab[data-tab="'+key+'"]');
       if(!button)return;
-      const number=button.querySelector('.tab-number');
-      if(number)number.dataset.state=status;
-      const info=button.querySelector('span:last-child');
-      if(!info)return;
-      let badge=info.querySelector('.config-step-state');
-      if(!badge){badge=document.createElement('em');badge.className='config-step-state';info.appendChild(badge);}
-      badge.dataset.state=status;
-      badge.textContent=label;
+      button.dataset.state=status;
+      button.title=label;
+      button.setAttribute('aria-label',button.textContent.trim()+' · '+label);
     });
   }
 
