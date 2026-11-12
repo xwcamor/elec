@@ -495,7 +495,7 @@
       editRevision=0;savedRevision=0;
       activeTestIndex=0;render();$('#planTitle').textContent='Registro de pruebas #'+editingId;
       if($('#saveTestPlan'))$('#saveTestPlan').innerHTML='<svg><use href="#i-check"/></svg>Guardar cambios';
-      setSaveStatus('Cambios guardados · puedes continuar el registro','saved');
+      setSaveStatus(String(x.status||'').toUpperCase()==='COMPLETADA'?'Registro completado · al editarlo volverá a En proceso':'Cambios guardados · puedes continuar el registro','saved');
       bridge.showPage('planPage');setPlanStep(items.length?'results':'shared');
     }catch(e){toast(e.message,true);}
   }
@@ -556,7 +556,6 @@
         editingId=Number(data.result.id);
         savedRevision=revisionAtStart;
         $('#planTitle').textContent='Registro de pruebas #'+editingId;
-        const pending=planMetrics().missing.length;
         setSaveStatus(confirmCompletion?'Registro completado':(complete?'Todos los ensayos completos · confirma el registro':(hasWork?'Cambios guardados automáticamente':'Borrador guardado automáticamente')),'saved');
         if(confirmCompletion){toast('Registro de pruebas #'+editingId+' completado correctamente.');await bridge.reloadTestHistory();bridge.showPage('testPage');}
         else if(!automatic){toast(hasWork?'Cambios guardados. Puedes continuar completando el registro.':'Borrador guardado.');}
