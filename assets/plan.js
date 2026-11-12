@@ -297,19 +297,43 @@
     }).join('');
   }
   function renderPicker(){
-    const select=$('#planTestTypeSelect'),add=$('#addPlanTest');
-    const available=catalog.filter(t=>!items.some(x=>x.code===t[0]));
-    const previous=select.value;
-    select.innerHTML=catalog.map(t=>'<option value="'+esc(t[0])+'" '+(items.some(x=>x.code===t[0])?'disabled':'')+'>'+esc(t[1])+(items.some(x=>x.code===t[0])?' · añadida':'')+'</option>').join('');
-    const next=available.find(t=>t[0]===previous)||available[0];
-    if(next)select.value=next[0];
-    select.disabled=available.length===0;
-    add.disabled=available.length===0;
+    const host=$('#planTestPicker');
+    const selected=new Set(items.map(item=>String(item.code).toUpperCase()));
+    if(host){
+      host.innerHTML=catalog.map(([code,name,description])=>{
+        const checked=selected.has(code.toUpperCase());
+        return '<label class="plan-picker-option '+(checked?'is-selected':'')+'" for="plan-pick-'+esc(code)+'">'+
+          '<input type="checkbox" id="plan-pick-'+esc(code)+'" value="'+esc(code)+'" '+(checked?'checked':'')+'>'+
+          '<span class="plan-picker-check" aria-hidden="true"><svg><use href="#i-check"/></svg></span>'+
+          '<span class="plan-picker-copy"><b>'+esc(name)+'</b><small>'+esc(description)+'</small></span>'+
+          '<span class="plan-picker-state">'+(checked?'Añadido':'Añadir')+'</span>'+
+        '</label>';
+      }).join('');
+    }
+    const count=$('#planPickerCount');
+    if(count)count.textContent=items.length+' seleccionado'+(items.length===1?'':'s');
     const complete=items.filter(x=>itemMetrics(x).complete).length;
     const names=items.map(x=>x.name).join(' · ');
     $('#planSelectionStatus').textContent=items.length
       ?items.length+' ensayo(s) en el plan · '+complete+' completos'+(names?' — '+names:'')
       :'Aún no has añadido ensayos al plan.';
+  }
+  function changePickedTest(code,checked){
+    const index=items.findIndex(item=>String(item.code).toUpperCase()===String(code).toUpperCase());
+    if(checked&&index<0){
+      items.push(makeItem(code));
+      activeTestIndex=items.length-1;
+    }else if(!checked&&index>=0){
+      if(items.length===1){
+        toast('El plan debe conservar al menos un ensayo. Añade otro antes de quitar este.',true);
+        renderPicker();
+        return;
+      }
+      items.splice(index,1);
+      activeTestIndex=Math.min(activeTestIndex,items.length-1);
+    }else return;
+    render();
+    markPlanChanged(350);
   }
   function renderCards(){
     const host=$('#planTestCards');
@@ -559,17 +583,10 @@
     activeTestIndex=Number(tab.dataset.planTestIndex);
     renderCards();refreshPlanFeedback();
   });
-  $('#addPlanTest').addEventListener('click',()=>{
-    const code=$('#planTestTypeSelect').value;
-    if(!code)return;
-    const duplicate=items.find(item=>String(item.code).toUpperCase()===String(code).toUpperCase());
-    if(duplicate){
-      toast('«'+duplicate.name+'» ya está en esta visita. No se permiten ensayos duplicados.',true);
-      renderPicker();
-      return;
-    }
-    items.push(makeItem(code));activeTestIndex=items.length-1;
-    render();markPlanChanged(350);
+  $('#planTestPicker').addEventListener('change',e=>{
+    const input=e.target.closest('input[type="checkbox"]');
+    if(!input)return;
+    changePickedTest(input.value,input.checked);
   });
   $('#planTestCards').addEventListener('click',e=>{
     const del=e.target.closest('[data-remove-test]');
