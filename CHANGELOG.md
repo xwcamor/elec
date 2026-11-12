@@ -1,3 +1,8 @@
+## v1.5.112
+- Corrige el enlace de acciones del historial para que «Exportar PDF» y «Eliminar» se registren correctamente en todos los botones.
+- Refuerza el informe PDF imprimible: referencia normativa por ensayo, presentación A4 y guía visible para guardar como PDF.
+- Los ensayos con datos registrados usan estados visuales neutros; el color verde ya no se aplica solo por tener campos llenos. Los pendientes conservan su advertencia ámbar.
+
 ## v1.5.111
 - Añade «Exportar PDF» por registro en el historial.
 - El informe incluye identificación del transformador, datos generales de ejecución, cada ensayo, su estado, todas las mediciones, unidades, notas y observaciones.
