@@ -19,19 +19,29 @@ try {
     $found = $repo->find($identifier);
     if ($found) { $transformer = $found; $transformerFound = true; }
     else $dbMessage = 'No se encontró el registro indicado; se muestra el transformador de demostración.';
-    $tables = $pdo->query("SHOW TABLES LIKE 'eh_electrical_configs'")->fetchAll();
-    $schemaReady = count($tables) > 0;
+    $requiredConfigTables = [
+        'eh_electrical_configs', 'eh_windings', 'eh_terminals', 'eh_bushings',
+        'eh_tap_changers', 'eh_tap_positions', 'eh_electrical_config_versions'
+    ];
+    $missingConfigTables = [];
+    foreach ($requiredConfigTables as $tableName) {
+        $check = $pdo->query("SHOW TABLES LIKE " . $pdo->quote($tableName))->fetchColumn();
+        if (!$check) $missingConfigTables[] = $tableName;
+    }
+    $schemaReady = count($missingConfigTables) === 0;
+
     $requiredTestTables = ['eh_test_types','eh_test_executions','eh_test_execution_data'];
-    $testsSchemaReady = true;
+    $missingTestTables = [];
     foreach ($requiredTestTables as $tableName) {
         $check = $pdo->query("SHOW TABLES LIKE " . $pdo->quote($tableName))->fetchColumn();
-        if (!$check) $testsSchemaReady = false;
+        if (!$check) $missingTestTables[] = $tableName;
     }
+    $testsSchemaReady = count($missingTestTables) === 0;
     if ($schemaReady) {
         $configRepo = new ElectricalConfigRepository($pdo);
         if ($found) $config = $configRepo->get($found['key']);
     } else {
-        $dbMessage = 'Conexión MySQL correcta. Falta importar database/schema.sql para habilitar el guardado del piloto.';
+        $dbMessage = 'Faltan tablas del piloto: ' . implode(', ', $missingConfigTables) . '. Importa database/schema.sql en la base ' . $dbName . '.';
     }
 } catch (Throwable $e) {
     $dbMessage = 'Modo demostración: configura MySQL en config/database.php. ' . $e->getMessage();
@@ -70,7 +80,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.32">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.33">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -454,6 +464,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.32"></script>
+<script src="./assets/app.js?v=1.5.33"></script>
 <script src="./assets/plan.js?v=1.5.32"></script>
 </body></html>
