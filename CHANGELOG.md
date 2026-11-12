@@ -1,3 +1,8 @@
+## v1.5.148
+- Homologa el padding y los márgenes interiores de los paneles de cada step en Configuración eléctrica y Registro de pruebas.
+- Unifica el espacio entre encabezado y campos, separación entre campos y gutter de acciones.
+- Aplica 20 px en escritorio y 16 px en móvil mediante tokens compartidos.
+
 ## v1.5.147
 - Define tokens CSS para la escala de espaciado y gutters compartidos.
 - Iguala el inicio vertical de Pruebas eléctricas y su formulario con Configuración eléctrica, eliminando el offset superior adicional.
