@@ -1,3 +1,8 @@
+## 1.5.59
+- Cierra automáticamente el acordeón de una prueba en cuanto todos sus campos mínimos quedan completos, incluso si estaba abierto antes de completar el último dato.
+- Mantiene abiertos los ensayos incompletos por defecto y respeta la apertura/cierre manual mientras sigan incompletos.
+- Actualiza la caché de recursos.
+
 ## 1.5.58
 - Convierte «Equipo y referencia» de cada prueba de acordeón a tarjeta visible y expandida permanentemente.
 - Mantiene los campos de norma, equipo, marca, modelo y número de serie dentro de cada formulario.
