@@ -1,3 +1,7 @@
+## 1.5.71
+- Corrige un error JavaScript al actualizar las líneas del stepper: se reemplaza el selector de elemento único por `querySelectorAll` y se define localmente la secuencia de etapas.
+- Evita que el error interrumpa la carga y navegación de los registros.
+
 ## 1.5.70
 - Compacta el stepper: los conectores ahora llegan directamente a los círculos y reflejan el progreso completado/activo.
 - Reorganiza los encabezados de las etapas en dos líneas principales: título y descripción alineados verticalmente, con el identificador pequeño encima.
