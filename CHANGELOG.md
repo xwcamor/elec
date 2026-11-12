@@ -1,3 +1,9 @@
+## v1.5.135
+- Amplía el título «Bobinados y bornes» y añade un subtítulo dinámico con total, completos y pendientes.
+- Elimina la acción redundante «Copiar» del encabezado del módulo.
+- Iguala los estados visuales a las tarjetas de ensayos: completado en gris neutro e incompleto en amarillo.
+- El estado y el resumen se recalculan al editar datos del bobinado o sus bornes.
+
 ## v1.5.134
 - Simplifica la tabla de posiciones TAP: elimina las columnas Etiqueta, Neutro y Observaciones; conserva Posición y la acción de eliminar.
 - Añade eliminación individual de filas mediante el control de papelera.
