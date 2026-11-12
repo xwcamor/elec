@@ -1,3 +1,8 @@
+## v1.5.115
+- La exportación deja de abrir el diálogo de impresión del navegador: ahora solicita el PDF al servidor PHP y descarga el archivo directamente.
+- Se agrega el endpoint `action=test-pdf`, que genera el documento A4 mediante Dompdf y devuelve `application/pdf`.
+- Se declara `dompdf/dompdf` en composer.json; el servidor debe ejecutar Composer para instalar la dependencia y disponer de `vendor/autoload.php`.
+
 ## v1.5.114
 - Cada ensayo comienza en una hoja nueva al imprimir o guardar el informe como PDF.
 - Los ensayos extensos pueden continuar automáticamente en páginas adicionales; no se recortan ni se fuerzan a caber en una sola hoja.
