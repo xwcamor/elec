@@ -1,0 +1,58 @@
+name: Remove merged development branches
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/cleanup-merged-branches.yml'
+      - 'VERSION'
+      - 'api.php'
+      - 'index.php'
+      - 'assets/app.js'
+      - 'CHANGELOG.md'
+      - 'tests/manual-checklist.md'
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete only branches already merged into main
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const { data: branches } = await github.rest.repos.listBranches({
+              owner, repo, per_page: 100
+            });
+
+            for (const branch of branches) {
+              if (branch.name === 'main' || branch.protected) continue;
+
+              const { data: prs } = await github.rest.pulls.list({
+                owner,
+                repo,
+                state: 'closed',
+                base: 'main',
+                head: owner + ':' + branch.name,
+                per_page: 100
+              });
+              const merged = prs.some(pr => Boolean(pr.merged_at));
+
+              if (!merged) {
+                core.notice('Se conserva ' + branch.name + ': no se encontró un PR integrado en main.');
+                continue;
+              }
+
+              await github.rest.git.deleteRef({
+                owner,
+                repo,
+                ref: 'heads/' + branch.name
+              });
+              core.notice('Rama eliminada: ' + branch.name);
+            }
