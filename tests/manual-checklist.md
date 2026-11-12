@@ -87,3 +87,10 @@
 - [ ] Confirmar que equipo, marca, modelo, serie y referencia por ensayo son opcionales.
 - [ ] Guardar, recargar y editar un plan; verificar que se conservan las mediciones.
 - [ ] Revisar escritorio y móvil: campos compactos y navegación sin una página excesivamente larga.
+
+
+## v1.5.33 — Persistencia y diagnóstico
+- [ ] Con esquema completo, guardar una configuración y comprobar que la lectura inmediata devuelve la misma versión, bobinados y conmutadores.
+- [ ] Recargar la página y confirmar que bobinados, bornes, bushings, conmutadores y posiciones siguen presentes.
+- [ ] Retirar temporalmente una tabla eh_ en una base de pruebas y confirmar que el sistema bloquea el guardado indicando su nombre; no realizar esta prueba en una base con datos reales.
+- [ ] Simular un error SQL en una base de pruebas y confirmar que la interfaz muestra el detalle técnico devuelto por PHP.
