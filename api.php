@@ -96,7 +96,10 @@ try {
     }
     if ($action === 'test-list') {
         $key = trim((string)($_GET['key'] ?? ''));
-        json_response(['ok' => true, 'items' => $tests->listForTransformer($key)]);
+        if ($key === '') json_response(['ok'=>false,'message'=>'Falta identificar el transformador para consultar el historial.'], 422);
+        if (!$transformers->find($key)) json_response(['ok'=>false,'message'=>'El transformador solicitado ya no existe o no está disponible.'], 404);
+        $items = $tests->listForTransformer($key);
+        json_response(['ok'=>true,'transformer_key'=>$key,'total'=>count($items),'items'=>$items]);
     }
     if ($action === 'test-get') {
         $key = trim((string)($_GET['key'] ?? ''));
