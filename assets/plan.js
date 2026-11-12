@@ -183,6 +183,19 @@
     if(!items.length)missing.unshift('Selecciona por lo menos una prueba');
     return {general,perItem,total,filled,percent,ready,completed,missing,complete:!general.length&&items.length>0&&perItem.every(x=>x.metrics.complete)};
   }
+  function refreshCardStatus(card,item){
+    if(!card||!item)return;
+    const metrics=itemMetrics(item);
+    const state=metrics.complete?'complete':(metrics.anyData?'incomplete':'empty');
+    card.dataset.state=state;
+    const badge=card.querySelector('.plan-card-state');
+    if(badge){badge.dataset.state=state;badge.textContent=metrics.complete?'Completo':(metrics.anyData?'Faltan datos':'Sin iniciar');}
+    const progress=card.querySelector('[data-card-progress]');
+    if(progress)progress.textContent=metrics.filled+'/'+metrics.total+' campos · '+metrics.percent+'%';
+    if(metrics.complete)card.open=false;
+    else if(state==='incomplete')card.open=true;
+    refreshFieldStyles(card,item,metrics);
+  }
   function refreshFieldStyles(card,item,metrics){
     card.querySelectorAll('.plan-cell').forEach(input=>{
       const row=Number(input.dataset.row),field=input.dataset.col,required=(requiredByTest[item.code]||[]).includes(field);
@@ -616,14 +629,20 @@
   });
   $('#planTestCards').addEventListener('input',e=>{
     const card=e.target.closest('[data-test-index]');if(!card)return;const item=items[Number(card.dataset.testIndex)];if(!item)return;
-    if(e.target.dataset.meta){if(e.target.dataset.meta==='status')return;item[e.target.dataset.meta]=e.target.value;refreshPlanFeedback();return;}
+    if(e.target.dataset.meta){if(e.target.dataset.meta==='status')return;item[e.target.dataset.meta]=e.target.value;refreshCardStatus(card,item);refreshPlanFeedback();return;}
     if(!e.target.classList.contains('plan-cell'))return;
     const row=Number(e.target.dataset.row),key=e.target.dataset.col;item.rows[row]=item.rows[row]||{};item.rows[row][key]=e.target.value;
     const nr=normalize(item.code,item.rows[row]);
     if(item.code==='INSULATION_RESISTANCE'&&['reading_30s','reading_1min'].includes(key)){item.rows[row]=nr;const out=card.querySelector('[data-row="'+row+'"][data-col="absorption_index"]');if(out)out.value=nr.absorption_index;}
     if(item.code==='TTR'&&['at','bt','U','V','W'].includes(key)){item.rows[row]=nr;['theoretical','errU','errV','errW','result'].forEach(k=>{const out=card.querySelector('[data-row="'+row+'"][data-col="'+k+'"]');if(out)out.value=nr[k]||'';});}
     if(item.code==='BUSHING'&&['capacitance_plate_pf','capacitance_measured_pf'].includes(key)){item.rows[row]=nr;['variation_percent','result'].forEach(k=>{const out=card.querySelector('[data-row="'+row+'"][data-col="'+k+'"]');if(out)out.value=nr[k]||'';});}
+    refreshCardStatus(card,item);
     refreshPlanFeedback();
+  });
+  $('#planTestCards').addEventListener('change',e=>{
+    const card=e.target.closest('[data-test-index]');if(!card)return;
+    const item=items[Number(card.dataset.testIndex)];if(!item)return;
+    if(e.target.dataset.meta||e.target.classList.contains('plan-cell')){refreshCardStatus(card,item);refreshPlanFeedback();}
   });
     $('#planPage').addEventListener('input',e=>{
     if(['planDate','planOperator','planSupervisor'].includes(e.target.id))refreshPlanFeedback();
