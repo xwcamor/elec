@@ -884,9 +884,8 @@
     }).join('')+'</tbody></table>';
   }
   async function exportExecutionPdf(id){
-    const printWindow=window.open('','_blank');
-    if(!printWindow){toast('Permite las ventanas emergentes para exportar el informe.',true);return;}
-    printWindow.document.write('<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Preparando informe...</title></head><body>Preparando informe...</body></html>');
+    const exportButton=$('[data-export-execution="'+id+'"]');
+    if(exportButton){exportButton.disabled=true;exportButton.dataset.originalText=exportButton.textContent;exportButton.textContent='Generando PDF…';}
     try{
       const response=await fetch(api('action=test-get&key='+encodeURIComponent(transformer.key)+'&id='+encodeURIComponent(id)),{cache:'no-store'});
       const data=await readApiResponse(response),x=data.item||{};
@@ -911,9 +910,22 @@
         '<section class="section"><h3>Datos del registro</h3><div class="grid">'+meta('Fecha de ejecución',formatExecutionDate(x.executed_at))+meta('Responsable / técnico',x.operator_name)+meta('Supervisor',x.supervisor_name)+meta('Temperatura de aceite',x.oil_temperature_c===null?'—':x.oil_temperature_c+' °C')+meta('Temperatura ambiente',x.ambient_temperature_c===null?'—':x.ambient_temperature_c+' °C')+meta('Humedad relativa',x.relative_humidity_percent===null?'—':x.relative_humidity_percent+' %')+'</div></section>'+
         '<section class="section"><h3>Ensayos y resultados</h3>'+testHtml+'</section>'+
         (x.observations?'<section class="section observation"><b>Observaciones generales</b><p>'+esc(x.observations)+'</p></section>':'')+
-        '<div class="footer"><span>ELEC · Informe generado desde el registro de pruebas</span><span>Registro #'+esc(x.id||id)+'</span></div><div class="print-actions"><button onclick="window.print()">Guardar / imprimir PDF</button><span>En el diálogo del navegador selecciona «Guardar como PDF».</span></div><script>window.addEventListener("load",function(){setTimeout(function(){window.print()},500)});<\\/script></body></html>';
-      printWindow.document.open();printWindow.document.write(html);printWindow.document.close();
-    }catch(error){printWindow.close();toast('No se pudo exportar el registro: '+(error.message||error),true);}
+        '<div class="footer"><span>ELEC · Informe de pruebas eléctricas</span><span>Registro #'+esc(x.id||id)+'</span></div></body></html>';
+      const pdfResponse=await fetch(api('action=test-pdf'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({html,filename:'ELEC-registro-'+(x.id||id)+'.pdf'})});
+      if(!pdfResponse.ok){
+        const raw=await pdfResponse.text();let message='No se pudo generar el PDF en el servidor.';
+        try{const payload=JSON.parse(raw);message=payload.message||message;if(payload.detail)message+=' · '+payload.detail;}catch(_){if(raw)message+=' '+raw.slice(0,220);}
+        throw new Error(message);
+      }
+      const blob=await pdfResponse.blob();
+      if(!blob.size)throw new Error('El servidor devolvió un PDF vacío.');
+      const url=URL.createObjectURL(blob),link=document.createElement('a');
+      link.href=url;link.download='ELEC-registro-'+(x.id||id)+'.pdf';
+      document.body.appendChild(link);link.click();link.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),1500);
+      toast('PDF generado y descargado correctamente.');
+    }catch(error){toast('No se pudo exportar el registro: '+(error.message||error),true);}
+    finally{if(exportButton){exportButton.disabled=false;exportButton.textContent=exportButton.dataset.originalText||'Exportar PDF';delete exportButton.dataset.originalText;}}
   }
   function renderTestHistory(){
     testStats();renderTestTypes();
