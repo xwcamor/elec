@@ -303,10 +303,6 @@
     });
   }
   $('#addWinding').addEventListener('click', () => addWinding());
-  $('#copyWindings')?.addEventListener('click',()=>copyGrid([
-    ['Bobinado','Tensión kV'],
-    ...state.windings.map(w=>[w.name,w.voltage_kv])
-  ].map(r=>r.join('\t')).join('\n')));
   function renderWindings(options = {}) {
     const host = $('#windingsContainer');
     const previouslyOpen = new Set([...host.querySelectorAll('[data-winding]')].filter(card=>card.open).map(card=>Number(card.dataset.winding)));
@@ -316,11 +312,11 @@
       $('#loadExample').addEventListener('click', loadExample); return;
     }
     host.innerHTML = state.windings.map((w,wi)=>`
-      <details class="winding-card winding-accordion" data-winding="${wi}" ${(previouslyOpen.size?previouslyOpen.has(wi):wi===0)?'open':''}>
+      <details class="winding-card winding-accordion" data-winding="${wi}" data-state="${isWindingComplete(w)?'complete':'incomplete'}" ${(previouslyOpen.size?previouslyOpen.has(wi):wi===0)?'open':''}>
         <summary class="winding-accordion-summary">
           <span class="winding-index">${String(wi+1).padStart(2,'0')}</span>
           <span class="winding-summary-main"><strong>${esc(w.name||'Bobinado sin nombre')}</strong><small>${esc(w.voltage_kv||'—')} kV</small></span>
-          <span class="winding-summary-status" data-winding-status="${wi}" data-state="${String(w.name||'').trim()&&String(w.code||'').trim()&&Number(w.voltage_kv)>0&&w.terminals.length>0&&w.terminals.every(t=>String(t.code||'').trim())?'complete':'incomplete'}">${String(w.name||'').trim()&&String(w.code||'').trim()&&Number(w.voltage_kv)>0&&w.terminals.length>0&&w.terminals.every(t=>String(t.code||'').trim())?'Completo':'Pendiente'}</span><span class="accordion-chevron">⌄</span>
+          <span class="winding-summary-status" data-winding-status="${wi}" data-state="${isWindingComplete(w)?'complete':'incomplete'}">${isWindingComplete(w)?'Completo':'Pendiente'}</span><span class="accordion-chevron">⌄</span>
         </summary>
         <div class="winding-accordion-body">
           <section class="winding-data-section">
@@ -541,6 +537,19 @@
   });
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#tapRowsModal').classList.contains('hidden'))closeTapGenerator();});
 
+  function isWindingComplete(w){
+    if(!w)return false;
+    const terminals=(Array.isArray(w.terminals)?w.terminals:[]).filter(t=>!(t._draft&&!String(t.code||'').trim()&&!t.has_capacitive_bushing));
+    return String(w.name||'').trim()!==''&&String(w.code||'').trim()!==''&&Number.isFinite(Number(w.voltage_kv))&&Number(w.voltage_kv)>0&&terminals.length>0&&terminals.every(t=>String(t.code||'').trim()!=='');
+  }
+  function refreshWindingOverview(){
+    const el=$('#windingOverviewMeta');
+    if(!el)return;
+    const total=state.windings.length;
+    const complete=state.windings.filter(isWindingComplete).length;
+    const pending=total-complete;
+    el.textContent=`${total} ${total===1?'bobinado':'bobinados'} · ${complete} ${complete===1?'completo':'completos'} · ${pending} por completar`;
+  }
   function refreshWindingCounters(){
     $('[data-winding-stats]').forEach(el=>{
       const i=Number(el.dataset.windingStats),w=state.windings[i];
@@ -549,10 +558,13 @@
     $('[data-winding-status]').forEach(el=>{
       const w=state.windings[Number(el.dataset.windingStatus)];
       if(!w)return;
-      const complete=String(w.name||'').trim()!==''&&String(w.code||'').trim()!==''&&Number.isFinite(Number(w.voltage_kv))&&Number(w.voltage_kv)>0&&w.terminals.length>0&&w.terminals.every(t=>String(t.code||'').trim()!=='');
+      const complete=isWindingComplete(w);
       el.dataset.state=complete?'complete':'incomplete';
       el.textContent=complete?'Completo':'Pendiente';
+      const card=el.closest('.winding-accordion');
+      if(card)card.dataset.state=complete?'complete':'incomplete';
     });
+    refreshWindingOverview();
   }
 
   function updateCounts(){
