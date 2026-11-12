@@ -129,7 +129,7 @@
   };
   const requiredEquipment=[];
   const equipmentLabels={equipment_name:'equipo',equipment_brand:'marca del equipo',equipment_model:'modelo',equipment_serial:'serie'};
-  const generalLabels={date:'fecha de la prueba',operator:'responsable / técnico'};
+  const generalLabels={date:'fecha de realización',operator:'responsable / técnico'};
   function isFilled(value){return value!==null&&value!==undefined&&String(value).trim()!=='';}
   function requiredValueFilled(key,value){
     if(['result','evaluation'].includes(key)&&String(value??'').trim().toUpperCase()==='PENDIENTE')return false;
@@ -350,7 +350,7 @@
     });
     const index=planStepKeys.indexOf(step),back=$('#planStepBack'),next=$('#planStepNext'),hint=$('#planStepHint');
     if(back){back.hidden=index===0;back.disabled=index===0;back.textContent=step==='review'?'Volver a resultados':'Anterior';}
-    if(next)next.textContent=step==='results'?'Revisar registro':(step==='review'?'Finalizar prueba':'Continuar');
+    if(next)next.textContent=step==='results'?'Revisar registro':(step==='review'?'Finalizar registro':'Continuar');
     if(editingId!==null&&hasUnsavedChanges())scheduleAutoSave(200);
     if(hint)hint.textContent='Paso '+(index+1)+' de 4';
     renderPlanFeedback();
@@ -359,7 +359,7 @@
   }
   async function ensureExecutionStarted(){
     if(editingId!==null)return true;
-    if(!items.length){toast('Selecciona al menos un ensayo antes de iniciar la prueba.',true);setPlanStep('selection');return false;}
+    if(!items.length){toast('Selecciona al menos un ensayo antes de crear el registro.',true);setPlanStep('selection');return false;}
     const message='Se creará el registro de esta ejecución con los ensayos seleccionados. Desde la confirmación, los cambios se guardarán automáticamente.';
     let accepted=false;
     if(window.Swal){
@@ -573,11 +573,11 @@
   async function savePlan(automatic,confirmCompletion,startRequested){
     if(savePromise){savePending=true;return savePromise;}
     if(editingId===null&&!startRequested){
-      setSaveStatus('Preparación · pulsa «Iniciar prueba» para crear el registro','idle');
-      if(!automatic)toast('Primero inicia la prueba. La preparación todavía no se guarda.',true);
+      setSaveStatus('Preparación · confirma la creación del registro para activar el autoguardado','idle');
+      if(!automatic)toast('Primero confirma la creación del registro. La preparación todavía no se guarda.',true);
       return false;
     }
-    if(confirmCompletion&&editingId===null){toast('Primero pulsa «Iniciar prueba» para crear el registro.',true);return false;}
+    if(confirmCompletion&&editingId===null){toast('Primero confirma la creación del registro.',true);return false;}
     const seenCodes=new Set();
     const duplicate=items.find(item=>{
       const code=String(item.code||'').trim().toUpperCase();
@@ -617,9 +617,7 @@
       relative_humidity_percent:$('#planHumidity').value,observations:$('#planObservations').value,
       measurements:[],plan:{version:1,session_id:sessionId,tests}
     };
-    const btn=$('#saveTestPlan');
-    if(btn){btn.disabled=true;btn.innerHTML='<svg><use href="#i-check"/></svg>Guardando...';}
-    setSaveStatus('Guardando cambios...','saving');
+        setSaveStatus('Guardando cambios...','saving');
     const operation=(async()=>{
       try{
         if(bridge.demo())throw new Error('Selecciona un transformador real antes de guardar.');
@@ -632,7 +630,7 @@
         editingId=Number(data.result.id);
         savedRevision=revisionAtStart;
         $('#planTitle').textContent='Registro de pruebas #'+editingId;
-        if(startRequested){setSaveStatus('Registro creado · autoguardado activo','saved');if(btn){btn.textContent='Guardar ahora';btn.hidden=false;}toast('Registro #'+editingId+' creado. El autoguardado está activo.');}
+        if(startRequested){setSaveStatus('Registro creado · autoguardado activo','saved');toast('Registro #'+editingId+' creado. El autoguardado está activo.');}
         else setSaveStatus(confirmCompletion?'Registro completado':(complete?'Todos los ensayos completos · confirma el registro':'Cambios guardados automáticamente'),'saved');
         if(confirmCompletion){toast('Registro de pruebas #'+editingId+' completado correctamente.');await bridge.reloadTestHistory();bridge.showPage('testPage');}
         else if(!automatic&&!startRequested){toast('Cambios guardados.');}
@@ -642,7 +640,6 @@
         if(!automatic)toast(error.message,true);
         return false;
       }finally{
-        if(btn){btn.disabled=false;btn.textContent='Guardar ahora';btn.hidden=editingId===null;}
       }
     })();
     savePromise=operation;
@@ -682,7 +679,6 @@
     if(editBtn)edit(Number(editBtn.dataset.openExecution));else if(pick)start(pick.dataset.newTest);else start(null);
   },true);
   $('#cancelPlan').addEventListener('click',leavePlan);
-  $('#saveTestPlan')?.addEventListener('click',()=>{if(editingId!==null)saveNow(false);});
   $('#planPage').addEventListener('focusout',()=>{if(editingId!==null&&hasUnsavedChanges())scheduleAutoSave(250);});
   $('#planStepper').addEventListener('click',async e=>{
     const step=e.target.closest('[data-plan-step]');
