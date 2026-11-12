@@ -1,3 +1,11 @@
+## v1.5.86
+- La validación del servidor vuelve a comprobar los campos obligatorios y los valores numéricos de cada ensayo antes de permitir completar un registro.
+- Rechaza códigos de ensayo desconocidos, fechas inválidas y cierres sin detalle de ensayos.
+- La configuración eléctrica valida en servidor bobinados, códigos duplicados, bornes y posiciones de TAP.
+- La carga de configuración agrupa bobinados/bornes/bushings y conmutadores/posiciones para reducir consultas SQL repetitivas.
+- Se agrupan las comprobaciones de tablas del esquema en una consulta por carga.
+- Se reduce el trabajo del DOM al editar ensayos y se actualizan los cálculos TTR por fila sin reconstruir toda la grilla.
+
 ## v1.5.79
 - Nueva ejecución inicia en modo preparación temporal: abrir el formulario, seleccionar ensayos y completar datos no crea filas en la base de datos.
 - El registro persistente se crea únicamente al pulsar «Iniciar prueba», tras validar fecha, responsable, supervisor y al menos un ensayo.
