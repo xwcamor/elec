@@ -105,7 +105,7 @@ try {
         $key = trim((string)($_GET['key'] ?? ''));
         $id = (int)($_GET['id'] ?? 0);
         $item = $tests->get($id, $key);
-        if (!$item) json_response(['ok' => false, 'message' => 'No se encontró la ejecución solicitada.'], 404);
+        if (!$item) json_response(['ok' => false, 'message' => 'No se encontró el registro solicitado.'], 404);
         json_response(['ok' => true, 'item' => $item]);
     }
     if ($action === 'test-save' && $_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -121,10 +121,10 @@ try {
         $payload = json_decode(file_get_contents('php://input'), true) ?: [];
         $key = trim((string)($payload['transformer_key'] ?? ''));
         $id = (int)($payload['id'] ?? 0);
-        if ($key === '' || $id < 1) json_response(['ok'=>false,'message'=>'Falta identificar la visita que deseas eliminar.'], 422);
+        if ($key === '' || $id < 1) json_response(['ok'=>false,'message'=>'Falta identificar el registro que deseas eliminar.'], 422);
         if (!$transformers->find($key)) json_response(['ok'=>false,'message'=>'No se identificó el transformador. Vuelve a seleccionarlo.'], 422);
-        if (!$tests->delete($id, $key)) json_response(['ok'=>false,'message'=>'La visita no existe o no pertenece al transformador seleccionado.'], 404);
-        json_response(['ok'=>true,'message'=>'Visita y mediciones eliminadas.','result'=>['id'=>$id]]);
+        if (!$tests->delete($id, $key)) json_response(['ok'=>false,'message'=>'El registro no existe o no pertenece al transformador seleccionado.'], 404);
+        json_response(['ok'=>true,'message'=>'Registro y mediciones eliminados.','result'=>['id'=>$id]]);
     }
     json_response(['ok' => false, 'message' => 'Acción no válida.'], 400);
 } catch (PDOException $e) {
