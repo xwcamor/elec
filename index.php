@@ -81,7 +81,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.45">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.46">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -200,7 +200,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
   <section class="test-page hidden" id="testPage">
     <div class="config-toolbar">
       <div><div class="breadcrumbs">Transformador <span>/</span> Pruebas eléctricas</div><h2>Pruebas eléctricas</h2><p>Registra los ensayos de este transformador y consulta sus resultados históricos.</p></div>
-      <div class="toolbar-actions"><button class="btn" id="backFromTests">Volver a detalles</button><button class="btn primary" id="newTestExecution"><svg><use href="#i-plus"/></svg>Registrar pruebas</button></div>
+      <div class="toolbar-actions"><button class="btn" id="backFromTests">Volver al transformador</button><button class="btn primary" id="newTestExecution"><svg><use href="#i-plus"/></svg>Registrar pruebas</button></div>
     </div>
     <div class="test-view-switcher" role="tablist" aria-label="Secciones de pruebas eléctricas">
       <button class="test-view-tab active" type="button" id="showTestSummary" data-test-view="summary" role="tab" aria-selected="true" aria-controls="testSummaryPanel"><svg><use href="#i-grid"/></svg>Resumen</button>
@@ -208,8 +208,11 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       <button class="test-view-tab" type="button" id="showTestGraph" data-test-view="graph" role="tab" aria-selected="false" aria-controls="testAnalyticsPanel"><svg><use href="#i-activity"/></svg>Gráfico</button>
     </div>
     <section id="testSummaryPanel" class="test-view-panel" role="tabpanel" aria-labelledby="showTestSummary">
-      <div class="test-info-banner"><svg><use href="#i-info"/></svg><div><b>Un registro por jornada.</b><span>Agrupa las pruebas eléctricas realizadas en una misma jornada, con sus mediciones, resultados y observaciones.</span></div></div>
       <div class="test-stats" id="testStats"></div>
+      <section class="test-attention-card" aria-label="Registros que requieren atención">
+        <div class="test-attention-head"><div><span class="eyebrow">SEGUIMIENTO</span><h3>Registros que requieren atención</h3><p>Revisa los registros pendientes o continúa los borradores.</p></div></div>
+        <div id="testAttentionList" class="test-attention-list"><div class="test-attention-empty">Cargando registros...</div></div>
+      </section>
       <div class="test-summary-intro">
         <div><span class="eyebrow">SEGUIMIENTO DEL TRANSFORMADOR</span><h3>Actividad de ensayos</h3><p>Consulta el historial o revisa la evolución sin mezclar magnitudes eléctricas distintas.</p></div>
         <div class="test-summary-latest" id="testSummaryLatest"><span>Último registro</span><strong>Sin registros</strong></div>
@@ -466,6 +469,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.45"></script>
-<script src="./assets/plan.js?v=1.5.45"></script>
+<script src="./assets/app.js?v=1.5.46"></script>
+<script src="./assets/plan.js?v=1.5.46"></script>
 </body></html>
