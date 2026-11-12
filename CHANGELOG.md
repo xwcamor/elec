@@ -1,3 +1,7 @@
+## v1.5.90
+- Simplifica la grilla de bornes/bushings: elimina de la captura visible fabricante, modelo, tensión de placa, capacitancia de placa y FP de placa.
+- Ajusta «Copiar bornes» para exportar únicamente las columnas que permanecen visibles.
+
 ## v1.5.89
 - La configuración eléctrica exige una cantidad de TAP mayor que cero en la ficha del transformador antes de entrar.
 - La etapa de conmutadores muestra el tipo detectado (DETC/OLTC) y la cantidad de posiciones como datos de solo lectura provenientes de la base de datos.
