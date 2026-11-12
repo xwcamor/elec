@@ -1,3 +1,7 @@
+## v1.5.118
+- Simplifica las etiquetas de bornes en el resumen de cada bobinado: muestra únicamente el código/nombre del borne y si es «Capacitivo» o «No capacitivo».
+- Elimina de ese resumen la fase y el indicador abreviado «C1».
+
 ## v1.5.117
 - Simplifica la tabla de bornes: elimina la columna de notas y conserva los datos de los elementos capacitivos existentes.
 - Renombra el indicador a «¿Capacitivo?» y la columna «Tipo» a «Función» con opciones Fase, Neutro, Tierra, Auxiliar y Otro.
