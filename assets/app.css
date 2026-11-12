@@ -1887,3 +1887,23 @@ body.config-focus .config-save-hint{display:none!important}
  .config-panel[data-panel="windings"] .config-section-title h3{font-size:20px!important}
  .config-panel[data-panel="windings"] .config-heading-actions{width:100%!important;justify-content:flex-end}
 }
+
+
+/* v1.5.136 · Ajustes finales de tarjeta de bobinado y encabezado. */
+.config-panel[data-panel="windings"] .config-section-title h3{
+ font-size:19px!important;line-height:1.25!important;font-weight:740!important;letter-spacing:-.025em!important;
+}
+.winding-data-section.plan-test-meta-card{margin:0 0 12px!important;border:1px solid #dfe7ed!important;border-radius:8px!important;background:#fbfcfd!important;overflow:hidden!important}
+.winding-data-section .plan-test-meta-card-head{display:flex!important;align-items:center!important;justify-content:flex-start!important;padding:10px 12px!important;border-bottom:1px solid #e8edf1!important;background:#fbfcfd!important}
+.winding-data-section .plan-test-meta-card-head b{font-size:12px!important;color:#40566b!important;font-weight:750!important}
+.winding-data-section .plan-test-meta-grid{display:grid!important;grid-template-columns:repeat(2,minmax(220px,1fr))!important;gap:12px!important;padding:12px!important}
+.winding-data-section .config-field{display:flex;flex-direction:column;gap:6px;color:#526579;font-size:11px;font-weight:650}
+.winding-data-section .config-field>span{font-size:11px;color:#526579}
+.winding-data-section .config-field input{width:100%;height:38px;border:1px solid #dbe2e9;border-radius:6px;background:#fff;padding:0 10px;color:#29435c;font:inherit;font-size:12px}
+.winding-card-actions{margin:14px 0 2px;padding:0 2px}
+.winding-card-actions hr{height:1px;border:0;background:#e8edf2;margin:0 0 10px}
+.winding-card-actions .text-remove{display:inline-flex;align-items:center;padding:4px 0;font-size:11px}
+@media(max-width:650px){
+ .winding-data-section .plan-test-meta-grid{grid-template-columns:1fr!important}
+ .config-panel[data-panel="windings"] .config-section-title h3{font-size:18px!important}
+}
