@@ -1363,3 +1363,5 @@ body.config-focus .config-save-hint{display:none!important}
 #transformerEditModal.tap-count-only .transformer-edit-grid>.edit-section-title{display:none}
 #transformerEditModal.tap-count-only .transformer-edit-grid{grid-template-columns:minmax(0,1fr);max-width:420px}
 #transformerEditModal.tap-count-only .modal-panel{max-width:520px}
+
+#syncTapPositions{margin-top:10px}
