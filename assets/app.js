@@ -11,14 +11,14 @@
   var activeExecutionMode = 'new';
   var activeSpecificCode = '';
   const specificTemplates={
-    WINDING_RESISTANCE:{title:'Resistencia de devanados',hint:'Campos LAP: secciones AT/BT, TAP, fase o par de bornes, corriente de prueba, temperatura medida y resistencias medida/referida a 75 °C.',prefix:'WR',cols:[['winding','Bobinado (AT/BT)'],['tap','TAP'],['phase','Fase / conexión'],['test_current_a','I de prueba (A)'],['temperature','Temperatura medida (°C)'],['resistance','Resistencia medida (Ω)'],['resistance_referred_75c','Resistencia referida 75 °C (Ω)'],['notes','Observación']]},
-    INSULATION_RESISTANCE:{title:'Resistencia de aislamiento',hint:'Tres puntos LAP: AT-BT, AT-Masa y BT-Masa. Registra voltaje aplicado, lecturas a 15 s, 30 s, 45 s y 1 min.',prefix:'IR',cols:[['point','Punto de aplicación'],['applied_voltage_kv','Voltaje aplicado (kV)'],['reading_15s','Resistencia a 15 s'],['reading_30s','Resistencia a 30 s'],['reading_45s','Resistencia a 45 s'],['reading_1min','Resistencia a 1 min'],['absorption_index','Índice de absorción'],['reading_unit','Unidad de lectura'],['notes','Observación']]},
+    WINDING_RESISTANCE:{title:'Resistencia de devanados',hint:'Campos LAP: sección AT/BT, TAP, fase o par de bornes, corriente de prueba, temperatura y resistencias medida/referida a 75 °C. La comparación entre fases ≤5% se documenta en observaciones.',prefix:'WR',cols:[['winding','Bobinado (AT/BT)'],['tap','TAP'],['phase','Fase / conexión'],['test_current_a','I de prueba (A)'],['temperature','Temperatura medida (°C)'],['resistance_measured','Resistencia medida'],['resistance_referred_75c','Resistencia referida 75 °C'],['notes','Observación']]},
+    INSULATION_RESISTANCE:{title:'Resistencia de aislamiento',hint:'Tres puntos LAP: AT-BT, AT-Masa y BT-Masa. Registra tensión aplicada, lecturas a 15 s, 30 s, 45 s y 1 min.',prefix:'IR',cols:[['point','Punto de aplicación'],['applied_voltage_kv','Voltaje aplicado (kV)'],['reading_15s','Resistencia a 15 s'],['reading_30s','Resistencia a 30 s'],['reading_45s','Resistencia a 45 s'],['reading_1min','Resistencia a 1 min'],['absorption_index','Índice de absorción (1 min / 30 s)'],['reading_unit','Unidad de lectura'],['notes','Observación']]},
     CAPACITANCE:{title:'Capacitancia complementaria',hint:'Ensayo adicional; no aparece como bloque independiente en el protocolo LAP.',prefix:'CAP',cols:[['point','Punto / borne'],['connection','Conexión de prueba'],['test_voltage','Tensión de prueba'],['capacitance','Capacitancia'],['unit','Unidad'],['frequency','Frecuencia'],['temperature','Temperatura °C'],['notes','Observación']]},
-    POWER_FACTOR:{title:'Factor de potencia del transformador',hint:'Campos LAP: modo, tensión de prueba, FP medido, FP corregido a 20 °C y capacitancia. La capacitancia no se exige en todos los modos.',prefix:'PF',cols:[['measurement','Modo de medición'],['test_voltage_v','Tensión de prueba'],['power_factor_measured','FP medido'],['power_factor_corrected_20c','FP corregido a 20 °C'],['capacitance_nf','Capacitancia (nF)'],['notes','Observación']]},
-    EXCITATION:{title:'Corriente de excitación',hint:'Campos LAP por TAP y fase: tensión de prueba, frecuencia, corriente de excitación y pérdidas; no se fuerzan ángulo ni reactancia.',prefix:'EXC',cols:[['tap','TAP'],['phase','Fase (U-0 / V-0 / W-0)'],['test_voltage_kv','Tensión de prueba (kV)'],['frequency_hz','Frecuencia (Hz)'],['current','Corriente de excitación'],['power','Pérdidas'],['notes','Observación']]},
-    BUSHING:{title:'Factor de potencia y capacitancia de bushings',hint:'Campos LAP por borne: serie, tensión de prueba, FP de placa/medido, capacitancia de placa/medida y variación.',prefix:'BUSH',cols:[['terminal','Borne'],['serial','Serie'],['test_voltage','Tensión de prueba'],['power_factor_plate','FP de placa'],['power_factor','FP medido'],['capacitance_plate','Capacitancia de placa (pF)'],['capacitance','Capacitancia medida (pF)'],['variation_percent','Variación (%)'],['notes','Observación']]},
+    POWER_FACTOR:{title:'Factor de potencia del transformador',hint:'Campos LAP: modo, tensión de prueba, FP medido, FP corregido a 20 °C y capacitancia medida. La hoja no fija unidad en el encabezado de capacitancia ni exige ese dato en todos los modos.',prefix:'PF',cols:[['measurement','Modo de medición'],['test_voltage','Tensión de prueba'],['power_factor_measured','FP medido'],['power_factor_corrected_20c','FP corregido a 20 °C'],['capacitance_measured','Capacitancia medida'],['notes','Observación']]},
+    EXCITATION:{title:'Corriente de excitación',hint:'Campos LAP por TAP y fase: frecuencia, corriente de excitación y pérdidas. No se fuerza tensión de prueba ni unidades ausentes en los encabezados.',prefix:'EXC',cols:[['tap','TAP'],['phase','Fase (U-0 / V-0 / W-0)'],['frequency_hz','Frecuencia (Hz)'],['excitation_current','Corriente de excitación'],['losses','Pérdidas'],['notes','Observación']]},
+    BUSHING:{title:'Factor de potencia y capacitancia de bushings',hint:'Campos LAP por borne: serie, tensión de prueba, FP de placa/medido, capacitancia de placa/medida y variación. La unidad se registra según protocolo/equipo.',prefix:'BUSH',cols:[['terminal','Borne'],['serial','Serie'],['test_voltage','Tensión de prueba'],['power_factor_plate','FP de placa'],['power_factor_measured','FP medido'],['capacitance_plate','Capacitancia de placa'],['capacitance_measured','Capacitancia medida'],['variation_percent','Variación (%)'],['notes','Observación']]},
     SFRA:{title:'Análisis de respuesta al barrido de frecuencia (SFRA)',hint:'Tres configuraciones LAP: AT–BT abierto, BT–AT abierto y AT–BT en cortocircuito. Documenta curva de campo y comparación con fábrica.',prefix:'SFRA',cols:[['connection','Configuración'],['tap','TAP'],['file_reference','Archivo / curva de campo'],['comparison_reference','Curva de referencia (fábrica)'],['comparison_result','Resultado de comparación'],['evaluation','Evaluación manual'],['notes','Observación']]},
-    ARRESTER:{title:'Prueba de pararrayos (AT / MT)',hint:'Campos LAP: fase, V. salida, I. salida, modo GST, pérdidas y capacitancia. La unidad de salida debe registrarse según el equipo.',prefix:'ARR',cols:[['section','Sección (AT/MT)'],['phase','Fase / borne'],['output_voltage_v','V. salida (unidad del equipo)'],['output_current_a','I. salida (unidad del equipo)'],['test_mode','Modo de prueba (GST)'],['losses_measured_w','Pérdidas medidas'],['capacitance_measured_pf','Capacitancia medida'],['evaluation','Evaluación manual'],['notes','Observación']]},
+    ARRESTER:{title:'Prueba de pararrayos (AT / MT)',hint:'Campos LAP: fase, V. salida, I. salida, modo GST, pérdidas y capacitancia. Los encabezados no fijan unidades; registra las unidades del equipo.',prefix:'ARR',cols:[['section','Sección (AT/MT)'],['phase','Fase / borne'],['output_voltage','V. salida'],['output_current','I. salida'],['test_mode','Modo de prueba (GST)'],['losses_measured','Pérdidas medidas'],['capacitance_measured','Capacitancia medida'],['notes','Observación']]},
     PROTECTIONS:{title:'Verificación de protecciones propias',hint:'Campos LAP: ítem, accesorio, bornes, contacto, condición, ajuste, resultado y observación. No se precargan contactos de otro transformador.',prefix:'PROT',cols:[['item','Ítem'],['accessory','Accesorio'],['terminals','Bornes'],['contact','Contacto'],['condition','Condición'],['setpoint','Ajuste'],['result','Resultado'],['notes','Observación']]}
   };
 
@@ -666,10 +666,10 @@
     const types=new Set(testExecutions.flatMap(x=>(x.plan_tests||[]).map(t=>t.code).concat(x.test_code==='PLAN'?[]:[x.test_code])));
     const last=testExecutions[0]?.executed_at;
     $('#testStats').innerHTML=
-      '<div class="test-stat"><small>Visitas registradas</small><strong>'+visits+'</strong><span>Planes de ensayos guardados</span></div>'+
+      '<div class="test-stat"><small>Ejecuciones registradas</small><strong>'+visits+'</strong><span>Planes de ensayos guardados</span></div>'+
       '<div class="test-stat"><small>Ensayos incluidos</small><strong>'+included+'</strong><span>Pruebas en todas las visitas</span></div>'+
       '<div class="test-stat"><small>Tipos utilizados</small><strong>'+types.size+'</strong><span>De '+testCatalog.length+' disponibles</span></div>'+
-      '<div class="test-stat"><small>Última visita</small><strong class="test-stat-date">'+(last?esc(formatExecutionDate(last)):'Sin registros')+'</strong><span>Fecha de realización</span></div>';
+      '<div class="test-stat"><small>Última ejecución</small><strong class="test-stat-date">'+(last?esc(formatExecutionDate(last)):'Sin registros')+'</strong><span>Fecha de realización</span></div>';
   }
   function renderTestTypes(){
     const host=$('#testTypeGrid');
@@ -680,7 +680,7 @@
     testStats();
     const latest=testExecutions[0]?.executed_at;
     const host=$('#testSummaryLatest');
-    if(host)host.innerHTML='<span>Última visita</span><strong>'+(latest?esc(formatExecutionDate(latest)):'Sin registros')+'</strong>';
+    if(host)host.innerHTML='<span>Última ejecución</span><strong>'+(latest?esc(formatExecutionDate(latest)):'Sin registros')+'</strong>';
   }
 
   function renderHistoricalAnalytics(){
@@ -732,8 +732,8 @@
       const names=x.plan_tests?.length?x.plan_tests.map(t=>t.name||typeName(t.code)):[x.test_name||typeName(x.test_code)];
       const measurementCount=Number(x.measurement_count||0);
       const detail=x.plan_tests?.length?names.length+' ensayos · '+measurementCount+' valores':measurementCount+' valores';
-      return '<tr><td><b>'+esc(formatExecutionDate(x.executed_at))+'</b><small>Visita #'+esc(x.id)+'</small></td><td><b>'+esc(names.join(' · '))+'</b></td><td>'+esc(x.operator_name||'—')+'</td><td>'+esc(detail)+'</td><td><div class="test-row-actions"><button class="btn small" data-open-execution="'+x.id+'" title="Continuar completando esta visita">Abrir plan</button><button class="btn small danger test-delete-button" data-delete-execution="'+x.id+'" title="Eliminar visita" aria-label="Eliminar visita #'+x.id+'"><svg><use href="#i-trash"/></svg>Eliminar</button></div></td></tr>';
-    }).join(''):'<tr><td colspan="5" class="test-empty">'+(testExecutions.length?'No hay registros que coincidan con el filtro.':'Aún no hay visitas registradas. Selecciona un tipo de prueba para comenzar.')+'</td></tr>';
+      return '<tr><td><b>'+esc(formatExecutionDate(x.executed_at))+'</b><small>Ejecución #'+esc(x.id)+'</small></td><td><b>'+esc(names.join(' · '))+'</b></td><td>'+esc(x.operator_name||'—')+'</td><td>'+esc(detail)+'</td><td><div class="test-row-actions"><button class="btn small" data-open-execution="'+x.id+'" title="Continuar completando esta ejecución">Abrir plan</button><button class="btn small danger test-delete-button" data-delete-execution="'+x.id+'" title="Eliminar ejecución" aria-label="Eliminar ejecución #'+x.id+'"><svg><use href="#i-trash"/></svg>Eliminar</button></div></td></tr>';
+    }).join(''):'<tr><td colspan="5" class="test-empty">'+(testExecutions.length?'No hay registros que coincidan con el filtro.':'Aún no hay ejecuciones registradas. Selecciona un tipo de prueba para comenzar.')+'</td></tr>';
     $('[data-open-execution]').forEach(b=>b.addEventListener('click',()=>openExistingExecution(Number(b.dataset.openExecution))));
     $('[data-delete-execution]').forEach(button=>button.addEventListener('click',async()=>{
       const id=Number(button.dataset.deleteExecution);
@@ -754,10 +754,10 @@
         if(!result.ok)throw new Error(result.message||'No se pudo eliminar la visita.');
         testExecutions=testExecutions.filter(item=>Number(item.id)!==id);
         renderTestHistory();
-        toast('Visita #'+id+' eliminada correctamente.');
+        toast('Ejecución #'+id+' eliminada correctamente.');
       }catch(error){
         button.disabled=false;
-        button.title='Eliminar visita';
+        button.title='Eliminar ejecución';
         toast(error.message,true);
       }
     }));
@@ -884,7 +884,7 @@
     if(code==='WINDING_RESISTANCE'){
       out.phase=out.phase||out.terminal_pair||'';
       out.winding=out.winding||out.section||'';
-      out.resistance=out.resistance||out.resistance_measured_ohm||'';
+      out.resistance=out.resistance||out.resistance_measured||out.resistance_measured_ohm||'';
       out.resistance_referred_75c=out.resistance_referred_75c||out.resistance_referred_75c_ohm||'';
     }
     if(code==='POWER_FACTOR'){
@@ -892,9 +892,9 @@
       out.power_factor_corrected_20c=out.power_factor_corrected_20c||out.power_factor_corrected||'';
     }
     if(code==='BUSHING'){
-      const plate=Number(String(out.capacitance_plate??'').replace(',','.'));
-      const measured=Number(String(out.capacitance??'').replace(',','.'));
-      out.variation_percent=Number.isFinite(plate)&&plate>0&&String(out.capacitance??'').trim()!==''?String(Math.abs(measured-plate)*100/plate):(out.variation_percent||'');
+      const plate=Number(String(out.capacitance_plate??out.capacitance_plate_pf??'').replace(',','.'));
+      const measured=Number(String(out.capacitance??out.capacitance_measured??out.capacitance_measured_pf??'').replace(',','.'));
+      out.variation_percent=Number.isFinite(plate)&&plate>0&&Number.isFinite(measured)&&String(out.capacitance??out.capacitance_measured??'').trim()!==''?String(Math.abs(measured-plate)*100/plate):(out.variation_percent||'');
     }
     return out;
   }
@@ -932,7 +932,7 @@
       const row=normalizeSpecificRow(code,raw),visible=new Set(cfg.cols.map(c=>c[0]));
       const legacy=Object.entries(row).filter(([key])=>!visible.has(key)).map(([key,value])=>'<input type="hidden" class="specific-legacy-cell" data-key="'+esc(key)+'" value="'+esc(value??'')+'">').join('');
       return '<tr>'+cfg.cols.map(([key],c)=>{
-        const readonly=key==='absorption_index'?' readonly title="R a 1 min / R a 30 s"':'';
+        const readonly=key==='absorption_index'?' readonly title="R a 1 min / R a 30 s"':(code==='BUSHING'&&['variation_percent','result'].includes(key)?' readonly title="Calculado a partir de capacitancia de placa y medida"':'');
         return '<td><input class="specific-cell" data-r="'+i+'" data-c="'+c+'" value="'+esc(row[key]??'')+'"'+readonly+'></td>';
       }).join('')+legacy+'</tr>';
     }).join('');
@@ -953,7 +953,7 @@
     $('#measurementGenericCard')?.classList.toggle('hidden',isTtr||isSpecific);
     if(activeSpecificCode!==code && $('#specificTestRows'))$('#specificTestRows').innerHTML='';
     activeSpecificCode=isSpecific?code:'';
-    if(isSpecific){const cfg=specificTemplates[code];$('#specificTestTitle').textContent=cfg.title;$('#specificTestHint').textContent=cfg.hint;if(!$('#specificTestRows').children.length)renderSpecificRows(Array.from({length:Math.max(3,(state.windings||[]).length)},()=>({})),code);}
+    if(isSpecific){const cfg=specificTemplates[code];$('#specificTestTitle').textContent=cfg.title;$('#specificTestHint').textContent=cfg.hint;if(!$('#specificTestRows').children.length){let initial=Array.from({length:Math.max(3,(state.windings||[]).length)},()=>({}));if(code==='BUSHING'){const configured=(state.windings||[]).flatMap(w=>w.terminals||[]).filter(t=>t.has_capacitive_bushing).map(t=>({terminal:t.code||'',serial:t.bushing?.serial_number||''}));if(configured.length)initial=configured;}renderSpecificRows(initial,code);}}
 
     if(isTtr && !$('#ttrRows').children.length){
       const configured=(state.tap_changers||[]).reduce((n,c)=>Math.max(n,(c.positions||[]).length),0);const count=Math.max(5,configured,Number(transformer.num_taps||0));
