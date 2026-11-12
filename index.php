@@ -76,7 +76,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.139">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.141">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body>
@@ -357,15 +357,15 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
     <div class="config-layout">
       <nav class="plan-stepper config-stepper" id="configStepper" aria-label="Etapas de configuración eléctrica">
         <button type="button" class="plan-step config-view-tab" data-tab="windings" data-state="missing" aria-current="step">
-          <span class="plan-step-number">1</span><span class="plan-step-copy"><b>Bobinados y bornes</b><small id="windingCount">0 bobinados</small><small class="config-step-status">Agregar bobinados</small></span>
+          <span class="plan-step-number">1</span><span class="plan-step-copy"><b>Bobinados y bornes</b><small id="windingCount">0 bobinados</small><strong class="config-step-status">Agregar bobinados</small></span>
         </button>
         <span class="plan-step-connector" aria-hidden="true"></span>
         <button type="button" class="plan-step config-view-tab" data-tab="taps" data-state="missing">
-          <span class="plan-step-number">2</span><span class="plan-step-copy"><b>Conmutadores y TAP</b><small id="tapCount">0 posiciones</small><small class="config-step-status">Agregar conmutador</small></span>
+          <span class="plan-step-number">2</span><span class="plan-step-copy"><b>Conmutadores y TAP</b><small id="tapCount">0 posiciones</small><strong class="config-step-status">Agregar conmutador</small></span>
         </button>
         <span class="plan-step-connector" aria-hidden="true"></span>
         <button type="button" class="plan-step config-view-tab" data-tab="review" data-state="missing">
-          <span class="plan-step-number">3</span><span class="plan-step-copy"><b>Revisión y versiones</b><small>Validar y guardar</small><small class="config-step-status">Pendiente</small></span>
+          <span class="plan-step-number">3</span><span class="plan-step-copy"><b>Revisión y versiones</b><small>Validar y guardar</small><strong class="config-step-status">Pendiente</small></span>
         </button>
       </nav>
       <div class="config-main">
@@ -464,7 +464,7 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.140"></script>
+<script src="./assets/app.js?v=1.5.141"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="./assets/plan.js?v=1.5.127"></script>
 </body></html>
