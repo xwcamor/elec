@@ -1,3 +1,9 @@
+## v1.5.141
+- Elimina la acción «Copiar tabla» de las posiciones TAP y su manejador asociado.
+- Unifica en Configuración eléctrica la escala de tipografía, espaciado, radios, controles, tablas y mensajes.
+- Presenta «Completo», «Faltan datos» y los estados del stepper como texto directo, sin badges ni etiquetas tipo píldora.
+- Homologa foco visible, estados hover/active y movimiento reducido sin añadir dependencias ni alterar reglas eléctricas.
+
 ## v1.5.139
 - Corrige la numeración del stepper: cada etapa conserva su número ordinal y solo muestra el check cuando está validada; evita reutilizar un número ya sustituido por el check.
 - Resalta en ámbar los campos obligatorios vacíos de nombre y tensión del bobinado.
