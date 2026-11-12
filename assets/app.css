@@ -1125,3 +1125,103 @@ body.config-focus .config-panel .form-grid input[readonly]:focus{border-color:#e
     grid-row:auto;
   }
 }
+
+
+/* v1.5.72 · Jerarquía tipográfica y medidas uniformes del asistente */
+.plan-wizard-shell>.plan-stepper .plan-step{
+  width:44px;
+  min-width:44px;
+  height:44px;
+  min-height:44px;
+  padding:0;
+  outline:none;
+  box-shadow:none;
+}
+.plan-wizard-shell>.plan-stepper .plan-step-number{
+  display:grid;
+  place-items:center;
+  box-sizing:border-box;
+  width:44px;
+  min-width:44px;
+  height:44px;
+  min-height:44px;
+  flex:0 0 44px;
+  margin:0;
+  border-radius:50%;
+  font-size:13px;
+  line-height:1;
+}
+.plan-wizard-shell>.plan-stepper .plan-step:focus-visible .plan-step-number{
+  outline:0;
+  box-shadow:0 0 0 4px rgba(36,117,178,.14);
+}
+.plan-wizard-shell>.plan-step-panel .execution-card-title{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:flex-start;
+  gap:7px;
+  margin:0 0 24px;
+  text-align:left;
+}
+.plan-wizard-shell>.plan-step-panel .execution-card-title>.eyebrow{
+  display:none;
+}
+.plan-wizard-shell>.plan-step-panel .execution-card-title h3{
+  display:block;
+  width:100%;
+  margin:0;
+  color:#263f56;
+  font-size:20px;
+  font-weight:750;
+  line-height:1.3;
+  letter-spacing:-.025em;
+  text-align:left;
+}
+.plan-wizard-shell>.plan-step-panel .execution-card-title p{
+  display:block;
+  width:100%;
+  max-width:760px;
+  margin:0;
+  color:#78899a;
+  font-size:13px;
+  line-height:1.5;
+  text-align:left;
+}
+.plan-wizard-shell>.plan-step-panel .plan-results-title{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  grid-template-rows:auto auto;
+  align-items:center;
+  gap:5px 16px;
+}
+.plan-wizard-shell>.plan-step-panel .plan-results-title h3{
+  grid-column:1;
+  grid-row:1;
+}
+.plan-wizard-shell>.plan-step-panel .plan-results-title p{
+  grid-column:1;
+  grid-row:2;
+}
+.plan-wizard-shell>.plan-step-panel .plan-results-title .plan-results-accordion-status{
+  grid-column:2;
+  grid-row:1/3;
+  justify-self:end;
+}
+@media(max-width:760px){
+  .plan-wizard-shell>.plan-stepper .plan-step,
+  .plan-wizard-shell>.plan-stepper .plan-step-number{
+    width:36px;
+    min-width:36px;
+    height:36px;
+    min-height:36px;
+    flex-basis:36px;
+  }
+  .plan-wizard-shell>.plan-step-panel .execution-card-title{gap:6px;margin-bottom:18px}
+  .plan-wizard-shell>.plan-step-panel .execution-card-title h3{font-size:17px}
+  .plan-wizard-shell>.plan-step-panel .execution-card-title p{font-size:12px}
+  .plan-wizard-shell>.plan-step-panel .plan-results-title{grid-template-columns:1fr}
+  .plan-wizard-shell>.plan-step-panel .plan-results-title .plan-results-accordion-status{
+    grid-column:1;grid-row:auto;justify-self:start
+  }
+}
