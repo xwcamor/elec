@@ -1,3 +1,8 @@
+## 1.5.73
+- Cambia el título del paso 2 a «Ensayos a realizar».
+- Fuerza una alineación consistente a la izquierda para títulos y subtítulos de todas las etapas, incluida la descripción de datos compartidos y el encabezado del selector de ensayos.
+- Evita que estilos heredados de tarjetas o grids desplacen los subtítulos hacia el centro o la derecha.
+
 ## 1.5.72
 - Elimina los identificadores de etapa en azul dentro de los encabezados; deja título y subtítulo alineados a la izquierda.
 - Homologa el tamaño de los cuatro indicadores numéricos y reemplaza el contorno rectangular de foco por un halo circular.
