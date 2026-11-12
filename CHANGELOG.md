@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 1.5.37
+- El historial consulta primero los registros guardados y ya no depende de que el catálogo de ensayos responda.
+- Al abrir la pestaña Historial se vuelve a consultar MySQL, evitando mostrar una lista local desactualizada.
+- Se conserva el último resultado visible si falla una consulta y se muestra el error real en vez de indicar falsamente que no existen registros.
+- La API devuelve el transformador consultado y el total de filas para facilitar el diagnóstico.
+- El listado mantiene el orden por fecha de visita descendente y desempata por ID.
+
+# CHANGELOG
+
 ## 1.5.36
 - Reemplaza el selector desplegable de ensayos por un catálogo visible de casillas de verificación.
 - Permite agregar y quitar varios ensayos directamente desde la selección, con actualización automática del plan.
