@@ -1,3 +1,7 @@
+## v1.5.149
+- Aplica el separador horizontal inferior al encabezado del formulario de Registro de pruebas.
+- Homologa borde, ancho y separación con el encabezado de Configuración eléctrica.
+
 ## v1.5.148
 - Homologa el padding y los márgenes interiores de los paneles de cada step en Configuración eléctrica y Registro de pruebas.
 - Unifica el espacio entre encabezado y campos, separación entre campos y gutter de acciones.
