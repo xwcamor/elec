@@ -367,7 +367,7 @@
       const body = rows.map((row,ri)=>`<tr data-grid-row="${ri}"><td>${ri+1}</td>${columns.map((col,ci)=>`<td>${renderCell(row,col,ri,ci)}</td>`).join('')}</tr>`).join('');
       container.innerHTML = `<table class="sheet-table"><thead><tr><th>#</th>${head}</tr></thead><tbody>${body}</tbody></table>`;
       container.querySelectorAll('.sheet-cell').forEach(cell=>{
-        cell.addEventListener('change',()=>{const r=Number(cell.dataset.row),c=Number(cell.dataset.col),key=columns[c].key,col=columns[c],raw=cell.type==='checkbox'?cell.checked:cell.value,val=['number','bushing-number'].includes(col.type)?normalizeNumeric(raw):(col.uppercase?String(raw).trim().toUpperCase():raw);if(['number','bushing-number'].includes(col.type)||col.uppercase)cell.value=val;onChange(rows[r],key,val);});
+        cell.addEventListener('change',()=>{const r=Number(cell.dataset.row),c=Number(cell.dataset.col),key=columns[c].key,col=columns[c],raw=cell.type==='checkbox'?cell.checked:cell.value,val=['number','bushing-number'].includes(col.type)?normalizeNumeric(raw):(col.uppercase?String(raw).trim().toUpperCase():raw);if(['number','bushing-number'].includes(col.type)||col.uppercase)cell.value=val;onChange(rows[r],key,val);if(key==='code')render();});
       });
       container.querySelectorAll('.sheet-cell').forEach(cell=>cell.addEventListener('keydown',e=>navigateGrid(e,container,rows,columns,render)));
       const table=container.querySelector('table');
