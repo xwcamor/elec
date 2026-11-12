@@ -1384,3 +1384,10 @@ body.config-focus .config-save-hint{display:none!important}
 .terminal-accordion>summary small{font-size:9px;color:#8594a3;flex:1}
 .terminal-accordion-body{padding:12px}
 @media(max-width:600px){.winding-accordion>.winding-accordion-summary{gap:7px;padding:10px}.winding-summary-count{font-size:9px;padding:4px 6px}.winding-accordion-body{padding:0 9px 9px}.terminal-accordion>summary{flex-wrap:wrap}}
+
+/* Fix: acción eliminar alineada en cabecera del acordeón de bobinado */
+.winding-accordion-body>.winding-card-head{display:flex;align-items:flex-start;gap:12px}
+.winding-accordion-body>.winding-card-head>.winding-head-fields{flex:1 1 auto;min-width:0}
+.winding-accordion-body>.winding-card-head>.delete-btn{flex:0 0 34px;width:34px;height:34px;display:grid;place-items:center;align-self:flex-start;margin:0;padding:0;border:1px solid #f0dada;border-radius:6px;background:#fff7f7;color:#bd4c4c}
+.winding-accordion-body>.winding-card-head>.delete-btn:hover{background:#ffeded;border-color:#e7baba;color:#a72e2e}
+@media(max-width:600px){.winding-accordion-body>.winding-card-head{gap:7px}.winding-accordion-body>.winding-card-head>.delete-btn{flex-basis:32px;width:32px;height:32px}}
