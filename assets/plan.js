@@ -683,6 +683,12 @@
     const targetIndex=planStepKeys.indexOf(target);
     const currentIndex=planStepKeys.indexOf(currentPlanStep);
     if(targetIndex>currentIndex&&targetIndex>=2&&editingId===null){
+      // Valida todas las etapas anteriores antes de crear el registro.
+      // Así no se genera un registro si se intenta saltar directamente a Revisión
+      // con resultados todavía incompletos.
+      for(let index=0;index<targetIndex;index++){
+        if(!validatePlanStep(planStepKeys[index]))return;
+      }
       if(!await ensureExecutionStarted())return;
     }
     setPlanStep(target);
