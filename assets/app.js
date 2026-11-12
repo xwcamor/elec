@@ -250,7 +250,7 @@
       tab='taps';
     }
     selectedTab = tab;
-    $$('.config-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    $('.config-view-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
     $$('.config-panel').forEach(p => p.classList.toggle('hidden', p.dataset.panel !== tab));
     if (tab === 'review') renderReview();
   }
@@ -279,7 +279,7 @@
 
   $('#openConfig').addEventListener('click', e => {e.preventDefault();openConfig();});
   $('#backOverview').addEventListener('click', backOverview);
-  $$('.config-tab').forEach(b => b.addEventListener('click', () => showPanel(b.dataset.tab)));
+  $('.config-view-tab').forEach(b => b.addEventListener('click', () => showPanel(b.dataset.tab)));
   $$('[data-prev]').forEach(b => b.addEventListener('click', () => showPanel(b.dataset.prev)));
   syncTransformerNominals();
 
@@ -290,7 +290,7 @@
     if (data.has_neutral) phases.push(['N'+suffix,'N','Neutro']);
     state.windings.push({name:data.name || ('Bobinado '+suffix),code:prefix,voltage_kv:data.voltage_kv || '',connection_type:data.connection_type || '',has_neutral:!!data.has_neutral,conductor_material:data.conductor_material || '',notes:data.notes || '',terminals:data.terminals || phases.map(p=>blankTerminal(...p))});
     const newIndex=state.windings.length-1;
-    markDirty(); renderWindings(); updateCounts();
+    markDirty(); renderWindings({openIndex:newIndex}); updateCounts();
     requestAnimationFrame(()=>{
       const card=$('#windingsContainer [data-winding="'+newIndex+'"]');
       if(!card)return;
@@ -303,14 +303,16 @@
     ['Bobinado','Tensión kV'],
     ...state.windings.map(w=>[w.name,w.voltage_kv])
   ].map(r=>r.join('\t')).join('\n')));
-  function renderWindings() {
+  function renderWindings(options = {}) {
     const host = $('#windingsContainer');
+    const previouslyOpen = new Set([...host.querySelectorAll('[data-winding]')].filter(card=>card.open).map(card=>Number(card.dataset.winding)));
+    if (Number.isInteger(options.openIndex)) previouslyOpen.add(options.openIndex);
     if (!state.windings.length) {
       host.innerHTML = `<div class="empty-state"><div style="font-size:22px;margin-bottom:6px">＋</div><b>No hay bobinados configurados</b><p>Agrega un bobinado o carga un ejemplo basado en tu Excel.</p><button class="btn primary" id="loadExample">Cargar estructura de ejemplo</button></div>`;
       $('#loadExample').addEventListener('click', loadExample); return;
     }
     host.innerHTML = state.windings.map((w,wi)=>`
-      <details class="winding-card winding-accordion" data-winding="${wi}" ${wi===0?'open':''}>
+      <details class="winding-card winding-accordion" data-winding="${wi}" ${(previouslyOpen.size?previouslyOpen.has(wi):wi===0)?'open':''}>
         <summary class="winding-accordion-summary">
           <span class="winding-index">${String(wi+1).padStart(2,'0')}</span>
           <span class="winding-summary-main"><strong>${esc(w.name||'Bobinado sin nombre')}</strong><small>${esc(w.voltage_kv||'—')} kV</small></span>
@@ -336,7 +338,7 @@
       </details>`).join('');
     host.querySelectorAll('[data-wfield]').forEach(el=>el.addEventListener('change', e=>{const card=e.target.closest('[data-winding]');const i=Number(card.dataset.winding);const key=e.target.dataset.wfield;state.windings[i][key]=key==='has_neutral'?e.target.value==='1':(key==='voltage_kv'?normalizeNumeric(e.target.value):e.target.value);if(key==='voltage_kv')e.target.value=state.windings[i][key];const summary=e.target.closest('.winding-card').querySelector('.winding-summary-main');if(summary)summary.innerHTML='<strong>'+esc(state.windings[i].name||'Bobinado sin nombre')+'</strong><small>'+esc(state.windings[i].voltage_kv||'—')+' kV</small>';markDirty();}));
     host.querySelectorAll('[data-remove-winding]').forEach(b=>b.addEventListener('click',()=>{const i=Number(b.dataset.removeWinding);if(!confirm('¿Eliminar este bobinado y sus bornes de la configuración actual?'))return;state.windings.splice(i,1);state.tap_changers=state.tap_changers.filter(c=>c.winding_index!==i).map(c=>({...c,winding_index:c.winding_index>i?c.winding_index-1:c.winding_index}));renderWindings();renderTapChangers();updateCounts();markDirty();}));
-    host.querySelectorAll('[data-add-terminal]').forEach(b=>b.addEventListener('click',()=>{const i=Number(b.dataset.addTerminal),row=blankTerminal('');row._draft=true;state.windings[i].terminals.push(row);renderWindings();refreshWindingCounters();}));
+    host.querySelectorAll('[data-add-terminal]').forEach(b=>b.addEventListener('click',()=>{const i=Number(b.dataset.addTerminal),row=blankTerminal('');row._draft=true;state.windings[i].terminals.push(row);renderWindings({openIndex:i});refreshWindingCounters();}));
     host.querySelectorAll('[data-copy-terminals]').forEach(b=>b.addEventListener('click',()=>copyGrid([['Borne','¿Capacitivo?'],...state.windings[Number(b.dataset.copyTerminals)].terminals.map(t=>[t.code,t.has_capacitive_bushing?'Sí':'No'])].map(r=>r.join('\t')).join('\n'))));
     state.windings.forEach((w,i)=>buildGrid($('#terminal-grid-'+i),w.terminals,[
       {key:'code',label:'Borne',type:'text',maxLength:20,uppercase:true,required:true},{key:'has_capacitive_bushing',label:'¿Capacitivo?',type:'yesno'},{key:'_delete',label:'',type:'delete'}
