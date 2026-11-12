@@ -1,3 +1,9 @@
+## 1.5.45
+- El Resumen reemplaza «Ensayos incluidos» y «Tipos utilizados» por contadores de registros Completos, Pendientes y Borradores.
+- Conserva el total de registros y la fecha del último registro.
+- Sustituye las referencias a visitas por registros y jornadas en el mensaje informativo del Resumen.
+- Actualiza los identificadores de caché de CSS y JavaScript.
+
 ## 1.5.44
 - Renombra el historial como «Pruebas eléctricas registradas» y reemplaza las referencias a visitas por registros de pruebas.
 - Cambia «Datos registrados» por «N.º de pruebas», que muestra el número de ensayos incluidos en cada registro.
