@@ -316,7 +316,7 @@
         <summary class="winding-accordion-summary">
           <span class="winding-index">${String(wi+1).padStart(2,'0')}</span>
           <span class="winding-summary-main"><strong>${esc(w.name||'Bobinado sin nombre')}</strong><small>${esc(w.voltage_kv||'—')} kV</small></span>
-          <small class="winding-summary-status" data-winding-status="${wi}" data-state="${isWindingComplete(w)?'complete':'incomplete'}">${isWindingComplete(w)?'Completo':'Faltan datos'}</small><span class="accordion-chevron">⌄</span>
+          <strong class="winding-summary-status" data-winding-status="${wi}" data-state="${isWindingComplete(w)?'complete':'incomplete'}">${isWindingComplete(w)?'Completo':'Faltan datos'}</strong><span class="accordion-chevron">⌄</span>
         </summary>
         <div class="winding-accordion-body">
           <section class="winding-data-section plan-test-meta-card">
@@ -502,7 +502,7 @@
           </div><button type="button" class="text-remove" data-remove-changer="${ci}">Quitar conmutador</button></div>
           <details class="tap-positions-accordion" open>
             <summary><span>Posiciones de TAP</span><small>${c.positions.length} posiciones registradas</small><span class="accordion-chevron">⌄</span></summary>
-            <div class="tap-card-body"><div class="table-caption"><strong>Posiciones de tap / datos de placa</strong><div class="sheet-tools"><button data-generate-taps="${ci}">Generar filas</button><button data-add-tap-row="${ci}">+ Fila</button><button data-copy-taps="${ci}">Copiar tabla</button></div></div><div class="sheet-wrap" id="tap-grid-${ci}"></div><div class="sheet-hint">Puedes pegar una columna con las posiciones desde Excel.</div></div>
+            <div class="tap-card-body"><div class="table-caption"><strong>Posiciones de tap / datos de placa</strong><div class="sheet-tools"><button data-generate-taps="${ci}">Generar filas</button><button data-add-tap-row="${ci}">+ Fila</button></div></div><div class="sheet-wrap" id="tap-grid-${ci}"></div><div class="sheet-hint">Puedes pegar una columna con las posiciones desde Excel.</div></div>
           </details>
         </div>
       </details>`).join('');
@@ -510,7 +510,6 @@
     host.querySelectorAll('[data-remove-changer]').forEach(b=>b.addEventListener('click',()=>{if(!confirm('¿Eliminar este conmutador y todas sus posiciones?'))return;state.tap_changers.splice(Number(b.dataset.removeChanger),1);renderTapChangers();updateCounts();markDirty();}));
     host.querySelectorAll('[data-generate-taps]').forEach(b=>b.addEventListener('click',()=>openTapGenerator(Number(b.dataset.generateTaps))));
     host.querySelectorAll('[data-add-tap-row]').forEach(b=>b.addEventListener('click',()=>{const c=state.tap_changers[Number(b.dataset.addTapRow)];if(c.positions.length>=150){toast('Cada conmutador admite como máximo 150 posiciones TAP.',true);return;}c.positions.push({position_no:c.positions.length+1,label:'Tap '+(c.positions.length+1),voltage_kv:'',percent_change:'',is_neutral:false,notes:''});renderTapChangers();updateCounts();markDirty();}));
-    host.querySelectorAll('[data-copy-taps]').forEach(b=>b.addEventListener('click',()=>copyGrid(state.tap_changers[Number(b.dataset.copyTaps)].positions.map(p=>String(p.position_no??'')).join('\n'))));
     state.tap_changers.forEach((c,i)=>{if(!Array.isArray(c.positions)||!c.positions.length)c.positions=[{position_no:1,label:'Tap 1',is_neutral:false,notes:''}];buildGrid($('#tap-grid-'+i),c.positions,[{key:'position_no',label:'Posición',type:'number',required:true},{key:'_delete',label:'',type:'delete'}],(row,key,value)=>{row[key]=value;markDirty();updateCounts();},()=>{markDirty();updateCounts();});});
   }
 
