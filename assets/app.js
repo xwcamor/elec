@@ -316,7 +316,7 @@
         <summary class="winding-accordion-summary">
           <span class="winding-index">${String(wi+1).padStart(2,'0')}</span>
           <span class="winding-summary-main"><strong>${esc(w.name||'Bobinado sin nombre')}</strong><small>${esc(w.voltage_kv||'—')} kV</small></span>
-          <span class="winding-summary-status" data-winding-status="${wi}" data-state="${isWindingComplete(w)?'complete':'incomplete'}">${isWindingComplete(w)?'Completo':'Pendiente'}</span><span class="accordion-chevron">⌄</span>
+          <small class="winding-summary-status" data-winding-status="${wi}" data-state="${isWindingComplete(w)?'complete':'incomplete'}">${isWindingComplete(w)?'Completo':'Faltan datos'}</small><span class="accordion-chevron">⌄</span>
         </summary>
         <div class="winding-accordion-body">
           <section class="winding-data-section plan-test-meta-card">
@@ -339,7 +339,7 @@
           <div class="winding-card-actions"><hr><button type="button" class="text-remove" data-remove-winding="${wi}">Quitar bobinado</button></div>
         </div>
       </details>`).join('');
-    host.querySelectorAll('[data-wfield]').forEach(el=>el.addEventListener('change', e=>{const card=e.target.closest('[data-winding]');const i=Number(card.dataset.winding);const key=e.target.dataset.wfield;state.windings[i][key]=key==='has_neutral'?e.target.value==='1':(key==='voltage_kv'?normalizeNumeric(e.target.value):e.target.value);if(key==='voltage_kv')e.target.value=state.windings[i][key];const summary=e.target.closest('.winding-card').querySelector('.winding-summary-main');if(summary)summary.innerHTML='<strong>'+esc(state.windings[i].name||'Bobinado sin nombre')+'</strong><small>'+esc(state.windings[i].voltage_kv||'—')+' kV</small>';refreshWindingCounters();markDirty();}));
+    host.querySelectorAll('[data-wfield]').forEach(el=>{el.addEventListener('input',e=>{const card=e.target.closest('[data-winding]'),i=Number(card.dataset.winding),key=e.target.dataset.wfield;if(key==='name'||key==='voltage_kv'){state.windings[i][key]=e.target.value;const summary=card.querySelector('.winding-summary-main');if(summary)summary.innerHTML='<strong>'+esc(state.windings[i].name||'Bobinado sin nombre')+'</strong><small>'+esc(state.windings[i].voltage_kv||'—')+' kV</small>';refreshWindingCounters();markDirty();}});el.addEventListener('change',e=>{const card=e.target.closest('[data-winding]');const i=Number(card.dataset.winding);const key=e.target.dataset.wfield;state.windings[i][key]=key==='has_neutral'?e.target.value==='1':(key==='voltage_kv'?normalizeNumeric(e.target.value):e.target.value);if(key==='voltage_kv')e.target.value=state.windings[i][key];const summary=card.querySelector('.winding-summary-main');if(summary)summary.innerHTML='<strong>'+esc(state.windings[i].name||'Bobinado sin nombre')+'</strong><small>'+esc(state.windings[i].voltage_kv||'—')+' kV</small>';refreshWindingCounters();markDirty();});});
     host.querySelectorAll('[data-remove-winding]').forEach(b=>b.addEventListener('click',()=>{const i=Number(b.dataset.removeWinding);if(!confirm('¿Eliminar este bobinado y sus bornes de la configuración actual?'))return;state.windings.splice(i,1);state.tap_changers=state.tap_changers.filter(c=>c.winding_index!==i).map(c=>({...c,winding_index:c.winding_index>i?c.winding_index-1:c.winding_index}));renderWindings();renderTapChangers();updateCounts();markDirty();}));
     host.querySelectorAll('[data-add-terminal]').forEach(b=>b.addEventListener('click',()=>{const i=Number(b.dataset.addTerminal),row=blankTerminal('');row._draft=true;state.windings[i].terminals.push(row);renderWindings({openIndex:i});refreshWindingCounters();}));
     host.querySelectorAll('[data-copy-terminals]').forEach(b=>b.addEventListener('click',()=>copyGrid([['Borne','¿Capacitivo?'],...state.windings[Number(b.dataset.copyTerminals)].terminals.map(t=>[t.code,t.has_capacitive_bushing?'Sí':'No'])].map(r=>r.join('\t')).join('\n'))));
@@ -548,7 +548,7 @@
     const total=state.windings.length;
     const complete=state.windings.filter(isWindingComplete).length;
     const pending=total-complete;
-    el.textContent=`${total} ${total===1?'bobinado':'bobinados'} · ${complete} ${complete===1?'completo':'completos'} · ${pending} por completar`;
+    el.textContent=pending?`${total} ${total===1?'bobinado':'bobinados'} · ${complete} ${complete===1?'completo':'completos'} · faltan datos en ${pending}`:`${total} ${total===1?'bobinado':'bobinados'} · todos los datos completos`;
   }
   function refreshWindingCounters(){
     $$('[data-winding-stats]').forEach(el=>{
@@ -560,7 +560,7 @@
       if(!w)return;
       const complete=isWindingComplete(w);
       el.dataset.state=complete?'complete':'incomplete';
-      el.textContent=complete?'Completo':'Pendiente';
+      el.textContent=complete?'Completo':'Faltan datos';
       const card=el.closest('.winding-accordion');
       if(card)card.dataset.state=complete?'complete':'incomplete';
     });
@@ -597,6 +597,8 @@
       if(!button)return;
       button.dataset.state=status;
       button.setAttribute('aria-current',button.dataset.tab===selectedTab?'step':'false');
+      const number=button.querySelector('.plan-step-number');
+      if(number){if(!button.dataset.stepNumber)button.dataset.stepNumber=number.textContent.trim();number.textContent=status==='complete'?'✓':button.dataset.stepNumber;}
       const statusText=button.querySelector('.config-step-status');
       if(statusText)statusText.textContent=label;
       button.title=label;
