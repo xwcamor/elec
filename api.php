@@ -119,11 +119,11 @@ try {
         if ($html === '' || strlen($html) > 8 * 1024 * 1024) {
             json_response(['ok'=>false,'message'=>'El contenido del informe está vacío o supera el límite permitido.'], 422);
         }
-        $options = new \\Dompdf\\Options();
+        $options = new \Dompdf\Options();
         $options->set('isRemoteEnabled', false);
         $options->set('isHtml5ParserEnabled', true);
         $options->set('defaultFont', 'DejaVu Sans');
-        $pdf = new \\Dompdf\\Dompdf($options);
+        $pdf = new \Dompdf\Dompdf($options);
         $pdf->loadHtml($html, 'UTF-8');
         $pdf->setPaper('A4', 'portrait');
         $pdf->render();
