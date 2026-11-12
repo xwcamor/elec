@@ -1200,12 +1200,14 @@
     activeSpecificCode=isSpecific?code:'';
     if(isSpecific){const cfg=specificTemplates[code];const needs=testElementNeeds[code]||[];$('#specificTestTitle').textContent=cfg.title;$('#specificTestHint').textContent=cfg.hint+' Elementos de configuración utilizados: '+needs.join(' · ')+'.';if(!$('#specificTestRows').children.length){
         let initial=Array.from({length:Math.max(1,(state.windings||[]).length)},()=>({}));
+        if(code==='POWER_FACTOR')initial=['CH+CHL','CH','CHL','CL+CLH','CL','CLH'].map(measurement=>({measurement}));
         if(code==='WINDING_RESISTANCE')initial=(state.windings||[]).map(w=>({winding:w.name||'',tap:'',phase:''}));
         if(code==='INSULATION_RESISTANCE'){const points=contextOptionsForField(code,'point')||[];initial=points.map(([point])=>({point}));}
         if(code==='EXCITATION'){const terminals=configuredTerminalOptions(false);initial=terminals.map(([phase])=>({tap:'',phase,frequency_hz:String(transformer.frequency_hz||state.frequency_hz||'')}));}
         if(code==='BUSHING'){const configured=configuredTerminalOptions(true).map(([terminal])=>({terminal,serial:''}));if(configured.length)initial=configured;}
         if(code==='CAPACITANCE')initial=configuredTerminalOptions(false).map(([point])=>({point}));
         renderSpecificRows(initial,code);
+        if(code==='POWER_FACTOR')$('#executionObservations').value='Pendiente de completar las seis mediciones del ensayo.';
       }}
 
     if(isTtr && !$('#ttrRows').children.length){
