@@ -1,3 +1,11 @@
+## 1.5.55
+- Convierte «03 · Formularios de prueba / Resultados por ensayo» en un acordeón general que contiene las pestañas y los formularios individuales.
+- El acordeón se abre por defecto si existe algún ensayo pendiente y se cierra si todos están completos.
+- El usuario puede abrirlo o cerrarlo manualmente; esa preferencia se respeta mientras trabaja en el mismo plan y se reinicia al abrir otro plan.
+- Añade un resumen dinámico con cantidad de ensayos seleccionados, completos y pendientes.
+- Conserva los acordeones internos de cada formulario y la lógica de mediciones/guardado.
+- Actualiza la caché de recursos.
+
 ## 1.5.54
 - Pestañas de resultados por ensayo con estados visibles: verde para completo, ámbar para incompleto y gris para sin iniciar.
 - Selección activa con contorno azul independiente del color de estado.
