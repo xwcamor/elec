@@ -1,3 +1,10 @@
+## 1.5.49
+- Condiciones ambientales queda desplegada por defecto al abrir el plan.
+- Fecha de realización, responsable/técnico y supervisor pasan a ser obligatorios para completar el registro.
+- Los tres campos muestran asterisco de obligatorio y estado visual ámbar cuando faltan datos y verde cuando están registrados.
+- El avance y la validación del paso Datos generales incluyen ahora el supervisor.
+- Actualiza recursos de caché.
+
 ## 1.5.48
 - En Configuración eléctrica, tipo de transformador (fases), grupo vectorial y frecuencia nominal se toman de la ficha del transformador y se muestran como datos de solo lectura.
 - Al abrir Configuración eléctrica se sincronizan esos valores desde el registro del transformador; la estructura de bobinados y bornes se mantiene editable.
