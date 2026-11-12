@@ -1,3 +1,7 @@
+## v1.5.124
+- Corrige los selectores JavaScript de las nuevas pestañas horizontales de configuración para que la navegación y el estado activo funcionen correctamente.
+- Invalida nuevamente la caché de recursos frontend.
+
 ## v1.5.123
 - Rediseña la navegación de Configuración eléctrica con pestañas horizontales, siguiendo el patrón visual de Pruebas eléctricas.
 - Simplifica la descripción del módulo: «Configura los bobinados, bornes y conmutadores del transformador».
