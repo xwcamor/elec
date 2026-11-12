@@ -149,8 +149,9 @@ class ElectricalConfigRepository
         $changers = is_array($payload['tap_changers'] ?? null) ? $payload['tap_changers'] : [];
         if (!$windings) throw new InvalidArgumentException('Agrega al menos un bobinado antes de guardar.');
 
-        $phaseCount = (int)($payload['phase_count'] ?? 3);
-        if (!in_array($phaseCount, [1, 3], true)) throw new InvalidArgumentException('La cantidad de fases debe ser 1 o 3.');
+        $phaseCountRaw = (string)($payload['phase_count'] ?? '3');
+        if (!in_array($phaseCountRaw, ['1', '3'], true)) throw new InvalidArgumentException('La cantidad de fases debe ser 1 o 3.');
+        $phaseCount = (int)$phaseCountRaw;
         $frequency = $payload['frequency_hz'] ?? '';
         if ($frequency !== '' && (!is_numeric($frequency) || (float)$frequency <= 0)) {
             throw new InvalidArgumentException('La frecuencia debe ser un valor numérico mayor que cero.');
