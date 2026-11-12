@@ -1,3 +1,7 @@
+## v1.5.142
+- Corrige el marcado HTML del texto de estado del stepper: cada etiqueta ahora cierra correctamente como elemento strong.
+- Recupera la distribución horizontal y alineación de los tres indicadores circulares sin modificar la lógica ni los colores de validación.
+
 ## v1.5.141
 - Elimina la acción «Copiar tabla» de las posiciones TAP y su manejador asociado.
 - Unifica en Configuración eléctrica la escala de tipografía, espaciado, radios, controles, tablas y mensajes.
