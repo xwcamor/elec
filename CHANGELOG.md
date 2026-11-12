@@ -1,3 +1,8 @@
+## v1.5.121
+- Al cargar una configuración, descarta filas históricas de bornes cuyo código está vacío. Esas filas antiguas podían seguir apareciendo como incompletas y activar la exclamación aunque no fueran bornes reales.
+- Mantiene las filas nuevas vacías como borradores locales: no se incluyen en el payload ni se guardan hasta completar el código del borne.
+- Actualiza las versiones de CSS, JavaScript y plan.js en index.php para invalidar la caché del navegador y asegurar que se ejecute el código publicado.
+
 ## v1.5.120
 - A newly added empty terminal row is a local draft: it does not mark the configuration dirty, trigger an incomplete-state warning, or enter the save payload.
 - Editing a draft row turns it into a real change; the normal «Guardar configuración» action is still required to persist it.
