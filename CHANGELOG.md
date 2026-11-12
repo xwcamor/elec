@@ -1,3 +1,7 @@
+## 1.5.75
+- Corrige la carga inicial del resumen: al terminar de recuperar los registros se actualizan «Registros que requieren atención» y «Actividad de ensayos» sin tener que cambiar de pestaña.
+- Refresca ambos paneles también después de enriquecer los nombres con el catálogo de ensayos.
+
 ## 1.5.74
 - Define el registro de pruebas como una jornada que agrupa varios ensayos; unifica los términos visibles: registro, ensayo, mediciones y resultados.
 - Renombra las etapas del asistente: Datos generales, Ensayos a realizar, Registro de resultados y Revisión del registro. Usa números simples (1–4) y oculta «Anterior» en el primer paso.
