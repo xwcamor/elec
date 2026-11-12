@@ -102,7 +102,7 @@
     if(mode!=='create')payload.transformer_key=transformer.key;
     if(mode==='tap'){
       const count=$('#editTrafoNumTaps').value.trim();
-      if(!Number.isInteger(Number(count))||Number(count)<=0){$('#editTransformerStatus').textContent='La cantidad de TAP debe ser un entero entre 1 y 150.';return;}
+      if(!Number.isInteger(Number(count))||Number(count)<1||Number(count)>150){$('#editTransformerStatus').textContent='La cantidad de TAP debe ser un entero entre 1 y 150.';return;}
       payload.num_taps=count;
     }else Object.entries(editFields).forEach(([key,id])=>payload[key]=$('#'+id).value.trim());
     const btn=$('#saveTransformerEdit');btn.disabled=true;btn.textContent=mode==='create'?'Creando...':'Guardando...';
