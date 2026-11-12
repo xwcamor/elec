@@ -1852,3 +1852,12 @@ body.config-focus .config-save-hint{display:none!important}
  .winding-data-section>.winding-head-fields{grid-template-columns:1fr}
  .winding-data-section{padding:12px!important}
 }
+
+
+/* v1.5.134 · Tabla TAP compacta con acción de eliminar fila. */
+#tap-grid-0 .sheet-table th:last-child,
+[id^="tap-grid-"] .sheet-table th:last-child{width:48px;min-width:48px;text-align:center}
+[id^="tap-grid-"] .sheet-table td:last-child{width:48px;min-width:48px;text-align:center;padding:2px}
+[id^="tap-grid-"] .sheet-row-delete{width:26px;height:26px;display:inline-grid;place-items:center;padding:0;border:0;background:transparent;color:#bd4c4c}
+[id^="tap-grid-"] .sheet-row-delete:hover{background:#fff0f0;border-radius:5px}
+[id^="tap-grid-"] .sheet-row-delete svg{width:14px;height:14px}
