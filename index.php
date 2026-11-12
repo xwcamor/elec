@@ -76,7 +76,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.87">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.88">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body>
@@ -350,7 +350,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 
   <section class="config-page hidden" id="configPage">
     <div class="config-toolbar">
-      <div><div class="breadcrumbs">Transformador <span>/</span> Configuración eléctrica</div><h2>Configuración eléctrica</h2><p>Define la estructura física y eléctrica que utilizarán las pruebas del transformador.</p></div>
+      <div><div class="breadcrumbs">Transformador <span>/</span> Configuración eléctrica</div><h2>Configuración eléctrica</h2><p>Configura bobinados, bornes, bushings y conmutadores. Las fases, tensión nominal, grupo vectorial y frecuencia se consultan desde la ficha del transformador.</p></div>
       <div class="toolbar-actions"><span class="save-status" id="saveStatus"><i></i>Sin guardar</span><button class="btn" id="backOverview">Volver a detalles</button></div>
     </div>
     <div class="config-alert <?= $dbMessage === '' ? 'hidden' : '' ?>" id="dbAlert" role="status"><svg><use href="#i-info"/></svg><span><?=h($dbMessage)?></span></div>
@@ -453,8 +453,8 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.87"></script>
+<script src="./assets/app.js?v=1.5.88"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="./assets/plan.js?v=1.5.87"></script>
+<script src="./assets/plan.js?v=1.5.88"></script>
 </body></html>
 0
