@@ -1,13 +1,20 @@
 name: Validate LAP UI changes
 on:
   push:
-    branches: [lap-protocol-ui]
+    branches: [main]
     paths:
       - "index.php"
       - "assets/**"
       - "app/**"
       - "tests/**"
       - ".github/workflows/validate-lap-ui.yml"
+      - ".github/workflows/cleanup-merged-branches.yml"
+      - "api.php"
+      - "bootstrap.php"
+      - "config/**"
+      - "database/**"
+      - "VERSION"
+      - "CHANGELOG.md"
 permissions:
   contents: read
 jobs:
