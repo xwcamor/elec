@@ -69,11 +69,11 @@
     $('#editTransformerSubtitle').textContent=mode==='create'?'Registra un nuevo equipo en la tabla de transformadores.':'Modifica los datos principales de la ficha.';
     $('#saveTransformerEdit').textContent=mode==='create'?'Crear transformador':'Guardar cambios';
   }
-  function openTransformerEditor(){
+  function openTransformerEditor(focusTap=false){
     setTransformerFormMode('edit');
     const vals={code:transformer.code,name:transformer.name||'',company:transformer.company||'',voltage:transformer.voltage??'',power:transformer.power??'',year:transformer.year??'',brand:transformer.brand||'',tap_type:transformer.tap_type||'',num_taps:transformer.num_taps??'',vector_group:transformer.vector_group||'',location:transformer.location||'',phase_count:transformer.phase_count??'',frequency_hz:transformer.frequency_hz??'',insulation_type:transformer.insulation_type||'',cooling_type:transformer.cooling_type||'',notes:transformer.notes||''};
     Object.entries(editFields).forEach(([key,id])=>$('#'+id).value=vals[key]??'');
-    $('#editTransformerStatus').textContent='';$('#transformerEditModal').classList.remove('hidden');$('#editTrafoCode').focus();
+    $('#editTransformerStatus').textContent='';$('#transformerEditModal').classList.remove('hidden');(focusTap?$('#editTrafoNumTaps'):$('#editTrafoCode')).focus();
   }
   function openTransformerCreate(){
     setTransformerFormMode('create');
@@ -101,6 +101,7 @@
       if(mode==='edit'){
         Object.assign(transformer,result.transformer);
         updateTransformerDisplay();
+        updateTapSourceSummary();
         await loadTransformerSwitcher(transformer.key);
         if(result.unsupported_fields?.length){
           const labels={phase_count:'número de fases',frequency_hz:'frecuencia',insulation_type:'aislamiento',cooling_type:'refrigeración',notes:'observaciones'};
@@ -210,7 +211,12 @@
   }
   function getTapProgress(){
     const tapData=state.tap_changers.length>0;
+    const expectedCount=Number(transformer.num_taps||0);
     const issues=validateConfiguration().filter(message=>/conmutador|posición/i.test(message));
+    if(expectedCount>0)state.tap_changers.forEach((changer,index)=>{
+      const actual=Array.isArray(changer.positions)?changer.positions.length:0;
+      if(actual!==expectedCount)issues.push('El conmutador '+(index+1)+' tiene '+actual+' posiciones; la ficha técnica indica '+expectedCount+'. Ajusta las filas para continuar.');
+    });
     const complete=tapData&&state.tap_changers.every(c=>{
       const positions=Array.isArray(c.positions)?c.positions:[];
       const numbers=positions.map(p=>Number(p.position_no));
@@ -243,11 +249,19 @@
     if(transformer.frequency_hz!==null&&transformer.frequency_hz!==undefined&&transformer.frequency_hz!=='')state.frequency_hz=transformer.frequency_hz;
   }
   function openConfig() {
+    const tapCount=Number(transformer.num_taps||0);
+    if(!Number.isInteger(tapCount)||tapCount<=0){
+      toast('Antes de configurar eléctricamente, registra una cantidad de TAP mayor que cero en la ficha del transformador.',true);
+      openTransformerEditor(true);
+      return false;
+    }
     syncTransformerNominals();
+    updateTapSourceSummary();
     showOnlyMain('configPage');
     showPanel('windings');
     updateCounts();
     refreshConfigStepIndicators();
+    return true;
   }
   function backOverview() { showOnlyMain('overviewPage'); }
 
@@ -402,13 +416,25 @@
   }
 
   function addTapChanger() {
-    if(!state.windings.length){toast('Primero configura al menos un bobinado en el paso 02.',true);showPanel('windings');return;}
+    if(!state.windings.length){toast('Primero configura al menos un bobinado.',true);showPanel('windings');return;}
     const count = Number(transformer.num_taps || 0);
+    if(!Number.isInteger(count)||count<=0){toast('Registra primero una cantidad de TAP mayor que cero en la ficha técnica.',true);openTransformerEditor(true);return;}
     const positions = Array.from({length:Math.max(0,Math.min(1000,count))},(_,i)=>({position_no:i+1,label:'Tap '+(i+1),voltage_kv:'',percent_change:'',is_neutral:false,notes:''}));
     state.tap_changers.push({name:'Conmutador '+(state.tap_changers.length+1),type:(transformer.tap_type||'DETC').toUpperCase().includes('OLTC')?'OLTC':'DETC',operation_type:'Manual',winding_index:0,min_position:positions.length?1:'',max_position:positions.length?positions.length:'',neutral_position:'',current_position:'',notes:'',positions});
     renderTapChangers();updateCounts();markDirty();
   }
   $('#addTapChanger').addEventListener('click', addTapChanger);
+  function updateTapSourceSummary(){
+    const type=String(transformer.tap_type||'').trim().toUpperCase();
+    const count=Number(transformer.num_taps||0);
+    const typeLabel=type==='OLTC'?'OLTC · Bajo carga':type==='DETC'?'DETC · Desenergizado':(type||'No definido');
+    const typeNode=$('#tapSourceType'),countNode=$('#tapSourceCount'),note=$('#tapSourceNote');
+    if(typeNode)typeNode.textContent=typeLabel;
+    if(countNode)countNode.textContent=Number.isInteger(count)&&count>0?count+' posiciones':'Pendiente';
+    if(note)note.textContent=count>0?'Cada conmutador debe contener exactamente '+count+' posiciones. Si cambias este valor en la ficha, tendrás que ajustar las filas antes de guardar una nueva versión.':'Debes registrar una cantidad de TAP mayor que cero en la ficha del transformador.';
+  }
+  $('#editTapMetadata')?.addEventListener('click',()=>openTransformerEditor(true));
+  updateTapSourceSummary();
   function renderTapChangers(){
     const host=$('#tapChangersContainer');
     if(!state.tap_changers.length){host.innerHTML=`<div class="empty-state"><div style="font-size:22px;margin-bottom:6px">＋</div><b>No hay conmutadores configurados</b><p>Agrega el conmutador asociado al bobinado que regula la tensión.</p><button class="btn primary" id="addFirstChanger">Agregar conmutador</button></div>`;$('#addFirstChanger').addEventListener('click',addTapChanger);return;}
