@@ -102,7 +102,7 @@
     if(mode!=='create')payload.transformer_key=transformer.key;
     if(mode==='tap'){
       const count=$('#editTrafoNumTaps').value.trim();
-      if(!Number.isInteger(Number(count))||Number(count)<=0){$('#editTransformerStatus').textContent='La cantidad de TAP debe ser un entero mayor que cero.';return;}
+      if(!Number.isInteger(Number(count))||Number(count)<=0){$('#editTransformerStatus').textContent='La cantidad de TAP debe ser un entero entre 1 y 150.';return;}
       payload.num_taps=count;
     }else Object.entries(editFields).forEach(([key,id])=>payload[key]=$('#'+id).value.trim());
     const btn=$('#saveTransformerEdit');btn.disabled=true;btn.textContent=mode==='create'?'Creando...':'Guardando...';
@@ -432,7 +432,8 @@
     if(!state.windings.length){toast('Primero configura al menos un bobinado.',true);showPanel('windings');return;}
     const count = Number(transformer.num_taps || 0);
     if(!Number.isInteger(count)||count<=0){toast('Registra primero una cantidad de TAP mayor que cero en la ficha técnica.',true);openTapCountEditor();return;}
-    const positions = Array.from({length:Math.max(0,Math.min(1000,count))},(_,i)=>({position_no:i+1,label:'Tap '+(i+1),voltage_kv:'',percent_change:'',is_neutral:false,notes:''}));
+    if(!Number.isInteger(count)||count<1||count>150){toast('La ficha técnica debe indicar entre 1 y 150 posiciones TAP.',true);return;}
+    const positions = Array.from({length:count},(_,i)=>({position_no:i+1,label:'Tap '+(i+1),voltage_kv:'',percent_change:'',is_neutral:false,notes:''}));
     state.tap_changers.push({name:'Conmutador '+(state.tap_changers.length+1),type:(transformer.tap_type||'DETC').toUpperCase().includes('OLTC')?'OLTC':'DETC',operation_type:'Manual',winding_index:0,min_position:positions.length?1:'',max_position:positions.length?positions.length:'',neutral_position:'',current_position:'',notes:'',positions});
     renderTapChangers();updateCounts();markDirty();
   }
@@ -461,7 +462,7 @@
     host.querySelectorAll('[data-cfield]').forEach(el=>el.addEventListener('change',e=>{const ci=Number(e.target.closest('[data-changer]').dataset.changer),key=e.target.dataset.cfield;state.tap_changers[ci][key]=key==='winding_index'?Number(e.target.value):e.target.value;markDirty();}));
     host.querySelectorAll('[data-remove-changer]').forEach(b=>b.addEventListener('click',()=>{if(!confirm('¿Eliminar este conmutador y todas sus posiciones?'))return;state.tap_changers.splice(Number(b.dataset.removeChanger),1);renderTapChangers();updateCounts();markDirty();}));
     host.querySelectorAll('[data-generate-taps]').forEach(b=>b.addEventListener('click',()=>openTapGenerator(Number(b.dataset.generateTaps))));
-    host.querySelectorAll('[data-add-tap-row]').forEach(b=>b.addEventListener('click',()=>{const c=state.tap_changers[Number(b.dataset.addTapRow)];c.positions.push({position_no:c.positions.length+1,label:'Tap '+(c.positions.length+1),voltage_kv:'',percent_change:'',is_neutral:false,notes:''});renderTapChangers();updateCounts();markDirty();}));
+    host.querySelectorAll('[data-add-tap-row]').forEach(b=>b.addEventListener('click',()=>{const c=state.tap_changers[Number(b.dataset.addTapRow)];if(c.positions.length>=150){toast('Cada conmutador admite como máximo 150 posiciones TAP.',true);return;}c.positions.push({position_no:c.positions.length+1,label:'Tap '+(c.positions.length+1),voltage_kv:'',percent_change:'',is_neutral:false,notes:''});renderTapChangers();updateCounts();markDirty();}));
     host.querySelectorAll('[data-copy-taps]').forEach(b=>b.addEventListener('click',()=>copyGrid(state.tap_changers[Number(b.dataset.copyTaps)].positions.map(p=>[p.position_no,p.label,p.is_neutral?'Sí':'No',p.notes].join('\t')).join('\n'))));
     state.tap_changers.forEach((c,i)=>buildGrid($('#tap-grid-'+i),c.positions,[{key:'position_no',label:'Posición',type:'number'},{key:'label',label:'Etiqueta',type:'text'},{key:'is_neutral',label:'Neutro',type:'check'},{key:'notes',label:'Observaciones',type:'text'}],(row,key,value)=>{row[key]=value;markDirty();updateCounts();}));
   }
@@ -480,7 +481,7 @@
   $('#tapRowsModal').addEventListener('click',e=>{if(e.target===$('#tapRowsModal'))closeTapGenerator();});
   $('#confirmTapRows').addEventListener('click',()=>{
     const n=Number($('#tapRowsCount').value);
-    if(!Number.isInteger(n)||n<1||n>1000){toast('Ingresa una cantidad entera entre 1 y 1000.',true);return;}
+    if(!Number.isInteger(n)||n<1||n>150){toast('Ingresa una cantidad entera entre 1 y 150.',true);return;}
     const c=state.tap_changers[tapGeneratorIndex];if(!c)return;
     if(n<c.positions.length){const removed=c.positions.slice(n).some(p=>p.voltage_kv!==''||p.percent_change!==''||p.is_neutral||String(p.notes||'').trim()||String(p.label||'').trim()!==('Tap '+(c.positions.indexOf(p)+1)));if(removed&&!confirm('Al reducir la cantidad se eliminarán las filas posteriores al nuevo límite. ¿Deseas continuar?'))return;}
     c.positions=Array.from({length:n},(_,i)=>c.positions[i]||({position_no:i+1,label:'Tap '+(i+1),voltage_kv:'',percent_change:'',is_neutral:false,notes:''}));
