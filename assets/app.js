@@ -10,6 +10,7 @@
   var activeExecutionId = null;
   var activeExecutionMode = 'new';
   var activeSpecificCode = '';
+  var executionConfigContext = null;
   const specificTemplates={
     WINDING_RESISTANCE:{title:'Resistencia de devanados',hint:'Campos LAP: sección AT/BT, TAP, fase o par de bornes, corriente de prueba, temperatura y resistencias medida/referida a 75 °C. La comparación entre fases ≤5% se documenta en observaciones.',prefix:'WR',cols:[['winding','Bobinado (AT/BT)'],['tap','TAP'],['phase','Fase / conexión'],['test_current_a','I de prueba (A)'],['temperature','Temperatura medida (°C)'],['resistance_measured','Resistencia medida'],['resistance_referred_75c','Resistencia referida 75 °C'],['notes','Observación']]},
     INSULATION_RESISTANCE:{title:'Resistencia de aislamiento',hint:'Tres puntos LAP: AT-BT, AT-Masa y BT-Masa. Registra tensión aplicada, lecturas a 15 s, 30 s, 45 s y 1 min.',prefix:'IR',cols:[['point','Punto de aplicación'],['applied_voltage_kv','Voltaje aplicado (kV)'],['reading_15s','Resistencia a 15 s'],['reading_30s','Resistencia a 30 s'],['reading_45s','Resistencia a 45 s'],['reading_1min','Resistencia a 1 min'],['absorption_index','Índice de absorción (1 min / 30 s)'],['reading_unit','Unidad de lectura'],['notes','Observación']]},
@@ -944,6 +945,7 @@
   function fillTypeOptions(selected){$('#executionType').innerHTML=testCatalog.map(t=>'<option value="'+esc(t[0])+'" '+(t[0]===selected?'selected':'')+'>'+esc(t[1])+'</option>').join('');}
   function startExecution(code){
     const reason=electricalTestsBlockReason();if(reason){toast(reason,true);refreshSidebarAccess();return false;}
+    executionConfigContext=clone(state);
     clearExecutionForm();fillTypeOptions(code);toggleTestTemplate();
     $('#executionTitle').textContent='Nuevo registro · '+typeName(code);
     showOnlyMain('executionPage');
@@ -975,6 +977,8 @@
       const d=await readApiResponse(r),x=d.item;
       clearExecutionForm();
       activeExecutionId=Number(x.id||id);activeExecutionMode='edit';
+      let historicalSnapshot=x.config_snapshot||null;try{if(typeof historicalSnapshot==='string')historicalSnapshot=JSON.parse(historicalSnapshot);}catch(_){historicalSnapshot=null;}
+      executionConfigContext=historicalSnapshot?normalizeConfig(historicalSnapshot):clone(state);
       fillTypeOptions(x.test_code);$('#executionType').value=x.test_code;toggleTestTemplate();
       if(x.test_code==='TTR')renderTtrRows(ttrRowsFromMeasurements(x.measurements||[]));
       else if(specificTemplates[x.test_code])renderSpecificRows(specificRowsFromMeasurements(x.measurements||[],x.test_code),x.test_code);
@@ -1013,7 +1017,7 @@
   function renderTtrRows(rows){
     const body=$('#ttrRows'); if(!body)return;
     body.innerHTML=(rows||[]).map((raw,i)=>{const r=ttrCalc(raw);return `<tr>
-      <td><select class="ttr-cell contextual-select" data-r="${i}" data-c="0">${[['','Selecciona TAP'],...configuredTapOptions()].map(([v,label])=>'<option value="'+esc(v)+'" '+(String(r.tap||i+1)===String(v)?'selected':'')+'>'+esc(label)+'</option>').join('')}</select></td>
+      <td><select class="ttr-cell contextual-select" data-r="${i}" data-c="0">${[['','Selecciona TAP'],...configuredTapOptions(),...(r.tap&&!configuredTapOptions().some(([v])=>String(v)===String(r.tap))?[[String(r.tap),String(r.tap)+' · registro anterior']]:[])].map(([v,label])=>'<option value="'+esc(v)+'" '+(String(r.tap||i+1)===String(v)?'selected':'')+'>'+esc(label)+'</option>').join('')}</select></td>
       <td><input class="ttr-cell numeric" data-r="${i}" data-c="1" value="${esc(r.at||'')}"></td>
       <td><input class="ttr-cell numeric" data-r="${i}" data-c="2" value="${esc(r.bt||'')}"></td>
       <td><input class="ttr-cell numeric ttr-calculated" data-r="${i}" data-c="3" value="${esc(r.theoretical||'')}" readonly title="V AT / (V BT × √3)"></td>
@@ -1117,17 +1121,20 @@
     PROTECTIONS:['Accesorios y bornes del circuito de protección']
   };
   function configuredTapOptions(){
-    const positions=(state.tap_changers||[]).flatMap(c=>(c.positions||[]).map(p=>String(p.position_no??'').trim()).filter(Boolean));
+    const config=executionConfigContext||state;
+    const positions=(config.tap_changers||[]).flatMap(c=>(c.positions||[]).map(p=>String(p.position_no??'').trim()).filter(Boolean));
     const unique=[...new Set(positions)].sort((a,b)=>Number(a)-Number(b));
     if(unique.length)return unique.map(v=>[v,'TAP '+v]);
     const count=Math.min(150,Math.max(0,Number(transformer.num_taps||0)));
     return Array.from({length:count},(_,i)=>[String(i+1),'TAP '+(i+1)]);
   }
   function configuredWindingOptions(){
-    return (state.windings||[]).map((w,i)=>[String(w.name||('Bobinado '+(i+1))),String(w.name||('Bobinado '+(i+1)))]);
+    const config=executionConfigContext||state;
+    return (config.windings||[]).map((w,i)=>[String(w.name||('Bobinado '+(i+1))),String(w.name||('Bobinado '+(i+1)))]);
   }
   function configuredTerminalOptions(capacitiveOnly=false){
-    return (state.windings||[]).flatMap((w,wi)=>(w.terminals||[]).filter(t=>!capacitiveOnly||t.has_capacitive_bushing).map(t=>{
+    const config=executionConfigContext||state;
+    return (config.windings||[]).flatMap((w,wi)=>(w.terminals||[]).filter(t=>!capacitiveOnly||t.has_capacitive_bushing).map(t=>{
       const code=String(t.code||'').trim(),label=(w.name||('Bobinado '+(wi+1)))+' · '+(code||'Borne sin código');
       return [code,label];
     })).filter(x=>x[0]);
@@ -1149,7 +1156,7 @@
   function renderContextSelect(code,key,value,rowIndex,columnIndex){
     const options=contextOptionsForField(code,key);if(options===null)return null;
     const placeholder=key==='tap'?'Selecciona TAP':key==='winding'||key==='section'?'Selecciona bobinado':key==='terminal'?'Selecciona borne':key==='phase'?'Selecciona borne/fase':'Selecciona punto';
-    const opts=[['',placeholder],...options].map(([v,label])=>'<option value="'+esc(v)+'" '+(String(value??'')===String(v)?'selected':'')+'>'+esc(label)+'</option>').join('');
+    const safeOptions=[...options];if(value!==undefined&&value!==null&&String(value)!==''&&!safeOptions.some(([v])=>String(v)===String(value)))safeOptions.push([String(value),String(value)+' · registro anterior']);const opts=[['',placeholder],...safeOptions].map(([v,label])=>'<option value="'+esc(v)+'" '+(String(value??'')===String(v)?'selected':'')+'>'+esc(label)+'</option>').join('');
     const empty=options.length?'':' disabled';
     return '<select class="specific-cell contextual-select" data-r="'+rowIndex+'" data-c="'+columnIndex+'" '+empty+'>'+opts+'</select>';
   }
