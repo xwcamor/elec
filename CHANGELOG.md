@@ -1,3 +1,8 @@
+## v1.5.131
+- Adapta el indicador de Configuración eléctrica al diseño del asistente de pruebas: círculos grandes, línea de progreso, paso activo azul y pasos completados verdes.
+- Mantiene únicamente los números, sin títulos ni contadores dentro del indicador.
+- Conserva el contenido de cada panel debajo de la navegación y adapta el stepper a móvil.
+
 ## v1.5.130
 - El indicador de Configuración eléctrica muestra únicamente los tres círculos numerados, sin títulos, contadores ni conectores.
 - Corrige la navegación de los paneles: utiliza selectores de colección para actualizar todos los botones y mostrar el panel correspondiente. Antes se intentaba iterar el resultado de querySelector, lo que impedía abrir el contenido.
