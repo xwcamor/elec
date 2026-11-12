@@ -1,3 +1,10 @@
+## 1.5.60
+- Actualiza en vivo el estado de cada acordeón de prueba al editar datos de equipo, referencia o medición.
+- El indicador cambia inmediatamente entre «Completo», «Faltan datos» y «Sin iniciar», junto con el porcentaje y el color.
+- Al completar todos los campos mínimos, el acordeón se contrae automáticamente; si vuelve a quedar incompleto, se expande.
+- Conserva el guardado automático y refresca el estado tanto en eventos input como change.
+- Actualiza la caché de recursos.
+
 ## 1.5.59
 - Cierra automáticamente el acordeón de una prueba en cuanto todos sus campos mínimos quedan completos, incluso si estaba abierto antes de completar el último dato.
 - Mantiene abiertos los ensayos incompletos por defecto y respeta la apertura/cierre manual mientras sigan incompletos.
