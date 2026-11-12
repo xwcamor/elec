@@ -76,7 +76,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.96">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.97">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body>
@@ -372,7 +372,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
           <div class="panel-heading"><div><span class="eyebrow">ETAPA 02</span><h3>Conmutadores y posiciones de TAP</h3><p>El tipo y la cantidad de posiciones se consultan desde la ficha técnica del transformador.</p></div><button class="btn primary" id="addTapChanger"><svg><use href="#i-plus"/></svg>Agregar conmutador</button></div>
           <div class="tap-source-card" id="tapSourceCard">
             <div class="tap-source-heading"><span class="tap-source-icon"><svg><use href="#i-info"/></svg></span><div><strong>Datos del conmutador · ficha técnica</strong><small>Valores de solo lectura sincronizados con la tabla de transformadores.</small></div><button class="tap-source-edit" type="button" id="editTapMetadata">Modificar en ficha técnica ↗</button></div>
-            <div class="tap-source-values"><div><small>Tipo detectado</small><strong id="tapSourceType">—</strong></div><div><small>Posiciones TAP registradas</small><strong id="tapSourceCount">—</strong></div><div><small>Origen</small><strong>Base de datos</strong></div></div>
+            <div class="tap-source-values"><div><small>Tipo detectado</small><strong id="tapSourceType">—</strong></div><div><small>Posiciones TAP registradas</small><strong id="tapSourceCount">—</strong></div></div>
             <p class="tap-source-note" id="tapSourceNote">Las posiciones de los conmutadores se comparan con la ficha técnica.</p><button class="btn primary hidden" type="button" id="syncTapPositions">Sincronizar posiciones con la ficha</button>
           </div>
           <div id="tapChangersContainer" class="tap-changers-container"></div>
@@ -458,8 +458,8 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.96"></script>
+<script src="./assets/app.js?v=1.5.97"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="./assets/plan.js?v=1.5.96"></script>
+<script src="./assets/plan.js?v=1.5.97"></script>
 </body></html>
 0
