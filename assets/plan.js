@@ -637,6 +637,7 @@
         setSaveStatus('No se pudo guardar · revisa la conexión y vuelve a intentar','error');
         if(!automatic)toast(error.message,true);
         return false;
+      }
     })();
     savePromise=operation;
     let result=false;
