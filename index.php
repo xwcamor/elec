@@ -293,8 +293,8 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 
   <section class="execution-page hidden" id="planPage">
     <div class="config-toolbar">
-      <div><div class="breadcrumbs">Transformador <span>/</span> Pruebas eléctricas <span>/</span> Registro</div><h2 id="planTitle">Nuevo registro de pruebas</h2><p>Registra una jornada de trabajo, selecciona los ensayos y captura sus resultados.</p></div>
-      <div class="plan-toolbar-actions"><span id="planSaveStatus" class="plan-save-status" data-state="idle" aria-live="polite"><i></i><span>Se guardará automáticamente al modificar datos</span></span><div class="toolbar-actions"><button class="btn" id="cancelPlan">Volver a registros</button></div></div>
+      <div><div class="breadcrumbs">Transformador <span>/</span> Pruebas eléctricas <span>/</span> Registro</div><h2 id="planTitle">Nuevo registro de pruebas</h2><p>Prepara los datos y ensayos. El registro se crea únicamente cuando confirmes «Iniciar prueba».</p></div>
+      <div class="plan-toolbar-actions"><span id="planSaveStatus" class="plan-save-status" data-state="idle" aria-live="polite"><i></i><span>Preparación · todavía no se guarda</span></span><div class="toolbar-actions"><button class="btn" id="cancelPlan">Volver a registros</button><button class="btn primary" type="button" id="saveTestPlan">Iniciar prueba</button></div></div>
     </div>
     <div class="plan-wizard-shell">
     <nav class="plan-stepper" id="planStepper" aria-label="Etapas del registro de pruebas">
@@ -470,7 +470,7 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.78"></script>
-<script src="./assets/plan.js?v=1.5.78"></script>
+<script src="./assets/app.js?v=1.5.79"></script>
+<script src="./assets/plan.js?v=1.5.79"></script>
 </body></html>
 0
