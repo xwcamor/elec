@@ -3,7 +3,15 @@
 Aplicación web independiente para configurar transformadores y registrar pruebas eléctricas. Es un prototipo PHP + MySQL pensado para ejecutarse localmente con Laragon.
 
 ## Versión
-**1.5.144**
+**1.5.145**
+
+## Arquitectura de procesos
+
+- **Configuración eléctrica** y **Pruebas eléctricas** se inicializan en scripts JavaScript independientes.
+- `assets/app.js` es dueño del estado de bobinados, bornes, conmutadores, TAP y versiones; expone snapshots de solo lectura mediante `window.ELEC_CONFIG_BRIDGE`.
+- `assets/electrical-tests.js` es dueño del catálogo, formularios, mediciones, historial y ejecuciones; cada registro toma una copia de la configuración vigente como contexto.
+- `assets/plan.js` pertenece al flujo de pruebas y utiliza un bridge específico (`window.ELEC_PLAN_BRIDGE`).
+- La ficha del transformador, la navegación principal, la API y las notificaciones son servicios compartidos explícitos. Los repositorios y tablas SQL de configuración/pruebas ya están separados.
 
 ## Funcionalidades
 
@@ -62,8 +70,10 @@ Cada ejecución tiene su propio identificador. Editar una ejecución existente n
 elec/
 ├── app/                  # Acceso a datos y repositorios
 ├── assets/
-│   ├── app.css           # Estilos
-│   └── app.js            # Interfaz y lógica del cliente
+│   ├── app.css           # Estilos compartidos
+│   ├── app.js            # Configuración eléctrica
+│   ├── electrical-tests.js # Pruebas eléctricas
+│   └── plan.js           # Asistente de registro de pruebas
 ├── config/
 │   └── database.php      # Conexión y mapeo de transformers
 ├── database/
