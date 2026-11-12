@@ -17,7 +17,7 @@
   const templates={
     WINDING_RESISTANCE:{prefix:'WR',cols:[['section','Devanado (AT / BT)'],['tap','TAP'],['phase','Fase / conexión'],['test_current_a','I de prueba (A)'],['temperature_c','Temperatura medida (°C)'],['resistance_measured','Resistencia medida'],['resistance_referred_75c','Resistencia referida 75 °C'],['notes','Observación']]},
     INSULATION_RESISTANCE:{prefix:'IR',cols:[['point','Punto de aplicación'],['applied_voltage_kv','Voltaje aplicado (kV)'],['reading_15s','Resistencia a 15 s'],['reading_30s','Resistencia a 30 s'],['reading_45s','Resistencia a 45 s'],['reading_1min','Resistencia a 1 min'],['absorption_index','Índice de absorción (1 min / 30 s)'],['reading_unit','Unidad de resistencia'],['notes','Observación']]},
-    POWER_FACTOR:{prefix:'PF',cols:[['measurement','Modo de prueba'],['test_voltage','Tensión de prueba (V)'],['power_factor_measured','Factor de Potencia (medido) (%)'],['power_factor_corrected_20c','Factor de Potencia (Corregido) (%)'],['capacitance_source_f','Capacitancia fuente (F)'],['capacitance_measured','Capacitancia medida (nF)'],['status','Estado']]},
+    POWER_FACTOR:{prefix:'PF',cols:[['measurement','Modo de prueba'],['test_voltage','Tensión de prueba (V)'],['power_factor_measured','Factor de Potencia (medido) (%)'],['power_factor_corrected_20c','Factor de Potencia (Corregido) (%)'],['capacitance_source_f','Capacitancia'],['capacitance_measured','Capacitancia medida (nF)'],['status','Estado']]},
     EXCITATION:{prefix:'EXC',cols:[['tap','TAP'],['phase','Fase'],['frequency_hz','Frecuencia (Hz)'],['excitation_current','Corriente de excitación'],['losses','Pérdidas'],['notes','Observación']]},
     BUSHING:{prefix:'BUSH',cols:[['terminal','Borne'],['serial','Serie'],['test_voltage','Tensión de prueba'],['power_factor_plate','FP de placa'],['power_factor_measured','FP medido'],['capacitance_plate','Capacitancia de placa'],['capacitance_measured','Capacitancia medida'],['variation_percent','Variación (%)'],['result','Resultado capacitancia'],['notes','Observación']]},
     SFRA:{prefix:'SFRA',cols:[['connection','Configuración'],['tap','TAP'],['file_reference','Archivo / curva de campo'],['reference_curve','Curva de referencia (fábrica)'],['comparison_result','Resultado de comparación'],['result','Evaluación manual'],['notes','Observación']]},
@@ -227,8 +227,7 @@
     if(badge){badge.dataset.state=state;badge.textContent=metrics.complete?'Completo':(metrics.anyData?'Faltan datos':'Sin iniciar');}
     const progress=card.querySelector('[data-card-progress]');
     if(progress)progress.textContent=metrics.filled+'/'+metrics.total+' campos · '+metrics.percent+'%';
-    if(metrics.complete)card.open=false;
-    else if(state==='incomplete')card.open=true;
+    if(state==='incomplete')card.open=true;
     refreshFieldStyles(card,item,metrics);
   }
   function refreshFieldStyles(card,item,metrics){
@@ -493,7 +492,7 @@
       if(item.code==='SFRA')hint='<div class="plan-reference-note"><b>Referencia técnica:</b> la conclusión se obtiene comparando las gráficas de campo con las de planta. La evaluación es manual; el protocolo no define un umbral numérico.</div>';
       const previousCard=host.querySelector('.plan-test-card[data-test-index="'+idx+'"]');
       const hasPreviousState=!!previousCard;
-      const shouldOpen=metrics.complete?false:(hasPreviousState?previousCard.open:true);
+      const shouldOpen=hasPreviousState?previousCard.open:true;
       return '<details class="plan-test-card" data-test-index="'+idx+'" data-state="'+metrics.state+'" '+(shouldOpen?'open':'')+'>'+
         '<summary class="plan-test-card-head"><span class="plan-test-index">'+String(idx+1).padStart(2,'0')+'</span><span class="plan-test-heading"><b>'+esc(item.name)+'</b><small data-card-progress>'+metrics.filled+'/'+metrics.total+' campos · '+metrics.percent+'%</small></span><span class="plan-card-state" data-state="'+metrics.state+'">'+(metrics.complete?'Completo':metrics.anyData?'En curso':'Pendiente')+'</span><span class="plan-card-chevron">⌄</span></summary>'+
         '<div class="plan-test-body">'+
@@ -778,7 +777,7 @@
     if(nextCol>=fields.length){nextCol=0;nextRow++;}
     if(nextCol<0){nextCol=fields.length-1;nextRow=Math.max(0,nextRow-1);}
     nextRow=Math.max(0,nextRow);
-    while(nextRow>=item.rows.length)item.rows.push({});
+    if(nextRow>=item.rows.length)return;
     renderCards();refreshPlanFeedback();
     const target=$('#planTestCards [data-test-index="'+Number(card.dataset.testIndex)+'"] [data-row="'+nextRow+'"][data-col="'+fields[nextCol][0]+'"]');
     target?.focus();
