@@ -204,7 +204,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
     </div>
     <div class="test-view-switcher" role="tablist" aria-label="Secciones de pruebas eléctricas">
       <button class="test-view-tab active" type="button" id="showTestSummary" data-test-view="summary" role="tab" aria-selected="true" aria-controls="testSummaryPanel"><svg><use href="#i-grid"/></svg>Resumen</button>
-      <button class="test-view-tab" type="button" id="showTestTable" data-test-view="table" role="tab" aria-selected="false" aria-controls="testHistoryPanel"><svg><use href="#i-file"/></svg>Tabla</button>
+      <button class="test-view-tab" type="button" id="showTestTable" data-test-view="table" role="tab" aria-selected="false" aria-controls="testHistoryPanel"><svg><use href="#i-file"/></svg>Historial</button>
       <button class="test-view-tab" type="button" id="showTestGraph" data-test-view="graph" role="tab" aria-selected="false" aria-controls="testAnalyticsPanel"><svg><use href="#i-activity"/></svg>Gráfico</button>
     </div>
     <section id="testSummaryPanel" class="test-view-panel" role="tabpanel" aria-labelledby="showTestSummary">
@@ -217,7 +217,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
     </section>
     <section id="testHistoryPanel" class="test-view-panel hidden" role="tabpanel" aria-labelledby="showTestTable">
       <div class="test-history-card">
-        <div class="test-history-head"><div><span class="eyebrow">TABLA DE REGISTROS</span><h3>Visitas y ensayos registrados</h3><p>Una fila por visita. Abre un registro para consultar o continuar completando sus datos.</p></div><div class="test-filter"><svg><use href="#i-search"/></svg><input id="testHistoryFilter" placeholder="Filtrar por prueba o responsable..."></div></div>
+        <div class="test-history-head"><div><span class="eyebrow">HISTORIAL DE VISITAS</span><h3>Historial de visitas</h3><p>Una fila por visita. Abre un registro para consultar o continuar completando sus datos.</p></div><div class="test-filter"><svg><use href="#i-search"/></svg><input id="testHistoryFilter" placeholder="Filtrar por prueba o responsable..."></div></div>
         <div class="test-table-wrap"><table class="test-history-table"><thead><tr><th>Fecha de visita</th><th>Pruebas incluidas</th><th>Responsable</th><th>Datos registrados</th><th>Acción</th></tr></thead><tbody id="testHistoryBody"><tr><td colspan="5" class="test-empty">Aún no hay registros. Selecciona una prueba para crear tu primer plan.</td></tr></tbody></table></div>
       </div>
     </section>
