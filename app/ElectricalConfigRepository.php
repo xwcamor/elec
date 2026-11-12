@@ -54,6 +54,14 @@ class ElectricalConfigRepository
                     'phase_code' => $row['phase_code'],
                     'terminal_type' => $row['terminal_type'],
                     'has_capacitive_bushing' => (int)$row['has_capacitive_bushing'],
+                    // Mantener los campos planos esperados por normalizeConfig() del cliente.
+                    'serial_number' => $row['serial_number'],
+                    'bushing_manufacturer' => $row['bushing_manufacturer'],
+                    'bushing_model' => $row['bushing_model'],
+                    'rated_voltage_kv' => $row['rated_voltage_kv'],
+                    'capacitance_pf' => $row['capacitance_pf'],
+                    'power_factor_percent' => $row['power_factor_percent'],
+                    'bushing_notes' => $row['bushing_notes'],
                 ];
                 if ((int)$row['has_capacitive_bushing'] === 1) {
                     $terminal['bushing'] = [
