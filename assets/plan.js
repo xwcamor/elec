@@ -183,6 +183,18 @@
     if(!items.length)missing.unshift('Selecciona por lo menos una prueba');
     return {general,perItem,total,filled,percent,ready,completed,missing,complete:!general.length&&items.length>0&&perItem.every(x=>x.metrics.complete)};
   }
+  function refreshResultsSummary(){
+    const meta=$('#planResultsAccordionMeta'),statusNode=$('#planResultsAccordionStatus');
+    if(!meta||!statusNode)return;
+    const states=items.map(item=>itemMetrics(item));
+    const complete=states.filter(metric=>metric.complete).length;
+    const incomplete=states.filter(metric=>metric.anyData&&!metric.complete).length;
+    const unstarted=states.length-complete-incomplete;
+    const pending=incomplete+unstarted;
+    meta.textContent=items.length+' '+(items.length===1?'ensayo seleccionado':'ensayos seleccionados')+' · '+complete+' completos · '+pending+' por completar';
+    statusNode.textContent=pending===0&&items.length>0?'Todos completos':pending+' pendientes';
+    statusNode.dataset.state=pending===0&&items.length>0?'complete':(incomplete?'incomplete':'unstarted');
+  }
   function refreshCardStatus(card,item){
     if(!card||!item)return;
     const metrics=itemMetrics(item);
@@ -195,6 +207,7 @@
     if(metrics.complete)card.open=false;
     else if(state==='incomplete')card.open=true;
     refreshFieldStyles(card,item,metrics);
+    refreshResultsSummary();
   }
   function refreshFieldStyles(card,item,metrics){
     card.querySelectorAll('.plan-cell').forEach(input=>{
@@ -414,13 +427,7 @@
         '<details class="plan-optional-details plan-observation-details"><summary><span>Observaciones del ensayo</span><small>Notas e incidencias</small></summary><label class="plan-test-observations"><textarea data-meta="observations" rows="2" placeholder="Resultados, incidencias y comentarios">'+esc(item.observations)+'</textarea></label></details>'+
         '<div class="plan-card-actions"><button type="button" class="text-action" data-remove-test="'+idx+'">Retirar este ensayo</button></div></div></details>';
     }).join('');
-    const meta=$('#planResultsAccordionMeta'),statusNode=$('#planResultsAccordionStatus');
-    const states=items.map(item=>itemMetrics(item));
-    const complete=states.filter(metric=>metric.complete).length;
-    const incomplete=states.filter(metric=>metric.anyData&&!metric.complete).length;
-    const unstarted=states.length-complete-incomplete;
-    if(meta)meta.textContent=items.length+' '+(items.length===1?'ensayo seleccionado':'ensayos seleccionados')+' · '+complete+' completos · '+(incomplete+unstarted)+' por completar';
-    if(statusNode){statusNode.textContent=incomplete+unstarted===0?'Todos completos':(incomplete+unstarted)+' pendientes';statusNode.dataset.state=incomplete?'incomplete':(unstarted?'unstarted':'complete');}
+    refreshResultsSummary();
     items.forEach((item,index)=>{const card=host.querySelector('[data-test-index="'+index+'"]');if(card)refreshFieldStyles(card,item,itemMetrics(item));});
   }
   function render(){renderPicker();renderCards();renderPlanFeedback();renderPlanReview();}
