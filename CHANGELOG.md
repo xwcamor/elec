@@ -1,3 +1,9 @@
+## v1.5.100
+- Retira los campos «Código» y «Notas» de la edición de bobinados.
+- Actualiza «Copiar bobinados» para incluir solo nombre, tensión, conexión y neutro.
+- Simplifica el resumen del acordeón para mostrar nombre, tensión y conexión.
+- Los códigos internos y notas previamente almacenados se conservan para compatibilidad; ya no se exponen en esta interfaz.
+
 ## v1.5.99
 - Retira el campo «Material» de la edición de bobinados.
 - Actualiza «Copiar bobinados» para excluir el material.
