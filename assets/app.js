@@ -665,13 +665,11 @@
     const total=testExecutions.length;
     const counts={COMPLETE:0,INCOMPLETE:0,DRAFT:0};
     testExecutions.forEach(execution=>{const status=executionDisplayStatus(execution).code;counts[status]=(counts[status]||0)+1;});
-    const last=testExecutions[0]?.executed_at;
     $('#testStats').innerHTML=
       '<div class="test-stat"><small>Registros guardados</small><strong>'+total+'</strong><span>Planes de pruebas eléctricas</span></div>'+
       '<div class="test-stat"><small>Completos</small><strong>'+counts.COMPLETE+'</strong><span>Todos los ensayos finalizados</span></div>'+
-      '<div class="test-stat"><small>Pendientes</small><strong>'+counts.INCOMPLETE+'</strong><span>Con ensayos por completar</span></div>'+
-      '<div class="test-stat"><small>Borradores</small><strong>'+counts.DRAFT+'</strong><span>Sin ensayos finalizados</span></div>'+
-      '<div class="test-stat"><small>Último registro</small><strong class="test-stat-date">'+(last?esc(formatExecutionDate(last)):'Sin registros')+'</strong><span>Fecha de realización</span></div>';
+      '<div class="test-stat"><small>Pendientes</small><strong>'+counts.INCOMPLETE+'</strong><span>Con datos por completar</span></div>'+
+      '<div class="test-stat"><small>Borradores</small><strong>'+counts.DRAFT+'</strong><span>Sin datos de medición</span></div>';
   }
   function renderTestTypes(){
     const host=$('#testTypeGrid');
@@ -683,6 +681,16 @@
     const latest=testExecutions[0]?.executed_at;
     const host=$('#testSummaryLatest');
     if(host)host.innerHTML='<span>Último registro</span><strong>'+(latest?esc(formatExecutionDate(latest)):'Sin registros')+'</strong>';
+    const attention=$('#testAttentionList');
+    const pending=testExecutions.filter(execution=>['INCOMPLETE','DRAFT'].includes(executionDisplayStatus(execution).code));
+    if(attention){
+      attention.innerHTML=pending.length?pending.map(execution=>{
+        const names=execution.plan_tests?.length?execution.plan_tests.map(test=>test.name||typeName(test.code)):[execution.test_name||typeName(execution.test_code)];
+        const status=executionDisplayStatus(execution);
+        return '<article class="test-attention-row"><div class="test-attention-copy"><b>'+esc(formatExecutionDate(execution.executed_at))+'</b><span>'+esc(names.join(' · '))+'</span></div><span class="execution-status '+status.className+'">'+(status.code==='DRAFT'?'Borrador':'Pendiente')+'</span><button class="btn small" data-summary-open="'+execution.id+'">Abrir registro</button></article>';
+      }).join(''):'<div class="test-attention-empty">Todos los registros están al día. No hay pruebas pendientes ni borradores.</div>';
+      attention.querySelectorAll('[data-summary-open]').forEach(button=>button.addEventListener('click',()=>openExistingExecution(Number(button.dataset.summaryOpen))));
+    }
   }
 
   function renderHistoricalAnalytics(){
@@ -732,8 +740,9 @@
     if(overall==='COMPLETADA'&&completed===tests.length){
       return {code:'COMPLETE',label:'Completo',className:'done'};
     }
-    if(completed>0){
-      return {code:'INCOMPLETE',label:'Incompleto',className:'incomplete'};
+    const hasStarted=tests.some(test=>test.has_data===true||String(test.status||'').trim().toUpperCase()==='COMPLETADA');
+    if(hasStarted){
+      return {code:'INCOMPLETE',label:'Pendiente',className:'incomplete'};
     }
     return {code:'DRAFT',label:'En borrador',className:'draft'};
   }
@@ -752,7 +761,7 @@
       const testCount=names.length;
       const state=executionDisplayStatus(x);
       return '<tr><td><b>'+esc(formatExecutionDate(x.executed_at))+'</b></td><td><b>'+esc(names.join(' · '))+'</b></td><td>'+testCount+'</td><td>'+esc(x.operator_name||'—')+'</td><td><span class="execution-status '+state.className+'">'+state.label+'</span></td><td><div class="test-row-actions"><button class="btn small" data-open-execution="'+x.id+'" title="Continuar completando esta ejecución">Abrir plan</button><button class="btn small danger test-delete-button" data-delete-execution="'+x.id+'" title="Eliminar ejecución" aria-label="Eliminar ejecución #'+x.id+'"><svg><use href="#i-trash"/></svg>Eliminar</button></div></td></tr>';
-    }).join(''):'<tr><td colspan="6" class="test-empty">'+(testHistoryLoadError?'No se pudo consultar el historial: '+esc(testHistoryLoadError):(testExecutions.length?'No hay registros que coincidan con el filtro.':'No hay registros para este transformador. Los planes se ordenan por fecha de visita, del más reciente al más antiguo.'))+'</td></tr>';
+    }).join(''):'<tr><td colspan="6" class="test-empty">'+(testHistoryLoadError?'No se pudo consultar el historial: '+esc(testHistoryLoadError):(testExecutions.length?'No hay registros que coincidan con el filtro.':'No hay registros para este transformador. Los registros se ordenan por fecha, del más reciente al más antiguo.'))+'</td></tr>';
     $$('[data-open-execution]').forEach(b=>b.addEventListener('click',()=>openExistingExecution(Number(b.dataset.openExecution))));
     $$('[data-delete-execution]').forEach(button=>button.addEventListener('click',async()=>{
       const id=Number(button.dataset.deleteExecution);
@@ -760,7 +769,7 @@
       if(!id||!visit)return;
       const date=formatExecutionDate(visit.executed_at);
       const count=visit.plan_tests?.length||1;
-      const confirmed=window.confirm('¿Eliminar la visita #'+id+' del '+date+'? Se eliminarán también sus '+count+' ensayo(s) y todas sus mediciones. Esta acción no se puede deshacer.');
+      const confirmed=window.confirm('¿Eliminar el registro #'+id+' del '+date+'? Se eliminarán también sus '+count+' ensayo(s) y todas sus mediciones. Esta acción no se puede deshacer.');
       if(!confirmed)return;
       button.disabled=true;
       button.title='Eliminando…';
@@ -770,10 +779,10 @@
           body:JSON.stringify({id:id,transformer_key:transformer.key})
         });
         const result=await readApiResponse(response);
-        if(!result.ok)throw new Error(result.message||'No se pudo eliminar la visita.');
+        if(!result.ok)throw new Error(result.message||'No se pudo eliminar el registro.');
         testExecutions=testExecutions.filter(item=>Number(item.id)!==id);
         renderTestHistory();
-        toast('Ejecución #'+id+' eliminada correctamente.');
+        toast('Registro #'+id+' eliminado correctamente.');
       }catch(error){
         button.disabled=false;
         button.title='Eliminar ejecución';
