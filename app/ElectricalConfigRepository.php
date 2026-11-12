@@ -177,7 +177,10 @@ class ElectricalConfigRepository
                 if (!$hasData) continue;
                 $activeTerminals++;
                 if ($terminalCode === '') throw new InvalidArgumentException('Falta el código del borne '.($tIndex + 1).' en '.$name.'.');
-                if (trim((string)($terminal['phase'] ?? '')) === '') throw new InvalidArgumentException('Indica la fase del borne '.$terminalCode.' en '.$name.'.');
+                if (mb_strlen($terminalCode) > 20) throw new InvalidArgumentException('El código del borne '.$terminalCode.' supera el máximo de 20 caracteres.');
+                $phaseCode = strtoupper(trim((string)($terminal['phase'] ?? '')));
+                if ($phaseCode === '') throw new InvalidArgumentException('Indica la fase o designación del borne '.$terminalCode.' en '.$name.'.');
+                if (mb_strlen($phaseCode) > 8) throw new InvalidArgumentException('La fase o designación del borne '.$terminalCode.' admite máximo 8 caracteres.');
                 if (isset($terminalCodes[$terminalCode])) throw new InvalidArgumentException('El borne '.$terminalCode.' está repetido en '.$name.'.');
                 $terminalCodes[$terminalCode] = true;
             }
@@ -242,7 +245,7 @@ class ElectricalConfigRepository
                 $windingIds[$index] = $windingId;
                 foreach (($winding['terminals'] ?? []) as $tiIndex => $terminal) {
                     $hasBushing = !empty($terminal['has_capacitive_bushing']) ? 1 : 0;
-                    $ti->execute([$windingId, $tiIndex + 1, trim((string)($terminal['code'] ?? '')), trim((string)($terminal['phase'] ?? '')), trim((string)($terminal['type'] ?? 'Fase')), $hasBushing]);
+                    $ti->execute([$windingId, $tiIndex + 1, strtoupper(trim((string)($terminal['code'] ?? ''))), strtoupper(trim((string)($terminal['phase'] ?? ''))), trim((string)($terminal['type'] ?? 'Fase')), $hasBushing]);
                     $terminalId = (int)$this->pdo->lastInsertId();
                     if ($hasBushing) {
                         $b = $terminal['bushing'] ?? [];
