@@ -373,7 +373,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
           <div class="tap-source-card" id="tapSourceCard">
             <div class="tap-source-heading"><span class="tap-source-icon"><svg><use href="#i-info"/></svg></span><div><strong>Datos del conmutador · ficha técnica</strong><small>Valores de solo lectura sincronizados con la tabla de transformadores.</small></div><button class="tap-source-edit" type="button" id="editTapMetadata">Modificar en ficha técnica ↗</button></div>
             <div class="tap-source-values"><div><small>Tipo detectado</small><strong id="tapSourceType">—</strong></div><div><small>Posiciones TAP registradas</small><strong id="tapSourceCount">—</strong></div><div><small>Origen</small><strong>Base de datos</strong></div></div>
-            <p class="tap-source-note" id="tapSourceNote">La cantidad indicada debe coincidir con las posiciones registradas en cada conmutador.</p>
+            <p class="tap-source-note" id="tapSourceNote">Las posiciones de los conmutadores se comparan con la ficha técnica.</p><button class="btn primary hidden" type="button" id="syncTapPositions">Sincronizar posiciones con la ficha</button>
           </div>
           <div id="tapChangersContainer" class="tap-changers-container"></div>
           <div class="panel-footer"><button class="btn" type="button" data-prev="windings">← Volver a bobinados</button><span>Las posiciones pueden pegarse directamente desde Excel.</span><button class="btn primary" type="button" data-next="review">Revisar configuración <span>→</span></button></div>
