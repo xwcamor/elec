@@ -1,3 +1,9 @@
+## v1.5.93
+- Corrige el desajuste entre cantidad TAP de la ficha técnica y filas del conmutador: deja de bloquear el avance solo por diferencias de cantidad.
+- Añade acción explícita para sincronizar las filas de los conmutadores con la ficha técnica.
+- Conserva las filas existentes que caben en la nueva cantidad; solicita confirmación si se eliminarían filas con datos.
+- La sincronización modifica solo el borrador actual; las versiones históricas y ensayos guardados permanecen intactos.
+
 ## v1.5.92
 - Establece un máximo de 150 posiciones TAP por transformador/conmutador.
 - Valida cantidades en el formulario de ficha técnica y en el servidor PHP.
