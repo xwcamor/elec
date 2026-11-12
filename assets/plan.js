@@ -17,7 +17,7 @@
   const templates={
     WINDING_RESISTANCE:{prefix:'WR',cols:[['section','Devanado (AT / BT)'],['tap','TAP'],['phase','Fase / conexión'],['test_current_a','I de prueba (A)'],['temperature_c','Temperatura medida (°C)'],['resistance_measured','Resistencia medida'],['resistance_referred_75c','Resistencia referida 75 °C'],['notes','Observación']]},
     INSULATION_RESISTANCE:{prefix:'IR',cols:[['point','Punto de aplicación'],['applied_voltage_kv','Voltaje aplicado (kV)'],['reading_15s','Resistencia a 15 s'],['reading_30s','Resistencia a 30 s'],['reading_45s','Resistencia a 45 s'],['reading_1min','Resistencia a 1 min'],['absorption_index','Índice de absorción (1 min / 30 s)'],['reading_unit','Unidad de resistencia'],['notes','Observación']]},
-    POWER_FACTOR:{prefix:'PF',cols:[['measurement','Modo de prueba'],['test_voltage','Tensión de prueba (V)'],['power_factor_measured','Factor de Potencia (medido) (%)'],['power_factor_corrected_20c','Factor de Potencia (Corregido) (%)'],['capacitance_source_f','Capacitancia'],['capacitance_measured','Capacitancia medida (nF)'],['status','Estado']]},
+    POWER_FACTOR:{prefix:'PF',cols:[['measurement','Modo de prueba'],['test_voltage','Tensión de prueba (V)'],['power_factor_measured','Factor de Potencia medido (%)'],['power_factor_corrected_20c','Factor de Potencia corregido (%)'],['capacitance_source_f','Capacitancia'],['capacitance_measured','Capacitancia medida'],['status','Estado']]},
     EXCITATION:{prefix:'EXC',cols:[['tap','TAP'],['phase','Fase'],['frequency_hz','Frecuencia (Hz)'],['excitation_current','Corriente de excitación'],['losses','Pérdidas'],['notes','Observación']]},
     BUSHING:{prefix:'BUSH',cols:[['terminal','Borne'],['serial','Serie'],['test_voltage','Tensión de prueba'],['power_factor_plate','FP de placa'],['power_factor_measured','FP medido'],['capacitance_plate','Capacitancia de placa'],['capacitance_measured','Capacitancia medida'],['variation_percent','Variación (%)'],['result','Resultado capacitancia'],['notes','Observación']]},
     SFRA:{prefix:'SFRA',cols:[['connection','Configuración'],['tap','TAP'],['file_reference','Archivo / curva de campo'],['reference_curve','Curva de referencia (fábrica)'],['comparison_result','Resultado de comparación'],['result','Evaluación manual'],['notes','Observación']]},
@@ -84,17 +84,19 @@
   }
   function powerFactorObservation(rows){
     const statuses=(rows||[]).map(row=>normalize('POWER_FACTOR',row).status);
-    if(statuses.length===6&&statuses.every(s=>s==='CORRECTO'))return 'Los valores obtenidos están dentro de lo recomendado según la cláusula 7.2.14 de la norma IEEE Std C57. 152 - 2013. Los valores son aceptables.';
+    if(statuses.length>0&&statuses.every(s=>s==='CORRECTO'))return 'Los valores obtenidos están dentro de lo recomendado según la cláusula 7.2.14 de la norma IEEE Std C57. 152 - 2013. Los valores son aceptables.';
     if(statuses.some(s=>s==='OBSERVADO'))return 'Se encontraron valores observados';
     return 'Pendiente de completar las seis mediciones del ensayo.';
   }
+  const capacitanceUnits={pF:1e-3,nF:1,µF:1e3,mF:1e6,F:1e9};
+  function capacitanceDisplay(value,unit){const n=number(value);return n===null?'':(n*(capacitanceUnits[unit]||1)).toFixed(6);}
   function refreshPowerFactorLive(card,item){
     if(!card||!item||item.code!=='POWER_FACTOR')return;
     item.rows=(item.rows||[]).map(row=>normalize('POWER_FACTOR',row));
     item.observations=powerFactorObservation(item.rows);
     item.rows.forEach((row,index)=>['capacitance_measured','status'].forEach(key=>{
       const output=card.querySelector('[data-row="'+index+'"][data-col="'+key+'"]');
-      if(output&&output.value!==String(row[key]??''))output.value=row[key]??'';
+      if(output){const display=key==='capacitance_measured'?capacitanceDisplay(row[key],item.capacitance_unit||'nF'):(row[key]??'');if(output.value!==String(display))output.value=display;}
     }));
     const observation=card.querySelector('[data-meta="observations"]');
     if(observation&&observation.value!==item.observations)observation.value=item.observations;
@@ -136,7 +138,7 @@
     });
     return out;
   }
-  function makeItem(code,old){old=old||{};return {id:old.id||null,code,name:typeName(code),status:old.status||'BORRADOR',standard_reference:old.standard_reference||'',equipment_name:old.equipment_name||'',equipment_brand:old.equipment_brand||'',equipment_model:old.equipment_model||'',equipment_serial:old.equipment_serial||'',observations:old.observations||'',rows:old.rows||defaults(code)};}
+  function makeItem(code,old){old=old||{};return {id:old.id||null,code,name:typeName(code),status:old.status||'BORRADOR',standard_reference:old.standard_reference||'',equipment_name:old.equipment_name||'',equipment_brand:old.equipment_brand||'',equipment_model:old.equipment_model||'',equipment_serial:old.equipment_serial||'',capacitance_unit:old.capacitance_unit||'nF',observations:old.observations||'',rows:old.rows||defaults(code)};}
   const requiredByTest={
     TTR:['tap','at','bt','U','V','W','result'],
     POWER_FACTOR:['measurement','test_voltage','power_factor_measured','power_factor_corrected_20c','capacitance_source_f','status'],
@@ -467,10 +469,10 @@
     activeTestIndex=Math.max(0,Math.min(activeTestIndex,items.length-1));
     host.innerHTML=items.map((item,idx)=>{
       const fieldList=columns(item.code),required=requiredByTest[item.code]||[],metrics=itemMetrics(item);
-      const head='<tr>'+fieldList.map(f=>'<th>'+esc(f[1])+(required.includes(f[0])?'<i class="required-mark" title="Campo requerido">*</i>':'')+'</th>').join('')+'<th class="plan-row-action-head">Acción</th></tr>';
+      const head='<tr>'+fieldList.map(f=>'<th>'+((item.code==='POWER_FACTOR'&&f[0]==='power_factor_measured')?'Factor de Potencia medido (%)':(item.code==='POWER_FACTOR'&&f[0]==='power_factor_corrected_20c')?'Factor de Potencia corregido (%)':(item.code==='POWER_FACTOR'&&f[0]==='capacitance_measured'?'Capacitancia medida (<select class="plan-unit-select" data-meta="capacitance_unit" aria-label="Unidad de capacitancia">'+['pF','nF','µF','mF','F'].map(u=>'<option value="'+u+'" '+((item.capacitance_unit||'nF')===u?'selected':'')+'>'+u+'</option>').join('')+'</select>)':esc(f[1]))+(required.includes(f[0])?'<i class="required-mark" title="Campo requerido">*</i>':'')+'</th>').join('')+'<th class="plan-row-action-head">Acción</th></tr>';
       if(item.code==='POWER_FACTOR')item.observations=powerFactorObservation(item.rows);
        const body=item.rows.map((raw,ri)=>{
-        const row=normalize(item.code,raw),rowMetrics=metrics.rowStates[ri]||{any:false,state:'empty'};
+        const row=normalize(item.code,raw),rowMetrics=metrics.rowStates[ri]||{any:false,state:'empty'};if(item.code==='POWER_FACTOR')row.capacitance_measured=capacitanceDisplay(row.capacitance_measured,item.capacitance_unit||'nF');
         return '<tr data-row-state="'+rowMetrics.state+'">'+fieldList.map(([key])=>{
           const calc=['absorption_index','theoretical','errU','errV','errW'].includes(key)||(item.code==='TTR'&&key==='result')||(item.code==='BUSHING'&&['variation_percent','result'].includes(key))||(item.code==='POWER_FACTOR'&&['capacitance_measured','status'].includes(key)),must=required.includes(key),value=row[key]??'';
           const filled=requiredValueFilled(key,value),missing=must&&!filled;
@@ -480,7 +482,7 @@
             return '<td><select class="plan-cell plan-result-select '+(filled?'is-filled':'is-missing')+'" data-row="'+ri+'" data-col="'+key+'" data-state="'+(filled?current.toLowerCase():'pending')+'" '+(must?'data-required="1"':'')+'>'+extra+options.map(option=>'<option value="'+option+'" '+(current===option?'selected':'')+'>'+option+'</option>').join('')+'</select></td>';
           }
           return '<td><input class="plan-cell '+(calc?'calculated':'')+(filled?' is-filled':'')+(missing?' is-missing':'')+'" data-row="'+ri+'" data-col="'+key+'" value="'+esc(value)+'" '+(must?'data-required="1"':'')+(calc?' readonly title="Campo calculado según el protocolo"':'')+(must&&!filled?' aria-label="'+esc(fieldList.find(f=>f[0]===key)?.[1]||key)+' pendiente"':'')+'></td>';
-        }).join('')+'<td class="plan-row-action"><button type="button" class="plan-remove-row" data-remove-row="'+ri+'" data-test-index="'+idx+'" '+((item.code==='POWER_FACTOR'?item.rows.length<=6:item.rows.length<=1)?'disabled':'')+' title="'+(item.code==='POWER_FACTOR'&&item.rows.length<=6?'Los seis modos LAP son obligatorios':'Eliminar fila')+'" aria-label="Eliminar fila '+(ri+1)+'">×</button></td></tr>';
+        }).join('')+'<td class="plan-row-action"><button type="button" class="plan-remove-row" data-remove-row="'+ri+'" data-test-index="'+idx+'" '+(item.rows.length<=1?'disabled':'')+' title="'+(item.rows.length<=1?'Debe conservarse al menos una fila':'Eliminar fila')+'" aria-label="Eliminar fila '+(ri+1)+'">×</button></td></tr>';
       }).join('');
       let hint='';
       if(item.code==='POWER_FACTOR')hint='<div class="plan-reference-note"><b>Cálculo y aceptación:</b> capacitancia medida (nF) = capacitancia de fuente (F) × 10⁹. Estado CORRECTO cuando el FP corregido es menor que 1%; en caso contrario, OBSERVADO. Criterio del protocolo: cláusula 7.2.14 de IEEE Std C57.152-2013.</div>';
@@ -615,6 +617,7 @@
     const tests=items.map(item=>({
       id:item.id,code:item.code,name:item.name,
       status:itemMetrics(item).complete?'COMPLETADA':'BORRADOR',
+      capacitance_unit:item.capacitance_unit||'nF',
       standard_reference:item.standard_reference,
       equipment_name:item.equipment_name,equipment_brand:item.equipment_brand,
       equipment_model:item.equipment_model,equipment_serial:item.equipment_serial,
@@ -725,13 +728,13 @@
       const removedIndex=Number(del.dataset.removeTest);items.splice(removedIndex,1);activeTestIndex=Math.min(activeTestIndex,items.length-1);render();markPlanChanged(350);return;
     }
     const removeRow=e.target.closest('[data-remove-row]');
-    if(removeRow){const index=Number(removeRow.dataset.testIndex),row=Number(removeRow.dataset.removeRow),item=items[index];if(!item)return;if(item.code==='POWER_FACTOR'&&item.rows.length<=6){toast('Los seis modos de factor de potencia son obligatorios.',true);return;}if(item.rows.length<=1){toast('El ensayo debe conservar al menos una fila.',true);return;}item.rows.splice(row,1);if(item.code==='POWER_FACTOR')item.observations=powerFactorObservation(item.rows);renderCards();refreshPlanFeedback();markPlanChanged(350);return;}
+    if(removeRow){const index=Number(removeRow.dataset.testIndex),row=Number(removeRow.dataset.removeRow),item=items[index];if(!item)return;if(item.rows.length<=1){toast('El ensayo debe conservar al menos una fila.',true);return;}item.rows.splice(row,1);if(item.code==='POWER_FACTOR')item.observations=powerFactorObservation(item.rows);renderCards();refreshPlanFeedback();markPlanChanged(350);return;}
     const add=e.target.closest('[data-add-row]');
     if(add){items[Number(add.dataset.addRow)]?.rows.push({});renderCards();refreshPlanFeedback();markPlanChanged(350);}
   });
   $('#planTestCards').addEventListener('input',e=>{
     const card=e.target.closest('[data-test-index]');if(!card)return;const item=items[Number(card.dataset.testIndex)];if(!item)return;
-    if(e.target.dataset.meta){if(e.target.dataset.meta==='status')return;item[e.target.dataset.meta]=e.target.value;refreshCardStatus(card,item);refreshPlanFeedback();return;}
+    if(e.target.dataset.meta){if(e.target.dataset.meta==='status')return;item[e.target.dataset.meta]=e.target.value;if(item.code==='POWER_FACTOR'&&e.target.dataset.meta==='capacitance_unit')refreshPowerFactorLive(card,item);refreshCardStatus(card,item);refreshPlanFeedback();return;}
     if(!e.target.classList.contains('plan-cell'))return;
     const row=Number(e.target.dataset.row),key=e.target.dataset.col;item.rows[row]=item.rows[row]||{};item.rows[row][key]=e.target.value;
     const nr=normalize(item.code,item.rows[row]);
