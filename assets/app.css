@@ -824,3 +824,11 @@ body.config-focus .config-toolbar{position:sticky;top:0;z-index:70}
 body.config-focus .config-sidebar{position:relative;top:auto;z-index:1}
 body.config-focus .config-panel .form-grid input[readonly]{background:#f6f8fa;color:#536a7d;border-color:#e1e7ec;cursor:default}
 body.config-focus .config-panel .form-grid input[readonly]:focus{border-color:#e1e7ec;box-shadow:none}
+
+/* Datos compartidos obligatorios: ámbar pendiente, verde registrado */
+.plan-core-grid label,.execution-date-field{position:relative}
+.plan-core-grid label.meta-pending,.execution-date-field:has(input.is-missing){color:#996d20}
+.plan-core-grid label.meta-complete,.execution-date-field:has(input.is-filled){color:#327b4d}
+.plan-core-grid input.is-missing,.execution-date-field input.is-missing{border-color:#e7c983;background:#fff9ec}
+.plan-core-grid input.is-filled,.execution-date-field input.is-filled{border-color:#b5d9bd;background:#f3faf4;color:#245d38}
+.plan-core-grid label .required-mark{color:#c17b16;font-style:normal;font-weight:900}
