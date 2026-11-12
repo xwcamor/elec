@@ -188,7 +188,7 @@ Reglas:
 - Los conectores entre pasos reflejan progreso completado.
 - No depender exclusivamente del color: usar número, check, icono y/o texto.
 
-## 8. Formularios y tarjetas
+## 7. Formularios y tarjetas
 
 - Cada campo tiene etiqueta persistente; el placeholder no reemplaza la etiqueta.
 - La unidad se coloca en la etiqueta o junto al valor de forma consistente.
