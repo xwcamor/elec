@@ -88,6 +88,17 @@
     if(statuses.some(s=>s==='OBSERVADO'))return 'Se encontraron valores observados';
     return 'Pendiente de completar las seis mediciones del ensayo.';
   }
+  function refreshPowerFactorLive(card,item){
+    if(!card||!item||item.code!=='POWER_FACTOR')return;
+    item.rows=(item.rows||[]).map(row=>normalize('POWER_FACTOR',row));
+    item.observations=powerFactorObservation(item.rows);
+    item.rows.forEach((row,index)=>['capacitance_measured','status'].forEach(key=>{
+      const output=card.querySelector('[data-row="'+index+'"][data-col="'+key+'"]');
+      if(output&&output.value!==String(row[key]??''))output.value=row[key]??'';
+    }));
+    const observation=card.querySelector('[data-meta="observations"]');
+    if(observation&&observation.value!==item.observations)observation.value=item.observations;
+  }
   function defaults(code){
     if(code==='TTR'){const t=transformer(),n=Math.max(5,Number(t.num_taps||0));return Array.from({length:Math.min(n,100)},(_,i)=>({tap:String(i+1)}));}
     if(code==='POWER_FACTOR')return ['CH+CHL','CH','CHL','CL+CLH','CL','CLH'].map(measurement=>({measurement}));
@@ -727,8 +738,7 @@
     const nr=normalize(item.code,item.rows[row]);
      if(item.code==='POWER_FACTOR'){
        item.rows[row]=nr;
-       ['capacitance_measured','status'].forEach(k=>{const out=card.querySelector('[data-row="'+row+'"][data-col="'+k+'"]');if(out)out.value=nr[k]||'';});
-       item.observations=powerFactorObservation(item.rows);const note=card.querySelector('[data-meta="observations"]');if(note)note.value=item.observations;
+       refreshPowerFactorLive(card,item);
      }
     if(item.code==='INSULATION_RESISTANCE'&&['reading_30s','reading_1min'].includes(key)){item.rows[row]=nr;const out=card.querySelector('[data-row="'+row+'"][data-col="absorption_index"]');if(out)out.value=nr.absorption_index;}
     if(item.code==='TTR'&&['at','bt','U','V','W'].includes(key)){item.rows[row]=nr;['theoretical','errU','errV','errW','result'].forEach(k=>{const out=card.querySelector('[data-row="'+row+'"][data-col="'+k+'"]');if(out)out.value=nr[k]||'';});}
@@ -739,7 +749,7 @@
   $('#planTestCards').addEventListener('change',e=>{
     const card=e.target.closest('[data-test-index]');if(!card)return;
     const item=items[Number(card.dataset.testIndex)];if(!item)return;
-    if(e.target.dataset.meta||e.target.classList.contains('plan-cell')){refreshCardStatus(card,item);refreshPlanFeedback();}
+    if(e.target.dataset.meta||e.target.classList.contains('plan-cell')){if(item.code==='POWER_FACTOR')refreshPowerFactorLive(card,item);refreshCardStatus(card,item);refreshPlanFeedback();}
   });
     $('#planPage').addEventListener('input',e=>{
     if(['planDate','planOperator','planSupervisor'].includes(e.target.id))refreshPlanFeedback();
