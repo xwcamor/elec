@@ -368,6 +368,18 @@ body.config-focus .config-toolbar{padding-top:14px}
 
 /* v1.5.27 · Rediseño de interfaz: sobriedad, foco y movimiento funcional */
 :root{
+  --ui-space-1:4px;
+  --ui-space-2:8px;
+  --ui-space-3:12px;
+  --ui-space-4:16px;
+  --ui-space-5:20px;
+  --ui-space-6:24px;
+  --ui-space-7:32px;
+  --ui-page-gutter:24px;
+  --ui-page-gutter-mobile:12px;
+  --ui-page-section-gap:24px;
+  --ui-card-padding:20px;
+  --ui-card-padding-compact:16px;
   --ui-ink:#192b3d;
   --ui-muted:#687b8d;
   --ui-line:#dce4eb;
@@ -388,7 +400,7 @@ body{background:var(--ui-canvas);color:var(--ui-ink)}
 .btn:hover{border-color:#b9cad8;background:#f9fbfc}
 .btn:active,.test-view-tab:active,.config-tab:active{transform:scale(.985)}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid #5c9bc8;outline-offset:2px}
-.test-page,.execution-page{padding-top:4px}
+.test-page,.execution-page{padding-top:0}
 .test-page>.config-toolbar,.execution-page>.config-toolbar{margin-bottom:8px}
 .test-view-switcher{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:5px;margin:0 0 14px;background:#edf1f4;border:1px solid #e0e6eb;border-radius:9px}
 .test-view-tab{justify-content:center;min-height:41px;padding:8px 12px;border:1px solid transparent;border-radius:6px;color:#708091;font-size:11px;font-weight:650;transition:background-color .17s ease,color .17s ease,border-color .17s ease,transform .14s ease}
@@ -621,11 +633,11 @@ body.test-page-focus .record-heading,
 body.test-page-focus .record-tabs,
 body.test-page-focus>.page-shell>.general-card{display:none!important}
 body.test-page-focus .page-shell{width:100%;max-width:none;margin:0;padding:0 24px 22px}
-body.test-page-focus .test-page{margin-top:0;min-height:calc(100vh - 20px)}
+body.test-page-focus .test-page{margin-top:0;padding-top:0;min-height:calc(100vh - 20px)}
 body.test-page-focus .test-page>.config-toolbar{padding-top:14px}
 @media(max-width:760px){body.test-page-focus .page-shell{padding:0 12px 16px}body.test-page-focus .test-page>.config-toolbar{padding-top:10px}}
 body.test-form-focus .page-shell{width:100%;max-width:none;margin:0;padding:0 24px 22px}
-body.test-form-focus .execution-page{margin-top:0;min-height:calc(100vh - 20px)}
+body.test-form-focus .execution-page{margin-top:0;padding-top:0;min-height:calc(100vh - 20px)}
 body.test-form-focus .config-toolbar{padding-top:14px}
 body.test-form-focus .plan-shared-section,
 body.test-form-focus .plan-tests-section{scroll-margin-top:84px}
