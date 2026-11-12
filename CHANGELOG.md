@@ -1,3 +1,8 @@
+## v1.5.122
+- Restaura el resaltado amarillo de las celdas obligatorias de Borne cuando están vacías, tanto al cargar como al agregar filas nuevas.
+- Al escribir un código de borne, el resaltado amarillo desaparece; si se borra el valor, vuelve a mostrarse.
+- Actualiza las referencias de caché de los recursos frontend.
+
 ## v1.5.121
 - Al cargar una configuración, descarta filas históricas de bornes cuyo código está vacío. Esas filas antiguas podían seguir apareciendo como incompletas y activar la exclamación aunque no fueran bornes reales.
 - Mantiene las filas nuevas vacías como borradores locales: no se incluyen en el payload ni se guardan hasta completar el código del borne.
