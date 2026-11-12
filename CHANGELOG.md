@@ -1,3 +1,7 @@
+## 1.5.62
+- Retira el título «¿Qué pruebas vas a registrar?» y el texto explicativo de la sección de selección de ensayos para simplificar el formulario.
+- Actualiza la caché de recursos.
+
 ## 1.5.61
 - Recalcula el resumen global de ensayos en tiempo real al editar cualquier campo, no solo al reconstruir los formularios.
 - Actualiza inmediatamente el indicador «Todos completos» o la cantidad de pendientes y su estado visual.
