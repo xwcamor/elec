@@ -81,7 +81,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.54">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.55">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -334,9 +334,17 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       <div class="plan-selection-status" id="planSelectionStatus" aria-live="polite">Aún no has añadido ensayos al plan.</div>
     </section>
     <section class="execution-card plan-tests-section plan-step-panel" id="planResultsSection" data-plan-panel="results" hidden>
-      <div class="execution-card-title"><span class="eyebrow">03 · FORMULARIOS DE PRUEBA</span><h3>Resultados por ensayo</h3><p>Marca, modelo, serie, norma y observaciones se registran por prueba, ya que el instrumento puede cambiar entre ensayos.</p></div>
-      <div id="planTestNav" class="plan-test-nav" aria-label="Ensayos seleccionados"></div>
-      <div id="planTestCards"><div class="empty-state">Selecciona los ensayos para que aparezcan aquí sus formularios.</div></div>
+      <details class="plan-results-accordion" id="planResultsAccordion">
+        <summary class="plan-results-accordion-head">
+          <span class="plan-results-accordion-copy"><span class="eyebrow">03 · FORMULARIOS DE PRUEBA</span><b>Resultados por ensayo</b><small id="planResultsAccordionMeta">Ensayos seleccionados</small></span>
+          <span class="plan-results-accordion-status" id="planResultsAccordionStatus"></span>
+          <span class="plan-results-accordion-chevron" aria-hidden="true">⌄</span>
+        </summary>
+        <div class="plan-results-accordion-content">
+          <div id="planTestNav" class="plan-test-nav" aria-label="Ensayos seleccionados"></div>
+          <div id="planTestCards"><div class="empty-state">Selecciona los ensayos para que aparezcan aquí sus formularios.</div></div>
+        </div>
+      </details>
     </section>
     <section class="execution-card plan-step-panel" id="planReviewSection" data-plan-panel="review" hidden>
       <div class="execution-card-title"><span class="eyebrow">04 · RESUMEN</span><h3>Revisa el registro antes de guardarlo</h3><p>Comprueba los ensayos incluidos, el avance y los datos pendientes.</p></div>
@@ -467,6 +475,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.54"></script>
-<script src="./assets/plan.js?v=1.5.54"></script>
+<script src="./assets/app.js?v=1.5.55"></script>
+<script src="./assets/plan.js?v=1.5.55"></script>
 </body></html>
