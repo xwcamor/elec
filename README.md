@@ -3,7 +3,7 @@
 Aplicación web independiente para configurar transformadores y registrar pruebas eléctricas. Es un prototipo PHP + MySQL pensado para ejecutarse localmente con Laragon.
 
 ## Versión
-**1.5.79**
+**1.5.81**
 
 ## Funcionalidades
 
@@ -18,7 +18,7 @@ Aplicación web independiente para configurar transformadores y registrar prueba
 - Registro de ejecuciones con fecha/hora, responsable, equipo, condiciones ambientales, observaciones y mediciones.
 - Historial de visitas por transformador, edición y eliminación de planes con sus mediciones, y panel de estadísticas de ejecuciones.
 - Formularios alineados con los encabezados LAP; cuando el libro no fija un criterio numérico, la evaluación queda para revisión técnica manual.
-- Registro por etapas: datos generales, selección de ensayos, mediciones de un ensayo a la vez y resumen.
+- Registro por etapas: datos generales, selección de ensayos, registro de resultados y revisión final. El registro se crea al confirmar el inicio y luego se guarda automáticamente.
 
 ## Requisitos
 
@@ -50,8 +50,8 @@ Las tablas propias del prototipo usan el prefijo `eh_`. La configuración y las 
 3. Revisa y guarda una versión de la configuración.
 4. Entra a **Pruebas eléctricas** y pulsa **Registrar pruebas** o elige un tipo de ensayo.
 5. Completa los datos generales y selecciona los ensayos. Esta preparación es temporal y no crea filas en la base de datos.
-6. Pulsa **Iniciar prueba** para crear el registro. Desde ese momento se activa el autoguardado al editar campos, salir de ellos y cambiar de etapa.
-7. Completa las mediciones, revisa los pendientes y pulsa **Finalizar prueba** cuando todos los campos obligatorios estén completos.
+6. Confirma la creación del registro al pasar a **Registro de resultados**. Desde ese momento se activa el autoguardado al editar campos, salir de ellos y cambiar de etapa.
+7. Completa las mediciones, revisa los pendientes y pulsa **Finalizar registro** cuando todos los campos obligatorios estén completos.
 8. Abre una ejecución existente desde el historial para revisar o editar ese registro; también puedes eliminarla con confirmación.
 
 Cada ejecución tiene su propio identificador. Editar una ejecución existente no debe crear otra ni sobrescribir registros de fechas distintas.
