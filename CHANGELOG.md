@@ -1,3 +1,8 @@
+## v1.5.150
+- Añade el separador inferior estándar al encabezado de la vista Resumen de Pruebas eléctricas.
+- Normaliza la jerarquía de color de las pestañas: solo la activa usa el acento; las inactivas son neutras.
+- Reduce el azul intenso de las etiquetas de contexto para respetar la jerarquía tipográfica y cromática.
+
 ## v1.5.149
 - Aplica el separador horizontal inferior al encabezado del formulario de Registro de pruebas.
 - Homologa borde, ancho y separación con el encabezado de Configuración eléctrica.
