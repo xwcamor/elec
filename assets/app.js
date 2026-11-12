@@ -896,10 +896,13 @@
       const testHtml=tests.map((test,index)=>{
         const equipment=[test.equipment_name,test.equipment_brand,test.equipment_model,test.equipment_serial].filter(Boolean).join(' · ');
         const standard=test.standard_reference||x.standard_reference||'';
+        const coreTypeLabels={NO_ESPECIFICADO:'No especificado',TRES_COLUMNAS:'Tres columnas',CINCO_COLUMNAS:'Cinco columnas',ACORAZADO:'Acorazado',OTRO:'Otro'};
+        const coreType=test.code==='EXCITATION'?coreTypeLabels[test.core_type||'NO_ESPECIFICADO']||'No especificado':'';
         const measurements=Array.isArray(test.measurements)?test.measurements:[];
         return '<section class="test"><div class="test-title"><div><small>ENSAYO '+String(index+1).padStart(2,'0')+'</small><h2>'+esc(test.name||typeName(test.code))+'</h2></div><strong>'+esc(String(test.status||'BORRADOR').replace(/_/g,' '))+'</strong></div>'+
           (standard?'<p class="equipment"><b>Norma / referencia:</b> '+esc(standard)+'</p>':'')+
           (equipment?'<p class="equipment"><b>Equipo:</b> '+esc(equipment)+'</p>':'')+
+          (coreType?'<p class="equipment"><b>Tipo de núcleo:</b> '+esc(coreType)+'</p>':'')+
           (specificTemplates[test.code]?buildSpecificReportTable(test.code,measurements,test.capacitance_unit||'nF'):buildReportMeasurementTable(measurements))+
           (test.observations?'<div class="observation"><b>Observaciones del ensayo</b><p>'+esc(test.observations).replace(/\\n/g,'<br>')+'</p></div>':'')+'</section>';
       }).join('');
