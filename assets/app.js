@@ -485,15 +485,13 @@
       <details class="tap-card tap-accordion" data-changer="${ci}" ${ci===0?'open':''}>
         <summary class="tap-accordion-summary">
           <span class="winding-index">${String(ci+1).padStart(2,'0')}</span>
-          <span class="tap-summary-main"><strong>${esc(c.name||'Conmutador sin nombre')}</strong><small>${esc(state.windings[Number(c.winding_index)]?.name||'Bobinado sin asignar')} · ${esc(c.type)} · ${c.positions.length} posiciones</small></span>
+          <span class="tap-summary-main"><strong>${esc(c.name||'Conmutador sin nombre')}</strong><small>${esc(state.windings[Number(c.winding_index)]?.name||'Bobinado sin asignar')} · ${c.positions.length} posiciones</small></span>
           <span class="winding-summary-count">${c.positions.length} TAP</span><span class="accordion-chevron">⌄</span>
         </summary>
         <div class="tap-accordion-body">
           <div class="tap-card-head"><div class="tap-meta">
             <label>Nombre<input data-cfield="name" value="${esc(c.name)}"></label>
             <label>Bobinado asociado<select data-cfield="winding_index">${state.windings.map((w,i)=>`<option value="${i}" ${Number(c.winding_index)===i?'selected':''}>${esc(w.name||w.code||'Bobinado '+(i+1))}</option>`).join('')}</select></label>
-            <label>Tipo<select data-cfield="type"><option ${c.type==='DETC'?'selected':''}>DETC</option><option ${c.type==='OLTC'?'selected':''}>OLTC</option></select></label>
-            <label>Accionamiento<select data-cfield="operation_type"><option ${c.operation_type==='Manual'?'selected':''}>Manual</option><option ${c.operation_type==='Motorizado'?'selected':''}>Motorizado</option><option ${c.operation_type==='Automático'?'selected':''}>Automático</option></select></label>
             <label>Posición mínima<input data-cfield="min_position" type="number" value="${esc(c.min_position)}"></label><label>Posición máxima<input data-cfield="max_position" type="number" value="${esc(c.max_position)}"></label><label>Neutro<input data-cfield="neutral_position" type="number" value="${esc(c.neutral_position)}"></label><label>Actual<input data-cfield="current_position" type="number" value="${esc(c.current_position)}"></label>
           </div><button class="delete-btn" data-remove-changer="${ci}" title="Eliminar conmutador"><svg><use href="#i-trash"/></svg></button></div>
           <details class="tap-positions-accordion" open>
@@ -654,7 +652,7 @@
       dirty=false;refreshSidebarAccess();refreshConfigStepIndicators();
       $('#saveStatus').classList.add('saved');$('#saveStatus').innerHTML='<i></i>Guardado';
       $('#versionBadge').textContent='Versión '+state.version_no;renderReview();
-      toast('Configuración guardada y verificada en MySQL · versión '+state.version_no+'.');
+      toast('Configuración guardada · versión '+state.version_no+'.');
     }catch(error){toast(error.message,true);}finally{btns.forEach(b=>{b.disabled=false;b.innerHTML='<svg><use href="#i-check"/></svg>Guardar configuración';});}
   }
   $('#saveConfig')?.addEventListener('click',saveConfig);
