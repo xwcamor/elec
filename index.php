@@ -81,7 +81,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.67">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.68">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -297,13 +297,13 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       <div class="plan-toolbar-actions"><span id="planSaveStatus" class="plan-save-status" data-state="idle" aria-live="polite"><i></i><span>Se guardará automáticamente al modificar datos</span></span><div class="toolbar-actions"><button class="btn" id="cancelPlan">Volver al historial</button><button class="btn primary" id="saveTestPlan"><svg><use href="#i-check"/></svg>Guardar ahora</button></div></div>
     </div>
     <nav class="plan-stepper" id="planStepper" aria-label="Etapas del registro de pruebas">
-      <button type="button" class="plan-step" data-plan-step="shared" data-state="missing" aria-current="step"><span class="plan-step-number">01</span><span class="plan-step-copy"><b>Datos generales</b><small>Fecha y responsables</small></span></button>
+      <button type="button" class="plan-step" data-plan-step="shared" data-state="missing" aria-current="step"><span class="plan-step-number">01</span></button>
       <span class="plan-step-connector" aria-hidden="true"></span>
-      <button type="button" class="plan-step" data-plan-step="selection" data-state="missing"><span class="plan-step-number">02</span><span class="plan-step-copy"><b>Ensayos</b><small>Seleccionar pruebas</small></span></button>
+      <button type="button" class="plan-step" data-plan-step="selection" data-state="missing"><span class="plan-step-number">02</span></button>
       <span class="plan-step-connector" aria-hidden="true"></span>
-      <button type="button" class="plan-step" data-plan-step="results" data-state="missing"><span class="plan-step-number">03</span><span class="plan-step-copy"><b>Mediciones</b><small>Un ensayo a la vez</small></span></button>
+      <button type="button" class="plan-step" data-plan-step="results" data-state="missing"><span class="plan-step-number">03</span></button>
       <span class="plan-step-connector" aria-hidden="true"></span>
-      <button type="button" class="plan-step" data-plan-step="review" data-state="missing"><span class="plan-step-number">04</span><span class="plan-step-copy"><b>Resumen</b><small>Revisión y guardado</small></span></button>
+      <button type="button" class="plan-step" data-plan-step="review" data-state="missing"><span class="plan-step-number">04</span></button>
     </nav>
     <section class="execution-card plan-shared-card plan-step-panel" id="planSharedSection" data-plan-panel="shared">
       <div class="execution-card-title"><span class="eyebrow">01 · DATOS COMPARTIDOS</span><h3>Datos de realización y condiciones ambientales</h3><p>Se ingresan una sola vez y se comparten con todos los ensayos del plan.</p></div>
@@ -469,7 +469,7 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.67"></script>
-<script src="./assets/plan.js?v=1.5.67"></script>
+<script src="./assets/app.js?v=1.5.68"></script>
+<script src="./assets/plan.js?v=1.5.68"></script>
 </body></html>
 0
