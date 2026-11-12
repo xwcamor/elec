@@ -709,7 +709,7 @@
     Object.entries(panels).forEach(([key,selector])=>{
       $(selector)?.classList.toggle('hidden',key!==view);
     });
-    $('[data-test-view]').forEach(button=>{
+    $$('[data-test-view]').forEach(button=>{
       const active=button.dataset.testView===view;
       button.classList.toggle('active',active);
       button.setAttribute('aria-selected',active?'true':'false');
@@ -734,8 +734,8 @@
       const detail=x.plan_tests?.length?names.length+' ensayos · '+measurementCount+' valores':measurementCount+' valores';
       return '<tr><td><b>'+esc(formatExecutionDate(x.executed_at))+'</b><small>Ejecución #'+esc(x.id)+'</small></td><td><b>'+esc(names.join(' · '))+'</b></td><td>'+esc(x.operator_name||'—')+'</td><td>'+esc(detail)+'</td><td><div class="test-row-actions"><button class="btn small" data-open-execution="'+x.id+'" title="Continuar completando esta ejecución">Abrir plan</button><button class="btn small danger test-delete-button" data-delete-execution="'+x.id+'" title="Eliminar ejecución" aria-label="Eliminar ejecución #'+x.id+'"><svg><use href="#i-trash"/></svg>Eliminar</button></div></td></tr>';
     }).join(''):'<tr><td colspan="5" class="test-empty">'+(testHistoryLoadError?'No se pudo consultar el historial: '+esc(testHistoryLoadError):(testExecutions.length?'No hay registros que coincidan con el filtro.':'No hay registros para este transformador. Los planes se ordenan por fecha de visita, del más reciente al más antiguo.'))+'</td></tr>';
-    $('[data-open-execution]').forEach(b=>b.addEventListener('click',()=>openExistingExecution(Number(b.dataset.openExecution))));
-    $('[data-delete-execution]').forEach(button=>button.addEventListener('click',async()=>{
+    $$('[data-open-execution]').forEach(b=>b.addEventListener('click',()=>openExistingExecution(Number(b.dataset.openExecution))));
+    $$('[data-delete-execution]').forEach(button=>button.addEventListener('click',async()=>{
       const id=Number(button.dataset.deleteExecution);
       const visit=testExecutions.find(item=>Number(item.id)===id);
       if(!id||!visit)return;
@@ -984,7 +984,7 @@
   }
   function collectSpecificRows(){
     const cfg=specificTemplates[activeSpecificCode];if(!cfg)return[];
-    return $('#specificTestRows tr').map(tr=>{const o={};$('.specific-cell',tr).forEach((e,i)=>o[cfg.cols[i][0]]=e.value);$('.specific-legacy-cell',tr).forEach(e=>o[e.dataset.key]=e.value);return normalizeSpecificRow(activeSpecificCode,o);}).filter(r=>Object.entries(r).some(([k,v])=>k!=='absorption_index'&&String(v).trim()!==''));
+    return $('#specificTestRows tr').map(tr=>{const o={};$$('.specific-cell',tr).forEach((e,i)=>o[cfg.cols[i][0]]=e.value);$$('.specific-legacy-cell',tr).forEach(e=>o[e.dataset.key]=e.value);return normalizeSpecificRow(activeSpecificCode,o);}).filter(r=>Object.entries(r).some(([k,v])=>k!=='absorption_index'&&String(v).trim()!==''));
   }
   function specificToMeasurements(){
     const cfg=specificTemplates[activeSpecificCode],out=[];if(!cfg)return out;
