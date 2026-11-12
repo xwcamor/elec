@@ -135,6 +135,7 @@ class ElectricalTestRepository
                     'code'=>substr($testCode,0,40),
                     'name'=>substr(trim((string)($test['name'] ?? '')),0,120),
                     'status'=>in_array(strtoupper((string)($test['status'] ?? 'BORRADOR')),['BORRADOR','COMPLETADA'],true)?strtoupper((string)($test['status'] ?? 'BORRADOR')):'BORRADOR',
+                    'capacitance_unit'=>in_array((string)($test['capacitance_unit'] ?? 'nF'),['pF','nF','µF','mF','F'],true)?(string)($test['capacitance_unit'] ?? 'nF'):'nF',
                     'standard_reference'=>substr(trim((string)($test['standard_reference'] ?? '')),0,120),
                     'equipment_name'=>substr(trim((string)($test['equipment_name'] ?? '')),0,150),
                     'equipment_brand'=>substr(trim((string)($test['equipment_brand'] ?? '')),0,100),
