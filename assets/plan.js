@@ -15,13 +15,13 @@
     ['CAPACITANCE','Capacitancia complementaria (fuera de LAP)','Ensayo adicional no incluido como bloque independiente en LAP']
   ];
   const templates={
-    WINDING_RESISTANCE:{prefix:'WR',cols:[['section','Devanado (AT / BT)'],['tap','TAP'],['phase','Fase / conexión'],['test_current_a','I de prueba (A)'],['temperature_c','Temperatura medida (°C)'],['resistance_measured_ohm','Resistencia medida (Ω)'],['resistance_referred_75c_ohm','Resistencia referida 75 °C (Ω)'],['result','Resultado comparativo'],['notes','Observación']]},
-    INSULATION_RESISTANCE:{prefix:'IR',cols:[['point','Punto de aplicación'],['applied_voltage_kv','Voltaje aplicado (kV)'],['reading_15s','R a 15 s'],['reading_30s','R a 30 s'],['reading_45s','R a 45 s'],['reading_1min','R a 1 min'],['absorption_index','Índice de absorción'],['reading_unit','Unidad de resistencia'],['result','Resultado'],['notes','Observación']]},
-    POWER_FACTOR:{prefix:'PF',cols:[['measurement','Modo de medición'],['test_voltage_v','Tensión de prueba'],['power_factor_measured','FP medido'],['power_factor_corrected_20c','FP corregido a 20 °C'],['capacitance_nf','Capacitancia (nF)'],['evaluation','Evaluación manual'],['notes','Observación']]},
-    EXCITATION:{prefix:'EXC',cols:[['tap','TAP'],['phase','Fase'],['test_voltage_kv','Tensión de prueba (kV)'],['frequency_hz','Frecuencia (Hz)'],['output_current_a','Corriente de excitación'],['losses_w','Pérdidas'],['result','Resultado manual'],['notes','Observación']]},
-    BUSHING:{prefix:'BUSH',cols:[['terminal','Borne'],['serial','Serie'],['test_voltage_kv','Tensión de prueba'],['power_factor_plate','FP de placa'],['power_factor_measured','FP medido'],['capacitance_plate_pf','Capacitancia de placa (pF)'],['capacitance_measured_pf','Capacitancia medida (pF)'],['variation_percent','Variación (%)'],['result','Resultado capacitancia'],['notes','Observación']]},
+    WINDING_RESISTANCE:{prefix:'WR',cols:[['section','Devanado (AT / BT)'],['tap','TAP'],['phase','Fase / conexión'],['test_current_a','I de prueba (A)'],['temperature_c','Temperatura medida (°C)'],['resistance_measured','Resistencia medida'],['resistance_referred_75c','Resistencia referida 75 °C'],['notes','Observación']]},
+    INSULATION_RESISTANCE:{prefix:'IR',cols:[['point','Punto de aplicación'],['applied_voltage_kv','Voltaje aplicado (kV)'],['reading_15s','Resistencia a 15 s'],['reading_30s','Resistencia a 30 s'],['reading_45s','Resistencia a 45 s'],['reading_1min','Resistencia a 1 min'],['absorption_index','Índice de absorción (1 min / 30 s)'],['reading_unit','Unidad de resistencia'],['notes','Observación']]},
+    POWER_FACTOR:{prefix:'PF',cols:[['measurement','Modo de medición'],['test_voltage','Tensión de prueba'],['power_factor_measured','FP medido'],['power_factor_corrected_20c','FP corregido a 20 °C'],['capacitance_measured','Capacitancia medida'],['notes','Observación']]},
+    EXCITATION:{prefix:'EXC',cols:[['tap','TAP'],['phase','Fase'],['frequency_hz','Frecuencia (Hz)'],['excitation_current','Corriente de excitación'],['losses','Pérdidas'],['notes','Observación']]},
+    BUSHING:{prefix:'BUSH',cols:[['terminal','Borne'],['serial','Serie'],['test_voltage','Tensión de prueba'],['power_factor_plate','FP de placa'],['power_factor_measured','FP medido'],['capacitance_plate','Capacitancia de placa'],['capacitance_measured','Capacitancia medida'],['variation_percent','Variación (%)'],['result','Resultado capacitancia'],['notes','Observación']]},
     SFRA:{prefix:'SFRA',cols:[['connection','Configuración'],['tap','TAP'],['file_reference','Archivo / curva de campo'],['reference_curve','Curva de referencia (fábrica)'],['comparison_result','Resultado de comparación'],['result','Evaluación manual'],['notes','Observación']]},
-    ARRESTER:{prefix:'ARR',cols:[['section','Sección (AT / MT)'],['phase','Fase'],['output_voltage_kv','V. salida (unidad del equipo)'],['output_current_ma','I. salida (unidad del equipo)'],['test_mode','Modo (GST)'],['losses_w','Pérdidas medidas'],['capacitance_pf','Capacitancia medida'],['result','Resultado manual'],['notes','Observación']]},
+    ARRESTER:{prefix:'ARR',cols:[['section','Sección (AT / MT)'],['phase','Fase'],['output_voltage','V. salida'],['output_current','I. salida'],['test_mode','Modo de prueba (GST)'],['losses_measured','Pérdidas medidas'],['capacitance_measured','Capacitancia medida'],['notes','Observación']]},
     PROTECTIONS:{prefix:'PROT',cols:[['item','Ítem'],['accessory','Accesorio'],['terminals','Bornes'],['contact','Contacto'],['condition','Condición'],['setpoint','Ajuste'],['result','Resultado'],['notes','Observación']]},
     CAPACITANCE:{prefix:'CAP',cols:[['point','Punto / borne'],['connection','Conexión de prueba'],['test_voltage_kv','Tensión de prueba (kV)'],['capacitance_nf','Capacitancia (nF)'],['frequency_hz','Frecuencia (Hz)'],['temperature_c','Temperatura (°C)'],['result','Resultado'],['notes','Observación']]}
   };
@@ -53,6 +53,14 @@
   function number(v){const s=String(v??'').trim().replace(',','.');if(!s)return null;const n=Number(s);return Number.isFinite(n)?n:null;}
   function normalize(code,row){
     const r={...(row||{})};
+    const aliases={
+      POWER_FACTOR:{test_voltage:['test_voltage_v','test_voltage_kv'],capacitance_measured:['capacitance_nf','capacitance']},
+      EXCITATION:{excitation_current:['current','output_current_a'],losses:['power','losses_w']},
+      WINDING_RESISTANCE:{resistance_measured:['resistance_measured_ohm','resistance'],resistance_referred_75c:['resistance_referred_75c_ohm']},
+      BUSHING:{test_voltage:['test_voltage_kv'],power_factor_measured:['power_factor'],capacitance_plate:['capacitance_plate_pf'],capacitance_measured:['capacitance_measured_pf','capacitance'],serial:['serial_number']},
+      ARRESTER:{output_voltage:['output_voltage_kv','output_voltage_v'],output_current:['output_current_ma','output_current_a'],losses_measured:['losses_w','losses_measured_w'],capacitance_measured:['capacitance_pf','capacitance_measured_pf']}
+    };
+    Object.entries(aliases[code]||{}).forEach(([target,legacy])=>{if(!isFilled(r[target])){const value=legacy.map(key=>r[key]).find(isFilled);if(value!==undefined)r[target]=value;}});
     if(code==='INSULATION_RESISTANCE'){const a=number(r.reading_30s),b=number(r.reading_1min);r.absorption_index=a!==null&&a!==0&&b!==null?String(b/a):'';}
     if(code==='TTR'){
       const a=number(r.at),b=number(r.bt),theo=a!==null&&b!==null&&b!==0?a/(b*Math.sqrt(3)):number(r.theoretical);
@@ -61,7 +69,7 @@
       r.result=errors.every(v=>v!==null)?(errors.every(v=>Math.abs(v)<=0.5)?'CORRECTO':'FUERA DE TOLERANCIA'):'PENDIENTE';
     }
     if(code==='BUSHING'){
-      const plate=number(r.capacitance_plate_pf),measured=number(r.capacitance_measured_pf);
+      const plate=number(r.capacitance_plate),measured=number(r.capacitance_measured);
       const variation=plate!==null&&plate>0&&measured!==null?Math.abs(measured-plate)*100/plate:null;
       r.variation_percent=variation===null?'':String(variation);
       r.result=variation===null?'PENDIENTE':(variation<5?'CONFORME':'OBSERVADO');
@@ -72,14 +80,14 @@
     if(code==='TTR'){const t=transformer(),n=Math.max(5,Number(t.num_taps||0));return Array.from({length:Math.min(n,100)},(_,i)=>({tap:String(i+1)}));}
     if(code==='POWER_FACTOR')return ['CH+CHL','CH','CHL','CL+CLH','CL','CLH'].map(measurement=>({measurement}));
     if(code==='INSULATION_RESISTANCE')return ['AT-BT','AT-Masa','BT-Masa'].map(point=>({point}));
-    if(code==='WINDING_RESISTANCE')return [{section:'AT',phase:'U-0',test_current_a:'5'},{section:'AT',phase:'V-0',test_current_a:'5'},{section:'AT',phase:'W-0',test_current_a:'5'},{section:'BT',phase:'u-v',test_current_a:'16'},{section:'BT',phase:'v-w',test_current_a:'16'},{section:'BT',phase:'w-u',test_current_a:'16'}];
-    if(code==='EXCITATION')return ['U-0','V-0','W-0'].map(phase=>({phase}));
+    if(code==='WINDING_RESISTANCE')return [{},{}];
+    if(code==='EXCITATION'){const frequency=String(transformer().frequency_hz||'');return ['U-0','V-0','W-0'].map(phase=>({tap:'',phase,frequency_hz:frequency}));}
     if(code==='BUSHING'){
       const config=bridge.getElectricalConfig();
       const terminals=(config?.windings||[]).flatMap(w=>w.terminals||[]).filter(t=>t.has_capacitive_bushing).map(t=>({terminal:t.code||'',serial:t.bushing?.serial_number||''}));
-      return terminals.length?terminals:['1U','1V','1W','1N'].map(terminal=>({terminal}));
+      return terminals.length?terminals:[{}];
     }
-    if(code==='SFRA')return [{connection:'AT vs BT (abierto)'},{connection:'BT vs AT (abierto)'},{connection:'AT vs BT (corto circuito)'}];
+    if(code==='SFRA')return [{connection:'AT vs BT (abierto)',tap:''},{connection:'BT vs AT (abierto)',tap:''},{connection:'AT vs BT (corto circuito)',tap:''}];
     if(code==='ARRESTER')return [...['1U','1V','1W'].map(phase=>({section:'AT',phase,test_mode:'GST'})),...['2U','2V','2W','2N'].map(phase=>({section:'MT',phase,test_mode:'GST'}))];
     if(code==='PROTECTIONS')return [{}];
     return [{},{}];
@@ -108,13 +116,13 @@
   function makeItem(code,old){old=old||{};return {id:old.id||null,code,name:typeName(code),status:old.status||'BORRADOR',standard_reference:old.standard_reference||'',equipment_name:old.equipment_name||'',equipment_brand:old.equipment_brand||'',equipment_model:old.equipment_model||'',equipment_serial:old.equipment_serial||'',observations:old.observations||'',rows:old.rows||defaults(code)};}
   const requiredByTest={
     TTR:['tap','at','bt','U','V','W','result'],
-    POWER_FACTOR:['measurement','test_voltage_v','power_factor_measured','power_factor_corrected_20c'],
-    EXCITATION:['tap','phase','test_voltage_kv','frequency_hz','output_current_a','losses_w'],
-    WINDING_RESISTANCE:['section','tap','phase','test_current_a','temperature_c','resistance_measured_ohm','resistance_referred_75c_ohm'],
+    POWER_FACTOR:['measurement','test_voltage','power_factor_measured','power_factor_corrected_20c'],
+    EXCITATION:['tap','phase','frequency_hz','excitation_current','losses'],
+    WINDING_RESISTANCE:['section','tap','phase','test_current_a','temperature_c','resistance_measured','resistance_referred_75c'],
     INSULATION_RESISTANCE:['point','applied_voltage_kv','reading_15s','reading_30s','reading_45s','reading_1min'],
-    BUSHING:['terminal','serial','test_voltage_kv','power_factor_plate','power_factor_measured','capacitance_plate_pf','capacitance_measured_pf','variation_percent'],
-    SFRA:['connection','tap','result'],
-    ARRESTER:['section','phase','output_voltage_kv','output_current_ma','test_mode','losses_w','capacitance_pf'],
+    BUSHING:['terminal','serial','test_voltage','power_factor_plate','power_factor_measured','capacitance_plate','capacitance_measured','variation_percent'],
+    SFRA:['connection','tap','comparison_result','result'],
+    ARRESTER:['section','phase','output_voltage','output_current','test_mode','losses_measured','capacitance_measured'],
     PROTECTIONS:['accessory','terminals','contact','condition','result'],
     CAPACITANCE:['point','connection','test_voltage_kv','capacitance_nf']
   };
