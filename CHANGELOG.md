@@ -1,3 +1,7 @@
+## v1.5.129
+- Corrige el colapso visual del segundo paso de Configuración eléctrica reemplazando la distribución de columnas por una fila flex con conectores de ancho fijo.
+- Garantiza que los tres pasos conserven espacio para el círculo, título, contador y estado en escritorio y móvil.
+
 ## v1.5.128
 - Corrige la visualización del título y los contadores del paso «Conmutadores y TAP» en el indicador de Configuración eléctrica.
 - Refuerza la distribución de los tres pasos para mantener visibles y alineados sus textos en escritorio y móvil.
