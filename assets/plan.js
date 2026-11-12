@@ -312,7 +312,9 @@
     const host=$('#planTestNav');if(!host)return;
     host.innerHTML=items.map((item,index)=>{
       const metrics=itemMetrics(item),status=metrics.complete?'Completo':(metrics.anyData?metrics.percent+'%':'Por llenar');
-      return '<button type="button" class="plan-test-tab '+(index===activeTestIndex?'active':'')+'" data-plan-test-index="'+index+'" aria-pressed="'+(index===activeTestIndex?'true':'false')+'"><span>'+String(index+1).padStart(2,'0')+'</span><b>'+esc(item.name)+'</b><small>'+status+'</small></button>';
+      const stateClass=metrics.complete?'is-complete':(metrics.anyData?'is-incomplete':'is-unstarted');
+      const stateLabel=metrics.complete?'Completo':(metrics.anyData?'Incompleto':'Sin iniciar');
+      return '<button type="button" class="plan-test-tab '+stateClass+' '+(index===activeTestIndex?'active':'')+'" data-plan-test-index="'+index+'" aria-pressed="'+(index===activeTestIndex?'true':'false')+'" aria-label="'+esc(item.name)+' — '+stateLabel+'"><span>'+String(index+1).padStart(2,'0')+'</span><b>'+esc(item.name)+'</b><small>'+status+'</small></button>';
     }).join('');
   }
   function renderPicker(){
