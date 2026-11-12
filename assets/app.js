@@ -309,19 +309,36 @@
       $('#loadExample').addEventListener('click', loadExample); return;
     }
     host.innerHTML = state.windings.map((w,wi)=>`
-      <article class="winding-card" data-winding="${wi}">
-        <div class="winding-card-head"><span class="winding-index">${String(wi+1).padStart(2,'0')}</span><div class="winding-head-fields">
-          <input aria-label="Nombre bobinado" data-wfield="name" value="${esc(w.name)}" placeholder="Nombre bobinado">
-          <input aria-label="Código" data-wfield="code" value="${esc(w.code)}" placeholder="Código">
-          <input class="w-voltage" aria-label="Tensión kV" data-wfield="voltage_kv" type="text" inputmode="decimal" value="${esc(w.voltage_kv)}" placeholder="kV">
-          <select aria-label="Conexión" data-wfield="connection_type">${['','Estrella (Y)','Estrella con neutro (YN)','Triángulo (D)','Zig-zag (Z)','Monofásico','Autotransformador'].map(v=>`<option ${w.connection_type===v?'selected':''} value="${esc(v)}">${v || 'Conexión...'}</option>`).join('')}</select>
-          <select aria-label="Material" data-wfield="conductor_material"><option value="">Material...</option><option ${w.conductor_material==='Cobre'?'selected':''}>Cobre</option><option ${w.conductor_material==='Aluminio'?'selected':''}>Aluminio</option><option ${w.conductor_material==='Otro'?'selected':''}>Otro</option></select>
-          <input aria-label="Notas del bobinado" data-wfield="notes" value="${esc(w.notes)}" placeholder="Notas del bobinado">
-          <label class="check-inline">¿Tiene neutro?<select data-wfield="has_neutral"><option value="0" ${!w.has_neutral?'selected':''}>No</option><option value="1" ${w.has_neutral?'selected':''}>Sí</option></select></label>
-        </div><button class="delete-btn" data-remove-winding="${wi}" title="Eliminar bobinado"><svg><use href="#i-trash"/></svg></button></div>
-        <div class="winding-body"><div class="table-caption"><strong>Bornes / terminales <small data-winding-stats="${wi}">${w.terminals.length} registros · ${w.terminals.filter(t=>t.has_capacitive_bushing).length} bushings capacitivos</small></strong><div class="sheet-tools"><button data-add-terminal="${wi}">+ Fila</button><button data-copy-terminals="${wi}">Copiar bornes</button></div></div><div class="sheet-wrap" id="terminal-grid-${wi}"></div><div class="sheet-hint">Copia la tabla con «Copiar tabla» o pega desde Excel con Ctrl+V en la primera celda. Se admiten bloques con tabulaciones y saltos de línea. Incluye la ficha del bushing: serie, fabricante, modelo, tensión, capacitancia, FP y notas. Desplázate horizontalmente para ver todas las columnas.</div></div>
-      </article>`).join('');
-    host.querySelectorAll('[data-wfield]').forEach(el=>el.addEventListener('change', e=>{const card=e.target.closest('[data-winding]');const i=Number(card.dataset.winding);const key=e.target.dataset.wfield;state.windings[i][key]=key==='has_neutral'?e.target.value==='1':(key==='voltage_kv'?normalizeNumeric(e.target.value):e.target.value);if(key==='voltage_kv')e.target.value=state.windings[i][key];markDirty();}));
+      <details class="winding-card winding-accordion" data-winding="${wi}" ${wi===0?'open':''}>
+        <summary class="winding-accordion-summary">
+          <span class="winding-index">${String(wi+1).padStart(2,'0')}</span>
+          <span class="winding-summary-main"><strong>${esc(w.name||'Bobinado sin nombre')}</strong><small>${esc(w.code||'Sin código')} · ${esc(w.voltage_kv||'—')} kV · ${esc(w.connection_type||'Conexión pendiente')}</small></span>
+          <span class="winding-summary-count">${w.terminals.length} bornes</span><span class="accordion-chevron">⌄</span>
+        </summary>
+        <div class="winding-accordion-body">
+          <div class="winding-card-head"><div class="winding-head-fields">
+            <input aria-label="Nombre bobinado" data-wfield="name" value="${esc(w.name)}" placeholder="Nombre bobinado">
+            <input aria-label="Código" data-wfield="code" value="${esc(w.code)}" placeholder="Código">
+            <input class="w-voltage" aria-label="Tensión kV" data-wfield="voltage_kv" type="text" inputmode="decimal" value="${esc(w.voltage_kv)}" placeholder="kV">
+            <select aria-label="Conexión" data-wfield="connection_type">${['','Estrella (Y)','Estrella con neutro (YN)','Triángulo (D)','Zig-zag (Z)','Monofásico','Autotransformador'].map(v=>`<option ${w.connection_type===v?'selected':''} value="${esc(v)}">${v || 'Conexión...'}</option>`).join('')}</select>
+            <select aria-label="Material" data-wfield="conductor_material"><option value="">Material...</option><option ${w.conductor_material==='Cobre'?'selected':''}>Cobre</option><option ${w.conductor_material==='Aluminio'?'selected':''}>Aluminio</option><option ${w.conductor_material==='Otro'?'selected':''}>Otro</option></select>
+            <input aria-label="Notas del bobinado" data-wfield="notes" value="${esc(w.notes)}" placeholder="Notas del bobinado">
+            <label class="check-inline">¿Tiene neutro?<select data-wfield="has_neutral"><option value="0" ${!w.has_neutral?'selected':''}>No</option><option value="1" ${w.has_neutral?'selected':''}>Sí</option></select></label>
+          </div><button class="delete-btn" data-remove-winding="${wi}" title="Eliminar bobinado"><svg><use href="#i-trash"/></svg></button></div>
+          <details class="terminal-accordion" open>
+            <summary><span>Bornes y terminales</span><small data-winding-stats="${wi}">${w.terminals.length} registros · ${w.terminals.filter(t=>t.has_capacitive_bushing).length} bushings capacitivos</small><span class="accordion-chevron">⌄</span></summary>
+            <div class="terminal-accordion-body"><div class="table-caption"><strong>Conexiones del bobinado</strong><div class="sheet-tools"><button type="button" data-add-terminal="${wi}">+ Fila</button><button type="button" data-copy-terminals="${wi}">Copiar bornes</button></div></div>
+              <div class="sheet-wrap" id="terminal-grid-${wi}"></div>
+              <div class="sheet-hint">Pega bloques desde Excel con Ctrl+V en la primera celda. Las fichas de bushing capacitivo se registran por borne.</div>
+            </div>
+          </details>
+        </div>
+      </details>`).join('');
+    host.querySelectorAll('.winding-accordion').forEach(details=>details.addEventListener('toggle',()=>{
+      if(!details.open)return;
+      host.querySelectorAll('.winding-accordion').forEach(other=>{if(other!==details)other.open=false;});
+    }));
+    host.querySelectorAll('[data-wfield]').forEach(el=>el.addEventListener('change', e=>{const card=e.target.closest('[data-winding]');const i=Number(card.dataset.winding);const key=e.target.dataset.wfield;state.windings[i][key]=key==='has_neutral'?e.target.value==='1':(key==='voltage_kv'?normalizeNumeric(e.target.value):e.target.value);if(key==='voltage_kv')e.target.value=state.windings[i][key];const summary=e.target.closest('.winding-card').querySelector('.winding-summary-main');if(summary)summary.innerHTML='<strong>'+esc(state.windings[i].name||'Bobinado sin nombre')+'</strong><small>'+esc(state.windings[i].code||'Sin código')+' · '+esc(state.windings[i].voltage_kv||'—')+' kV · '+esc(state.windings[i].connection_type||'Conexión pendiente')+'</small>';markDirty();}));
     host.querySelectorAll('[data-remove-winding]').forEach(b=>b.addEventListener('click',()=>{const i=Number(b.dataset.removeWinding);if(!confirm('¿Eliminar este bobinado y sus bornes de la configuración actual?'))return;state.windings.splice(i,1);state.tap_changers=state.tap_changers.filter(c=>c.winding_index!==i).map(c=>({...c,winding_index:c.winding_index>i?c.winding_index-1:c.winding_index}));renderWindings();renderTapChangers();updateCounts();markDirty();}));
     host.querySelectorAll('[data-add-terminal]').forEach(b=>b.addEventListener('click',()=>{const i=Number(b.dataset.addTerminal);state.windings[i].terminals.push(blankTerminal(''));renderWindings();markDirty();}));
     host.querySelectorAll('[data-copy-terminals]').forEach(b=>b.addEventListener('click',()=>copyGrid([['Borne','Fase','Tipo','¿Bushing capacitivo?','Serie bushing','Notas bushing'],...state.windings[Number(b.dataset.copyTerminals)].terminals.map(t=>[t.code,t.phase,t.type,t.has_capacitive_bushing?'Sí':'No',t.bushing.serial_number,t.bushing.notes])].map(r=>r.join('\t')).join('\n'))));
