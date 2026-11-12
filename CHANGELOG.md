@@ -1,3 +1,8 @@
+## v1.5.35
+- Completa el formulario individual de bushings con el resultado calculado de capacitancia.
+- Normaliza claves históricas de resistencia, factor de potencia, excitación, bushings y pararrayos para mostrarlas en las columnas LAP nuevas.
+- Actualiza la versión de caché de app.js y plan.js.
+
 ## v1.5.34
 - Alinea formularios de plan y ejecución individual con los protocolos LAP.
 - Elimina unidades no declaradas y campos de resultado ajenos a ciertos encabezados.
