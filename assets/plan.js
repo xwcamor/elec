@@ -260,16 +260,15 @@
     });
   }
   function renderPlanFeedback(){
-    const host=$('#planProgressPanel');if(!host)return;
-    const m=planMetrics(),allReady=m.general.length===0&&m.perItem.length>0&&m.perItem.every(x=>x.metrics.complete);
-    const headline=m.complete?'Información completa':(allReady?'Los formularios están listos':'Faltan datos por completar');
-    const state=m.complete?'success':(allReady?'info':'warning'),messages=m.missing.slice(0,7);
-    host.dataset.state=state;
-    host.innerHTML='<div class="plan-progress-main"><div class="plan-progress-copy"><div class="plan-progress-heading"><span class="plan-alert-icon">'+(state==='success'?'✓':state==='warning'?'!':'i')+'</span><div><strong>'+headline+'</strong><small>'+(items.length?m.ready+' de '+items.length+' formularios con campos mínimos completos':'Selecciona las pruebas que vas a realizar')+'</small></div></div><div class="plan-progress-track"><span style="width:'+m.percent+'%"></span></div><small class="plan-progress-number">'+m.filled+' de '+m.total+' campos mínimos · '+m.percent+'%</small></div><div class="plan-progress-side"><b>'+m.percent+'%</b><span>avance</span></div></div>'+
-      (messages.length?'<div class="plan-alert-details"><b>Datos pendientes por completar</b><ul>'+messages.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>'+(m.missing.length>messages.length?'<small>Y '+(m.missing.length-messages.length)+' pendientes más.</small>':'')+'</div>':'<div class="plan-alert-clear">✓ No hay campos obligatorios pendientes. Los datos están guardados.</div>')+
-      '<div class="plan-color-legend"><span><i class="legend-filled"></i> Verde: dato registrado</span><span><i class="legend-missing"></i> Ámbar: falta completar</span><span><i class="legend-calculated"></i> Gris: cálculo automático</span></div>';
+    const m=planMetrics();
     ['planDate','planOperator','planSupervisor'].forEach(id=>{const field=$('#'+id);if(!field)return;const missing=!isFilled(field.value);field.classList.toggle('is-missing',missing);field.classList.remove('is-filled');field.closest('label')?.classList.toggle('meta-pending',missing);field.closest('label')?.classList.remove('meta-complete');});
     updatePlanStepper(m);
+    const next=$('#planStepNext');
+    if(next){
+      const blocked=(currentPlanStep==='shared'&&m.general.length>0)||(currentPlanStep==='selection'&&items.length===0)||(currentPlanStep==='results'&&m.perItem.some(entry=>!entry.metrics.complete));
+      next.disabled=blocked;
+      next.title=blocked?(currentPlanStep==='shared'?'Completa fecha, responsable/técnico y supervisor.':currentPlanStep==='selection'?'Selecciona al menos un ensayo.':'Completa todos los campos obligatorios de cada ensayo.'):'';
+    }
     renderPlanReview();
   }
   function refreshPlanFeedback(){
@@ -291,6 +290,13 @@
   function setPlanStep(step){
     if(!planStepKeys.includes(step))return;
     if((step==='results'||step==='review')&&!items.length){toast('Añade al menos un ensayo antes de continuar.',true);step='selection';}
+    if(currentPlanStep==='shared'&&step!=='shared'&&generalMissing().length){
+      const missing=generalMissing();
+      const ids={ 'fecha de la prueba':'planDate', 'responsable / técnico':'planOperator', 'supervisor':'planSupervisor' };
+      $('#'+(ids[missing[0]]||'planDate'))?.focus();
+      toast('Completa los datos obligatorios: '+missing.join(', ')+'.',true);
+      return false;
+    }
     // No se permite abandonar Resultados por ensayo hasta completar todos los
     // campos obligatorios de cada prueba seleccionada. El guardado automático
     // de borradores sigue habilitado para no perder avances.
@@ -619,7 +625,7 @@
     if(step)setPlanStep(step.dataset.planStep);
   });
   $('#planStepBack').addEventListener('click',()=>movePlanStep(-1));
-  $('#planStepNext').addEventListener('click',()=>currentPlanStep==='review'?saveNow():movePlanStep(1));
+  $('#planStepNext').addEventListener('click',()=>{if($('#planStepNext').disabled)return;currentPlanStep==='review'?saveNow():movePlanStep(1);});
   $('#planTestPicker').addEventListener('change',e=>{
     const input=e.target.closest('input[type="checkbox"]');
     if(!input)return;
