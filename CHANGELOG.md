@@ -1,3 +1,8 @@
+## v1.5.113
+- La exportación PDF conserva la estructura de las grillas específicas: encabezados originales y una fila por medición, en lugar de convertir cada campo en una fila separada.
+- Factor de potencia: el PDF muestra modo, tensión, FP medido/corregido, capacitancia fuente, capacitancia medida y estado en sus columnas originales.
+- Guarda la unidad elegida para capacitancia medida (pF, nF, µF, mF o F) y la respeta al generar el PDF. Los registros antiguos usan nF como valor predeterminado.
+
 ## v1.5.112
 - Corrige el enlace de acciones del historial para que «Exportar PDF» y «Eliminar» se registren correctamente en todos los botones.
 - Refuerza el informe PDF imprimible: referencia normativa por ensayo, presentación A4 y guía visible para guardar como PDF.
