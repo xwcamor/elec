@@ -299,8 +299,8 @@
   }
   $('#addWinding').addEventListener('click', () => addWinding());
   $('#copyWindings')?.addEventListener('click',()=>copyGrid([
-    ['Bobinado','Código','Tensión kV','Conexión','¿Tiene neutro?','Notas'],
-    ...state.windings.map(w=>[w.name,w.code,w.voltage_kv,w.connection_type,w.has_neutral?'Sí':'No',w.notes])
+    ['Bobinado','Tensión kV','Conexión','¿Tiene neutro?'],
+    ...state.windings.map(w=>[w.name,w.voltage_kv,w.connection_type,w.has_neutral?'Sí':'No'])
   ].map(r=>r.join('\t')).join('\n')));
   function renderWindings() {
     const host = $('#windingsContainer');
@@ -312,16 +312,14 @@
       <details class="winding-card winding-accordion" data-winding="${wi}" ${wi===0?'open':''}>
         <summary class="winding-accordion-summary">
           <span class="winding-index">${String(wi+1).padStart(2,'0')}</span>
-          <span class="winding-summary-main"><strong>${esc(w.name||'Bobinado sin nombre')}</strong><small>${esc(w.code||'Sin código')} · ${esc(w.voltage_kv||'—')} kV · ${esc(w.connection_type||'Conexión pendiente')}</small></span>
+          <span class="winding-summary-main"><strong>${esc(w.name||'Bobinado sin nombre')}</strong><small>${esc(w.voltage_kv||'—')} kV · ${esc(w.connection_type||'Conexión pendiente')}</small></span>
           <span class="winding-summary-count">${w.terminals.length} bornes</span><span class="accordion-chevron">⌄</span>
         </summary>
         <div class="winding-accordion-body">
           <div class="winding-card-head"><div class="winding-head-fields">
             <input aria-label="Nombre bobinado" data-wfield="name" value="${esc(w.name)}" placeholder="Nombre bobinado">
-            <input aria-label="Código" data-wfield="code" value="${esc(w.code)}" placeholder="Código">
             <input class="w-voltage" aria-label="Tensión kV" data-wfield="voltage_kv" type="text" inputmode="decimal" value="${esc(w.voltage_kv)}" placeholder="kV">
             <select aria-label="Conexión" data-wfield="connection_type">${['','Estrella (Y)','Estrella con neutro (YN)','Triángulo (D)','Zig-zag (Z)','Monofásico','Autotransformador'].map(v=>`<option ${w.connection_type===v?'selected':''} value="${esc(v)}">${v || 'Conexión...'}</option>`).join('')}</select>
-            <input aria-label="Notas del bobinado" data-wfield="notes" value="${esc(w.notes)}" placeholder="Notas del bobinado">
             <label class="check-inline">¿Tiene neutro?<select data-wfield="has_neutral"><option value="0" ${!w.has_neutral?'selected':''}>No</option><option value="1" ${w.has_neutral?'selected':''}>Sí</option></select></label>
           </div><button class="delete-btn" data-remove-winding="${wi}" title="Eliminar bobinado"><svg><use href="#i-trash"/></svg></button></div>
           <details class="terminal-accordion" open>
@@ -333,7 +331,7 @@
           </details>
         </div>
       </details>`).join('');
-    host.querySelectorAll('[data-wfield]').forEach(el=>el.addEventListener('change', e=>{const card=e.target.closest('[data-winding]');const i=Number(card.dataset.winding);const key=e.target.dataset.wfield;state.windings[i][key]=key==='has_neutral'?e.target.value==='1':(key==='voltage_kv'?normalizeNumeric(e.target.value):e.target.value);if(key==='voltage_kv')e.target.value=state.windings[i][key];const summary=e.target.closest('.winding-card').querySelector('.winding-summary-main');if(summary)summary.innerHTML='<strong>'+esc(state.windings[i].name||'Bobinado sin nombre')+'</strong><small>'+esc(state.windings[i].code||'Sin código')+' · '+esc(state.windings[i].voltage_kv||'—')+' kV · '+esc(state.windings[i].connection_type||'Conexión pendiente')+'</small>';markDirty();}));
+    host.querySelectorAll('[data-wfield]').forEach(el=>el.addEventListener('change', e=>{const card=e.target.closest('[data-winding]');const i=Number(card.dataset.winding);const key=e.target.dataset.wfield;state.windings[i][key]=key==='has_neutral'?e.target.value==='1':(key==='voltage_kv'?normalizeNumeric(e.target.value):e.target.value);if(key==='voltage_kv')e.target.value=state.windings[i][key];const summary=e.target.closest('.winding-card').querySelector('.winding-summary-main');if(summary)summary.innerHTML='<strong>'+esc(state.windings[i].name||'Bobinado sin nombre')+'</strong><small>'+esc(state.windings[i].voltage_kv||'—')+' kV · '+esc(state.windings[i].connection_type||'Conexión pendiente')+'</small>';markDirty();}));
     host.querySelectorAll('[data-remove-winding]').forEach(b=>b.addEventListener('click',()=>{const i=Number(b.dataset.removeWinding);if(!confirm('¿Eliminar este bobinado y sus bornes de la configuración actual?'))return;state.windings.splice(i,1);state.tap_changers=state.tap_changers.filter(c=>c.winding_index!==i).map(c=>({...c,winding_index:c.winding_index>i?c.winding_index-1:c.winding_index}));renderWindings();renderTapChangers();updateCounts();markDirty();}));
     host.querySelectorAll('[data-add-terminal]').forEach(b=>b.addEventListener('click',()=>{const i=Number(b.dataset.addTerminal);state.windings[i].terminals.push(blankTerminal(''));renderWindings();markDirty();}));
     host.querySelectorAll('[data-copy-terminals]').forEach(b=>b.addEventListener('click',()=>copyGrid([['Borne','Fase','Tipo','¿Bushing capacitivo?','Notas bushing'],...state.windings[Number(b.dataset.copyTerminals)].terminals.map(t=>[t.code,t.phase,t.type,t.has_capacitive_bushing?'Sí':'No',t.bushing.notes])].map(r=>r.join('\t')).join('\n'))));
