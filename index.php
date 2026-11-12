@@ -81,7 +81,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.52">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.53">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -310,14 +310,12 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
     </section>
     <section class="execution-card plan-shared-card plan-step-panel" id="planSharedSection" data-plan-panel="shared">
       <div class="execution-card-title"><span class="eyebrow">01 · DATOS COMPARTIDOS</span><h3>Datos de realización y condiciones ambientales</h3><p>Se ingresan una sola vez y se comparten con todos los ensayos del plan.</p></div>
-      <div class="plan-shared-status is-pending" id="planSharedStatus" aria-live="polite">Pendiente: fecha de realización · responsable / técnico · supervisor</div>
       <div class="plan-core-grid plan-realization-grid">
         <label class="execution-date-field"><span>Realizada el <i class="required-mark">*</i></span><input id="planDate" type="datetime-local" required aria-required="true"></label>
         <label><span>Responsable / técnico <i class="required-mark">*</i></span><input id="planOperator" placeholder="Nombre del técnico" required aria-required="true"></label>
         <label><span>Supervisor <i class="required-mark">*</i></span><input id="planSupervisor" placeholder="Nombre del supervisor" required aria-required="true"></label>
       </div>
       <div class="plan-environment-fields">
-        <div class="plan-environment-heading"><b>Condiciones ambientales</b><span>Temperaturas y humedad durante los ensayos.</span></div>
         <div class="form-grid execution-meta-grid plan-shared-grid">
           <label>Temperatura del aceite (°C)<input id="planOilTemp" inputmode="decimal" placeholder="Ej. 35.5"></label>
           <label>Temperatura ambiente (°C)<input id="planAmbientTemp" inputmode="decimal" placeholder="Ej. 22"></label>
@@ -469,6 +467,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.52"></script>
-<script src="./assets/plan.js?v=1.5.52"></script>
+<script src="./assets/app.js?v=1.5.53"></script>
+<script src="./assets/plan.js?v=1.5.53"></script>
 </body></html>
