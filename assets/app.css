@@ -1691,3 +1691,120 @@ body.config-focus .config-save-hint{display:none!important}
  .config-stepper>.config-view-tab>.plan-step-number{font-size:14px!important}
  .config-stepper>.plan-step-connector{height:2px!important;min-width:12px!important}
 }
+
+
+/* v1.5.132 · Unifica stepper y formulario en una sola tarjeta; medidas del wizard de pruebas. */
+.config-layout{
+ display:block!important;
+ margin-top:12px!important;
+ overflow:hidden!important;
+ border:1px solid #dce5ed!important;
+ border-radius:14px!important;
+ background:#fff!important;
+ box-shadow:0 5px 22px rgba(31,55,78,.055)!important;
+}
+.config-stepper{
+ display:grid!important;
+ grid-template-columns:44px minmax(24px,1fr) 44px minmax(24px,1fr) 44px!important;
+ align-items:center!important;
+ justify-items:stretch!important;
+ column-gap:0!important;
+ width:100%!important;
+ min-height:92px!important;
+ margin:0!important;
+ padding:14px clamp(20px,7vw,112px)!important;
+ border:0!important;
+ border-bottom:1px solid #e8edf2!important;
+ border-radius:0!important;
+ background:linear-gradient(180deg,#fff 0%,#fbfcfe 100%)!important;
+ box-shadow:none!important;
+}
+.config-stepper>.config-view-tab{
+ position:relative!important;
+ z-index:1!important;
+ display:flex!important;
+ width:44px!important;
+ min-width:44px!important;
+ height:44px!important;
+ min-height:44px!important;
+ margin:0 auto!important;
+ padding:0!important;
+ justify-content:center!important;
+ align-items:center!important;
+ border:0!important;
+ border-radius:50%!important;
+ background:transparent!important;
+ box-shadow:none!important;
+}
+.config-stepper>.config-view-tab:hover,
+.config-stepper>.config-view-tab.active{
+ border:0!important;
+ background:transparent!important;
+}
+.config-stepper>.config-view-tab>.plan-step-number{
+ display:grid!important;
+ place-items:center!important;
+ box-sizing:border-box!important;
+ flex:0 0 44px!important;
+ width:44px!important;
+ min-width:44px!important;
+ height:44px!important;
+ min-height:44px!important;
+ margin:0!important;
+ border:1px solid #b9e2c7!important;
+ border-radius:50%!important;
+ background:#e8f6ed!important;
+ color:#167346!important;
+ font-size:13px!important;
+ font-weight:800!important;
+ line-height:1!important;
+ box-shadow:none!important;
+}
+.config-stepper>.config-view-tab.active>.plan-step-number{
+ border-color:#2475b2!important;
+ background:#2475b2!important;
+ color:#fff!important;
+ box-shadow:0 0 0 5px rgba(36,117,178,.10)!important;
+}
+.config-stepper>.config-view-tab[data-state="missing"]>.plan-step-number{
+ border-color:#e7d7b8!important;
+ background:#fff8eb!important;
+ color:#a16a18!important;
+}
+.config-stepper>.config-view-tab>.plan-step-copy{display:none!important}
+.config-stepper>.plan-step-connector{
+ display:block!important;
+ position:relative!important;
+ z-index:0!important;
+ width:100%!important;
+ min-width:24px!important;
+ height:2px!important;
+ margin:0!important;
+ border-radius:2px!important;
+ background:#e7edf2!important;
+}
+.config-stepper>.config-view-tab[data-state="complete"]+.plan-step-connector{background:#45a875!important}
+.config-main{width:100%!important;min-width:0!important}
+.config-panel{
+ margin:0!important;
+ padding:22px 22px 0!important;
+ border:0!important;
+ border-radius:0!important;
+ box-shadow:none!important;
+ background:#fff!important;
+}
+.config-panel .panel-footer{margin-left:-22px!important;margin-right:-22px!important}
+@media(max-width:760px){
+ .config-layout{margin-top:10px!important;border-radius:10px!important}
+ .config-stepper{
+  grid-template-columns:36px minmax(12px,1fr) 36px minmax(12px,1fr) 36px!important;
+  min-height:72px!important;
+  padding:10px 14px!important;
+ }
+ .config-stepper>.config-view-tab,
+ .config-stepper>.config-view-tab>.plan-step-number{
+  width:36px!important;min-width:36px!important;height:36px!important;min-height:36px!important;flex-basis:36px!important
+ }
+ .config-panel{padding:16px 12px 0!important}
+ .config-panel .panel-footer{margin-left:-12px!important;margin-right:-12px!important}
+}
