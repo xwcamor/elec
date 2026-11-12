@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 1.5.40
+- Corrige iteraciones DOM en las pestañas, acciones del historial y lectura de celdas de ensayos; evita que la navegación se interrumpa antes de consultar la API.
+
 ## 1.5.39
 - Actualiza los identificadores de caché de CSS y JavaScript a 1.5.39 para evitar que el navegador reutilice recursos antiguos y mantener sincronizada la carga del historial.
 
