@@ -1,3 +1,10 @@
+# CHANGELOG
+
+## 1.5.36
+- Reemplaza el selector desplegable de ensayos por un catálogo visible de casillas de verificación.
+- Permite agregar y quitar varios ensayos directamente desde la selección, con actualización automática del plan.
+- Indica visualmente qué ensayos están seleccionados y el total elegido.
+
 ## v1.5.35
 - Completa el formulario individual de bushings con el resultado calculado de capacitancia.
 - Normaliza claves históricas de resistencia, factor de potencia, excitación, bushings y pararrayos para mostrarlas en las columnas LAP nuevas.
