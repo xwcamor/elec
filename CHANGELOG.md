@@ -1,3 +1,9 @@
+## 1.5.58
+- Convierte «Equipo y referencia» de cada prueba de acordeón a tarjeta visible y expandida permanentemente.
+- Mantiene los campos de norma, equipo, marca, modelo y número de serie dentro de cada formulario.
+- Conserva «Observaciones del ensayo» como acordeón independiente para no recargar visualmente cada prueba.
+- Actualiza la caché de recursos.
+
 ## 1.5.57
 - Conserva un ancla interna no visible para compatibilidad con la validación del asistente; no renderiza pestañas ni botones de navegación por ensayo.
 - Mantiene los formularios como acordeones individuales visibles.
