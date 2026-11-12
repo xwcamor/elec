@@ -187,8 +187,14 @@ class ElectricalTestRepository
             ];
             $id=(int)($p['id']??0);
             if($id>0){
-                $chk=$this->pdo->prepare('SELECT id FROM eh_test_executions WHERE id=? AND transformer_key=? FOR UPDATE');
-                $chk->execute([$id,$key]); if(!$chk->fetch()) throw new RuntimeException('No se encontró el registro que intentas editar.');
+                $chk=$this->pdo->prepare('SELECT id,config_version,config_snapshot FROM eh_test_executions WHERE id=? AND transformer_key=? FOR UPDATE');
+                $chk->execute([$id,$key]); $existingExecution=$chk->fetch();
+                if(!$existingExecution) throw new RuntimeException('No se encontró el registro que intentas editar.');
+                // Al editar, conservar la versión eléctrica original del ensayo; nunca migrarlo a la versión más reciente.
+                if(!empty($existingExecution['config_version'])){
+                    $values['config_version']=(int)$existingExecution['config_version'];
+                    $values['config_snapshot']=$existingExecution['config_snapshot'] ?: $snapshot;
+                }
                 $set=[]; foreach(array_keys($values) as $col)$set[]="`$col`=:$col";
                 $values['id']=$id;
                 $up=$this->pdo->prepare('UPDATE eh_test_executions SET '.implode(',',$set).' WHERE id=:id');
