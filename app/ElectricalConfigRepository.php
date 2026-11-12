@@ -165,16 +165,23 @@ class ElectricalConfigRepository
             if ($code === '') throw new InvalidArgumentException('El bobinado '.($wIndex + 1).' necesita un código.');
             if (isset($windingCodes[$code])) throw new InvalidArgumentException('El código de bobinado '.$code.' está repetido.');
             $windingCodes[$code] = true;
+            $voltage = $winding['voltage_kv'] ?? null;
+            if (!is_numeric($voltage) || (float)$voltage <= 0) throw new InvalidArgumentException('Indica una tensión nominal válida para el bobinado '.$name.'.');
+            if (trim((string)($winding['connection_type'] ?? '')) === '') throw new InvalidArgumentException('Selecciona la conexión del bobinado '.$name.'.');
             $terminalCodes = [];
+            $activeTerminals = 0;
             foreach (($winding['terminals'] ?? []) as $tIndex => $terminal) {
                 if (!is_array($terminal)) continue;
                 $terminalCode = strtoupper(trim((string)($terminal['code'] ?? '')));
                 $hasData = $terminalCode !== '' || trim((string)($terminal['phase'] ?? '')) !== '' || !empty($terminal['has_capacitive_bushing']);
                 if (!$hasData) continue;
+                $activeTerminals++;
                 if ($terminalCode === '') throw new InvalidArgumentException('Falta el código del borne '.($tIndex + 1).' en '.$name.'.');
+                if (trim((string)($terminal['phase'] ?? '')) === '') throw new InvalidArgumentException('Indica la fase del borne '.$terminalCode.' en '.$name.'.');
                 if (isset($terminalCodes[$terminalCode])) throw new InvalidArgumentException('El borne '.$terminalCode.' está repetido en '.$name.'.');
                 $terminalCodes[$terminalCode] = true;
             }
+            if ($activeTerminals === 0) throw new InvalidArgumentException('Agrega al menos un borne al bobinado '.$name.'.');
         }
         foreach ($changers as $cIndex => $changer) {
             if (!is_array($changer)) throw new InvalidArgumentException('Hay un conmutador con datos inválidos.');
