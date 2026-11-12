@@ -1,3 +1,7 @@
+## 1.5.57
+- Conserva un ancla interna no visible para compatibilidad con la validación del asistente; no renderiza pestañas ni botones de navegación por ensayo.
+- Mantiene los formularios como acordeones individuales visibles.
+
 ## 1.5.56
 - Elimina por completo las pestañas de selección rápida de ensayos en el paso 03.
 - Elimina el acordeón exterior que envolvía todos los formularios.
