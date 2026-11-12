@@ -100,7 +100,42 @@ Los componentes siguientes deben verse y comportarse igual en Configuración y P
 
 Si un componente necesita una variante, declararla de forma explícita y documentarla. No crear selectores globales que alteren accidentalmente otros módulos.
 
-## 4. Steps: números y checks
+## 4. Separadores horizontales (`hr`)
+
+Sí se estandarizan. El separador es un elemento de jerarquía y agrupación, no un adorno. Debe tener una apariencia común y usarse solo cuando ayude a distinguir bloques.
+
+### Estilo base
+
+- Línea de 1 px.
+- Color neutro suave: `var(--ui-border)` (sin azul ni gris oscuro).
+- Sin sombra, degradado ni radio.
+- Espaciado vertical controlado por el contexto, no por márgenes predeterminados del navegador.
+- Implementar mediante una clase reutilizable (`.ui-divider`) o el borde del componente contenedor; evitar estilos distintos para cada `hr`.
+
+### Dónde utilizarlo
+
+1. **Debajo del encabezado de página:** separa el título/estado/acciones del contenido principal. Debe recorrer el ancho de la zona de contenido, como en el encabezado de Configuración eléctrica. Usar el mismo patrón en Pruebas eléctricas y en el encabezado del registro.
+2. **Entre grupos de contenido dentro de una tarjeta:** por ejemplo, entre datos generales y opciones avanzadas, o entre una tabla y un bloque de observaciones cuando pertenecen a la misma tarjeta.
+3. **Antes de acciones destructivas:** al final de un acordeón expandido, separa el formulario de «Eliminar bobinado» o «Eliminar conmutador».
+4. **Entre bloques de resumen relacionados:** solo cuando la separación visual aporte más claridad que el espacio en blanco.
+
+### Dónde no utilizarlo
+
+- Entre cada campo de un formulario; usar espaciado.
+- Entre cada tarjeta; usar el gap del layout.
+- Para separar filas de una tabla; usar los bordes propios de la tabla.
+- Después de cada título o párrafo.
+- Como línea decorativa repetida sin una función de agrupación.
+
+### Variantes permitidas
+
+- `.ui-divider--page`: separador de encabezado, ancho completo del contenido, con margen inferior consistente.
+- `.ui-divider--section`: separador dentro de una tarjeta, con margen vertical moderado.
+- `.ui-divider--danger-zone`: mismo color neutro y grosor; no pintar toda la línea de rojo. El texto/acción destructiva comunica el peligro.
+
+No crear más variantes salvo que exista una necesidad de interacción claramente distinta. Si el contenedor ya utiliza un `border-bottom` para cumplir la misma función, no agregar además un `hr` duplicado.
+
+## 6. Steps: números y checks
 
 Usar el mismo patrón en todos los flujos secuenciales:
 
@@ -118,7 +153,7 @@ Reglas:
 - Los conectores entre pasos reflejan progreso completado.
 - No depender exclusivamente del color: usar número, check, icono y/o texto.
 
-## 5. Formularios y tarjetas
+## 6. Formularios y tarjetas
 
 - Cada campo tiene etiqueta persistente; el placeholder no reemplaza la etiqueta.
 - La unidad se coloca en la etiqueta o junto al valor de forma consistente.
@@ -129,7 +164,7 @@ Reglas:
 - Mantener alineación de columnas, alturas y espacios de controles.
 - Formularios de Configuración y Pruebas comparten la misma gramática visual aunque sus campos y estructura funcional sean distintos.
 
-## 6. Acordeones y acciones destructivas
+## 7. Acordeones y acciones destructivas
 
 Para bobinados, conmutadores u otros elementos repetibles:
 
@@ -143,7 +178,7 @@ Para bobinados, conmutadores u otros elementos repetibles:
 
 La acción debe permanecer visible al final del contenido incluso cuando la sección contenga tablas extensas; no debe ser sticky.
 
-## 7. Encabezados, navegación y comportamiento sticky
+## 8. Encabezados, navegación y comportamiento sticky
 
 ### Estado y acción de retorno en barras de herramientas
 - Cuando un encabezado muestre un estado contextual (guardado, autoguardado, error o advertencia) junto a una acción de retorno, el estado se coloca **inmediatamente a la izquierda del botón**.
@@ -159,7 +194,7 @@ La acción debe permanecer visible al final del contenido incluso cuando la secc
 - Antes de proponer sticky, demostrar que resuelve un problema de navegación real, comprobar que no tapa contenido y solicitar aprobación si cambia el comportamiento acordado.
 - Evitar barras translúcidas con blur si no aportan una ventaja clara.
 
-## 8. CSS y arquitectura de estilos
+## 9. CSS y arquitectura de estilos
 
 Organización objetivo:
 
@@ -177,7 +212,7 @@ Reglas CSS:
 - Eliminar reglas obsoletas cuando se sustituya un patrón.
 - No añadir dependencias, fuentes remotas ni recursos externos para resolver detalles cosméticos.
 
-## 9. Metodología obligatoria para cada cambio de interfaz
+## 10. Metodología obligatoria para cada cambio de interfaz
 
 1. **Inspeccionar:** leer `AGENTS.md`, esta guía y la skill de design engineering. Revisar HTML/PHP, CSS y JS afectados.
 2. **Inventariar:** identificar componentes compartidos, estados, responsive y dependencias; comprobar si el mismo componente aparece en otros módulos.
@@ -189,7 +224,7 @@ Reglas CSS:
 8. **Comprobar regresiones:** verificar navegación, guardado, autoguardado, validaciones, edición, eliminación y datos existentes cuando la pantalla afectada los utilice.
 9. **Informar:** indicar archivos cambiados, comportamiento preservado, pruebas ejecutadas y pruebas que no pudieron ejecutarse. No afirmar que se probó en Laragon si no se hizo.
 
-## 10. Criterios de aceptación visual
+## 11. Criterios de aceptación visual
 
 Una tarea de diseño no se considera terminada hasta que:
 
@@ -203,7 +238,7 @@ Una tarea de diseño no se considera terminada hasta que:
 - Focus visible, navegación por teclado y `prefers-reduced-motion` funcionan.
 - No se introducen errores de consola ni regresiones funcionales conocidas.
 
-## 11. Regla de trabajo del repositorio
+## 12. Regla de trabajo del repositorio
 
 - Trabajar directamente sobre `main`.
 - No crear ramas ni Pull Requests salvo instrucción expresa del usuario.
