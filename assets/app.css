@@ -839,3 +839,11 @@ body.config-focus .config-panel .form-grid input[readonly]:focus{border-color:#e
 .plan-realization-grid input{height:35px;min-width:0}
 @media(max-width:760px){.plan-core-grid.plan-realization-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.plan-core-grid.plan-realization-grid{grid-template-columns:1fr}}
+
+/* Condiciones ambientales visibles, sin acordeón */
+.plan-environment-fields{margin-top:12px;padding-top:12px;border-top:1px solid #e8edf1}
+.plan-environment-heading{display:flex;align-items:baseline;gap:10px;margin:0 1px 8px}
+.plan-environment-heading b{font-size:10px;color:#40566b}
+.plan-environment-heading span{font-size:9px;color:#8a98a5}
+.plan-environment-fields .plan-shared-grid{padding:0 1px 8px}
+.plan-shared-status[hidden]{display:none!important}
