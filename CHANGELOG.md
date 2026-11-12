@@ -1,3 +1,10 @@
+## v1.5.119
+- Simplifica la tabla de conexiones del bobinado: muestra únicamente Borne y ¿Capacitivo?, sin fase ni función.
+- Añade eliminación individual de filas y conserva obligatoriamente una fila como mínimo.
+- El nombre del borne es obligatorio en todas las filas; no se permite guardar filas vacías.
+- Nombre del bobinado y tensión nominal (kV) se marcan como obligatorios y se validan antes de guardar.
+- La validación PHP también exige al menos un borne con código por bobinado y deja de exigir fase/designación.
+
 ## v1.5.118
 - Simplifica las etiquetas de bornes en el resumen de cada bobinado: muestra únicamente el código/nombre del borne y si es «Capacitivo» o «No capacitivo».
 - Elimina de ese resumen la fase y el indicador abreviado «C1».
