@@ -823,6 +823,8 @@
         testExecutions=listData.items;
         testHistoryLoadError='';
         renderTestHistory();
+        renderTestSummary();
+        renderHistoricalAnalytics();
 
         // El catálogo solo enriquece los nombres; si falla, no ocultamos los registros guardados.
         try{
@@ -831,6 +833,8 @@
           if(Array.isArray(catalogData.items)&&catalogData.items.length){
             testCatalog.splice(0,testCatalog.length,...catalogData.items.filter(x=>x.code!=='PLAN').map(x=>[x.code,x.name,'Datos de ensayo']));
             renderTestHistory();
+            renderTestSummary();
+            renderHistoricalAnalytics();
           }
         }catch(catalogError){console.warn('No se pudo actualizar el catálogo de ensayos:',catalogError);}
       }catch(e){
