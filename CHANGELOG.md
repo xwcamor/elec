@@ -1,3 +1,9 @@
+## v1.5.92
+- Establece un máximo de 150 posiciones TAP por transformador/conmutador.
+- Valida cantidades en el formulario de ficha técnica y en el servidor PHP.
+- Limita el generador de filas y la adición manual de posiciones.
+- Valida en servidor que cada conmutador no supere 150 posiciones y que sus números estén entre 1 y 150.
+
 ## v1.5.91
 - Simplifica la grilla de posiciones TAP: elimina las columnas de tensión (kV) y variación (%).
 - Actualiza la ayuda de pegado desde Excel y la acción «Copiar tabla» para usar únicamente Posición, Etiqueta, Neutro y Observaciones.
