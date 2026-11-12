@@ -308,7 +308,7 @@
         renderCards();
         refreshPlanFeedback();
         const firstMissing=metrics.missing[0]||'Completa los campos obligatorios y sus mediciones.';
-        toast('No puedes continuar todavía. Falta completar «'+item.name+'»: '+firstMissing+'.',true);
+        toast('Completa la prueba: '+item.name+'.',true);
         return false;
       }
     }
