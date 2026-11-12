@@ -157,7 +157,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
         <div class="location-line"><span>⌖</span><b id="summaryCompany"><?=h($transformer['company'])?></b> &nbsp;|&nbsp; → → <span id="summaryLocation"><?=h($location)?></span></div>
         <div class="transformer-spec-line" id="summaryTechnicalDetails"><?=h(implode(' · ', array_filter([$transformer['phase_count'] ? $transformer['phase_count'].' fases' : '', $transformer['frequency_hz'] ? $transformer['frequency_hz'].' Hz' : '', $transformer['insulation_type'], $transformer['cooling_type']])))?></div>
       </div>
-      <div class="health-box"><div class="health-ring"><strong>100</strong><small>%</small></div><b><i></i> Excelente</b><small>ÍNDICE DE SALUD</small><span class="stable-pill">▰ ESTABLE</span></div>
+      <div class="health-box"><div class="health-ring"><strong>—</strong><small>/100</small></div><b>Sin cálculo</b><small>ÍNDICE DE SALUD</small><span class="stable-pill">DATOS PENDIENTES</span></div>
     </div>
   </section>
 
@@ -182,13 +182,13 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       </button>
     </aside>
     <div class="overview-content">
-      <div class="info-banner"><svg><use href="#i-info"/></svg> Diagnóstico parcial: faltan pruebas. El índice se calcula solo con las que tienen datos.</div>
-      <div class="conclusion-box"><strong>CONCLUSIÓN DEL ÍNDICE DE SALUD</strong><p>Índice de salud 100/100 → estado Excelente.</p><p>Todas las pruebas realizadas están en buen estado; ninguna reduce el índice de forma significativa.</p><p>Acción sugerida: monitoreo de rutina, mantener la frecuencia de muestreo habitual.</p></div>
+      <div class="info-banner"><svg><use href="#i-info"/></svg> Resumen del piloto: aquí se muestra el estado de los módulos. El índice de salud no se calcula hasta integrar y validar los ensayos necesarios.</div>
+      <div class="conclusion-box"><strong>ESTADO DEL DIAGNÓSTICO</strong><p>El índice de salud todavía no está disponible en este piloto.</p><p>No se muestran resultados de ejemplo como si fueran mediciones reales del transformador.</p><p>Completa la configuración eléctrica y registra ensayos para construir el historial técnico.</p></div>
       <div class="health-cards">
-        <article class="health-card"><h3>Cromatografía (DGA)</h3><div class="mini-health"><div class="mini-gauge"><span></span></div><div><b>Excelente</b><small>Peso de la prueba 47.6%</small><em>▢ Última muestra: 2026-04-05</em></div></div><hr><strong>● Sin falla activa: gases bajo sus valores típicos (IEC 60599).</strong><p>CO₂/CO = 11 → oxidación/envejecimiento del papel a baja temperatura; bajo riesgo.</p></article>
-        <article class="health-card"><h3>Fisicoquímico</h3><div class="mini-health"><div class="mini-gauge"><span></span></div><div><b>Excelente</b><small>Peso de la prueba 28.6%</small><em>▢ Última muestra: 2026-04-05</em></div></div><hr><strong>● Todos los parámetros medidos están dentro de rango.</strong></article>
-        <article class="health-card"><h3>Furanos</h3><div class="mini-health"><div class="mini-gauge"><span></span></div><div><b>Excelente</b><small>Peso de la prueba 23.8%</small><em>▢ Última muestra: 2026-04-05</em></div></div><hr><strong>● Papel aislante en buen estado</strong><p>DP ≈ 1140<br>0% de vida del papel consumida</p></article>
-        <article class="health-card muted-card"><h3>Factor de Potencia</h3><p><em>Sin registro</em></p></article>
+        <article class="health-card"><h3>Configuración eléctrica</h3><div class="mini-health"><div class="mini-gauge"><span></span></div><div><b><?= $hasSavedElectricalConfig ? 'Configurada' : 'Pendiente' ?></b><small><?= $hasSavedElectricalConfig ? 'Versión '.$initialConfig['version_no'] : 'Requiere datos de bobinados y bornes' ?></small><em>Bobinados, bornes, bushings y TAP</em></div></div><hr><strong><?= $hasSavedElectricalConfig ? 'La configuración está guardada.' : 'Completa y guarda la configuración para habilitar las pruebas.' ?></strong></article>
+        <article class="health-card"><h3>Pruebas eléctricas</h3><div class="mini-health"><div class="mini-gauge"><span></span></div><div><b><?= $canAccessElectricalTests ? 'Disponible' : 'Bloqueado' ?></b><small><?= $canAccessElectricalTests ? 'Puedes registrar ensayos' : 'Requiere configuración previa' ?></small><em>Registros, resultados e historial</em></div></div><hr><strong><?= h($canAccessElectricalTests ? 'Módulo habilitado para este transformador.' : $testsAccessBlockReason) ?></strong></article>
+        <article class="health-card muted-card"><h3>Índice de salud</h3><p><em>Sin cálculo disponible</em></p><hr><strong>Se habilitará cuando existan datos suficientes y criterios de evaluación aprobados.</strong></article>
+        <article class="health-card muted-card"><h3>Diagnóstico complementario</h3><p><em>Módulos no integrados en este piloto</em></p><hr><strong>Cromatografía, fisicoquímico y furanos no presentan datos ficticios.</strong></article>
       </div>
     </div>
   </section>
