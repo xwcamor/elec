@@ -1207,7 +1207,10 @@
         if(code==='BUSHING'){const configured=configuredTerminalOptions(true).map(([terminal])=>({terminal,serial:''}));if(configured.length)initial=configured;}
         if(code==='CAPACITANCE')initial=configuredTerminalOptions(false).map(([point])=>({point}));
         renderSpecificRows(initial,code);
-        if(code==='POWER_FACTOR')$('#executionObservations').value='Pendiente de completar las seis mediciones del ensayo.';
+        if(code==='POWER_FACTOR'){
+          const statuses=initial.map(row=>normalizeSpecificRow('POWER_FACTOR',row).status);
+          $('#executionObservations').value=statuses.length===6&&statuses.every(v=>v==='CORRECTO')?'Los valores obtenidos están dentro de lo recomendado según la cláusula 7.2.14 de la norma IEEE Std C57. 152 - 2013. Los valores son aceptables.':(statuses.some(v=>v==='OBSERVADO')?'Se encontraron valores observados':'Pendiente de completar las seis mediciones del ensayo.');
+        }
       }}
 
     if(isTtr && !$('#ttrRows').children.length){
@@ -1230,7 +1233,7 @@
       const rows=collectSpecificRows(),ri=Number(e.target.dataset.r),normalized=normalizeSpecificRow('POWER_FACTOR',rows[ri]||{});rows[ri]=normalized;
       const cap=tr.querySelector('[data-c="5"]'),status=tr.querySelector('[data-c="6"]');if(cap)cap.value=normalized.capacitance_measured||'';if(status)status.value=normalized.status||'PENDIENTE';
       const states=rows.map(r=>normalizeSpecificRow('POWER_FACTOR',r).status);
-      $('#executionObservations').value=states.length===6&&states.every(s=>s==='CORRECTO')?'Los valores obtenidos están dentro de lo recomendado según la cláusula 7.2.14 de la norma IEEE Std C57.152-2013. Los valores son aceptables.':(states.some(s=>s==='OBSERVADO')?'Se encontraron valores observados':'Pendiente de completar las seis mediciones del ensayo.');
+      $('#executionObservations').value=states.length===6&&states.every(s=>s==='CORRECTO')?'Los valores obtenidos están dentro de lo recomendado según la cláusula 7.2.14 de la norma IEEE Std C57. 152 - 2013. Los valores son aceptables.':(states.some(s=>s==='OBSERVADO')?'Se encontraron valores observados':'Pendiente de completar las seis mediciones del ensayo.');
     }
   });
   $('#specificTestRows')?.addEventListener('paste',e=>{
