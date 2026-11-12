@@ -1,3 +1,9 @@
+## 1.5.46
+- El botón de salida de Pruebas eléctricas ahora dice «Volver al transformador».
+- El Resumen elimina el banner explicativo y muestra un bloque de registros que requieren atención, con acceso directo para abrirlos.
+- Distingue Pendiente (el ensayo ya tiene mediciones, observaciones o datos de equipo, pero no está completo) de Borrador (sin datos de ensayo).
+- El resumen conserva cuatro indicadores principales: registros guardados, completos, pendientes y borradores; la fecha del último registro permanece como dato discreto.
+- La API incluye un indicador de datos iniciados por ensayo para clasificar correctamente los registros guardados.
 ## 1.5.45
 - El Resumen reemplaza «Ensayos incluidos» y «Tipos utilizados» por contadores de registros Completos, Pendientes y Borradores.
 - Conserva el total de registros y la fecha del último registro.
