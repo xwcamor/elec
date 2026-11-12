@@ -105,3 +105,11 @@
 - [ ] Abrir datos antiguos y verificar alias históricos.
 - [ ] Stepper de cuatro etapas y grillas compactas; pegado TSV.
 - [ ] Historial con etiqueta «Ejecuciones».
+
+
+## v1.5.38 — Validación obligatoria de resultados por ensayo
+- [ ] Crear un plan con dos o más ensayos y dejar incompleto un campo obligatorio del primer ensayo.
+- [ ] Intentar avanzar de Resultados por ensayo a Resumen; debe bloquearse y enfocar el primer ensayo incompleto.
+- [ ] Completar el primer ensayo y dejar incompleta una fila del segundo; debe bloquearse y enfocar el segundo.
+- [ ] Completar todas las filas y datos requeridos de todos los ensayos; debe permitir avanzar al Resumen.
+- [ ] Confirmar que el guardado automático conserva borradores aunque el avance esté bloqueado.
