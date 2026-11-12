@@ -863,3 +863,22 @@ body.config-focus .config-panel .form-grid input[readonly]:focus{border-color:#e
 .plan-test-tab.active{outline:2px solid #2879bb;outline-offset:1px;box-shadow:0 0 0 3px rgba(40,121,187,.10)}
 .plan-test-tab:focus-visible{outline:3px solid #166ab1;outline-offset:3px}
 @media(max-width:650px){.plan-test-tab{flex:1 1 100%}.plan-test-tab>b{flex:1}}
+
+/* Acordeón general para los formularios de prueba */
+.plan-results-accordion{border:0;border-radius:8px;overflow:hidden}
+.plan-results-accordion>summary{list-style:none;cursor:pointer}
+.plan-results-accordion>summary::-webkit-details-marker{display:none}
+.plan-results-accordion-head{display:flex;align-items:center;gap:14px;padding:13px 15px;background:#f8fafc;border:1px solid #e1e8ef;border-radius:8px}
+.plan-results-accordion[open]>.plan-results-accordion-head{border-radius:8px 8px 0 0;border-bottom-color:#e7edf2}
+.plan-results-accordion-copy{display:grid;gap:3px;flex:1;min-width:0}
+.plan-results-accordion-copy .eyebrow{font-size:10px}
+.plan-results-accordion-copy>b{font-size:15px;color:#29435c}
+.plan-results-accordion-copy>small{font-size:11px;color:#7b8b9b}
+.plan-results-accordion-status{font-size:11px;font-weight:700;padding:5px 9px;border-radius:20px;background:#fff2d8;color:#885a10;white-space:nowrap}
+.plan-results-accordion-status[data-state="complete"]{background:#eaf6ee;color:#267447}
+.plan-results-accordion-status[data-state="unstarted"]{background:#eef1f4;color:#657586}
+.plan-results-accordion-chevron{font-size:20px;line-height:1;color:#718397;transition:transform .18s}
+.plan-results-accordion[open] .plan-results-accordion-chevron{transform:rotate(180deg)}
+.plan-results-accordion-content{padding:14px 2px 2px}
+.plan-results-accordion:not([open]) .plan-results-accordion-content{display:none}
+@media(max-width:560px){.plan-results-accordion-head{gap:8px;padding:11px}.plan-results-accordion-copy>b{font-size:13px}.plan-results-accordion-copy>small{font-size:10px}.plan-results-accordion-status{font-size:10px;padding:4px 7px}}
