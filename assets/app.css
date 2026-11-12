@@ -356,6 +356,7 @@ body.config-focus .config-toolbar{padding-top:14px}
 .plan-result-select[data-state="observado"],.plan-result-select[data-state="fuera de tolerancia"]{color:#9b3833;background:#fff1ef}
 .plan-result-select[data-state="no aplica"]{color:#64748b;background:#f1f5f9}
 .plan-result-select[data-state="pending"],.plan-result-select[data-state="pendiente"]{color:#9a6817;background:#fff7e8}
+.plan-result-select.is-missing[data-state="pending"],.plan-result-select.is-missing[data-state="pendiente"]{background:#fff0cf!important;box-shadow:inset 0 0 0 1px #e7bd68!important}
 .plan-cell.calculated[data-col="result"]{font-weight:800;letter-spacing:.1px}
 
 
