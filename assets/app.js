@@ -676,9 +676,9 @@
     const counts={COMPLETE:0,INCOMPLETE:0,DRAFT:0};
     testExecutions.forEach(execution=>{const status=executionDisplayStatus(execution).code;counts[status]=(counts[status]||0)+1;});
     $('#testStats').innerHTML=
-      '<div class="test-stat"><small>Registros guardados</small><strong>'+total+'</strong><span>Planes de pruebas eléctricas</span></div>'+
-      '<div class="test-stat"><small>Completos</small><strong>'+counts.COMPLETE+'</strong><span>Todos los ensayos finalizados</span></div>'+
-      '<div class="test-stat"><small>Pendientes</small><strong>'+counts.INCOMPLETE+'</strong><span>Con datos por completar</span></div>'+
+      '<div class="test-stat"><small>Registros guardados</small><strong>'+total+'</strong><span>Jornadas de pruebas</span></div>'+
+      '<div class="test-stat"><small>Completados</small><strong>'+counts.COMPLETE+'</strong><span>Todos los ensayos finalizados</span></div>'+
+      '<div class="test-stat"><small>En proceso</small><strong>'+counts.INCOMPLETE+'</strong><span>Con ensayos por completar</span></div>'+
       '<div class="test-stat"><small>Borradores</small><strong>'+counts.DRAFT+'</strong><span>Sin datos de medición</span></div>';
   }
   function renderTestTypes(){
@@ -697,8 +697,8 @@
       attention.innerHTML=pending.length?pending.map(execution=>{
         const names=execution.plan_tests?.length?execution.plan_tests.map(test=>test.name||typeName(test.code)):[execution.test_name||typeName(execution.test_code)];
         const status=executionDisplayStatus(execution);
-        return '<article class="test-attention-row"><div class="test-attention-copy"><b>'+esc(formatExecutionDate(execution.executed_at))+'</b><span>'+esc(names.join(' · '))+'</span></div><span class="execution-status '+status.className+'">'+(status.code==='DRAFT'?'Borrador':'Pendiente')+'</span><button class="btn small" data-open-execution="'+execution.id+'">Abrir plan</button></article>';
-      }).join(''):'<div class="test-attention-empty">Todos los registros están al día. No hay pruebas pendientes ni borradores.</div>';
+        return '<article class="test-attention-row"><div class="test-attention-copy"><b>'+esc(formatExecutionDate(execution.executed_at))+'</b><span>'+esc(names.join(' · '))+'</span></div><span class="execution-status '+status.className+'">'+(status.code==='DRAFT'?'Borrador':'En proceso')+'</span><button class="btn small" data-open-execution="'+execution.id+'">Continuar registro</button></article>';
+      }).join(''):'<div class="test-attention-empty">Todos los registros están al día. No hay registros pendientes ni borradores.</div>';
 
     }
   }
@@ -752,7 +752,7 @@
     }
     const hasStarted=tests.some(test=>test.has_data===true||String(test.status||'').trim().toUpperCase()==='COMPLETADA');
     if(hasStarted){
-      return {code:'INCOMPLETE',label:'Pendiente',className:'incomplete'};
+      return {code:'INCOMPLETE',label:'En proceso',className:'incomplete'};
     }
     return {code:'DRAFT',label:'En borrador',className:'draft'};
   }
@@ -770,7 +770,7 @@
       const names=x.plan_tests?.length?x.plan_tests.map(t=>t.name||typeName(t.code)):[x.test_name||typeName(x.test_code)];
       const testCount=names.length;
       const state=executionDisplayStatus(x);
-      return '<tr><td><b>'+esc(formatExecutionDate(x.executed_at))+'</b></td><td><b>'+esc(names.join(' · '))+'</b></td><td>'+testCount+'</td><td>'+esc(x.operator_name||'—')+'</td><td><span class="execution-status '+state.className+'">'+state.label+'</span></td><td><div class="test-row-actions"><button class="btn small" data-open-execution="'+x.id+'" title="Continuar completando esta ejecución">Abrir plan</button><button class="btn small danger test-delete-button" data-delete-execution="'+x.id+'" title="Eliminar ejecución" aria-label="Eliminar ejecución #'+x.id+'"><svg><use href="#i-trash"/></svg>Eliminar</button></div></td></tr>';
+      return '<tr><td><b>'+esc(formatExecutionDate(x.executed_at))+'</b></td><td><b>'+esc(names.join(' · '))+'</b></td><td>'+testCount+'</td><td>'+esc(x.operator_name||'—')+'</td><td><span class="execution-status '+state.className+'">'+state.label+'</span></td><td><div class="test-row-actions"><button class="btn small" data-open-execution="'+x.id+'" title="Continuar este registro">Abrir registro</button><button class="btn small danger test-delete-button" data-delete-execution="'+x.id+'" title="Eliminar ejecución" aria-label="Eliminar ejecución #'+x.id+'"><svg><use href="#i-trash"/></svg>Eliminar</button></div></td></tr>';
     }).join(''):'<tr><td colspan="6" class="test-empty">'+(testHistoryLoadError?'No se pudo consultar el historial: '+esc(testHistoryLoadError):(testExecutions.length?'No hay registros que coincidan con el filtro.':'No hay registros para este transformador. Los registros se ordenan por fecha, del más reciente al más antiguo.'))+'</td></tr>';
 
     $$('[data-delete-execution]').forEach(button=>button.addEventListener('click',async()=>{
