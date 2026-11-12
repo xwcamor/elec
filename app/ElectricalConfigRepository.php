@@ -185,6 +185,10 @@ class ElectricalConfigRepository
         }
         foreach ($changers as $cIndex => $changer) {
             if (!is_array($changer)) throw new InvalidArgumentException('Hay un conmutador con datos inválidos.');
+            $changerPositions = $changer['positions'] ?? [];
+            if (!is_array($changerPositions) || count($changerPositions) > 150) {
+                throw new InvalidArgumentException('Cada conmutador admite como máximo 150 posiciones TAP.');
+            }
             $windingIndex = $changer['winding_index'] ?? null;
             if (!is_numeric($windingIndex) || (int)$windingIndex < 0 || (int)$windingIndex >= count($windings)) {
                 throw new InvalidArgumentException('El conmutador '.($cIndex + 1).' debe estar asociado a un bobinado válido.');
@@ -194,7 +198,7 @@ class ElectricalConfigRepository
                 if (!is_array($position)) continue;
                 $rawPosition = trim((string)($position['position_no'] ?? ''));
                 if ($rawPosition === '') continue;
-                if (!ctype_digit($rawPosition) || (int)$rawPosition < 1) throw new InvalidArgumentException('Las posiciones de TAP deben ser enteros positivos.');
+                if (!ctype_digit($rawPosition) || strlen($rawPosition)>3 || (int)$rawPosition < 1 || (int)$rawPosition > 150) throw new InvalidArgumentException('Las posiciones de TAP deben ser enteros entre 1 y 150.');
                 $positionNo = (int)$rawPosition;
                 if (isset($positions[$positionNo])) throw new InvalidArgumentException('La posición '.$positionNo.' está duplicada en '.($changer['name'] ?? 'el conmutador').'.');
                 $positions[$positionNo] = true;
