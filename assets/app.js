@@ -65,15 +65,24 @@
   let transformerFormMode='edit';
   function setTransformerFormMode(mode){
     transformerFormMode=mode;
-    $('#editTransformerTitle').textContent=mode==='create'?'Crear transformador':'Editar transformador';
-    $('#editTransformerSubtitle').textContent=mode==='create'?'Registra un nuevo equipo en la tabla de transformadores.':'Modifica los datos principales de la ficha.';
-    $('#saveTransformerEdit').textContent=mode==='create'?'Crear transformador':'Guardar cambios';
+    $('#editTransformerTitle').textContent=mode==='create'?'Crear transformador':(mode==='tap'?'Actualizar cantidad de TAP':'Editar transformador');
+    $('#editTransformerSubtitle').textContent=mode==='create'?'Registra un nuevo equipo en la tabla de transformadores.':(mode==='tap'?'Actualiza únicamente la cantidad de posiciones TAP de la ficha técnica.':'Modifica los datos principales de la ficha.');
+    $('#saveTransformerEdit').textContent=mode==='create'?'Crear transformador':(mode==='tap'?'Actualizar TAP':'Guardar cambios');
   }
-  function openTransformerEditor(focusTap=false){
+  function openTransformerEditor(){
     setTransformerFormMode('edit');
+    $('#transformerEditModal').classList.remove('tap-count-only');
     const vals={code:transformer.code,name:transformer.name||'',company:transformer.company||'',voltage:transformer.voltage??'',power:transformer.power??'',year:transformer.year??'',brand:transformer.brand||'',tap_type:transformer.tap_type||'',num_taps:transformer.num_taps??'',vector_group:transformer.vector_group||'',location:transformer.location||'',phase_count:transformer.phase_count??'',frequency_hz:transformer.frequency_hz??'',insulation_type:transformer.insulation_type||'',cooling_type:transformer.cooling_type||'',notes:transformer.notes||''};
     Object.entries(editFields).forEach(([key,id])=>$('#'+id).value=vals[key]??'');
-    $('#editTransformerStatus').textContent='';$('#transformerEditModal').classList.remove('hidden');(focusTap?$('#editTrafoNumTaps'):$('#editTrafoCode')).focus();
+    $('#editTransformerStatus').textContent='';$('#transformerEditModal').classList.remove('hidden');$('#editTrafoCode').focus();
+  }
+  function openTapCountEditor(){
+    setTransformerFormMode('tap');
+    $('#editTrafoNumTaps').value=transformer.num_taps??'';
+    $('#editTransformerStatus').textContent='';
+    $('#transformerEditModal').classList.add('tap-count-only');
+    $('#transformerEditModal').classList.remove('hidden');
+    $('#editTrafoNumTaps').focus();
   }
   function openTransformerCreate(){
     setTransformerFormMode('create');
@@ -81,7 +90,7 @@
     $('#editTrafoPhaseCount').value='3';$('#editTrafoFrequency').value='60';
     $('#editTransformerStatus').textContent='';$('#transformerEditModal').classList.remove('hidden');$('#editTrafoCode').focus();
   }
-  function closeTransformerEditor(){$('#transformerEditModal').classList.add('hidden');setTransformerFormMode('edit');}
+  function closeTransformerEditor(){$('#transformerEditModal').classList.add('hidden');$('#transformerEditModal').classList.remove('tap-count-only');setTransformerFormMode('edit');}
   $('#editTransformerBtn')?.addEventListener('click',openTransformerEditor);
   $('#closeTransformerModal')?.addEventListener('click',closeTransformerEditor);
   $('#cancelTransformerEdit')?.addEventListener('click',closeTransformerEditor);
@@ -90,20 +99,26 @@
     e.preventDefault();
     const mode=transformerFormMode;
     const payload={};
-    if(mode==='edit')payload.transformer_key=transformer.key;
-    Object.entries(editFields).forEach(([key,id])=>payload[key]=$('#'+id).value.trim());
+    if(mode!=='create')payload.transformer_key=transformer.key;
+    if(mode==='tap'){
+      const count=$('#editTrafoNumTaps').value.trim();
+      if(!/^\\d+$/.test(count)||Number(count)<=0){$('#editTransformerStatus').textContent='La cantidad de TAP debe ser un entero mayor que cero.';return;}
+      payload.num_taps=count;
+    }else Object.entries(editFields).forEach(([key,id])=>payload[key]=$('#'+id).value.trim());
     const btn=$('#saveTransformerEdit');btn.disabled=true;btn.textContent=mode==='create'?'Creando...':'Guardando...';
     try{
       if(PILOT.demo)throw new Error('No hay conexión con MySQL. Conecta la base de datos para registrar transformadores.');
       const action=mode==='create'?'transformer-create':'transformer-update';
       const response=await fetch(api('action='+action),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
       const result=await readApiResponse(response);
-      if(mode==='edit'){
+      if(mode==='edit'||mode==='tap'){
         Object.assign(transformer,result.transformer);
         updateTransformerDisplay();
         updateTapSourceSummary();
         await loadTransformerSwitcher(transformer.key);
-        if(result.unsupported_fields?.length){
+        if(mode==='tap'){
+          toast('Cantidad de TAP actualizada en la ficha técnica.');
+        }else if(result.unsupported_fields?.length){
           const labels={phase_count:'número de fases',frequency_hz:'frecuencia',insulation_type:'aislamiento',cooling_type:'refrigeración',notes:'observaciones'};
           toast('Guardado parcial. Tu tabla no tiene columnas para: '+result.unsupported_fields.map(k=>labels[k]||k).join(', ')+'.',true);
         }else toast('Datos de placa del transformador actualizados.');
@@ -117,7 +132,7 @@
         toast('Transformador '+result.transformer.code+(switched?' creado y seleccionado.':' creado. No se cambió el transformador activo.'));
       }
     }catch(err){$('#editTransformerStatus').textContent=err.message;toast(err.message,true);}
-    finally{btn.disabled=false;btn.textContent=transformerFormMode==='create'?'Crear transformador':'Guardar cambios';}
+    finally{btn.disabled=false;btn.textContent=transformerFormMode==='create'?'Crear transformador':(transformerFormMode==='tap'?'Actualizar TAP':'Guardar cambios');}
   });
 
 
@@ -252,7 +267,7 @@
     const tapCount=Number(transformer.num_taps||0);
     if(!Number.isInteger(tapCount)||tapCount<=0){
       toast('Antes de configurar eléctricamente, registra una cantidad de TAP mayor que cero en la ficha del transformador.',true);
-      openTransformerEditor(true);
+      openTapCountEditor();
       return false;
     }
     syncTransformerNominals();
@@ -418,7 +433,7 @@
   function addTapChanger() {
     if(!state.windings.length){toast('Primero configura al menos un bobinado.',true);showPanel('windings');return;}
     const count = Number(transformer.num_taps || 0);
-    if(!Number.isInteger(count)||count<=0){toast('Registra primero una cantidad de TAP mayor que cero en la ficha técnica.',true);openTransformerEditor(true);return;}
+    if(!Number.isInteger(count)||count<=0){toast('Registra primero una cantidad de TAP mayor que cero en la ficha técnica.',true);openTapCountEditor();return;}
     const positions = Array.from({length:Math.max(0,Math.min(1000,count))},(_,i)=>({position_no:i+1,label:'Tap '+(i+1),voltage_kv:'',percent_change:'',is_neutral:false,notes:''}));
     state.tap_changers.push({name:'Conmutador '+(state.tap_changers.length+1),type:(transformer.tap_type||'DETC').toUpperCase().includes('OLTC')?'OLTC':'DETC',operation_type:'Manual',winding_index:0,min_position:positions.length?1:'',max_position:positions.length?positions.length:'',neutral_position:'',current_position:'',notes:'',positions});
     renderTapChangers();updateCounts();markDirty();
@@ -433,7 +448,7 @@
     if(countNode)countNode.textContent=Number.isInteger(count)&&count>0?count+' posiciones':'Pendiente';
     if(note)note.textContent=count>0?'Cada conmutador debe contener exactamente '+count+' posiciones. Si cambias este valor en la ficha, tendrás que ajustar las filas antes de guardar una nueva versión.':'Debes registrar una cantidad de TAP mayor que cero en la ficha del transformador.';
   }
-  $('#editTapMetadata')?.addEventListener('click',()=>openTransformerEditor(true));
+  $('#editTapMetadata')?.addEventListener('click',()=>openTapCountEditor());
   updateTapSourceSummary();
   function renderTapChangers(){
     const host=$('#tapChangersContainer');
