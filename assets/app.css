@@ -1316,3 +1316,29 @@ body.config-focus .config-panel .form-grid input[readonly]:focus{border-color:#e
     animation:none!important;transition:none!important;scroll-behavior:auto!important;
   }
 }
+
+
+/* v1.5.88 · Flujo de configuración simplificado */
+.config-toolbar{align-items:center}
+.config-toolbar .toolbar-actions{gap:12px}
+.config-sidebar{position:sticky;top:16px}
+.config-tab{min-height:66px}
+.config-tab .tab-number{flex:0 0 30px}
+.config-panel .panel-heading{align-items:flex-start}
+.review-save-footer{justify-content:space-between;padding:16px 0}
+.review-save-footer>span{flex:1;text-align:center}
+.review-save-footer #saveConfig{min-width:190px;justify-content:center}
+body.config-focus #saveConfigBottom{display:none!important}
+body.config-focus .config-save-hint{display:none!important}
+@media(max-width:760px){
+  .config-layout{grid-template-columns:minmax(0,1fr);gap:10px}
+  .config-sidebar{position:static;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:7px}
+  .config-tab{min-height:60px;padding:8px 5px;gap:5px;align-items:flex-start}
+  .config-tab .tab-number{flex-basis:24px;width:24px;height:24px}
+  .config-tab>span:last-child{min-width:0}
+  .config-tab b{font-size:10px;line-height:1.25}
+  .config-tab small{font-size:8px}
+  .review-save-footer{flex-wrap:wrap}
+  .review-save-footer>span{order:3;flex-basis:100%;text-align:left}
+  .review-save-footer #saveConfig{min-width:0}
+}
