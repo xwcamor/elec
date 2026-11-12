@@ -81,7 +81,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.49">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.50">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -313,8 +313,8 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       <div class="execution-date-card plan-date-inline"><div class="date-emblem"><svg><use href="#i-calendar"/></svg></div><div class="date-copy"><strong>Fecha y hora de las pruebas</strong><small>Fecha real de realización de los ensayos.</small></div><label class="execution-date-field"><span>Realizada el <i class="required-mark">*</i></span><input id="planDate" type="datetime-local" required aria-required="true"></label></div>
       <div class="plan-shared-status is-pending" id="planSharedStatus" aria-live="polite">Pendiente: fecha de la visita · responsable / técnico</div>
       <div class="plan-core-grid">
-        <label>Responsable / técnico <i class="required-mark">*</i><input id="planOperator" placeholder="Nombre del técnico" required aria-required="true"></label>
-        <label>Supervisor <i class="required-mark">*</i><input id="planSupervisor" placeholder="Nombre del supervisor" required aria-required="true"></label>
+        <label><span>Responsable / técnico <i class="required-mark">*</i></span><input id="planOperator" placeholder="Nombre del técnico" required aria-required="true"></label>
+        <label><span>Supervisor <i class="required-mark">*</i></span><input id="planSupervisor" placeholder="Nombre del supervisor" required aria-required="true"></label>
       </div>
       <details class="plan-optional-details" open>
         <summary><span>Condiciones ambientales</span><small>Temperaturas, humedad y observaciones</small></summary>
@@ -469,6 +469,6 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.49"></script>
-<script src="./assets/plan.js?v=1.5.49"></script>
+<script src="./assets/app.js?v=1.5.50"></script>
+<script src="./assets/plan.js?v=1.5.50"></script>
 </body></html>
