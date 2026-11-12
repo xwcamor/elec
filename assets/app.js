@@ -15,13 +15,13 @@
       marker.setAttribute('aria-hidden','true');
       const textSpan=[...label.children].find(el=>el.tagName==='SPAN'&&!el.classList.contains('required-mark'));
       if(textSpan){
-        const clean=textSpan.textContent.replace(/\\s*\\*\\s*$/,'').trimEnd();
+        const clean=textSpan.textContent.replace(/\s*\*\s*$/,'').trimEnd();
         textSpan.textContent=clean+' ';
         textSpan.appendChild(marker);
       }else{
         const firstControl=controls[0];
         const leadingText=[...label.childNodes].find(node=>node.nodeType===Node.TEXT_NODE&&node.textContent.trim());
-        if(leadingText)leadingText.textContent=leadingText.textContent.replace(/\\s*\\*\\s*$/,' ');
+        if(leadingText)leadingText.textContent=leadingText.textContent.replace(/\s*\*\s*$/,' ');
         label.insertBefore(marker,firstControl);
       }
     });
