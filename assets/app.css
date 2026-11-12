@@ -2088,6 +2088,7 @@ body.config-focus .config-panel,
 
 /* v1.5.149 · Separador de encabezado compartido para configuración y registro. */
 .config-page>.config-toolbar,
+.test-page>.config-toolbar,
 .execution-page>.config-toolbar{
   border-bottom:1px solid var(--ui-border);
   padding-bottom:16px;
@@ -2099,5 +2100,19 @@ body.config-focus .config-panel,
     padding-bottom:12px;
     margin-bottom:12px;
   }
+}
+
+/* v1.5.150 · Jerarquía cromática del módulo de Pruebas eléctricas. */
+.test-page>.config-toolbar{
+  border-bottom:1px solid var(--ui-border);
+  padding-bottom:16px;
+  margin-bottom:16px;
+}
+.test-page .eyebrow{color:var(--ui-muted)}
+.test-view-tab{color:var(--ui-muted)}
+.test-view-tab:hover{color:var(--ui-ink)}
+.test-view-tab.active{color:var(--ui-accent)}
+@media(max-width:760px){
+  .test-page>.config-toolbar{padding-bottom:12px;margin-bottom:12px}
 }
 
