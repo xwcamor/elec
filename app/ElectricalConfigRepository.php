@@ -169,18 +169,13 @@ class ElectricalConfigRepository
             if (!is_numeric($voltage) || (float)$voltage <= 0) throw new InvalidArgumentException('Indica una tensión nominal válida para el bobinado '.$name.'.');
 
             $terminalCodes = [];
-            $activeTerminals = 0;
-            foreach (($winding['terminals'] ?? []) as $tIndex => $terminal) {
+            $terminals = $winding['terminals'] ?? [];
+            if (!is_array($terminals) || count($terminals) < 1) throw new InvalidArgumentException('El bobinado '.$name.' debe tener al menos un borne.');
+            foreach ($terminals as $tIndex => $terminal) {
                 if (!is_array($terminal)) continue;
                 $terminalCode = strtoupper(trim((string)($terminal['code'] ?? '')));
-                $hasData = $terminalCode !== '' || trim((string)($terminal['phase'] ?? '')) !== '' || !empty($terminal['has_capacitive_bushing']);
-                if (!$hasData) continue;
-                $activeTerminals++;
                 if ($terminalCode === '') throw new InvalidArgumentException('Falta el código del borne '.($tIndex + 1).' en '.$name.'.');
                 if (mb_strlen($terminalCode) > 20) throw new InvalidArgumentException('El código del borne '.$terminalCode.' supera el máximo de 20 caracteres.');
-                $phaseCode = strtoupper(trim((string)($terminal['phase'] ?? '')));
-                if ($phaseCode === '') throw new InvalidArgumentException('Indica la fase o designación del borne '.$terminalCode.' en '.$name.'.');
-                if (mb_strlen($phaseCode) > 8) throw new InvalidArgumentException('La fase o designación del borne '.$terminalCode.' admite máximo 8 caracteres.');
                 if (isset($terminalCodes[$terminalCode])) throw new InvalidArgumentException('El borne '.$terminalCode.' está repetido en '.$name.'.');
                 $terminalCodes[$terminalCode] = true;
             }
