@@ -61,10 +61,10 @@
       BUSHING:{test_voltage:['test_voltage_kv'],power_factor_measured:['power_factor'],capacitance_plate:['capacitance_plate_pf'],capacitance_measured:['capacitance_measured_pf','capacitance'],serial:['serial_number']},
       ARRESTER:{output_voltage:['output_voltage_kv','output_voltage_v'],output_current:['output_current_ma','output_current_a'],losses_measured:['losses_w','losses_measured_w'],capacitance_measured:['capacitance_pf','capacitance_measured_pf']}
     };
-    Object.entries(aliases[code]||{}).forEach(([target,legacy])=>{if(!isFilled(r[target])){const value=legacy.map(key=>r[key]).find(isFilled);if(value!==undefined)r[target]=value;}});
+    Object.entries(aliases[code]||{}).forEach(([target,legacy])=>{if(!Object.prototype.hasOwnProperty.call(r,target)){const value=legacy.map(key=>r[key]).find(isFilled);if(value!==undefined)r[target]=value;}});
     if(code==='INSULATION_RESISTANCE'){const a=number(r.reading_30s),b=number(r.reading_1min);r.absorption_index=a!==null&&a!==0&&b!==null?String(b/a):'';}
     if(code==='POWER_FACTOR'){
-      if(!isFilled(r.capacitance_source_f)){const legacy=number(r.capacitance_measured??r.capacitance_nf??r.capacitance);if(legacy!==null)r.capacitance_source_f=String(legacy/1e9);}
+      if(!Object.prototype.hasOwnProperty.call(r,'capacitance_source_f')){const legacy=number(r.capacitance_measured??r.capacitance_nf??r.capacitance);if(legacy!==null)r.capacitance_source_f=String(legacy/1e9);}
       const source=number(r.capacitance_source_f);r.capacitance_measured=source===null?'':(source*1e9).toFixed(6);
       const corrected=number(r.power_factor_corrected_20c);r.status=corrected===null?'PENDIENTE':(Math.abs(corrected)<1?'CORRECTO':'OBSERVADO');
     }
