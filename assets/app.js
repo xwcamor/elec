@@ -282,12 +282,12 @@
       tab='taps';
     }
     selectedTab = tab;
-    $$('.config-view-tab').forEach(b => {
+    queryAll('.config-view-tab').forEach(b => {
       const active=b.dataset.tab===tab;
       b.classList.toggle('active',active);
       if(active)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');
     });
-    $$('.config-panel').forEach(p => p.classList.toggle('hidden', p.dataset.panel !== tab));
+    queryAll('.config-panel').forEach(p => p.classList.toggle('hidden', p.dataset.panel !== tab));
     if (tab === 'review') renderReview();
   }
   function syncTransformerNominals(){
@@ -315,8 +315,8 @@
 
   $('#openConfig').addEventListener('click', e => {e.preventDefault();openConfig();});
   $('#backOverview').addEventListener('click', backOverview);
-  $$('.config-view-tab').forEach(b => b.addEventListener('click', () => showPanel(b.dataset.tab)));
-  $$('[data-prev]').forEach(b => b.addEventListener('click', () => showPanel(b.dataset.prev)));
+  queryAll('.config-view-tab').forEach(b => b.addEventListener('click', () => showPanel(b.dataset.tab)));
+  queryAll('[data-prev]').forEach(b => b.addEventListener('click', () => showPanel(b.dataset.prev)));
   syncTransformerNominals();
 
   function addWinding(data = {}) {
@@ -570,11 +570,11 @@
     el.textContent=pending?`${total} ${total===1?'bobinado':'bobinados'} · ${complete} ${complete===1?'completo':'completos'} · faltan datos en ${pending}`:`${total} ${total===1?'bobinado':'bobinados'} · todos los datos completos`;
   }
   function refreshWindingCounters(){
-    $$('[data-winding-stats]').forEach(el=>{
+    queryAll('[data-winding-stats]').forEach(el=>{
       const i=Number(el.dataset.windingStats),w=state.windings[i];
       if(w)el.textContent=`${w.terminals.filter(t=>!(t._draft&&!String(t.code||'').trim()&&!t.has_capacitive_bushing)).length} bornes · ${w.terminals.filter(t=>t.has_capacitive_bushing).length} capacitivos`;
     });
-    $$('[data-winding-status]').forEach(el=>{
+    queryAll('[data-winding-status]').forEach(el=>{
       const w=state.windings[Number(el.dataset.windingStatus)];
       if(!w)return;
       const complete=isWindingComplete(w);
@@ -863,7 +863,7 @@
     Object.entries(panels).forEach(([key,selector])=>{
       $(selector)?.classList.toggle('hidden',key!==view);
     });
-    $$('[data-test-view]').forEach(button=>{
+    queryAll('[data-test-view]').forEach(button=>{
       const active=button.dataset.testView===view;
       button.classList.toggle('active',active);
       button.setAttribute('aria-selected',active?'true':'false');
@@ -872,7 +872,7 @@
     if(view==='table'){renderTestHistory();loadTestHistory();}
     if(view==='graph')renderHistoricalAnalytics();
   }
-  $$('[data-test-view]').forEach(button=>button.addEventListener('click',()=>setTestWorkspaceView(button.dataset.testView)));
+  queryAll('[data-test-view]').forEach(button=>button.addEventListener('click',()=>setTestWorkspaceView(button.dataset.testView)));
 
   function executionDisplayStatus(execution){
     const tests=Array.isArray(execution.plan_tests)?execution.plan_tests:[];
@@ -1083,10 +1083,10 @@
   }
   function renderMeasurementRows(rows){
     $('#measurementRows').innerHTML=(rows||[]).map((r,i)=>`<tr><td class="measurement-row-number">${i+1}</td><td><input class="measurement-cell" data-r="${i}" data-c="0" value="${esc(r.parameter||'')}" placeholder="Ej. Tap 1 / U-N"></td><td><input class="measurement-cell numeric" data-r="${i}" data-c="1" value="${esc(r.value??'')}" placeholder="Valor"></td><td><input class="measurement-cell" data-r="${i}" data-c="2" value="${esc(r.unit||'')}" placeholder="Unidad"></td><td><input class="measurement-cell" data-r="${i}" data-c="3" value="${esc(r.notes||'')}" placeholder="Observación"></td><td><button type="button" class="measurement-delete" data-delete-row="${i}" title="Eliminar fila">×</button></td></tr>`).join('');
-    $$('#measurementRows [data-delete-row]').forEach(b=>b.addEventListener('click',()=>{const a=collectMeasurementRows();a.splice(Number(b.dataset.deleteRow),1);renderMeasurementRows(a);}));
+    queryAll('#measurementRows [data-delete-row]').forEach(b=>b.addEventListener('click',()=>{const a=collectMeasurementRows();a.splice(Number(b.dataset.deleteRow),1);renderMeasurementRows(a);}));
   }
-  function collectMeasurementRows(){return $$('#measurementRows tr').map(tr=>{const a=$$('.measurement-cell',tr);return {parameter:a[0]?.value||'',value:a[1]?.value||'',unit:a[2]?.value||'',notes:a[3]?.value||''};});}
-  $('#addMeasurementRow').addEventListener('click',()=>{const a=collectMeasurementRows();a.push({parameter:'',value:'',unit:'',notes:''});renderMeasurementRows(a);const n=$$('#measurementRows .measurement-cell').length;$('#measurementRows .measurement-cell')[n-4]?.focus();});
+  function collectMeasurementRows(){return queryAll('#measurementRows tr').map(tr=>{const a=queryAll('.measurement-cell',tr);return {parameter:a[0]?.value||'',value:a[1]?.value||'',unit:a[2]?.value||'',notes:a[3]?.value||''};});}
+  $('#addMeasurementRow').addEventListener('click',()=>{const a=collectMeasurementRows();a.push({parameter:'',value:'',unit:'',notes:''});renderMeasurementRows(a);const n=queryAll('#measurementRows .measurement-cell').length;$('#measurementRows .measurement-cell')[n-4]?.focus();});
   $('#measurementRows').addEventListener('paste',e=>{
     const target=e.target.closest('.measurement-cell');if(!target)return;
     const text=(e.clipboardData||window.clipboardData).getData('text');if(!text.includes('\t')&&!text.includes('\n'))return;
@@ -1162,7 +1162,7 @@
     </tr>`;}).join('');
   }
   function collectTtrRows(){
-    return $$('#ttrRows tr').map(tr=>{const a=$$('.ttr-cell',tr);return {tap:a[0]?.value||'',at:a[1]?.value||'',bt:a[2]?.value||'',theoretical:a[3]?.value||'',U:a[4]?.value||'',errU:a[5]?.value||'',V:a[6]?.value||'',errV:a[7]?.value||'',W:a[8]?.value||'',errW:a[9]?.value||'',notes:a[10]?.value||''};}).filter(r=>Object.values(r).some(v=>String(v).trim()!==''));
+    return queryAll('#ttrRows tr').map(tr=>{const a=queryAll('.ttr-cell',tr);return {tap:a[0]?.value||'',at:a[1]?.value||'',bt:a[2]?.value||'',theoretical:a[3]?.value||'',U:a[4]?.value||'',errU:a[5]?.value||'',V:a[6]?.value||'',errV:a[7]?.value||'',W:a[8]?.value||'',errW:a[9]?.value||'',notes:a[10]?.value||''};}).filter(r=>Object.values(r).some(v=>String(v).trim()!==''));
   }
   function ttrToMeasurements(){
     const out=[];collectTtrRows().map(ttrCalc).forEach(r=>['at','bt','theoretical','U','errU','V','errV','W','errW','notes'].forEach(k=>{const value=r[k]||'';if(value!=='')out.push({parameter:`TTR|${r.tap}|${k}`,value,unit:k.startsWith('err')?'%':(k==='notes'?'':(k==='at'||k==='bt'?'kV':'ratio')),notes:''});}));return out;
@@ -1316,7 +1316,7 @@
   }
   function collectSpecificRows(){
     const cfg=specificTemplates[activeSpecificCode];if(!cfg)return[];
-    return $('#specificTestRows tr').map(tr=>{const o={};$$('.specific-cell',tr).forEach((e,i)=>o[cfg.cols[i][0]]=e.value);$$('.specific-legacy-cell',tr).forEach(e=>o[e.dataset.key]=e.value);return normalizeSpecificRow(activeSpecificCode,o);}).filter(r=>Object.entries(r).some(([k,v])=>k!=='absorption_index'&&String(v).trim()!==''));
+    return $('#specificTestRows tr').map(tr=>{const o={};queryAll('.specific-cell',tr).forEach((e,i)=>o[cfg.cols[i][0]]=e.value);queryAll('.specific-legacy-cell',tr).forEach(e=>o[e.dataset.key]=e.value);return normalizeSpecificRow(activeSpecificCode,o);}).filter(r=>Object.entries(r).some(([k,v])=>k!=='absorption_index'&&String(v).trim()!==''));
   }
   function specificToMeasurements(){
     const cfg=specificTemplates[activeSpecificCode],out=[];if(!cfg)return out;
@@ -1397,7 +1397,7 @@
   $('#ttrRows').addEventListener('input',e=>{
     if(!e.target.matches('.ttr-cell')||[3,5,7,9].includes(Number(e.target.dataset.c)))return;
     const row=e.target.closest('tr');if(!row)return;
-    const cells=$$('.ttr-cell',row);
+    const cells=queryAll('.ttr-cell',row);
     const values={tap:cells[0]?.value||'',at:cells[1]?.value||'',bt:cells[2]?.value||'',theoretical:'',U:cells[4]?.value||'',errU:'',V:cells[6]?.value||'',errV:'',W:cells[8]?.value||'',errW:'',notes:cells[10]?.value||''};
     const calculated=ttrCalc(values);
     [[3,'theoretical'],[5,'errU'],[7,'errV'],[9,'errW']].forEach(([index,key])=>{if(cells[index])cells[index].value=calculated[key]||'';});
