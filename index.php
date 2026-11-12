@@ -76,7 +76,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.145">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.146">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body>
@@ -290,7 +290,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
   <section class="execution-page hidden" id="planPage">
     <div class="config-toolbar">
       <div><div class="breadcrumbs">Transformador <span>/</span> Pruebas eléctricas <span>/</span> Registro</div><h2 id="planTitle">Nuevo registro de pruebas</h2><p>Prepara los datos y ensayos. El registro se crea al confirmar el inicio; después, los cambios se guardan automáticamente.</p></div>
-      <div class="plan-toolbar-actions"><span id="planSaveStatus" class="plan-save-status" data-state="idle" aria-live="polite"><i></i><span>Preparación · todavía no se guarda</span></span><div class="toolbar-actions"><button class="btn" id="cancelPlan">Volver a registros</button></div></div>
+      <div class="toolbar-actions plan-toolbar-actions"><span id="planSaveStatus" class="plan-save-status" data-state="idle" aria-live="polite"><i></i><span>Preparación · todavía no se guarda</span></span><button class="btn" id="cancelPlan">Volver a registros</button></div>
     </div>
     <div class="plan-wizard-shell">
     <nav class="plan-stepper" id="planStepper" aria-label="Etapas del registro de pruebas">
