@@ -40,7 +40,7 @@ class ElectricalTestRepository
 
     public function get(int $id, string $key): ?array
     {
-        $sql = "SELECT e.*, COALESCE(t.code, 'PLAN') AS test_code, COALESCE(t.name, 'Plan de pruebas') AS test_name,
+        $sql = "SELECT e.*, COALESCE(t.code, 'PLAN') AS test_code, COALESCE(t.name, 'Registro de pruebas') AS test_name,
                        d.payload_json, COALESCE(d.measurement_count,0) AS measurement_count
                 FROM eh_test_executions e
                 LEFT JOIN eh_test_types t ON t.id=e.test_type_id
