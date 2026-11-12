@@ -131,3 +131,9 @@ Los formularios de ensayos específicos toman sus opciones de la configuración 
 ## Edición de mediciones con teclado y Excel
 
 Las grillas de configuración y de ensayos permiten desplazarse entre celdas con flechas, Enter y Tab (Shift+Tab para retroceder), además de pegar rangos tabulados copiados desde Excel. Las grillas de TTR y de ensayos específicos conservan sus campos calculados y permiten navegar sin sobrescribirlos.
+
+
+## Factor de potencia (v1.5.106)
+- Registrar la capacitancia fuente en faradios; la aplicación calcula la capacitancia medida en nF con `F × 10^9`, como en la fórmula del libro LAP (`archivo fuente` → `protocolos`).
+- Estado calculado con FP corregido a 20 °C: `|FP corregido| < 1%` = `CORRECTO`; de lo contrario = `OBSERVADO`.
+- Las observaciones se generan automáticamente a partir del estado de los seis modos.
