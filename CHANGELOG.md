@@ -1,3 +1,9 @@
+## v1.5.106
+- Factor de potencia: encabezados completos y uniformes para FP medido y FP corregido a 20 °C.
+- Capacitancia medida calculada automáticamente en nF desde capacitancia fuente en F (× 10⁹), siguiendo el libro LAP.
+- Estado calculado: CORRECTO si |FP corregido a 20 °C| < 1%; OBSERVADO si no cumple.
+- Observaciones automáticas según los seis modos: conformidad IEEE Std C57.152-2013, cláusula 7.2.14, o «Se encontraron valores observados».
+
 ## v1.5.105
 - Estandariza navegación por teclado en las tablas de ensayos: flechas, Enter, Tab y Shift+Tab.
 - Añade navegación horizontal a las grillas de TTR y ensayos específicos.
