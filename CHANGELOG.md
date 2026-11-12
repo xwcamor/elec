@@ -1,3 +1,10 @@
+## v1.5.120
+- A newly added empty terminal row is a local draft: it does not mark the configuration dirty, trigger an incomplete-state warning, or enter the save payload.
+- Editing a draft row turns it into a real change; the normal «Guardar configuración» action is still required to persist it.
+- Deleting an untouched draft row does not mark the configuration dirty; deleting a populated row does.
+- Winding counters exclude untouched draft rows.
+- Aligns the terminal-row delete control to the far-right edge of the table.
+
 ## v1.5.119
 - Simplifica la tabla de conexiones del bobinado: muestra únicamente Borne y ¿Capacitivo?, sin fase ni función.
 - Añade eliminación individual de filas y conserva obligatoriamente una fila como mínimo.
