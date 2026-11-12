@@ -366,11 +366,7 @@
     }
     const count=$('#planPickerCount');
     if(count)count.textContent=items.length+' seleccionado'+(items.length===1?'':'s');
-    const complete=items.filter(x=>itemMetrics(x).complete).length;
-    const names=items.map(x=>x.name).join(' · ');
-    $('#planSelectionStatus').textContent=items.length
-      ?items.length+' ensayo(s) en el plan · '+complete+' completos'+(names?' — '+names:'')
-      :'Aún no has añadido ensayos al plan.';
+    $('#planSelectionStatus').textContent=items.length?'':'Aún no has añadido ensayos al plan.';
   }
   function changePickedTest(code,checked){
     const index=items.findIndex(item=>String(item.code).toUpperCase()===String(code).toUpperCase());
