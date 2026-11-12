@@ -1,3 +1,7 @@
+## v1.5.125
+- Corrige el uso de querySelectorAll en las pestañas horizontales de configuración para que los tres apartados se puedan seleccionar y actualizar visualmente.
+- Actualiza la versión de caché de los recursos frontend.
+
 ## v1.5.124
 - Corrige los selectores JavaScript de las nuevas pestañas horizontales de configuración para que la navegación y el estado activo funcionen correctamente.
 - Invalida nuevamente la caché de recursos frontend.
