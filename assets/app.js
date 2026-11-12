@@ -319,9 +319,9 @@
           <span class="winding-summary-status" data-winding-status="${wi}" data-state="${isWindingComplete(w)?'complete':'incomplete'}">${isWindingComplete(w)?'Completo':'Pendiente'}</span><span class="accordion-chevron">⌄</span>
         </summary>
         <div class="winding-accordion-body">
-          <section class="winding-data-section">
-            <div class="winding-data-heading"><strong>Datos del bobinado</strong><button type="button" class="text-remove" data-remove-winding="${wi}">Quitar bobinado</button></div>
-            <div class="winding-head-fields">
+          <section class="winding-data-section plan-test-meta-card">
+            <div class="plan-test-meta-card-head"><b>Datos del bobinado</b></div>
+            <div class="plan-test-meta-grid winding-head-fields">
               <label class="config-field"><span>Nombre del bobinado <i class="required-mark">*</i></span><input aria-label="Nombre bobinado" data-wfield="name" value="${esc(w.name)}" placeholder="Ej. Bobinado AT" required></label>
               <label class="config-field"><span>Tensión del bobinado (kV) <i class="required-mark">*</i></span><input class="w-voltage" aria-label="Tensión kV" data-wfield="voltage_kv" type="text" inputmode="decimal" value="${esc(w.voltage_kv)}" placeholder="Ej. 220" required></label>
             </div>
@@ -332,11 +332,11 @@
               <div class="sheet-tools"><button type="button" data-add-terminal="${wi}">+ Fila</button><button type="button" data-copy-terminals="${wi}">Copiar bornes</button></div>
             </div>
             <div class="terminal-section-content">
-              <div class="table-caption"><strong>Conexiones del bobinado</strong></div>
               <div class="sheet-wrap" id="terminal-grid-${wi}"></div>
               <div class="sheet-hint">Pega bloques desde Excel con Ctrl+V en la primera celda. Los datos del elemento capacitivo se registran por borne.</div>
             </div>
           </section>
+          <div class="winding-card-actions"><hr><button type="button" class="text-remove" data-remove-winding="${wi}">Quitar bobinado</button></div>
         </div>
       </details>`).join('');
     host.querySelectorAll('[data-wfield]').forEach(el=>el.addEventListener('change', e=>{const card=e.target.closest('[data-winding]');const i=Number(card.dataset.winding);const key=e.target.dataset.wfield;state.windings[i][key]=key==='has_neutral'?e.target.value==='1':(key==='voltage_kv'?normalizeNumeric(e.target.value):e.target.value);if(key==='voltage_kv')e.target.value=state.windings[i][key];const summary=e.target.closest('.winding-card').querySelector('.winding-summary-main');if(summary)summary.innerHTML='<strong>'+esc(state.windings[i].name||'Bobinado sin nombre')+'</strong><small>'+esc(state.windings[i].voltage_kv||'—')+' kV</small>';refreshWindingCounters();markDirty();}));
