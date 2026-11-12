@@ -1,3 +1,10 @@
+## v1.5.104
+- Vincula campos de bobinado, borne, bushing y TAP en plantillas de ensayos con los elementos reales de la configuración eléctrica.
+- Precarga filas para resistencia de devanados, aislamiento, excitación, bushings y capacitancia desde bobinados/terminales configurados.
+- El selector TAP de TTR utiliza posiciones disponibles en la configuración, no una lista genérica inventada.
+- Los formularios de ensayos históricos usan su snapshot eléctrico al editar, manteniendo valores antiguos aunque la configuración actual haya cambiado.
+- El servidor conserva config_version y config_snapshot originales al actualizar una ejecución existente.
+
 ## v1.5.103
 - Corrige validación del servidor: guardar bobinados ya no exige «Conexión», campo retirado de la interfaz en 1.5.102.
 - Se mantiene la columna histórica connection_type como opcional; no se elimina ni modifica información previa.
