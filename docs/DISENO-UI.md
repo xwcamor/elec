@@ -159,7 +159,7 @@ No crear más variantes salvo que exista una necesidad de interacción clarament
 
 ## 4.1. Separador del encabezado de página
 
-El encabezado de Configuración eléctrica y el encabezado del formulario de Registro de pruebas deben mostrar siempre el mismo separador horizontal inferior.
+Los encabezados de Configuración eléctrica, la vista principal de Pruebas eléctricas y el formulario de Registro de pruebas deben mostrar siempre el mismo separador horizontal inferior.
 
 - Línea de 1 px con el token neutro `var(--ui-border)`.
 - Mismo ancho que el área de contenido.
