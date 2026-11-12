@@ -1,3 +1,8 @@
+## v1.5.139
+- Corrige la numeración del stepper: cada etapa conserva su número ordinal y solo muestra el check cuando está validada; evita reutilizar un número ya sustituido por el check.
+- Resalta en ámbar los campos obligatorios vacíos de nombre y tensión del bobinado.
+- Elimina el comportamiento sticky del encabezado de Configuración eléctrica; ahora se desplaza normalmente con la página.
+
 ## v1.5.138
 - Cambia los estados de los bobinados a texto simple: «Completo» y «Faltan datos», sin badges ni fondos tipo píldora.
 - El resumen indica explícitamente cuántos bobinados tienen datos pendientes.
