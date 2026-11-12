@@ -358,7 +358,7 @@
   }
   function renderCards(){
     const host=$('#planTestCards');
-    if(!items.length){host.innerHTML='<div class="empty-state">Selecciona pruebas para que aparezcan aquí sus formularios.</div>';$('#planTestNav').innerHTML='';return;}
+    if(!items.length){host.innerHTML='<div class="empty-state">Selecciona pruebas para que aparezcan aquí sus formularios.</div>';return;}
     activeTestIndex=Math.max(0,Math.min(activeTestIndex,items.length-1));
     host.innerHTML=items.map((item,idx)=>{
       const fieldList=columns(item.code),required=requiredByTest[item.code]||[],metrics=itemMetrics(item);
@@ -384,8 +384,9 @@
       if(item.code==='WINDING_RESISTANCE')hint='<div class="plan-reference-note"><b>Referencia técnica:</b> el comparativo entre fases debe ser ≤5% (IEEE C57.152-2013, cláusula 7.2.7). El archivo no documenta con claridad la fórmula comparativa; por eso el resultado se registra manualmente y no se calcula con la columna auxiliar defectuosa del Excel.</div>';
       if(item.code==='ARRESTER')hint='<div class="plan-reference-note"><b>Referencia técnica:</b> comparar las mediciones con los valores de fábrica. Si no existen, usar esta ejecución como referencia histórica; no se fija un límite absoluto en este formulario.</div>';
       if(item.code==='SFRA')hint='<div class="plan-reference-note"><b>Referencia técnica:</b> la conclusión se obtiene comparando las gráficas de campo con las de planta. La evaluación es manual; el protocolo no define un umbral numérico.</div>';
-      const openIndexes=[...host.querySelectorAll('.plan-test-card[open]')].map(node=>Number(node.dataset.testIndex));
-      const shouldOpen=openIndexes.length?openIndexes.includes(idx):idx===0;
+      const previousCard=host.querySelector('.plan-test-card[data-test-index="'+idx+'"]');
+      const hasPreviousState=!!previousCard;
+      const shouldOpen=hasPreviousState?previousCard.open:!metrics.complete;
       return '<details class="plan-test-card" data-test-index="'+idx+'" data-state="'+metrics.state+'" '+(shouldOpen?'open':'')+'>'+
         '<summary class="plan-test-card-head"><span class="plan-test-index">'+String(idx+1).padStart(2,'0')+'</span><span class="plan-test-heading"><b>'+esc(item.name)+'</b><small data-card-progress>'+metrics.filled+'/'+metrics.total+' campos · '+metrics.percent+'%</small></span><span class="plan-card-state" data-state="'+metrics.state+'">'+(metrics.complete?'Completo':metrics.anyData?'En curso':'Pendiente')+'</span><span class="plan-card-chevron">⌄</span></summary>'+
         '<div class="plan-test-body">'+
@@ -400,26 +401,19 @@
         '<details class="plan-optional-details plan-observation-details"><summary><span>Observaciones del ensayo</span><small>Notas e incidencias</small></summary><label class="plan-test-observations"><textarea data-meta="observations" rows="2" placeholder="Resultados, incidencias y comentarios">'+esc(item.observations)+'</textarea></label></details>'+
         '<div class="plan-card-actions"><button type="button" class="text-action" data-remove-test="'+idx+'">Retirar este ensayo</button></div></div></details>';
     }).join('');
-    host.querySelectorAll('[data-test-index]').forEach(card=>{
-      const active=Number(card.dataset.testIndex)===activeTestIndex;
-      card.hidden=!active;
-      if(active)card.open=true;
-    });
-    const accordion=$('#planResultsAccordion'),meta=$('#planResultsAccordionMeta'),statusNode=$('#planResultsAccordionStatus');
+    const meta=$('#planResultsAccordionMeta'),statusNode=$('#planResultsAccordionStatus');
     const states=items.map(item=>itemMetrics(item));
     const complete=states.filter(metric=>metric.complete).length;
     const incomplete=states.filter(metric=>metric.anyData&&!metric.complete).length;
     const unstarted=states.length-complete-incomplete;
     if(meta)meta.textContent=items.length+' '+(items.length===1?'ensayo seleccionado':'ensayos seleccionados')+' · '+complete+' completos · '+(incomplete+unstarted)+' por completar';
     if(statusNode){statusNode.textContent=incomplete+unstarted===0?'Todos completos':(incomplete+unstarted)+' pendientes';statusNode.dataset.state=incomplete?'incomplete':(unstarted?'unstarted':'complete');}
-    if(accordion&&accordion.dataset.userToggled!=='1')accordion.open=(incomplete+unstarted)>0;
-    renderTestNav();
     items.forEach((item,index)=>{const card=host.querySelector('[data-test-index="'+index+'"]');if(card)refreshFieldStyles(card,item,itemMetrics(item));});
   }
   function render(){renderPicker();renderCards();renderPlanFeedback();renderPlanReview();}
   function clear(){
     if(autoSaveTimer)clearTimeout(autoSaveTimer);
-    items=[];editingId=null;sessionId=null;activeTestIndex=0;currentPlanStep='shared';savePending=false;editRevision=0;savedRevision=0;const resultsAccordion=$('#planResultsAccordion');if(resultsAccordion){resultsAccordion.dataset.userToggled='0';resultsAccordion.open=true;}
+    items=[];editingId=null;sessionId=null;activeTestIndex=0;currentPlanStep='shared';savePending=false;editRevision=0;savedRevision=0;
     const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());$('#planDate').value=d.toISOString().slice(0,16);
     ['planOperator','planSupervisor','planOilTemp','planAmbientTemp','planHumidity','planObservations'].forEach(id=>$('#'+id).value='');
     $('#planTitle').textContent='Nuevo registro de pruebas';
@@ -606,13 +600,6 @@
   });
   $('#planStepBack').addEventListener('click',()=>movePlanStep(-1));
   $('#planStepNext').addEventListener('click',()=>currentPlanStep==='review'?saveNow():movePlanStep(1));
-  $('#planResultsAccordion summary').addEventListener('click',()=>{$('#planResultsAccordion').dataset.userToggled='1';});
-  $('#planTestNav').addEventListener('click',e=>{
-    const tab=e.target.closest('[data-plan-test-index]');
-    if(!tab)return;
-    activeTestIndex=Number(tab.dataset.planTestIndex);
-    renderCards();refreshPlanFeedback();
-  });
   $('#planTestPicker').addEventListener('change',e=>{
     const input=e.target.closest('input[type="checkbox"]');
     if(!input)return;
