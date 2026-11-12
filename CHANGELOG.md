@@ -1,3 +1,8 @@
+## v1.5.132
+- Integra el indicador de pasos y el panel del formulario dentro de una sola tarjeta continua, eliminando la separación entre secciones.
+- Reduce los círculos a 44 px en escritorio, siguiendo la escala del stepper del formulario de pruebas.
+- Conserva la línea de progreso, el estado azul activo y los estados verdes completados; mantiene adaptación móvil.
+
 ## v1.5.131
 - Adapta el indicador de Configuración eléctrica al diseño del asistente de pruebas: círculos grandes, línea de progreso, paso activo azul y pasos completados verdes.
 - Mantiene únicamente los números, sin títulos ni contadores dentro del indicador.
