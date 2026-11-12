@@ -17,7 +17,7 @@
   const templates={
     WINDING_RESISTANCE:{prefix:'WR',cols:[['section','Devanado (AT / BT)'],['tap','TAP'],['phase','Fase / conexión'],['test_current_a','I de prueba (A)'],['temperature_c','Temperatura medida (°C)'],['resistance_measured','Resistencia medida'],['resistance_referred_75c','Resistencia referida 75 °C'],['notes','Observación']]},
     INSULATION_RESISTANCE:{prefix:'IR',cols:[['point','Punto de aplicación'],['applied_voltage_kv','Voltaje aplicado (kV)'],['reading_15s','Resistencia a 15 s'],['reading_30s','Resistencia a 30 s'],['reading_45s','Resistencia a 45 s'],['reading_1min','Resistencia a 1 min'],['absorption_index','Índice de absorción (1 min / 30 s)'],['reading_unit','Unidad de resistencia'],['notes','Observación']]},
-    POWER_FACTOR:{prefix:'PF',cols:[['measurement','Modo de medición'],['test_voltage','Tensión de prueba'],['power_factor_measured','FP medido'],['power_factor_corrected_20c','FP corregido a 20 °C'],['capacitance_measured','Capacitancia medida'],['notes','Observación']]},
+    POWER_FACTOR:{prefix:'PF',cols:[['measurement','Modo de prueba'],['test_voltage','Tensión de prueba'],['power_factor_measured','Factor de Potencia (medido)'],['power_factor_corrected_20c','Factor de Potencia (Corregido a 20 °C)'],['capacitance_source_f','Capacitancia fuente (F)'],['capacitance_measured','Capacitancia medida (nF)'],['status','Estado']]},
     EXCITATION:{prefix:'EXC',cols:[['tap','TAP'],['phase','Fase'],['frequency_hz','Frecuencia (Hz)'],['excitation_current','Corriente de excitación'],['losses','Pérdidas'],['notes','Observación']]},
     BUSHING:{prefix:'BUSH',cols:[['terminal','Borne'],['serial','Serie'],['test_voltage','Tensión de prueba'],['power_factor_plate','FP de placa'],['power_factor_measured','FP medido'],['capacitance_plate','Capacitancia de placa'],['capacitance_measured','Capacitancia medida'],['variation_percent','Variación (%)'],['result','Resultado capacitancia'],['notes','Observación']]},
     SFRA:{prefix:'SFRA',cols:[['connection','Configuración'],['tap','TAP'],['file_reference','Archivo / curva de campo'],['reference_curve','Curva de referencia (fábrica)'],['comparison_result','Resultado de comparación'],['result','Evaluación manual'],['notes','Observación']]},
@@ -55,7 +55,7 @@
   function normalize(code,row){
     const r={...(row||{})};
     const aliases={
-      POWER_FACTOR:{test_voltage:['test_voltage_v','test_voltage_kv'],capacitance_measured:['capacitance_nf','capacitance']},
+      POWER_FACTOR:{test_voltage:['test_voltage_v','test_voltage_kv'],capacitance_source_f:['capacitance_f'],capacitance_measured:['capacitance_nf','capacitance']},
       EXCITATION:{excitation_current:['current','output_current_a'],losses:['power','losses_w']},
       WINDING_RESISTANCE:{resistance_measured:['resistance_measured_ohm','resistance'],resistance_referred_75c:['resistance_referred_75c_ohm']},
       BUSHING:{test_voltage:['test_voltage_kv'],power_factor_measured:['power_factor'],capacitance_plate:['capacitance_plate_pf'],capacitance_measured:['capacitance_measured_pf','capacitance'],serial:['serial_number']},
@@ -63,6 +63,11 @@
     };
     Object.entries(aliases[code]||{}).forEach(([target,legacy])=>{if(!isFilled(r[target])){const value=legacy.map(key=>r[key]).find(isFilled);if(value!==undefined)r[target]=value;}});
     if(code==='INSULATION_RESISTANCE'){const a=number(r.reading_30s),b=number(r.reading_1min);r.absorption_index=a!==null&&a!==0&&b!==null?String(b/a):'';}
+    if(code==='POWER_FACTOR'){
+      if(!isFilled(r.capacitance_source_f)){const legacy=number(r.capacitance_measured??r.capacitance_nf??r.capacitance);if(legacy!==null)r.capacitance_source_f=String(legacy/1e9);}
+      const source=number(r.capacitance_source_f);r.capacitance_measured=source===null?'':(source*1e9).toFixed(6);
+      const corrected=number(r.power_factor_corrected_20c);r.status=corrected===null?'PENDIENTE':(Math.abs(corrected)<1?'CORRECTO':'OBSERVADO');
+    }
     if(code==='TTR'){
       const a=number(r.at),b=number(r.bt),theo=a!==null&&b!==null&&b!==0?a/(b*Math.sqrt(3)):number(r.theoretical);
       r.theoretical=theo===null?'':String(theo);
@@ -76,6 +81,12 @@
       r.result=variation===null?'PENDIENTE':(variation<5?'CONFORME':'OBSERVADO');
     }
     return r;
+  }
+  function powerFactorObservation(rows){
+    const statuses=(rows||[]).map(row=>normalize('POWER_FACTOR',row).status);
+    if(statuses.length===6&&statuses.every(s=>s==='CORRECTO'))return 'Los valores obtenidos están dentro de lo recomendado según la cláusula 7.2.14 de la norma IEEE Std C57.152-2013. Los valores son aceptables.';
+    if(statuses.some(s=>s==='OBSERVADO'))return 'Se encontraron valores observados';
+    return 'Pendiente de completar las seis mediciones del ensayo.';
   }
   function defaults(code){
     if(code==='TTR'){const t=transformer(),n=Math.max(5,Number(t.num_taps||0));return Array.from({length:Math.min(n,100)},(_,i)=>({tap:String(i+1)}));}
@@ -117,7 +128,7 @@
   function makeItem(code,old){old=old||{};return {id:old.id||null,code,name:typeName(code),status:old.status||'BORRADOR',standard_reference:old.standard_reference||'',equipment_name:old.equipment_name||'',equipment_brand:old.equipment_brand||'',equipment_model:old.equipment_model||'',equipment_serial:old.equipment_serial||'',observations:old.observations||'',rows:old.rows||defaults(code)};}
   const requiredByTest={
     TTR:['tap','at','bt','U','V','W','result'],
-    POWER_FACTOR:['measurement','test_voltage','power_factor_measured','power_factor_corrected_20c'],
+    POWER_FACTOR:['measurement','test_voltage','power_factor_measured','power_factor_corrected_20c','capacitance_source_f','status'],
     EXCITATION:['tap','phase','frequency_hz','excitation_current','losses'],
     WINDING_RESISTANCE:['section','tap','phase','test_current_a','temperature_c','resistance_measured','resistance_referred_75c'],
     INSULATION_RESISTANCE:['point','applied_voltage_kv','reading_15s','reading_30s','reading_45s','reading_1min'],
@@ -132,7 +143,7 @@
   const generalLabels={date:'fecha de realización',operator:'responsable / técnico'};
   function isFilled(value){return value!==null&&value!==undefined&&String(value).trim()!=='';}
   function requiredValueFilled(key,value){
-    if(['result','evaluation'].includes(key)&&String(value??'').trim().toUpperCase()==='PENDIENTE')return false;
+    if(['result','evaluation','status'].includes(key)&&String(value??'').trim().toUpperCase()==='PENDIENTE')return false;
     return isFilled(value);
   }
   function missingForRow(code,row){
@@ -447,10 +458,11 @@
     host.innerHTML=items.map((item,idx)=>{
       const fieldList=columns(item.code),required=requiredByTest[item.code]||[],metrics=itemMetrics(item);
       const head='<tr>'+fieldList.map(f=>'<th>'+esc(f[1])+(required.includes(f[0])?'<i class="required-mark" title="Campo requerido">*</i>':'')+'</th>').join('')+'</tr>';
-      const body=item.rows.map((raw,ri)=>{
+      if(item.code==='POWER_FACTOR')item.observations=powerFactorObservation(item.rows);
+       const body=item.rows.map((raw,ri)=>{
         const row=normalize(item.code,raw),rowMetrics=metrics.rowStates[ri]||{any:false,state:'empty'};
         return '<tr data-row-state="'+rowMetrics.state+'">'+fieldList.map(([key])=>{
-          const calc=['absorption_index','theoretical','errU','errV','errW'].includes(key)||(item.code==='TTR'&&key==='result')||(item.code==='BUSHING'&&['variation_percent','result'].includes(key)),must=required.includes(key),value=row[key]??'';
+          const calc=['absorption_index','theoretical','errU','errV','errW'].includes(key)||(item.code==='TTR'&&key==='result')||(item.code==='BUSHING'&&['variation_percent','result'].includes(key))||(item.code==='POWER_FACTOR'&&['capacitance_measured','status'].includes(key)),must=required.includes(key),value=row[key]??'';
           const filled=requiredValueFilled(key,value),missing=must&&!filled;
           if(['result','evaluation'].includes(key)&&!calc){
             const options=['PENDIENTE','CONFORME','OBSERVADO','NO APLICA'],current=String(value||'PENDIENTE').toUpperCase();
@@ -461,7 +473,7 @@
         }).join('')+'</tr>';
       }).join('');
       let hint='';
-      if(item.code==='POWER_FACTOR')hint='<div class="plan-reference-note"><b>Referencia técnica:</b> seis modos CH+CHL, CH, CHL, CL+CLH, CL y CLH. El archivo registra FP medido y corregido a 20 °C, pero no fija un límite numérico de aceptación; el resultado se evalúa según el criterio técnico aplicable.</div>';
+      if(item.code==='POWER_FACTOR')hint='<div class="plan-reference-note"><b>Cálculo y aceptación:</b> capacitancia medida (nF) = capacitancia de fuente (F) × 10⁹. Estado CORRECTO cuando el FP corregido a 20 °C es menor que 1%; en caso contrario, OBSERVADO. Criterio del protocolo: cláusula 7.2.14 de IEEE Std C57.152-2013.</div>';
       if(item.code==='INSULATION_RESISTANCE')hint='<div class="plan-reference-note"><b>Referencia técnica:</b> referencia IEEE C57.152-2013, cláusula 7.2.13. El libro no muestra un umbral numérico de aceptación para estas lecturas; registra el resultado tras aplicar el criterio aprobado.</div>';
       if(item.code==='TTR')hint='<div class="plan-reference-note"><b>Evaluación automática según protocolo:</b> relación teórica = AT / (BT × √3); error por fase = (medida − teórica) × 100 / medida. Resultado CORRECTO cuando los tres errores están dentro de ±0,5%.</div>';
       if(item.code==='BUSHING')hint='<div class="plan-reference-note"><b>Evaluación automática según protocolo:</b> variación absoluta de capacitancia = |medida − placa| / placa × 100. CONFORME cuando la variación es menor a 5%. el FP se evalúa por separado, porque el libro no fija un umbral numérico para ese factor.</div>';
@@ -482,7 +494,7 @@
         '<label data-meta-wrap="equipment_serial">N.º de serie<input data-meta="equipment_serial" value="'+esc(item.equipment_serial)+'" placeholder="Serie"></label></div></section>'+hint+
         '<div class="plan-table-toolbar"><div><b>Mediciones del ensayo</b><small><i class="required-mark">*</i> Campo requerido · Puedes pegar desde Excel.</small><small class="plan-row-summary" data-row-summary></small></div><button class="btn small secondary-action" type="button" data-add-row="'+idx+'">+ Fila</button></div>'+
         '<div class="measurement-sheet-wrap plan-grid-wrap"><table class="measurement-sheet plan-sheet"><thead>'+head+'</thead><tbody>'+body+'</tbody></table></div>'+
-        '<details class="plan-optional-details plan-observation-details"><summary><span>Observaciones del ensayo</span><small>Notas e incidencias</small></summary><label class="plan-test-observations"><textarea data-meta="observations" rows="2" placeholder="Resultados, incidencias y comentarios">'+esc(item.observations)+'</textarea></label></details>'+
+        '<details class="plan-optional-details plan-observation-details" '+(item.code==='POWER_FACTOR'?'open':'')+'><summary><span>Observaciones del ensayo</span><small>'+(item.code==='POWER_FACTOR'?'Resultado automático según Estado':'Notas e incidencias')+'</small></summary><label class="plan-test-observations"><textarea data-meta="observations" rows="2" placeholder="Resultados, incidencias y comentarios" '+(item.code==='POWER_FACTOR'?'readonly title="Se genera automáticamente según los estados de las mediciones"':'')+'>'+esc(item.observations)+'</textarea></label></details>'+
         '<div class="plan-card-actions"><button type="button" class="text-action" data-remove-test="'+idx+'">Retirar este ensayo</button></div></div></details>';
     }).join('');
     refreshResultsSummary();
@@ -711,6 +723,11 @@
     if(!e.target.classList.contains('plan-cell'))return;
     const row=Number(e.target.dataset.row),key=e.target.dataset.col;item.rows[row]=item.rows[row]||{};item.rows[row][key]=e.target.value;
     const nr=normalize(item.code,item.rows[row]);
+     if(item.code==='POWER_FACTOR'){
+       item.rows[row]=nr;
+       ['capacitance_measured','status'].forEach(k=>{const out=card.querySelector('[data-row="'+row+'"][data-col="'+k+'"]');if(out)out.value=nr[k]||'';});
+       item.observations=powerFactorObservation(item.rows);const note=card.querySelector('[data-meta="observations"]');if(note)note.value=item.observations;
+     }
     if(item.code==='INSULATION_RESISTANCE'&&['reading_30s','reading_1min'].includes(key)){item.rows[row]=nr;const out=card.querySelector('[data-row="'+row+'"][data-col="absorption_index"]');if(out)out.value=nr.absorption_index;}
     if(item.code==='TTR'&&['at','bt','U','V','W'].includes(key)){item.rows[row]=nr;['theoretical','errU','errV','errW','result'].forEach(k=>{const out=card.querySelector('[data-row="'+row+'"][data-col="'+k+'"]');if(out)out.value=nr[k]||'';});}
     if(item.code==='BUSHING'&&['capacitance_plate_pf','capacitance_measured_pf'].includes(key)){item.rows[row]=nr;['variation_percent','result'].forEach(k=>{const out=card.querySelector('[data-row="'+row+'"][data-col="'+k+'"]');if(out)out.value=nr[k]||'';});}
