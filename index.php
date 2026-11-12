@@ -81,7 +81,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.66">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.67">
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
@@ -305,7 +305,6 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       <span class="plan-step-connector" aria-hidden="true"></span>
       <button type="button" class="plan-step" data-plan-step="review" data-state="missing"><span class="plan-step-number">04</span><span class="plan-step-copy"><b>Resumen</b><small>Revisión y guardado</small></span></button>
     </nav>
-ion>
     <section class="execution-card plan-shared-card plan-step-panel" id="planSharedSection" data-plan-panel="shared">
       <div class="execution-card-title"><span class="eyebrow">01 · DATOS COMPARTIDOS</span><h3>Datos de realización y condiciones ambientales</h3><p>Se ingresan una sola vez y se comparten con todos los ensayos del plan.</p></div>
       <div class="plan-core-grid plan-realization-grid">
@@ -470,7 +469,7 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.66"></script>
-<script src="./assets/plan.js?v=1.5.66"></script>
+<script src="./assets/app.js?v=1.5.67"></script>
+<script src="./assets/plan.js?v=1.5.67"></script>
 </body></html>
 0
