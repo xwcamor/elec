@@ -334,10 +334,6 @@
           </details>
         </div>
       </details>`).join('');
-    host.querySelectorAll('.winding-accordion').forEach(details=>details.addEventListener('toggle',()=>{
-      if(!details.open)return;
-      host.querySelectorAll('.winding-accordion').forEach(other=>{if(other!==details)other.open=false;});
-    }));
     host.querySelectorAll('[data-wfield]').forEach(el=>el.addEventListener('change', e=>{const card=e.target.closest('[data-winding]');const i=Number(card.dataset.winding);const key=e.target.dataset.wfield;state.windings[i][key]=key==='has_neutral'?e.target.value==='1':(key==='voltage_kv'?normalizeNumeric(e.target.value):e.target.value);if(key==='voltage_kv')e.target.value=state.windings[i][key];const summary=e.target.closest('.winding-card').querySelector('.winding-summary-main');if(summary)summary.innerHTML='<strong>'+esc(state.windings[i].name||'Bobinado sin nombre')+'</strong><small>'+esc(state.windings[i].code||'Sin código')+' · '+esc(state.windings[i].voltage_kv||'—')+' kV · '+esc(state.windings[i].connection_type||'Conexión pendiente')+'</small>';markDirty();}));
     host.querySelectorAll('[data-remove-winding]').forEach(b=>b.addEventListener('click',()=>{const i=Number(b.dataset.removeWinding);if(!confirm('¿Eliminar este bobinado y sus bornes de la configuración actual?'))return;state.windings.splice(i,1);state.tap_changers=state.tap_changers.filter(c=>c.winding_index!==i).map(c=>({...c,winding_index:c.winding_index>i?c.winding_index-1:c.winding_index}));renderWindings();renderTapChangers();updateCounts();markDirty();}));
     host.querySelectorAll('[data-add-terminal]').forEach(b=>b.addEventListener('click',()=>{const i=Number(b.dataset.addTerminal);state.windings[i].terminals.push(blankTerminal(''));renderWindings();markDirty();}));
@@ -485,14 +481,28 @@
   function renderTapChangers(){
     const host=$('#tapChangersContainer');
     if(!state.tap_changers.length){host.innerHTML=`<div class="empty-state"><div style="font-size:22px;margin-bottom:6px">＋</div><b>No hay conmutadores configurados</b><p>Agrega el conmutador asociado al bobinado que regula la tensión.</p><button class="btn primary" id="addFirstChanger">Agregar conmutador</button></div>`;$('#addFirstChanger').addEventListener('click',addTapChanger);return;}
-    host.innerHTML=state.tap_changers.map((c,ci)=>`<article class="tap-card" data-changer="${ci}"><div class="tap-card-head"><div><strong>${esc(c.name||'Conmutador')}</strong><br><small>${esc(c.type)} · ${c.positions.length} posiciones</small></div><button class="delete-btn" data-remove-changer="${ci}" title="Eliminar conmutador"><svg><use href="#i-trash"/></svg></button></div><div class="tap-meta">
-      <label>Nombre<input data-cfield="name" value="${esc(c.name)}"></label>
-      <label>Bobinado asociado<select data-cfield="winding_index">${state.windings.map((w,i)=>`<option value="${i}" ${Number(c.winding_index)===i?'selected':''}>${esc(w.name||w.code||'Bobinado '+(i+1))}</option>`).join('')}</select></label>
-      <label>Tipo<select data-cfield="type"><option ${c.type==='DETC'?'selected':''}>DETC</option><option ${c.type==='OLTC'?'selected':''}>OLTC</option></select></label>
-      <label>Accionamiento<select data-cfield="operation_type"><option ${c.operation_type==='Manual'?'selected':''}>Manual</option><option ${c.operation_type==='Motorizado'?'selected':''}>Motorizado</option><option ${c.operation_type==='Automático'?'selected':''}>Automático</option></select></label>
-      <label>Posición mínima<input data-cfield="min_position" type="number" value="${esc(c.min_position)}"></label><label>Posición máxima<input data-cfield="max_position" type="number" value="${esc(c.max_position)}"></label><label>Neutro<input data-cfield="neutral_position" type="number" value="${esc(c.neutral_position)}"></label><label>Actual<input data-cfield="current_position" type="number" value="${esc(c.current_position)}"></label>
-    </div><div class="tap-card-body"><div class="table-caption"><strong>Posiciones de tap / datos de placa</strong><div class="sheet-tools"><button data-generate-taps="${ci}">Generar filas</button><button data-add-tap-row="${ci}">+ Fila</button><button data-copy-taps="${ci}">Copiar tabla</button></div></div><div class="sheet-wrap" id="tap-grid-${ci}"></div><div class="sheet-hint">El número de posiciones se ajusta a la placa. Puedes pegar las columnas Posición, Etiqueta, Neutro y Observaciones.</div></div></article>`).join('');
-    host.querySelectorAll('[data-cfield]').forEach(el=>el.addEventListener('change',e=>{const ci=Number(e.target.closest('[data-changer]').dataset.changer),key=e.target.dataset.cfield;state.tap_changers[ci][key]=key==='winding_index'?Number(e.target.value):e.target.value;markDirty();}));
+    host.innerHTML=state.tap_changers.map((c,ci)=>`
+      <details class="tap-card tap-accordion" data-changer="${ci}" ${ci===0?'open':''}>
+        <summary class="tap-accordion-summary">
+          <span class="winding-index">${String(ci+1).padStart(2,'0')}</span>
+          <span class="tap-summary-main"><strong>${esc(c.name||'Conmutador sin nombre')}</strong><small>${esc(state.windings[Number(c.winding_index)]?.name||'Bobinado sin asignar')} · ${esc(c.type)} · ${c.positions.length} posiciones</small></span>
+          <span class="winding-summary-count">${c.positions.length} TAP</span><span class="accordion-chevron">⌄</span>
+        </summary>
+        <div class="tap-accordion-body">
+          <div class="tap-card-head"><div class="tap-meta">
+            <label>Nombre<input data-cfield="name" value="${esc(c.name)}"></label>
+            <label>Bobinado asociado<select data-cfield="winding_index">${state.windings.map((w,i)=>`<option value="${i}" ${Number(c.winding_index)===i?'selected':''}>${esc(w.name||w.code||'Bobinado '+(i+1))}</option>`).join('')}</select></label>
+            <label>Tipo<select data-cfield="type"><option ${c.type==='DETC'?'selected':''}>DETC</option><option ${c.type==='OLTC'?'selected':''}>OLTC</option></select></label>
+            <label>Accionamiento<select data-cfield="operation_type"><option ${c.operation_type==='Manual'?'selected':''}>Manual</option><option ${c.operation_type==='Motorizado'?'selected':''}>Motorizado</option><option ${c.operation_type==='Automático'?'selected':''}>Automático</option></select></label>
+            <label>Posición mínima<input data-cfield="min_position" type="number" value="${esc(c.min_position)}"></label><label>Posición máxima<input data-cfield="max_position" type="number" value="${esc(c.max_position)}"></label><label>Neutro<input data-cfield="neutral_position" type="number" value="${esc(c.neutral_position)}"></label><label>Actual<input data-cfield="current_position" type="number" value="${esc(c.current_position)}"></label>
+          </div><button class="delete-btn" data-remove-changer="${ci}" title="Eliminar conmutador"><svg><use href="#i-trash"/></svg></button></div>
+          <details class="tap-positions-accordion" open>
+            <summary><span>Posiciones de TAP</span><small>${c.positions.length} posiciones registradas</small><span class="accordion-chevron">⌄</span></summary>
+            <div class="tap-card-body"><div class="table-caption"><strong>Posiciones de tap / datos de placa</strong><div class="sheet-tools"><button data-generate-taps="${ci}">Generar filas</button><button data-add-tap-row="${ci}">+ Fila</button><button data-copy-taps="${ci}">Copiar tabla</button></div></div><div class="sheet-wrap" id="tap-grid-${ci}"></div><div class="sheet-hint">Puedes pegar las columnas Posición, Etiqueta, Neutro y Observaciones.</div></div>
+          </details>
+        </div>
+      </details>`).join('');
+    host.querySelectorAll('[data-cfield]').forEach(el=>el.addEventListener('change',e=>{const ci=Number(e.target.closest('[data-changer]').dataset.changer),key=e.target.dataset.cfield;state.tap_changers[ci][key]=key==='winding_index'?Number(e.target.value):e.target.value;const card=e.target.closest('.tap-accordion');const summary=card?.querySelector('.tap-summary-main');const changer=state.tap_changers[ci];if(summary)summary.innerHTML='<strong>'+esc(changer.name||'Conmutador sin nombre')+'</strong><small>'+esc(state.windings[Number(changer.winding_index)]?.name||'Bobinado sin asignar')+' · '+esc(changer.type)+' · '+changer.positions.length+' posiciones</small>';markDirty();}));
     host.querySelectorAll('[data-remove-changer]').forEach(b=>b.addEventListener('click',()=>{if(!confirm('¿Eliminar este conmutador y todas sus posiciones?'))return;state.tap_changers.splice(Number(b.dataset.removeChanger),1);renderTapChangers();updateCounts();markDirty();}));
     host.querySelectorAll('[data-generate-taps]').forEach(b=>b.addEventListener('click',()=>openTapGenerator(Number(b.dataset.generateTaps))));
     host.querySelectorAll('[data-add-tap-row]').forEach(b=>b.addEventListener('click',()=>{const c=state.tap_changers[Number(b.dataset.addTapRow)];if(c.positions.length>=150){toast('Cada conmutador admite como máximo 150 posiciones TAP.',true);return;}c.positions.push({position_no:c.positions.length+1,label:'Tap '+(c.positions.length+1),voltage_kv:'',percent_change:'',is_neutral:false,notes:''});renderTapChangers();updateCounts();markDirty();}));
