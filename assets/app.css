@@ -2086,3 +2086,18 @@ body.config-focus .config-panel,
   }
 }
 
+/* v1.5.149 · Separador de encabezado compartido para configuración y registro. */
+.config-page>.config-toolbar,
+.execution-page>.config-toolbar{
+  border-bottom:1px solid var(--ui-border);
+  padding-bottom:16px;
+  margin-bottom:16px;
+}
+@media(max-width:760px){
+  .config-page>.config-toolbar,
+  .execution-page>.config-toolbar{
+    padding-bottom:12px;
+    margin-bottom:12px;
+  }
+}
+
