@@ -1,3 +1,9 @@
+## 1.5.50
+- Corrige la posición del asterisco obligatorio de Responsable/técnico y Supervisor para que permanezca junto al texto.
+- Elimina el resaltado verde de los campos compartidos cuando están completos; solo se resaltan en ámbar los campos obligatorios pendientes.
+- Los campos completados vuelven al estilo neutro habitual.
+- Actualiza recursos de caché.
+
 ## 1.5.49
 - Condiciones ambientales queda desplegada por defecto al abrir el plan.
 - Fecha de realización, responsable/técnico y supervisor pasan a ser obligatorios para completar el registro.
