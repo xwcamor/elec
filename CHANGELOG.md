@@ -1,3 +1,8 @@
+## 1.5.77
+- Impone navegación secuencial: no permite saltar etapas desde el indicador y valida la etapa actual antes de avanzar.
+- Bloquea el paso 4 mientras existan ensayos incompletos en el paso 3 y muestra los nombres de los ensayos pendientes.
+- Permite retroceder para corregir información; el guardado automático de borradores se mantiene independiente de la navegación.
+
 ## 1.5.76
 - Evita bloquear silenciosamente el botón de avance/confirmación cuando faltan datos: permite el clic para ejecutar la validación y mostrar la alerta contextual con los campos pendientes.
 
