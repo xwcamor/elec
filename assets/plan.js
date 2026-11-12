@@ -386,7 +386,7 @@
       if(item.code==='SFRA')hint='<div class="plan-reference-note"><b>Referencia técnica:</b> la conclusión se obtiene comparando las gráficas de campo con las de planta. La evaluación es manual; el protocolo no define un umbral numérico.</div>';
       const previousCard=host.querySelector('.plan-test-card[data-test-index="'+idx+'"]');
       const hasPreviousState=!!previousCard;
-      const shouldOpen=hasPreviousState?previousCard.open:!metrics.complete;
+      const shouldOpen=metrics.complete?false:(hasPreviousState?previousCard.open:true);
       return '<details class="plan-test-card" data-test-index="'+idx+'" data-state="'+metrics.state+'" '+(shouldOpen?'open':'')+'>'+
         '<summary class="plan-test-card-head"><span class="plan-test-index">'+String(idx+1).padStart(2,'0')+'</span><span class="plan-test-heading"><b>'+esc(item.name)+'</b><small data-card-progress>'+metrics.filled+'/'+metrics.total+' campos · '+metrics.percent+'%</small></span><span class="plan-card-state" data-state="'+metrics.state+'">'+(metrics.complete?'Completo':metrics.anyData?'En curso':'Pendiente')+'</span><span class="plan-card-chevron">⌄</span></summary>'+
         '<div class="plan-test-body">'+
