@@ -1,3 +1,9 @@
+## v1.5.134
+- Simplifica la tabla de posiciones TAP: elimina las columnas Etiqueta, Neutro y Observaciones; conserva Posición y la acción de eliminar.
+- Añade eliminación individual de filas mediante el control de papelera.
+- Impide eliminar la última fila: siempre debe quedar al menos una posición.
+- Actualiza la ayuda y la acción «Copiar tabla» para trabajar únicamente con la columna Posición.
+
 ## v1.5.133
 - En la cabecera de cada bobinado, sustituye el contador de bornes por el estado «Completo» o «Pendiente».
 - Mantiene la cantidad de bornes y capacitivos en el encabezado de la sección «Bornes y terminales».
