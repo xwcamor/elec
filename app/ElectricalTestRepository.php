@@ -7,10 +7,12 @@ class ElectricalTestRepository
     public function listForTransformer(string $key): array
     {
         $sql = "SELECT e.id, e.executed_at, e.status, e.operator_name, e.equipment_name,
-                       e.standard_reference, t.code AS test_code, t.name AS test_name,
+                       e.standard_reference,
+                       COALESCE(t.code, 'PLAN') AS test_code,
+                       COALESCE(t.name, 'Plan de pruebas') AS test_name,
                        COALESCE(d.measurement_count,0) AS measurement_count, d.payload_json
                 FROM eh_test_executions e
-                INNER JOIN eh_test_types t ON t.id=e.test_type_id
+                LEFT JOIN eh_test_types t ON t.id=e.test_type_id
                 LEFT JOIN eh_test_execution_data d ON d.execution_id=e.id
                 WHERE e.transformer_key=:k
                 ORDER BY e.executed_at DESC, e.id DESC";
@@ -31,10 +33,10 @@ class ElectricalTestRepository
 
     public function get(int $id, string $key): ?array
     {
-        $sql = "SELECT e.*, t.code AS test_code, t.name AS test_name,
+        $sql = "SELECT e.*, COALESCE(t.code, 'PLAN') AS test_code, COALESCE(t.name, 'Plan de pruebas') AS test_name,
                        d.payload_json, COALESCE(d.measurement_count,0) AS measurement_count
                 FROM eh_test_executions e
-                INNER JOIN eh_test_types t ON t.id=e.test_type_id
+                LEFT JOIN eh_test_types t ON t.id=e.test_type_id
                 LEFT JOIN eh_test_execution_data d ON d.execution_id=e.id
                 WHERE e.id=:id AND e.transformer_key=:k LIMIT 1";
         $st=$this->pdo->prepare($sql); $st->execute(['id'=>$id,'k'=>$key]);
