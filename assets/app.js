@@ -767,9 +767,15 @@
     if(PILOT.demo){testExecutions=[];renderTestHistory();return;}
     if(!PILOT.testsSchemaReady){testExecutions=[];renderTestHistory();toast('Importa database/schema.sql para habilitar el historial de ejecuciones.',true);return;}
     try{
-      const [r,ct]=await Promise.all([fetch(api('action=test-list&key='+encodeURIComponent(transformer.key))),fetch(api('action=test-types'))]);
-      const d=await readApiResponse(r), c=await readApiResponse(ct);
-      testExecutions=d.items||[];if(ct.ok&&c.ok&&c.items?.length){testCatalog.splice(0,testCatalog.length,...c.items.filter(x=>x.code!=='PLAN').map(x=>[x.code,x.name,'Datos de ensayo']));}
+      // Sincroniza primero el catálogo: el listado no debe competir con la creación del tipo PLAN.
+      const catalogResponse=await fetch(api('action=test-types'));
+      const catalogData=await readApiResponse(catalogResponse);
+      if(catalogData.items?.length){
+        testCatalog.splice(0,testCatalog.length,...catalogData.items.filter(x=>x.code!=='PLAN').map(x=>[x.code,x.name,'Datos de ensayo']));
+      }
+      const listResponse=await fetch(api('action=test-list&key='+encodeURIComponent(transformer.key)));
+      const listData=await readApiResponse(listResponse);
+      testExecutions=listData.items||[];
       renderTestHistory();
     }catch(e){testExecutions=[];renderTestHistory();toast(e.message,true);}
   }
