@@ -1,3 +1,12 @@
+## 1.5.74
+- Define el registro de pruebas como una jornada que agrupa varios ensayos; unifica los términos visibles: registro, ensayo, mediciones y resultados.
+- Renombra las etapas del asistente: Datos generales, Ensayos a realizar, Registro de resultados y Revisión del registro. Usa números simples (1–4) y oculta «Anterior» en el primer paso.
+- Permite guardar automáticamente borradores incluso antes de seleccionar ensayos.
+- Separa el guardado automático de la confirmación final: los registros guardados quedan como BORRADOR o EN_PROCESO; solo pasan a COMPLETADA mediante «Confirmar registro».
+- Permite revisar datos pendientes y deshabilita la confirmación hasta que los datos generales y todos los ensayos estén completos.
+- El servidor valida que un registro confirmado tenga ensayos, mediciones, responsable y supervisor.
+- Actualiza historial, filtros, estadísticas, mensajes y acciones para usar la terminología acordada.
+
 ## 1.5.73
 - Cambia el título del paso 2 a «Ensayos a realizar».
 - Fuerza una alineación consistente a la izquierda para títulos y subtítulos de todas las etapas, incluida la descripción de datos compartidos y el encabezado del selector de ensayos.
