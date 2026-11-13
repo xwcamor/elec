@@ -650,14 +650,14 @@
       const changerName=c.name||'el conmutador '+(ci+1);
       if(!state.windings[c.winding_index])errors.push(`El conmutador ${ci+1} debe estar asociado a un bobinado.`);
       const positions=Array.isArray(c.positions)?c.positions:[];
-      if(!Array.isArray(c.positions))errors.push(\`El conmutador \${changerName} no contiene una lista válida de posiciones TAP.\`);
-      if(positions.length===0)errors.push(\`Agrega al menos una posición TAP a \${changerName}.\`);
-      if(positions.length>150)errors.push(\`El conmutador \${changerName} supera el máximo de 150 posiciones TAP.\`);
+      if(!Array.isArray(c.positions))errors.push(`El conmutador ${changerName} no contiene una lista válida de posiciones TAP.`);
+      if(positions.length===0)errors.push(`Agrega al menos una posición TAP a ${changerName}.`);
+      if(positions.length>150)errors.push(`El conmutador ${changerName} supera el máximo de 150 posiciones TAP.`);
       const seen=new Set();
       positions.forEach((p,pi)=>{
         const raw=String(p.position_no??'').trim();
         if(raw===''){
-          errors.push(\`Falta el número de posición TAP en la fila \${pi+1} de \${changerName}.\`);
+          errors.push(`Falta el número de posición TAP en la fila ${pi+1} de ${changerName}.`);
           return;
         }
         if(!/^\d{1,3}$/.test(raw)){
