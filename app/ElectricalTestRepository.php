@@ -229,7 +229,7 @@ class ElectricalTestRepository
     private function validateCompletedPlanTest(array $test): void
     {
         $rules = [
-            'TTR' => ['TTR', ['tap','at','bt','U','V','W','result'], ['at','bt','U','V','W']],
+            'TTR' => ['TTR', ['tap','at','bt','U','V','W','status'], ['at','bt','U','V','W']],
             'POWER_FACTOR' => ['PF', ['measurement','test_voltage','power_factor_measured','power_factor_corrected_20c','capacitance_source_f','status'], ['test_voltage','power_factor_measured','power_factor_corrected_20c','capacitance_source_f']],
             'EXCITATION' => ['EXC', ['tap','test_voltage_kv','frequency_hz','current_u_ma','losses_u_w','current_v_ma','losses_v_w','current_w_ma','losses_w_w','evaluation'], ['test_voltage_kv','frequency_hz','current_u_ma','losses_u_w','current_v_ma','losses_v_w','current_w_ma','losses_w_w']],
             'WINDING_RESISTANCE' => ['WR', ['section','tap','phase','test_current_a','temperature_c','resistance_measured','resistance_referred_75c'], ['test_current_a','temperature_c','resistance_measured','resistance_referred_75c']],
