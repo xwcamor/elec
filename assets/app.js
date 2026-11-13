@@ -722,8 +722,11 @@
         if(match)changerIndex=Number(match[1])-1;
       }
       if(changerIndex>=0){
+        const changerRoot=document.querySelector('[data-changer="'+changerIndex+'"]');
+        const metadataTarget=/posición mínima/i.test(message)?'min_position':/posición máxima/i.test(message)?'max_position':/posición neutra/i.test(message)?'neutral_position':/posición actual/i.test(message)?'current_position':null;
+        if(metadataTarget)target=changerRoot?.querySelector('[data-cfield="'+metadataTarget+'"]')||null;
         const grid=document.querySelector('#tap-grid-'+changerIndex);
-        if(/posición|fila.*tap/i.test(message)&&grid){
+        if(!target&&/posición|fila.*tap/i.test(message)&&grid){
           const rowMatch=message.match(/fila (\d+)/i);
           const positionMatch=message.match(/posición (\d+)/i);
           const cells=[...grid.querySelectorAll('.sheet-cell[data-col="0"]')];
