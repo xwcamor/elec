@@ -97,13 +97,13 @@
   function refreshPowerFactorLive(card,item){
     if(!card||!item||item.code!=='POWER_FACTOR')return;
     item.rows=(item.rows||[]).map(row=>normalize('POWER_FACTOR',row));
-    item.observations=powerFactorObservation(item.rows);
+    item.autoObservation=powerFactorObservation(item.rows);
     item.rows.forEach((row,index)=>['capacitance_measured','status'].forEach(key=>{
       const output=card.querySelector('[data-row="'+index+'"][data-col="'+key+'"]');
       if(output){const display=key==='capacitance_measured'?capacitanceDisplay(row[key],item.capacitance_unit||'nF'):(row[key]??'');if(output.value!==String(display))output.value=display;}
     }));
-    const observation=card.querySelector('[data-meta="observations"]');
-    if(observation&&observation.value!==item.observations)observation.value=item.observations;
+    const observation=card.querySelector('[data-auto-observation]');
+    if(observation)observation.textContent=item.autoObservation;
   }
   function defaults(code){
     if(code==='TTR'){const t=transformer(),n=Math.max(5,Number(t.num_taps||0));return Array.from({length:Math.min(n,100)},(_,i)=>({tap:String(i+1)}));}
@@ -519,7 +519,7 @@
       const fieldList=filteredColumns(item.code),required=requiredByTest[item.code]||[],metrics=itemMetrics(item);
       const head=item.code==='EXCITATION'?'<tr><th rowspan="2">TAP</th><th rowspan="2">Tensión de prueba (kV)</th><th rowspan="2">Frecuencia (Hz)</th><th colspan="2">U-0</th><th colspan="2">V-0</th><th colspan="2">W-0</th><th rowspan="2">Estado</th><th rowspan="2">Acción</th></tr><tr><th>Corriente (mA)</th><th>Pérdidas (W)</th><th>Corriente (mA)</th><th>Pérdidas (W)</th><th>Corriente (mA)</th><th>Pérdidas (W)</th></tr>':'<tr>'+fieldList.map(f=>{let label=esc(f[1]);if(item.code==='POWER_FACTOR'&&f[0]==='power_factor_measured')label='Factor de Potencia medido (%)';if(item.code==='POWER_FACTOR'&&f[0]==='power_factor_corrected_20c')label='Factor de Potencia corregido (%)';if(item.code==='POWER_FACTOR'&&f[0]==='capacitance_measured')label='Capacitancia medida (<select class="plan-unit-select" data-meta="capacitance_unit" aria-label="Unidad de capacitancia">'+['pF','nF','µF','mF','F'].map(u=>'<option value="'+u+'" '+((item.capacitance_unit||'nF')===u?'selected':'')+'>'+u+'</option>').join('')+'</select>)';return '<th>'+label+(required.includes(f[0])?'<i class="required-mark" title="Campo requerido">*</i>':'')+'</th>';}).join('')+'<th class="plan-row-action-head">Acción</th></tr>';
       const tableHead=head;
-      item.observations=observationSummary(item);
+      if(item.code==='POWER_FACTOR')item.autoObservation=powerFactorObservation(item.rows);
        const body=item.rows.map((raw,ri)=>{
         const row=normalize(item.code,raw),rowMetrics=metrics.rowStates[ri]||{any:false,state:'empty'};if(item.code==='POWER_FACTOR')row.capacitance_measured=capacitanceDisplay(row.capacitance_measured,item.capacitance_unit||'nF');
         return '<tr data-row-state="'+rowMetrics.state+'">'+fieldList.map(([key])=>{
@@ -535,7 +535,7 @@
         }).join('')+'<td class="plan-row-action"><button type="button" class="plan-remove-row ui-row-delete" data-remove-row="'+ri+'" data-test-index="'+idx+'" '+(item.rows.length<=1?'disabled':'')+' title="'+(item.rows.length<=1?'Debe conservarse al menos una fila':'Eliminar fila '+(ri+1))+'" aria-label="Eliminar fila '+(ri+1)+'"><svg aria-hidden="true"><use href="#i-trash"/></svg></button></td></tr>';
       }).join('');
       let hint='';
-      if(item.code==='POWER_FACTOR')hint='<div class="plan-reference-note"><b>Cálculo y aceptación:</b> capacitancia medida (nF) = capacitancia de fuente (F) × 10⁹. Estado CORRECTO cuando el FP corregido es menor que 1%; en caso contrario, OBSERVADO. Criterio del protocolo: cláusula 7.2.14 de IEEE Std C57.152-2013.</div>';
+      if(item.code==='POWER_FACTOR')hint='<div class="plan-reference-note"><b>Cálculo y aceptación:</b> capacitancia medida (nF) = capacitancia de fuente (F) × 10⁹. Estado CORRECTO cuando el FP corregido es menor que 1%; en caso contrario, OBSERVADO. Criterio del protocolo: cláusula 7.2.14 de IEEE Std C57.152-2013.</div><div class="plan-reference-note" data-auto-observation>'+esc(item.autoObservation||powerFactorObservation(item.rows))+'</div>';
       if(item.code==='INSULATION_RESISTANCE')hint='<div class="plan-reference-note"><b>Referencia técnica:</b> referencia IEEE C57.152-2013, cláusula 7.2.13. El libro no muestra un umbral numérico de aceptación para estas lecturas; registra el resultado tras aplicar el criterio aprobado.</div>';
       if(item.code==='TTR')hint='<div class="plan-reference-note"><b>Evaluación automática según protocolo:</b> relación teórica = AT / (BT × √3); error por fase = (medida − teórica) × 100 / medida. Resultado CORRECTO cuando los tres errores están dentro de ±0,5%.</div>';
       if(item.code==='BUSHING')hint='<div class="plan-reference-note"><b>Evaluación automática según protocolo:</b> variación absoluta de capacitancia = |medida − placa| / placa × 100. CONFORME cuando la variación es menor a 5%. el FP se evalúa por separado, porque el libro no fija un umbral numérico para ese factor.</div>';
@@ -796,7 +796,7 @@
       const removedIndex=Number(del.dataset.removeTest);items.splice(removedIndex,1);activeTestIndex=Math.min(activeTestIndex,items.length-1);render();markPlanChanged(350);return;
     }
     const removeRow=e.target.closest('[data-remove-row]');
-    if(removeRow){const index=Number(removeRow.dataset.testIndex),row=Number(removeRow.dataset.removeRow),item=items[index];if(!item)return;if(item.rows.length<=1){toast('El ensayo debe conservar al menos una fila.',true);return;}item.rows.splice(row,1);if(item.code==='POWER_FACTOR')item.observations=powerFactorObservation(item.rows);renderCards();refreshPlanFeedback();markPlanChanged(350);return;}
+    if(removeRow){const index=Number(removeRow.dataset.testIndex),row=Number(removeRow.dataset.removeRow),item=items[index];if(!item)return;if(item.rows.length<=1){toast('El ensayo debe conservar al menos una fila.',true);return;}item.rows.splice(row,1);if(item.code==='POWER_FACTOR')item.autoObservation=powerFactorObservation(item.rows);renderCards();refreshPlanFeedback();markPlanChanged(350);return;}
     const add=e.target.closest('[data-add-row]');
     if(add){const item=items[Number(add.dataset.addRow)];if(item){if(item.code==='EXCITATION')item.rows.push({tap:'',test_voltage_kv:'',frequency_hz:String(transformer().frequency_hz||''),evaluation:'PENDIENTE'});else if(item.code==='WINDING_RESISTANCE')item.rows.push({status:'PENDIENTE'});else item.rows.push({});}renderCards();refreshPlanFeedback();markPlanChanged(350);}
   });
@@ -819,7 +819,7 @@
   $('#planTestCards').addEventListener('change',e=>{
     const card=e.target.closest('[data-test-index]');if(!card)return;
     const item=items[Number(card.dataset.testIndex)];if(!item)return;
-    if(e.target.dataset.meta||e.target.classList.contains('plan-cell')){if(item.code==='POWER_FACTOR')refreshPowerFactorLive(card,item);if(e.target.dataset.meta)item[e.target.dataset.meta]=e.target.value;else if(e.target.classList.contains('plan-cell')){const row=Number(e.target.dataset.row),key=e.target.dataset.col;item.rows[row]=item.rows[row]||{};item.rows[row][key]=e.target.value;}if(!e.target.dataset.meta){item.observations=observationSummary(item);const note=card.querySelector('[data-meta="observations"]');if(note)note.value=item.observations;}refreshCardStatus(card,item);refreshPlanFeedback();markPlanChanged(350);}
+    if(e.target.dataset.meta||e.target.classList.contains('plan-cell')){if(item.code==='POWER_FACTOR')refreshPowerFactorLive(card,item);if(e.target.dataset.meta)item[e.target.dataset.meta]=e.target.value;else if(e.target.classList.contains('plan-cell')){const row=Number(e.target.dataset.row),key=e.target.dataset.col;item.rows[row]=item.rows[row]||{};item.rows[row][key]=e.target.value;}if(!e.target.dataset.meta&&item.code==='POWER_FACTOR'){item.autoObservation=powerFactorObservation(item.rows);const note=card.querySelector('[data-auto-observation]');if(note)note.textContent=item.autoObservation;}refreshCardStatus(card,item);refreshPlanFeedback();markPlanChanged(350);}
   });
     $('#planPage').addEventListener('input',e=>{
     if(['planDate','planOperator','planSupervisor'].includes(e.target.id))refreshPlanFeedback();
