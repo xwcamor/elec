@@ -112,7 +112,7 @@ class ElectricalTestRepository
         }
         $storedPayload = ['measurements'=>$clean];
         $plan = $p['plan'] ?? null;
-        if ($status === 'COMPLETADA' && !is_array($plan)) throw new InvalidArgumentException('No se puede completar un registro sin el detalle de sus ensayos.');
+        if (in_array($status, ['EN_PROCESO','COMPLETADA'], true) && !is_array($plan)) throw new InvalidArgumentException('Una jornada iniciada debe conservar el detalle de sus ensayos.');
         if (is_array($plan)) {
             $tests = $plan['tests'] ?? [];
             if (!is_array($tests) || count($tests) > 20) throw new InvalidArgumentException('Un registro admite hasta 20 ensayos.');
@@ -146,16 +146,19 @@ class ElectricalTestRepository
                     'measurements'=>$testMeasurements
                 ];
             }
+            if (in_array($status, ['EN_PROCESO','COMPLETADA'], true)) {
+                if (!$safeTests) throw new InvalidArgumentException('Una jornada iniciada debe contener al menos un ensayo.');
+                if (trim((string)($p['operator_name'] ?? '')) === '') throw new InvalidArgumentException('Completa el responsable o técnico para guardar la jornada.');
+                if (trim((string)($p['supervisor_name'] ?? '')) === '') throw new InvalidArgumentException('Completa el supervisor para guardar la jornada.');
+                if (trim((string)($p['executed_at'] ?? '')) === '') throw new InvalidArgumentException('La fecha de realización es obligatoria.');
+            }
             if ($status === 'COMPLETADA') {
-                if (!$safeTests) throw new InvalidArgumentException('No se puede completar un registro sin ensayos.');
                 foreach ($safeTests as $test) {
                     if (($test['status'] ?? 'BORRADOR') !== 'COMPLETADA') {
                         throw new InvalidArgumentException('Todos los ensayos deben estar completos antes de confirmar el registro.');
                     }
                     $this->validateCompletedPlanTest($test);
                 }
-                if (trim((string)($p['operator_name'] ?? '')) === '' || trim((string)($p['supervisor_name'] ?? '')) === '') throw new InvalidArgumentException('Completa el responsable y el supervisor antes de confirmar el registro.');
-                if (trim((string)($p['executed_at'] ?? '')) === '') throw new InvalidArgumentException('La fecha de realización es obligatoria.');
             }
             $storedPayload['plan'] = ['version'=>1,'session_id'=>substr(trim((string)($plan['session_id'] ?? '')),0,80) ?: null,'tests'=>$safeTests];
         }
@@ -227,8 +230,8 @@ class ElectricalTestRepository
     {
         $rules = [
             'TTR' => ['TTR', ['at','bt','U','V','W','result'], ['at','bt','U','V','W']],
-            'POWER_FACTOR' => ['PF', ['measurement','test_voltage','power_factor_measured','power_factor_corrected_20c'], ['test_voltage','power_factor_measured','power_factor_corrected_20c']],
-            'EXCITATION' => ['EXC', ['tap','phase','frequency_hz','excitation_current','losses'], ['frequency_hz','excitation_current','losses']],
+            'POWER_FACTOR' => ['PF', ['measurement','test_voltage','power_factor_measured','power_factor_corrected_20c','capacitance_source_f','status'], ['test_voltage','power_factor_measured','power_factor_corrected_20c','capacitance_source_f']],
+            'EXCITATION' => ['EXC', ['tap','test_voltage_kv','frequency_hz','current_u_ma','losses_u_w','current_v_ma','losses_v_w','current_w_ma','losses_w_w','evaluation'], ['test_voltage_kv','frequency_hz','current_u_ma','losses_u_w','current_v_ma','losses_v_w','current_w_ma','losses_w_w']],
             'WINDING_RESISTANCE' => ['WR', ['section','tap','phase','test_current_a','temperature_c','resistance_measured','resistance_referred_75c'], ['test_current_a','temperature_c','resistance_measured','resistance_referred_75c']],
             'INSULATION_RESISTANCE' => ['IR', ['point','applied_voltage_kv','reading_15s','reading_30s','reading_45s','reading_1min'], ['applied_voltage_kv','reading_15s','reading_30s','reading_45s','reading_1min']],
             'BUSHING' => ['BUSH', ['terminal','serial','test_voltage','power_factor_plate','power_factor_measured','capacitance_plate','capacitance_measured','variation_percent'], ['test_voltage','power_factor_plate','power_factor_measured','capacitance_plate','capacitance_measured','variation_percent']],
@@ -239,6 +242,18 @@ class ElectricalTestRepository
         ];
         $code = strtoupper((string)($test['code'] ?? ''));
         if (!isset($rules[$code])) throw new InvalidArgumentException('No existe una validación para el ensayo '.$code.'.');
+
+        foreach ([
+            'equipment_name' => 'nombre del equipo',
+            'equipment_brand' => 'marca del equipo',
+            'equipment_model' => 'modelo del equipo',
+            'equipment_serial' => 'número de serie del equipo',
+        ] as $field => $label) {
+            if (trim((string)($test[$field] ?? '')) === '') {
+                throw new InvalidArgumentException('El ensayo '.$code.' requiere completar '.$label.'.');
+            }
+        }
+
         [$prefix, $required, $numeric] = $rules[$code];
         $groups = [];
         foreach (($test['measurements'] ?? []) as $measurement) {
@@ -248,19 +263,20 @@ class ElectricalTestRepository
             $groups[$match[1]][$match[2]] = trim((string)($measurement['value'] ?? ''));
         }
         if (!$groups) throw new InvalidArgumentException('El ensayo '.$code.' no contiene filas de medición.');
+
         foreach ($groups as $rowNumber => $values) {
             foreach ($required as $field) {
-                // TAP se representa mediante el identificador de fila en el formato de almacenamiento.
+                // En TTR, TAP forma parte del identificador de fila (TTR|n|campo).
                 if ($field === 'tap' && $code === 'TTR') continue;
                 $value = trim((string)($values[$field] ?? ''));
-                if ($value === '' || (in_array($field, ['result','evaluation'], true) && strtoupper($value) === 'PENDIENTE')) {
+                if ($value === '' || (in_array($field, ['result','evaluation','status'], true) && strtoupper($value) === 'PENDIENTE')) {
                     throw new InvalidArgumentException('El ensayo '.$code.', fila '.$rowNumber.', tiene campos obligatorios pendientes.');
                 }
             }
             foreach ($numeric as $field) {
                 $value = str_replace(',', '.', trim((string)($values[$field] ?? '')));
                 if ($value === '' || !is_numeric($value)) {
-                    throw new InvalidArgumentException('El ensayo '.$code.', fila '.$rowNumber.', contiene una medición numérica inválida.');
+                    throw new InvalidArgumentException('El ensayo '.$code.', fila '.$rowNumber.', contiene una medición numérica inválida en «'.$field.'».');
                 }
             }
         }
