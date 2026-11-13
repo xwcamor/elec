@@ -665,7 +665,7 @@
           return;
         }
         const n=Number(raw);
-        if(n<1||n>150)errors.push(\`La posición TAP de la fila \${pi+1} en \${changerName} debe ser un entero entre 1 y 150.\`);
+        if(n<1||n>150)errors.push(`La posición TAP de la fila ${pi+1} en ${changerName} debe ser un entero entre 1 y 150.`);
         else if(seen.has(n))errors.push(`La posición ${n} está duplicada en ${changerName}.`);else seen.add(n);
       });
       const optionalPositions=['min_position','max_position','neutral_position','current_position'];
