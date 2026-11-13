@@ -72,10 +72,11 @@
       const corrected=number(r.power_factor_corrected_20c);r.status=corrected===null?'PENDIENTE':(Math.abs(corrected)<1?'CORRECTO':'OBSERVADO');
     }
     if(code==='TTR'){
+      if(!isFilled(r.status)&&isFilled(r.result))r.status=r.result;
       const a=number(r.at),b=number(r.bt),theo=a!==null&&b!==null&&b!==0?a/(b*Math.sqrt(3)):number(r.theoretical);
       r.theoretical=theo===null?'':String(theo);
       const errors=['U','V','W'].map(k=>{const m=number(r[k]);const error=theo!==null&&m!==null&&m!==0?(m-theo)*100/m:null;r['err'+k]=error===null?'':String(error);return error;});
-      r.result=errors.every(v=>v!==null)?(errors.every(v=>Math.abs(v)<=0.5)?'CORRECTO':'OBSERVADO'):'PENDIENTE';
+      r.status=errors.every(v=>v!==null)?(errors.every(v=>Math.abs(v)<=0.5)?'CORRECTO':'OBSERVADO'):'PENDIENTE';
     }
     if(code==='BUSHING'){
       const plate=number(r.capacitance_plate),measured=number(r.capacitance_measured);
@@ -145,7 +146,7 @@
   }
   function makeItem(code,old){old=old||{};return {id:old.id||null,code,name:typeName(code),status:old.status||'BORRADOR',standard_reference:old.standard_reference||'',equipment_name:old.equipment_name||'',equipment_brand:old.equipment_brand||'',equipment_model:old.equipment_model||'',equipment_serial:old.equipment_serial||'',core_type:old.core_type||'NO_ESPECIFICADO',capacitance_unit:old.capacitance_unit||'nF',observations:old.observations||'',rows:old.rows||defaults(code)};}
   const requiredByTest={
-    TTR:['tap','at','bt','U','V','W','result'],
+    TTR:['tap','at','bt','U','V','W','status'],
     POWER_FACTOR:['measurement','test_voltage','power_factor_measured','power_factor_corrected_20c','capacitance_source_f','status'],
     EXCITATION:['tap','test_voltage_kv','frequency_hz','current_u_ma','losses_u_w','current_v_ma','losses_v_w','current_w_ma','losses_w_w','evaluation'],
     WINDING_RESISTANCE:['section','tap','phase','test_current_a','temperature_c','resistance_measured','resistance_referred_75c','status'],
@@ -256,7 +257,7 @@
       input.classList.toggle('is-missing',required&&!valid);
       if(valid){input.removeAttribute('aria-invalid');delete input.dataset.validationAttempted;}else if(input.dataset.validationAttempted!=='true'){input.removeAttribute('aria-invalid');}
       if(input.classList.contains('plan-result-select'))input.dataset.state=String(input.value||'PENDIENTE').toLowerCase();
-      if(field==='result'){
+      if(field==='result'||(item.code==='TTR'&&field==='status')){
         const state=String(input.value||'').trim().toUpperCase();
         input.classList.toggle('result-good',['CORRECTO','CONFORME'].includes(state));
         input.classList.toggle('result-bad',state==='OBSERVADO');
@@ -523,7 +524,7 @@
        const body=item.rows.map((raw,ri)=>{
         const row=normalize(item.code,raw),rowMetrics=metrics.rowStates[ri]||{any:false,state:'empty'};if(item.code==='POWER_FACTOR')row.capacitance_measured=capacitanceDisplay(row.capacitance_measured,item.capacitance_unit||'nF');
         return '<tr data-row-state="'+rowMetrics.state+'">'+fieldList.map(([key])=>{
-          const calc=['absorption_index','theoretical','errU','errV','errW'].includes(key)||(item.code==='TTR'&&key==='result')||(item.code==='BUSHING'&&['variation_percent','result'].includes(key))||(item.code==='POWER_FACTOR'&&['capacitance_measured','status'].includes(key)),must=required.includes(key),value=row[key]??'';
+          const calc=['absorption_index','theoretical','errU','errV','errW'].includes(key)||(item.code==='TTR'&&key==='status')||(item.code==='BUSHING'&&['variation_percent','result'].includes(key))||(item.code==='POWER_FACTOR'&&['capacitance_measured','status'].includes(key)),must=required.includes(key),value=row[key]??'';
           const filled=requiredValueFilled(key,value),missing=must&&!filled;
           if(item.code==='EXCITATION'&&key==='tap'){const config=bridge.getElectricalConfig()||{},positions=[...new Set((config.tap_changers||[]).flatMap(c=>(c.positions||[]).map(x=>String(x.position_no??'').trim()).filter(Boolean)))].sort((a,b)=>Number(a)-Number(b));const options=positions.length?positions:Array.from({length:Math.min(150,Math.max(0,Number(transformer().num_taps||0)))},(_,i)=>String(i+1));const opts=options.map(v=>'<option value="'+esc(v)+'" '+(String(value)===String(v)?'selected':'')+'>TAP '+esc(v)+'</option>').join('');return '<td><select class="plan-cell" data-row="'+ri+'" data-col="tap"><option value="">Selecciona TAP</option>'+opts+(value&&!options.includes(String(value))?'<option selected value="'+esc(value)+'">'+esc(value)+' · registro anterior</option>':'')+'</select></td>';}
           if(['result','evaluation','status'].includes(key)&&!calc){
@@ -811,7 +812,7 @@
        refreshPowerFactorLive(card,item);
      }
     if(item.code==='INSULATION_RESISTANCE'&&['reading_30s','reading_1min'].includes(key)){item.rows[row]=nr;const out=card.querySelector('[data-row="'+row+'"][data-col="absorption_index"]');if(out)out.value=nr.absorption_index;}
-    if(item.code==='TTR'&&['at','bt','U','V','W'].includes(key)){item.rows[row]=nr;['theoretical','errU','errV','errW','result'].forEach(k=>{const out=card.querySelector('[data-row="'+row+'"][data-col="'+k+'"]');if(out)out.value=nr[k]||'';});}
+    if(item.code==='TTR'&&['at','bt','U','V','W'].includes(key)){item.rows[row]=nr;['theoretical','errU','errV','errW','status'].forEach(k=>{const out=card.querySelector('[data-row="'+row+'"][data-col="'+k+'"]');if(out)out.value=nr[k]||'';});}
     if(item.code==='BUSHING'&&['capacitance_plate_pf','capacitance_measured_pf'].includes(key)){item.rows[row]=nr;['variation_percent','result'].forEach(k=>{const out=card.querySelector('[data-row="'+row+'"][data-col="'+k+'"]');if(out)out.value=nr[k]||'';});}
     refreshCardStatus(card,item);
     refreshPlanFeedback();
@@ -860,7 +861,7 @@
     const cell=e.target.closest('.plan-cell');if(!cell||cell.readOnly)return;
     const text=(e.clipboardData||window.clipboardData).getData('text');if(!text.includes('\t')&&!text.includes('\n'))return;
     e.preventDefault();const card=cell.closest('[data-test-index]'),item=items[Number(card.dataset.testIndex)],fields=filteredColumns(item.code),r0=Number(cell.dataset.row),c0=fields.findIndex(c=>c[0]===cell.dataset.col);
-    text.replace(/\r/g,'').split('\n').filter((v,i,a)=>!(i===a.length-1&&v==='')).forEach((line,ri)=>{while(item.rows.length<=r0+ri)item.rows.push({});line.split('\t').forEach((v,ci)=>{const f=fields[c0+ci];if(f&&!['absorption_index','theoretical','errU','errV','errW'].includes(f[0])&&!(item.code==='TTR'&&f[0]==='result')&&!(item.code==='BUSHING'&&['variation_percent','result'].includes(f[0])))item.rows[r0+ri][f[0]]=v.trim();});item.rows[r0+ri]=normalize(item.code,item.rows[r0+ri]);});
+    text.replace(/\r/g,'').split('\n').filter((v,i,a)=>!(i===a.length-1&&v==='')).forEach((line,ri)=>{while(item.rows.length<=r0+ri)item.rows.push({});line.split('\t').forEach((v,ci)=>{const f=fields[c0+ci];if(f&&!['absorption_index','theoretical','errU','errV','errW'].includes(f[0])&&!(item.code==='TTR'&&f[0]==='status')&&!(item.code==='BUSHING'&&['variation_percent','result'].includes(f[0])))item.rows[r0+ri][f[0]]=v.trim();});item.rows[r0+ri]=normalize(item.code,item.rows[r0+ri]);});
     renderCards();refreshPlanFeedback();markPlanChanged(350);toast('Bloque pegado desde Excel.');
   });
 })();
