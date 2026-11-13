@@ -604,6 +604,10 @@
       button.setAttribute('aria-label',title+' · '+label);
       button.title=label;
     });
+    const connectorStates=[winding.complete?'complete':'pending',(tap.complete||tap.optional)?'complete':'pending'];
+    document.querySelectorAll('#configStepper .ui-step-connector').forEach((connector,index)=>{
+      connector.dataset.state=connectorStates[index]||'pending';
+    });
   }
 
   function renderReview(){
@@ -640,9 +644,13 @@
       if(!state.windings[c.winding_index])errors.push(`El conmutador ${ci+1} debe estar asociado a un bobinado.`);
       const seen=new Set();
       c.positions.forEach((p,pi)=>{
-        const n=Number(p.position_no);
-        if(p.position_no===null||String(p.position_no).trim()==='')return;
-        if(!Number.isInteger(n)||n<1||n>150)errors.push(`Las posiciones de ${c.name||'el conmutador '+(ci+1)} deben ser enteros entre 1 y 150.`);
+        const raw=String(p.position_no??'').trim();
+        if(raw===''){
+          errors.push(`Falta el número de posición TAP en la fila ${pi+1} de ${c.name||'el conmutador '+(ci+1)}.`);
+          return;
+        }
+        const n=Number(raw);
+        if(!Number.isInteger(n)||n<1||n>150)errors.push(`La posición TAP de la fila ${pi+1} en ${c.name||'el conmutador '+(ci+1)} debe ser un entero entre 1 y 150.`);
         else if(seen.has(n))errors.push(`La posición ${n} está duplicada en ${c.name||'el conmutador '+(ci+1)}.`);else seen.add(n);
       });
     });
@@ -659,6 +667,14 @@
     }
     if(/necesita un nombre|nombre del bobinado/i.test(message)&&windingIndex>=0){
       target=document.querySelector('[data-winding="'+windingIndex+'"] [data-wfield="name"]');
+    }else if(/código de bobinado .*repetido/i.test(message)){
+      const duplicatedCode=message.match(/código de bobinado (.+?) está repetido/i)?.[1]?.trim().toUpperCase();
+      if(duplicatedCode){
+        target=[...document.querySelectorAll('#windingsContainer [data-wfield="code"]')]
+          .find(field=>String(field.value||'').trim().toUpperCase()===duplicatedCode)||null;
+      }
+    }else if(/necesita un código/i.test(message)&&windingIndex>=0){
+      target=document.querySelector('[data-winding="'+windingIndex+'"] [data-wfield="code"]');
     }else if(/tensión nominal|tensión.*bobinado/i.test(message)&&windingIndex>=0){
       target=document.querySelector('[data-winding="'+windingIndex+'"] [data-wfield="voltage_kv"]');
     }
@@ -680,11 +696,16 @@
         if(match)changerIndex=Number(match[1])-1;
       }
       if(changerIndex>=0){
-        target=document.querySelector('[data-changer="'+changerIndex+'"] [data-cfield="winding_index"]');
-        if(!target&&/posición/i.test(message)){
-          const pos=message.match(/posición (\d+)/i),grid=document.querySelector('#tap-grid-'+changerIndex);
-          if(grid&&pos){const cells=[...grid.querySelectorAll('.sheet-cell[data-col="0"]')];target=cells.find(cell=>String(cell.value||'').trim()===pos[1])||cells[0]||null;}
+        const grid=document.querySelector('#tap-grid-'+changerIndex);
+        if(/posición|fila.*tap/i.test(message)&&grid){
+          const rowMatch=message.match(/fila (\d+)/i);
+          const positionMatch=message.match(/posición (\d+)/i);
+          const cells=[...grid.querySelectorAll('.sheet-cell[data-col="0"]')];
+          if(rowMatch)target=grid.querySelector('.sheet-cell[data-col="0"][data-row="'+(Number(rowMatch[1])-1)+'"]');
+          if(!target&&positionMatch)target=cells.find(cell=>String(cell.value||'').trim()===positionMatch[1])||null;
+          if(!target)target=cells[0]||null;
         }
+        if(!target)target=document.querySelector('[data-changer="'+changerIndex+'"] [data-cfield="winding_index"]');
       }
     }
     if(!target)target=document.querySelector('.config-panel:not(.hidden) [required]:invalid, .config-panel:not(.hidden) .sheet-cell.is-required-missing');
