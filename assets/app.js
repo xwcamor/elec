@@ -623,36 +623,58 @@
   }
   function validateConfiguration(){
     const errors=[];const codes=new Set();
+    const frequencyRaw=String(state.frequency_hz??'').trim();
+    if(frequencyRaw!==''){
+      const frequency=Number(normalizeNumeric(frequencyRaw));
+      if(!Number.isFinite(frequency)||frequency<=0)errors.push('La frecuencia debe ser un valor numérico mayor que cero.');
+    }
     state.windings.forEach((w,wi)=>{
+      const windingName=w.name||'Bobinado '+(wi+1);
       const code=(w.code||'').trim().toUpperCase();
       if(!String(w.name||'').trim())errors.push(`El bobinado ${wi+1} necesita un nombre.`);
       if(!code)errors.push(`El bobinado ${wi+1} necesita un código.`);
       else if(codes.has(code))errors.push(`El código de bobinado ${code} está repetido.`);else codes.add(code);
-      const voltage=Number(w.voltage_kv);
-      if(!Number.isFinite(voltage)||voltage<=0)errors.push(`Indica una tensión nominal válida para el bobinado ${w.name||wi+1}.`);
-      
+      const voltage=Number(normalizeNumeric(w.voltage_kv));
+      if(!Number.isFinite(voltage)||voltage<=0)errors.push(`Indica una tensión nominal válida para el bobinado ${windingName}.`);
       const terminalCodes=new Set();
-      if(!(w.terminals||[]).length)errors.push(`Agrega al menos un borne al bobinado ${w.name||wi+1}.`);
-      w.terminals.forEach((t,ti)=>{
+      const terminals=(w.terminals||[]).filter(t=>!(t._draft&&!String(t.code||'').trim()&&!t.has_capacitive_bushing));
+      if(!terminals.length)errors.push(`Agrega al menos un borne válido al bobinado ${windingName}.`);
+      terminals.forEach((t,ti)=>{
         const terminal=(t.code||'').trim().toUpperCase();
-        if(t._draft&&!terminal&&!t.has_capacitive_bushing)return;
-        if(!terminal){errors.push(`Completa el nombre del borne en la fila ${ti+1} de ${w.name||'el bobinado '+(wi+1)}.`);return;}
-        if(terminalCodes.has(terminal))errors.push(`El borne ${terminal} está repetido en ${w.name||'el bobinado '+(wi+1)}.`);else terminalCodes.add(terminal);
+        if(!terminal){errors.push(`Completa el nombre del borne en la fila ${ti+1} de ${windingName}.`);return;}
+        if(terminal.length>20)errors.push(`El código del borne en la fila ${ti+1} de ${windingName} supera el máximo de 20 caracteres.`);
+        if(terminalCodes.has(terminal))errors.push(`El borne ${terminal} está repetido en ${windingName}.`);else terminalCodes.add(terminal);
       });
     });
     state.tap_changers.forEach((c,ci)=>{
+      const changerName=c.name||'el conmutador '+(ci+1);
       if(!state.windings[c.winding_index])errors.push(`El conmutador ${ci+1} debe estar asociado a un bobinado.`);
       const seen=new Set();
       c.positions.forEach((p,pi)=>{
         const raw=String(p.position_no??'').trim();
         if(raw===''){
-          errors.push(`Falta el número de posición TAP en la fila ${pi+1} de ${c.name||'el conmutador '+(ci+1)}.`);
+          errors.push(`Falta el número de posición TAP en la fila ${pi+1} de ${changerName}.`);
           return;
         }
         const n=Number(raw);
-        if(!Number.isInteger(n)||n<1||n>150)errors.push(`La posición TAP de la fila ${pi+1} en ${c.name||'el conmutador '+(ci+1)} debe ser un entero entre 1 y 150.`);
-        else if(seen.has(n))errors.push(`La posición ${n} está duplicada en ${c.name||'el conmutador '+(ci+1)}.`);else seen.add(n);
+        if(!Number.isInteger(n)||n<1||n>150)errors.push(`La posición TAP de la fila ${pi+1} en ${changerName} debe ser un entero entre 1 y 150.`);
+        else if(seen.has(n))errors.push(`La posición ${n} está duplicada en ${changerName}.`);else seen.add(n);
       });
+      const optionalPositions=['min_position','max_position','neutral_position','current_position'];
+      optionalPositions.forEach(key=>{
+        const raw=String(c[key]??'').trim();if(raw==='')return;
+        const value=Number(raw);
+        if(!Number.isInteger(value)||value<1||value>150)errors.push(`${key==='min_position'?'La posición mínima':key==='max_position'?'La posición máxima':key==='neutral_position'?'La posición neutra':'La posición actual'} de ${changerName} debe ser un entero entre 1 y 150.`);
+      });
+      const min=String(c.min_position??'').trim()===''?null:Number(c.min_position);
+      const max=String(c.max_position??'').trim()===''?null:Number(c.max_position);
+      const neutral=String(c.neutral_position??'').trim()===''?null:Number(c.neutral_position);
+      const current=String(c.current_position??'').trim()===''?null:Number(c.current_position);
+      if(min!==null&&max!==null&&Number.isInteger(min)&&Number.isInteger(max)&&min>max)errors.push(`La posición mínima de ${changerName} no puede superar la posición máxima.`);
+      if(min!==null&&max!==null&&Number.isInteger(min)&&Number.isInteger(max)){
+        if(neutral!==null&&Number.isInteger(neutral)&&(neutral<min||neutral>max))errors.push(`La posición neutra de ${changerName} debe estar dentro del rango mínimo y máximo.`);
+        if(current!==null&&Number.isInteger(current)&&(current<min||current>max))errors.push(`La posición actual de ${changerName} debe estar dentro del rango mínimo y máximo.`);
+      }
     });
     return errors;
   }
@@ -678,7 +700,10 @@
     }else if(/tensión nominal|tensión.*bobinado/i.test(message)&&windingIndex>=0){
       target=document.querySelector('[data-winding="'+windingIndex+'"] [data-wfield="voltage_kv"]');
     }
-    if(!target&&/borne.*fila/i.test(message)){
+    if(!target&&/al menos un borne/i.test(message)&&windingIndex>=0){
+      target=document.querySelector('[data-add-terminal="'+windingIndex+'"]');
+    }
+    if(!target&&/borne.*fila|código del borne.*máximo/i.test(message)){
       const rowMatch=message.match(/fila (\d+)/i);
       if(rowMatch&&windingIndex>=0)target=document.querySelector('#terminal-grid-'+windingIndex+' .sheet-cell[data-row="'+(Number(rowMatch[1])-1)+'"][data-col="0"]');
     }
