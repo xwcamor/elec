@@ -239,12 +239,30 @@
     const complete=tapData&&state.tap_changers.every(c=>{
       const positions=Array.isArray(c.positions)?c.positions:[];
       const numbers=positions.map(p=>Number(p.position_no));
-      return !!state.windings[c.winding_index]&&positions.length>0&&positions.length<=150&&
-        positions.every(p=>/^\d{1,3}$/.test(String(p.position_no??'').trim())&&Number(p.position_no)>0&&Number(p.position_no)<=150)&&
+      return !!state.windings[c.winding_index]&&positions.length>0&&
+        positions.every(p=>String(p.position_no??'').trim()!==''&&Number.isInteger(Number(p.position_no))&&Number(p.position_no)>0&&Number(p.position_no)<=150)&&
         new Set(numbers).size===numbers.length;
     })&&issues.length===0;
     const expected=String(transformer.tap_type||'').trim()!==''||Number(transformer.num_taps||0)>0;
     return {complete,expected,optional:!tapData&&!expected,issues};
+  }
+  function getChangerState(changer){
+    const positions=Array.isArray(changer?.positions)?changer.positions:[];
+    const hasIdentity=String(changer?.name||'').trim()!==''&&Number.isInteger(Number(changer?.winding_index))&&!!state.windings[Number(changer.winding_index)]&&Number.isInteger(Number(changer?.min_position))&&Number.isInteger(Number(changer?.max_position))&&Number(changer.min_position)>0&&Number(changer.max_position)>=Number(changer.min_position);
+    const validPositions=positions.length>0&&positions.every(position=>{
+      const number=Number(position?.position_no);
+      return String(position?.position_no??'').trim()!==''&&Number.isInteger(number)&&number>0&&number<=150;
+    })&&new Set(positions.map(position=>Number(position.position_no))).size===positions.length;
+    if(hasIdentity&&validPositions)return 'complete';
+    return hasIdentity||positions.length?'partial':'empty';
+  }
+  function refreshChangerCardState(card,changer){
+    if(!card)return;
+    const stateName=getChangerState(changer);
+    const label=stateName==='complete'?'Completo':(stateName==='partial'?'En curso':'Pendiente');
+    card.dataset.state=stateName;
+    const status=card.querySelector('.winding-summary-status');
+    if(status){status.dataset.state=stateName;status.textContent=label;}
   }
   function showPanel(tab) {
     if(!['windings','taps','review'].includes(tab))return;
@@ -390,7 +408,7 @@
       table.addEventListener('paste',e=>handlePaste(e,container,rows,columns,onChange,render));
     };
     function renderCell(row,col,ri,ci){
-      if(col.type==='delete')return `<button type="button" class="delete-btn sheet-row-delete" data-delete-row="${ri}" title="Eliminar fila" aria-label="Eliminar fila"><svg><use href="#i-trash"/></svg></button>`;
+      if(col.type==='delete')return `<button type="button" class="delete-btn sheet-row-delete ui-row-delete" data-delete-row="${ri}" title="Eliminar fila ${ri+1}" aria-label="Eliminar fila ${ri+1}"><svg aria-hidden="true"><use href="#i-trash"/></svg></button>`;
       let val = col.type==='bushing'||col.type==='bushing-number' ? (row.bushing?.[col.key] ?? '') : (row[col.key] ?? '');
       if(col.type==='check') return `<div style="display:grid;place-items:center;height:32px"><input class="sheet-cell sheet-check" type="checkbox" data-row="${ri}" data-col="${ci}" ${val?'checked':''} aria-label="${esc(col.label)}"></div>`;
       if(col.type==='yesno') return `<select class="sheet-cell sheet-select" data-row="${ri}" data-col="${ci}" aria-label="${esc(col.label)}"><option value="0" ${!val?'selected':''}>No</option><option value="1" ${val?'selected':''}>Sí</option></select>`;
@@ -487,26 +505,26 @@
     const host=$('#tapChangersContainer');
     if(!state.tap_changers.length){host.innerHTML=`<div class="empty-state"><div style="font-size:22px;margin-bottom:6px">＋</div><b>No hay conmutadores configurados</b><p>Agrega el conmutador asociado al bobinado que regula la tensión.</p><button class="btn primary" id="addFirstChanger">Agregar conmutador</button></div>`;$('#addFirstChanger').addEventListener('click',addTapChanger);return;}
     host.innerHTML=state.tap_changers.map((c,ci)=>`
-      <details class="tap-card tap-accordion" data-changer="${ci}" ${ci===0?'open':''}>
+      <details class="tap-card tap-accordion" data-changer="${ci}" data-state="${getChangerState(c)}" ${ci===0?'open':''}>
         <summary class="tap-accordion-summary">
           <span class="winding-index">${String(ci+1).padStart(2,'0')}</span>
           <span class="tap-summary-main"><strong>${esc(c.name||'Conmutador sin nombre')}</strong><small>${esc(state.windings[Number(c.winding_index)]?.name||'Bobinado sin asignar')} · ${c.positions.length} posiciones</small></span>
-          <span class="winding-summary-count">${c.positions.length} TAP</span><span class="accordion-chevron">⌄</span>
+          <strong class="winding-summary-status" data-state="${getChangerState(c)}">${getChangerState(c)==='complete'?'Completo':(getChangerState(c)==='partial'?'En curso':'Pendiente')}</strong><span class="accordion-chevron">⌄</span>
         </summary>
         <div class="tap-accordion-body">
-          <div class="tap-card-head"><div class="tap-meta">
-            <label><span>Nombre del conmutador</span><input data-cfield="name" value="${esc(c.name)}" placeholder="Ej. CTC / DETC"></label>
-            <label><span>Bobinado asociado</span><select data-cfield="winding_index">${state.windings.map((w,i)=>`<option value="${i}" ${Number(c.winding_index)===i?'selected':''}>${esc(w.name||w.code||'Bobinado '+(i+1))}</option>`).join('')}</select></label>
-            <label><span>Posición mínima</span><input data-cfield="min_position" type="number" value="${esc(c.min_position)}"></label><label><span>Posición máxima</span><input data-cfield="max_position" type="number" value="${esc(c.max_position)}"></label><label><span>Posición neutra</span><input data-cfield="neutral_position" type="number" value="${esc(c.neutral_position)}"></label><label><span>Posición actual</span><input data-cfield="current_position" type="number" value="${esc(c.current_position)}"></label>
-          </div>
-          <details class="tap-positions-accordion" open>
-            <summary><span>Posiciones de TAP</span><small>${c.positions.length} posiciones registradas</small><span class="accordion-chevron">⌄</span></summary>
-            <div class="tap-card-body"><div class="table-caption"><strong>Posiciones de tap / datos de placa</strong><div class="sheet-tools"><button data-generate-taps="${ci}">Generar filas</button><button data-add-tap-row="${ci}">+ Fila</button></div></div><div class="sheet-wrap" id="tap-grid-${ci}"></div><div class="sheet-hint">Puedes pegar una columna con las posiciones desde Excel.</div></div>
-          </details>
+          <section class="tap-card-head"><div class="tap-meta-card-head"><strong>Datos del conmutador</strong></div><div class="tap-meta">
+            <label><span>Nombre del conmutador <i class="required-mark" aria-hidden="true">*</i></span><input data-cfield="name" value="${esc(c.name)}" placeholder="Ej. CTC / DETC" required aria-required="true"></label>
+            <label><span>Bobinado asociado <i class="required-mark" aria-hidden="true">*</i></span><select data-cfield="winding_index" required aria-required="true">${state.windings.map((w,i)=>`<option value="${i}" ${Number(c.winding_index)===i?'selected':''}>${esc(w.name||w.code||'Bobinado '+(i+1))}</option>`).join('')}</select></label>
+            <label><span>Posición mínima <i class="required-mark" aria-hidden="true">*</i></span><input data-cfield="min_position" type="number" value="${esc(c.min_position)}" required aria-required="true"></label><label><span>Posición máxima <i class="required-mark" aria-hidden="true">*</i></span><input data-cfield="max_position" type="number" value="${esc(c.max_position)}" required aria-required="true"></label>
+          </div></section>
+          <section class="tap-positions-card">
+            <div class="tap-positions-card-head"><div><strong>Posiciones de TAP</strong><small>${c.positions.length} posiciones registradas</small></div><div class="sheet-tools"><button data-generate-taps="${ci}">Generar filas</button><button data-add-tap-row="${ci}">+ Fila</button></div></div>
+            <div class="tap-card-body"><div class="sheet-wrap" id="tap-grid-${ci}"></div><div class="sheet-hint">Puedes pegar una columna con las posiciones desde Excel.</div></div>
+          </section>
           <div class="winding-card-actions ui-danger-zone"><hr><button type="button" class="text-remove" data-remove-changer="${ci}">Quitar conmutador</button></div>
         </div>
       </details>`).join('');
-    host.querySelectorAll('[data-cfield]').forEach(el=>el.addEventListener('change',e=>{const ci=Number(e.target.closest('[data-changer]').dataset.changer),key=e.target.dataset.cfield;state.tap_changers[ci][key]=key==='winding_index'?Number(e.target.value):e.target.value;const card=e.target.closest('.tap-accordion');const summary=card?.querySelector('.tap-summary-main');const changer=state.tap_changers[ci];if(summary)summary.innerHTML='<strong>'+esc(changer.name||'Conmutador sin nombre')+'</strong><small>'+esc(state.windings[Number(changer.winding_index)]?.name||'Bobinado sin asignar')+' · '+esc(changer.type)+' · '+changer.positions.length+' posiciones</small>';markDirty();}));
+    host.querySelectorAll('[data-cfield]').forEach(el=>el.addEventListener('change',e=>{const ci=Number(e.target.closest('[data-changer]').dataset.changer),key=e.target.dataset.cfield;state.tap_changers[ci][key]=key==='winding_index'?Number(e.target.value):e.target.value;const card=e.target.closest('.tap-accordion');const summary=card?.querySelector('.tap-summary-main');const changer=state.tap_changers[ci];if(summary)summary.innerHTML='<strong>'+esc(changer.name||'Conmutador sin nombre')+'</strong><small>'+esc(state.windings[Number(changer.winding_index)]?.name||'Bobinado sin asignar')+' · '+esc(changer.type)+' · '+changer.positions.length+' posiciones</small>';refreshChangerCardState(card,changer);markDirty();}));
     host.querySelectorAll('[data-remove-changer]').forEach(b=>b.addEventListener('click',()=>{if(!confirm('¿Eliminar este conmutador y todas sus posiciones?'))return;state.tap_changers.splice(Number(b.dataset.removeChanger),1);renderTapChangers();updateCounts();markDirty();}));
     host.querySelectorAll('[data-generate-taps]').forEach(b=>b.addEventListener('click',()=>openTapGenerator(Number(b.dataset.generateTaps))));
     host.querySelectorAll('[data-add-tap-row]').forEach(b=>b.addEventListener('click',()=>{const c=state.tap_changers[Number(b.dataset.addTapRow)];if(c.positions.length>=150){toast('Cada conmutador admite como máximo 150 posiciones TAP.',true);return;}c.positions.push({position_no:c.positions.length+1,label:'Tap '+(c.positions.length+1),voltage_kv:'',percent_change:'',is_neutral:false,notes:''});renderTapChangers();updateCounts();markDirty();}));
@@ -568,10 +586,7 @@
   }
 
   function updateCounts(){
-    $('#windingCount').textContent=state.windings.length+' '+(state.windings.length===1?'bobinado':'bobinados');
     refreshWindingCounters();
-    const positions=state.tap_changers.reduce((sum,c)=>sum+c.positions.length,0);
-    $('#tapCount').textContent=positions+' '+(positions===1?'posición':'posiciones');
     refreshConfigStepIndicators();
   }
 
@@ -623,66 +638,40 @@
   }
   function validateConfiguration(){
     const errors=[];const codes=new Set();
-    const frequencyRaw=String(state.frequency_hz??'').trim();
-    if(frequencyRaw!==''){
-      const frequency=Number(normalizeNumeric(frequencyRaw));
-      if(!Number.isFinite(frequency)||frequency<=0)errors.push('La frecuencia debe ser un valor numérico mayor que cero.');
-    }
     state.windings.forEach((w,wi)=>{
-      const windingName=w.name||'Bobinado '+(wi+1);
       const code=(w.code||'').trim().toUpperCase();
       if(!String(w.name||'').trim())errors.push(`El bobinado ${wi+1} necesita un nombre.`);
       if(!code)errors.push(`El bobinado ${wi+1} necesita un código.`);
       else if(codes.has(code))errors.push(`El código de bobinado ${code} está repetido.`);else codes.add(code);
-      const voltage=Number(normalizeNumeric(w.voltage_kv));
-      if(!Number.isFinite(voltage)||voltage<=0)errors.push(`Indica una tensión nominal válida para el bobinado ${windingName}.`);
+      const voltage=Number(w.voltage_kv);
+      if(!Number.isFinite(voltage)||voltage<=0)errors.push(`Indica una tensión nominal válida para el bobinado ${w.name||wi+1}.`);
+      
       const terminalCodes=new Set();
-      const terminals=(w.terminals||[]).filter(t=>!(t._draft&&!String(t.code||'').trim()&&!t.has_capacitive_bushing));
-      if(!terminals.length)errors.push(`Agrega al menos un borne válido al bobinado ${windingName}.`);
-      terminals.forEach((t,ti)=>{
+      if(!(w.terminals||[]).length)errors.push(`Agrega al menos un borne al bobinado ${w.name||wi+1}.`);
+      w.terminals.forEach((t,ti)=>{
         const terminal=(t.code||'').trim().toUpperCase();
-        if(!terminal){errors.push(`Completa el nombre del borne en la fila ${ti+1} de ${windingName}.`);return;}
-        if(Array.from(terminal).length>20)errors.push(`El código del borne en la fila ${ti+1} de ${windingName} supera el máximo de 20 caracteres.`);
-        if(terminalCodes.has(terminal))errors.push(`El borne ${terminal} está repetido en ${windingName}.`);else terminalCodes.add(terminal);
+        if(t._draft&&!terminal&&!t.has_capacitive_bushing)return;
+        if(!terminal){errors.push(`Completa el nombre del borne en la fila ${ti+1} de ${w.name||'el bobinado '+(wi+1)}.`);return;}
+        if(terminalCodes.has(terminal))errors.push(`El borne ${terminal} está repetido en ${w.name||'el bobinado '+(wi+1)}.`);else terminalCodes.add(terminal);
       });
     });
     state.tap_changers.forEach((c,ci)=>{
-      const changerName=c.name||'el conmutador '+(ci+1);
+      if(!String(c.name||'').trim())errors.push(`El conmutador ${ci+1} necesita un nombre.`);
       if(!state.windings[c.winding_index])errors.push(`El conmutador ${ci+1} debe estar asociado a un bobinado.`);
-      const positions=Array.isArray(c.positions)?c.positions:[];
-      if(!Array.isArray(c.positions))errors.push(`El conmutador ${changerName} no contiene una lista válida de posiciones TAP.`);
-      if(positions.length===0)errors.push(`Agrega al menos una posición TAP a ${changerName}.`);
-      if(positions.length>150)errors.push(`El conmutador ${changerName} supera el máximo de 150 posiciones TAP.`);
+      const minPosition=Number(c.min_position),maxPosition=Number(c.max_position);
+      if(!Number.isInteger(minPosition)||minPosition<1)errors.push(`El conmutador ${ci+1} necesita una posición mínima válida.`);
+      if(!Number.isInteger(maxPosition)||maxPosition<minPosition)errors.push(`El conmutador ${ci+1} necesita una posición máxima válida.`);
       const seen=new Set();
-      positions.forEach((p,pi)=>{
+      c.positions.forEach((p,pi)=>{
         const raw=String(p.position_no??'').trim();
         if(raw===''){
-          errors.push(`Falta el número de posición TAP en la fila ${pi+1} de ${changerName}.`);
-          return;
-        }
-        if(!/^\d{1,3}$/.test(raw)){
-          errors.push(`La posición TAP de la fila ${pi+1} en ${changerName} debe ser un entero entre 1 y 150.`);
+          errors.push(`Falta el número de posición TAP en la fila ${pi+1} de ${c.name||'el conmutador '+(ci+1)}.`);
           return;
         }
         const n=Number(raw);
-        if(n<1||n>150)errors.push(`La posición TAP de la fila ${pi+1} en ${changerName} debe ser un entero entre 1 y 150.`);
-        else if(seen.has(n))errors.push(`La posición ${n} está duplicada en ${changerName}.`);else seen.add(n);
+        if(!Number.isInteger(n)||n<1||n>150)errors.push(`La posición TAP de la fila ${pi+1} en ${c.name||'el conmutador '+(ci+1)} debe ser un entero entre 1 y 150.`);
+        else if(seen.has(n))errors.push(`La posición ${n} está duplicada en ${c.name||'el conmutador '+(ci+1)}.`);else seen.add(n);
       });
-      const optionalPositions=['min_position','max_position','neutral_position','current_position'];
-      optionalPositions.forEach(key=>{
-        const raw=String(c[key]??'').trim();if(raw==='')return;
-        const value=Number(raw);
-        if(!/^\d{1,3}$/.test(raw)||!Number.isInteger(value)||value<1||value>150)errors.push(`${key==='min_position'?'La posición mínima':key==='max_position'?'La posición máxima':key==='neutral_position'?'La posición neutra':'La posición actual'} de ${changerName} debe ser un entero entre 1 y 150.`);
-      });
-      const min=String(c.min_position??'').trim()===''?null:Number(c.min_position);
-      const max=String(c.max_position??'').trim()===''?null:Number(c.max_position);
-      const neutral=String(c.neutral_position??'').trim()===''?null:Number(c.neutral_position);
-      const current=String(c.current_position??'').trim()===''?null:Number(c.current_position);
-      if(min!==null&&max!==null&&Number.isInteger(min)&&Number.isInteger(max)&&min>max)errors.push(`La posición mínima de ${changerName} no puede superar la posición máxima.`);
-      if(min!==null&&max!==null&&Number.isInteger(min)&&Number.isInteger(max)){
-        if(neutral!==null&&Number.isInteger(neutral)&&(neutral<min||neutral>max))errors.push(`La posición neutra de ${changerName} debe estar dentro del rango mínimo y máximo.`);
-        if(current!==null&&Number.isInteger(current)&&(current<min||current>max))errors.push(`La posición actual de ${changerName} debe estar dentro del rango mínimo y máximo.`);
-      }
     });
     return errors;
   }
@@ -708,10 +697,7 @@
     }else if(/tensión nominal|tensión.*bobinado/i.test(message)&&windingIndex>=0){
       target=document.querySelector('[data-winding="'+windingIndex+'"] [data-wfield="voltage_kv"]');
     }
-    if(!target&&/al menos un borne/i.test(message)&&windingIndex>=0){
-      target=document.querySelector('[data-add-terminal="'+windingIndex+'"]');
-    }
-    if(!target&&/borne.*fila|código del borne.*máximo/i.test(message)){
+    if(!target&&/borne.*fila/i.test(message)){
       const rowMatch=message.match(/fila (\d+)/i);
       if(rowMatch&&windingIndex>=0)target=document.querySelector('#terminal-grid-'+windingIndex+' .sheet-cell[data-row="'+(Number(rowMatch[1])-1)+'"][data-col="0"]');
     }
@@ -729,17 +715,16 @@
         if(match)changerIndex=Number(match[1])-1;
       }
       if(changerIndex>=0){
-        const changerRoot=document.querySelector('[data-changer="'+changerIndex+'"]');
-        const metadataTarget=/posición mínima/i.test(message)?'min_position':/posición máxima/i.test(message)?'max_position':/posición neutra/i.test(message)?'neutral_position':/posición actual/i.test(message)?'current_position':null;
-        if(metadataTarget)target=changerRoot?.querySelector('[data-cfield="'+metadataTarget+'"]')||null;
+        const nameField=document.querySelector('[data-changer="'+changerIndex+'"] [data-cfield="name"]');
+        if(!target&&/necesita un nombre/i.test(message))target=nameField;
         const grid=document.querySelector('#tap-grid-'+changerIndex);
-        if(!target&&/posición|fila.*tap/i.test(message)&&grid){
+        if(/posición|fila.*tap/i.test(message)&&grid){
           const rowMatch=message.match(/fila (\d+)/i);
           const positionMatch=message.match(/posición (\d+)/i);
           const cells=[...grid.querySelectorAll('.sheet-cell[data-col="0"]')];
           if(rowMatch)target=grid.querySelector('.sheet-cell[data-col="0"][data-row="'+(Number(rowMatch[1])-1)+'"]');
           if(!target&&positionMatch)target=cells.find(cell=>String(cell.value||'').trim()===positionMatch[1])||null;
-          if(!target)target=cells[0]||grid.querySelector('[data-add-tap-row]')||null;
+          if(!target)target=cells[0]||null;
         }
         if(!target)target=document.querySelector('[data-changer="'+changerIndex+'"] [data-cfield="winding_index"]');
       }

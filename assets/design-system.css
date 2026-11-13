@@ -30,11 +30,18 @@
   --ui-space-7:32px;
   --ui-page-gutter:24px;
   --ui-page-gutter-mobile:12px;
-  --ui-panel-padding:20px;
+  --ui-panel-padding:24px;
   --ui-panel-padding-mobile:16px;
   --ui-control-height:38px;
   --ui-button-height:36px;
 }
+[hidden]{display:none!important}
+
+/* Canonical layout policy: shared operational surfaces scroll normally. */
+#configPage .config-sidebar,
+#planPage .execution-side-card,
+#planPage .config-toolbar,
+body.config-focus .config-toolbar{position:static!important;top:auto!important;bottom:auto!important;z-index:auto!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 body{color:var(--ui-ink);background:var(--ui-canvas)}
 /* El mismo gutter, encabezado y separador en las tres vistas operativas. */
 body.config-focus .page-shell,
@@ -337,15 +344,44 @@ body.test-form-focus .page-shell{
 .config-section-title{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0}
 .config-section-title h3{margin:0!important;font-size:17px!important;color:var(--ui-ink)!important}
 .config-section-title p{margin:0!important;color:var(--ui-muted)!important;font-size:11px!important}
+/* Encabezados de tarjeta: el título y su resumen ocupan una columna vertical. */
+.terminal-section-title,.plan-test-meta-card-head,.tap-meta-card-head{display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+.terminal-section-title small,.plan-test-meta-card-head small,.tap-meta-card-head small{margin:0;color:var(--ui-muted);font-size:10px;line-height:1.35}
+#configPage .winding-data-section .plan-test-meta-card-head{align-items:flex-start!important;justify-content:flex-start!important;text-align:left!important}
+
+/* Pruebas: la referencia del equipo se lee como una única fila en escritorio. */
+#planPage .plan-test-meta-grid{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:12px!important;
+}
+#planPage .plan-observation-details>summary{pointer-events:none;cursor:default;list-style:none}
+#planPage .plan-observation-details>summary::-webkit-details-marker{display:none}
+#planPage .plan-observation-details>summary small{display:none}
+#planPage .plan-sheet thead .required-mark{display:none!important}
+#planPage [data-meta-wrap="core_type"]{display:none!important}
+@media(max-width:900px){#planPage .plan-test-meta-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:560px){#planPage .plan-test-meta-grid{grid-template-columns:1fr!important}}
+#configPage .terminal-section{margin:0!important;border:1px solid var(--ui-line)!important;border-radius:var(--ui-radius-md)!important;background:var(--ui-surface)!important;overflow:hidden!important}
+#configPage .terminal-section-heading{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;padding:12px 14px!important;border-bottom:1px solid var(--ui-line)!important;background:var(--ui-subtle)!important}
+#configPage .terminal-section-title{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:3px!important;min-width:0!important}
+#configPage .terminal-section-title strong{color:var(--ui-ink)!important;font-size:13px!important;font-weight:700!important;line-height:1.3!important}
+#configPage .terminal-section-title small{color:var(--ui-muted)!important;font-size:10px!important;line-height:1.35!important}
+#configPage .terminal-section-content{padding:14px!important;background:var(--ui-surface)!important}
+#configPage .terminal-section-content .sheet-hint{margin-top:8px!important;color:var(--ui-muted)!important;font-size:10px!important;line-height:1.45!important}
+#configPage .winding-data-section.plan-test-meta-card{margin:0!important;padding:0!important;border:1px solid var(--ui-line)!important;border-radius:var(--ui-radius-md)!important;background:var(--ui-surface)!important;overflow:hidden!important}
+#configPage .winding-accordion-body{display:flex!important;flex-direction:column!important;gap:16px!important;padding:16px!important}
+#configPage .winding-accordion-body>.winding-card-actions{margin:0!important}
+#configPage .winding-data-section .plan-test-meta-card-head{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;gap:3px!important;margin:0!important;padding:12px 14px!important;border-bottom:1px solid var(--ui-line)!important;background:var(--ui-subtle)!important}
+#configPage .winding-data-section .plan-test-meta-card-head b{color:var(--ui-ink)!important;font-size:13px!important;font-weight:700!important;line-height:1.3!important}
+#configPage .winding-data-section .plan-test-meta-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;margin:0!important;padding:14px!important;background:var(--ui-surface)!important}
+@media(max-width:650px){#configPage .winding-data-section .plan-test-meta-grid{grid-template-columns:1fr!important}}
+@media(max-width:600px){#configPage .terminal-section-heading{align-items:flex-start!important;flex-direction:column!important;gap:9px!important}#configPage .terminal-section-heading .sheet-tools{width:100%;justify-content:flex-end}}
 .config-panel .form-grid,.plan-wizard-shell .form-grid{
   gap:16px!important;
   padding:0 0 16px!important;
 }
 .config-panel .panel-footer{
   position:static!important;
-  bottom:auto!important;
-  z-index:auto!important;
-  backdrop-filter:none!important;
   margin:0 calc(-1 * var(--ui-panel-padding))!important;
   padding:14px var(--ui-panel-padding)!important;
   border:0!important;
@@ -355,9 +391,7 @@ body.test-form-focus .page-shell{
 }
 #planPage .plan-step-actions{
   position:static!important;
-  bottom:auto!important;
-  z-index:auto!important;
-  backdrop-filter:none!important;
+  box-shadow:none!important;
   display:flex;
   align-items:center;
   gap:12px;
@@ -488,7 +522,6 @@ body.test-form-focus .page-shell{
 .terminal-section{margin-top:14px!important}
 .terminal-section-heading{padding:12px 14px!important;border-bottom:1px solid var(--ui-line)!important;background:#f8fafb!important}
 .terminal-section-content{padding:14px!important}
-.winding-data-section.plan-test-meta-card{margin:12px 14px 14px!important}
 .winding-card-actions{margin:14px 14px 2px!important}
 .tap-accordion-body>.winding-card-actions{margin:14px 14px 2px!important}
 /* Tipografía: los títulos dan jerarquía; el azul se reserva a acciones. */
@@ -580,6 +613,22 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   outline:2px solid rgba(40,121,181,.42)!important;
   outline-offset:2px!important;
 }
+/* Foco contextual: destaca la tarjeta activa sin cambiar su geometría. */
+#configPage .terminal-section:focus-within,
+#configPage .winding-data-section:focus-within,
+#planPage .plan-test-card:focus-within,
+#planPage .plan-test-meta-card:focus-within{
+  border-color:color-mix(in srgb,var(--ui-accent) 58%,var(--ui-line))!important;
+  box-shadow:0 0 0 3px rgba(40,121,181,.10)!important;
+}
+#configPage .winding-accordion:focus-within>.winding-accordion-summary,
+#configPage .tap-accordion:focus-within>.tap-accordion-summary,
+#planPage .plan-test-card:focus-within>.plan-test-card-head{
+  border-bottom-color:color-mix(in srgb,var(--ui-accent) 38%,var(--ui-line))!important;
+}
+@supports not (color:color-mix(in srgb,white,black)){
+  #configPage .terminal-section:focus-within,#configPage .winding-data-section:focus-within,#planPage .plan-test-card:focus-within,#planPage .plan-test-meta-card:focus-within{border-color:#8eb9d8!important;box-shadow:0 0 0 3px rgba(40,121,181,.10)!important}
+}
 input,select,textarea{accent-color:var(--ui-accent)}
 .config-panel input:not([type="checkbox"]),.config-panel select,
 .plan-step-panel input:not([type="checkbox"]),.plan-step-panel select,
@@ -624,7 +673,7 @@ input,select,textarea{accent-color:var(--ui-accent)}
   border-color:var(--ui-danger)!important;
   box-shadow:0 0 0 3px rgba(185,74,72,.10)!important;
 }
-.required-mark{color:#c64b46!important;font-size:1em!important;font-style:normal!important;font-weight:750!important}
+.required-mark{color:var(--ui-muted)!important;font-size:1em!important;font-style:normal!important;font-weight:700!important}
 .config-panel .panel-footer .btn,.plan-step-actions .btn{min-height:36px!important;height:36px!important}
 .test-filter,.test-status-filter select{min-height:36px;border-radius:6px;border-color:var(--ui-line)}
 /* Mensajes: un mismo canal visual para éxito, advertencia y error. */
@@ -696,9 +745,65 @@ input,select,textarea{accent-color:var(--ui-accent)}
   #configStepper,#planStepper{padding:10px 5px!important}
   #planStepper{grid-template-columns:minmax(0,1fr) 7px minmax(0,1fr) 7px minmax(0,1fr) 7px minmax(0,1fr)!important}
   .ui-step-copy b{font-size:8px}
-  .ui-step-copy small,.ui-step-copy em{font-size:8px}
+  .ui-step-copy small,.ui-step-copy em{font-size:7px}
 }
 @media(prefers-reduced-motion:reduce){
   .ui-step-icon,.ui-step,.btn,.toast{transition:none!important}
   .test-view-panel{animation:none!important}
 }
+
+/* Mantener el stepper de configuración centrado también tras las reglas móviles compartidas. */
+#configStepper>.ui-step-connector{align-self:center!important;margin:0!important}
+@media(max-width:760px){
+  #configStepper{grid-template-columns:minmax(0,1fr) minmax(12px,.5fr) minmax(0,1fr) minmax(12px,.5fr) minmax(0,1fr)!important;min-height:76px!important;padding:10px 12px!important}
+  #configStepper>.ui-step{min-height:52px!important;gap:0!important}
+  #configStepper>.ui-step>.ui-step-icon{display:grid!important;flex-basis:36px!important;width:36px!important;height:36px!important}
+  #configStepper>.ui-step>.ui-step-icon svg{display:block!important;width:16px!important;height:16px!important}
+  #configStepper>.ui-step-connector{align-self:center!important;margin:0!important}
+}
+
+/* Acciones de fila compartidas. */
+.ui-row-delete{display:inline-grid!important;place-items:center!important;width:28px!important;height:28px!important;padding:0!important;border:1px solid #ead3d1!important;border-radius:var(--ui-radius-sm)!important;background:#fff!important;color:var(--ui-danger)!important;cursor:pointer}
+.ui-row-delete svg{display:block;width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ui-row-delete:hover:not(:disabled){background:var(--ui-danger-soft)!important;border-color:#d9aaa6!important}
+.ui-row-delete:disabled{opacity:.4;cursor:not-allowed}
+input[aria-invalid="true"]:required:placeholder-shown{border-color:#e8d4a8!important;background:#fffaf0!important;box-shadow:none!important}
+select[required]:invalid{border-color:#e8d4a8!important;background:#fffaf0!important}
+input[type="checkbox"][required]:not(:checked),input[type="radio"][required]:not(:checked){accent-color:var(--ui-warning)}
+
+/* Taxonomía única: el estado se aplica al componente, no a cada dato capturado. */
+:root{--ui-label:#506477;--ui-state-complete:var(--ui-success);--ui-state-progress:var(--ui-warning);--ui-state-pending:var(--ui-muted)}
+#configPage label,#planPage label,#configPage .config-field>span,#planPage label>span{color:var(--ui-label)!important;font-size:11px!important;font-weight:600!important}
+#configPage .required-mark,#planPage .required-mark{color:var(--ui-muted)!important;font-weight:700!important}
+#configPage label.meta-pending,#configPage label.meta-complete,#planPage label.meta-pending,#planPage label.meta-complete{color:var(--ui-label)!important}
+:is(.plan-card-state,.winding-summary-status)[data-state="complete"]{color:var(--ui-state-complete)!important}
+:is(.plan-card-state,.winding-summary-status)[data-state="partial"],:is(.plan-card-state,.winding-summary-status)[data-state="incomplete"]{color:var(--ui-state-progress)!important}
+:is(.plan-card-state,.winding-summary-status)[data-state="empty"]{color:var(--ui-state-pending)!important}
+#configPage .winding-summary-status[data-state="complete"],#configPage .tap-accordion .winding-summary-status[data-state="complete"],#planPage .plan-card-state[data-state="complete"]{color:var(--ui-success)!important}
+#configPage .winding-summary-status[data-state="incomplete"],#configPage .tap-accordion .winding-summary-status[data-state="partial"],#planPage .plan-card-state[data-state="partial"],#planPage .plan-card-state[data-state="incomplete"]{color:var(--ui-warning)!important}
+.plan-test-card[data-state="complete"]>.plan-test-card-head,.winding-accordion[data-state="complete"]>.winding-accordion-summary,.tap-accordion[data-state="complete"]>.tap-accordion-summary{background:var(--ui-subtle)!important;border-color:var(--ui-line)!important}
+.plan-test-card[data-state="partial"]>.plan-test-card-head,.plan-test-card[data-state="incomplete"]>.plan-test-card-head,.winding-accordion[data-state="incomplete"]>.winding-accordion-summary,.tap-accordion[data-state="partial"]>.tap-accordion-summary{background:var(--ui-warning-soft)!important;border-color:var(--ui-line)!important}
+#planPage .plan-cell.is-filled,#planPage .plan-sheet tr[data-row-state="complete"] td{background:var(--ui-surface)!important;color:var(--ui-ink)!important;box-shadow:none!important}
+#planPage .plan-cell.is-missing,#configPage .sheet-cell.is-required-missing{background:#fffaf0!important;color:var(--ui-ink)!important;box-shadow:inset 0 0 0 1px #e8d4a8!important}
+#planPage .plan-result-select,
+#planPage .plan-cell.calculated{font-weight:500!important;letter-spacing:normal!important}
+#planPage .plan-test-meta-grid :is(input,select).is-filled{border-color:var(--ui-line)!important;background:var(--ui-surface)!important;color:var(--ui-ink)!important}
+#planPage .plan-test-meta-grid :is(input,select).is-missing,#configPage .config-field input:required:placeholder-shown{border-color:#e8d4a8!important;background:#fffaf0!important;color:var(--ui-ink)!important}
+
+/* Conmutadores: metadatos arriba y posiciones TAP en una tarjeta interna independiente. */
+#configPage .tap-accordion-body{display:flex;flex-direction:column;gap:16px;padding:16px!important}
+#configPage .tap-accordion-body>.tap-card-head{display:block!important;width:100%;box-sizing:border-box;margin:0;padding:16px!important;border:1px solid var(--ui-line)!important;border-radius:var(--ui-radius-md);background:var(--ui-surface)!important}
+#configPage .tap-accordion-body>.tap-card-head .tap-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:0!important;border:0!important}
+#configPage .tap-accordion-body>.tap-card-head .tap-meta label{min-width:0}
+#configPage .tap-meta-card-head{margin:0 0 12px;padding:0 0 10px;border-bottom:1px solid var(--ui-line)}
+#configPage .tap-meta-card-head strong{color:var(--ui-ink);font-size:13px;font-weight:700}
+#configPage .tap-positions-card{margin:0;border:1px solid var(--ui-line);border-radius:var(--ui-radius-md);background:var(--ui-surface);overflow:hidden}
+#configPage .tap-positions-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid var(--ui-line);background:var(--ui-subtle)}
+#configPage .tap-positions-card-head>div:first-child{display:flex;flex-direction:column;gap:3px;min-width:0}
+#configPage .tap-positions-card-head strong{color:var(--ui-ink);font-size:12px;font-weight:700}
+#configPage .tap-positions-card-head small{color:var(--ui-muted);font-size:10px}
+#configPage .tap-positions-card .tap-card-body{padding:14px!important}
+#configPage .tap-accordion-body>.winding-card-actions{margin:0!important;padding:0 2px!important}
+#configPage .tap-meta :is(input,select)[required]:invalid{border-color:#e8d4a8!important;background:#fffaf0!important;color:var(--ui-ink)!important;box-shadow:inset 0 0 0 1px #e8d4a8!important}
+#planStepBack[hidden]{display:none!important}
+@media(max-width:600px){#configPage .tap-accordion-body>.tap-card-head .tap-meta{grid-template-columns:1fr}#configPage .tap-positions-card-head{align-items:flex-start;flex-direction:column}#configPage .tap-positions-card-head .sheet-tools{width:100%;justify-content:flex-end}}

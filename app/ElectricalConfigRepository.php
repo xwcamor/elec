@@ -191,6 +191,17 @@ class ElectricalConfigRepository
             if (!is_numeric($windingIndex) || (int)$windingIndex < 0 || (int)$windingIndex >= count($windings)) {
                 throw new InvalidArgumentException('El conmutador '.($cIndex + 1).' debe estar asociado a un bobinado válido.');
             }
+            if (trim((string)($changer['name'] ?? '')) === '') {
+                throw new InvalidArgumentException('El conmutador '.($cIndex + 1).' necesita un nombre.');
+            }
+            $minPosition = $changer['min_position'] ?? null;
+            $maxPosition = $changer['max_position'] ?? null;
+            if (!is_numeric($minPosition) || (int)$minPosition < 1) {
+                throw new InvalidArgumentException('El conmutador '.($cIndex + 1).' necesita una posición mínima válida.');
+            }
+            if (!is_numeric($maxPosition) || (int)$maxPosition < (int)$minPosition) {
+                throw new InvalidArgumentException('El conmutador '.($cIndex + 1).' necesita una posición máxima válida.');
+            }
             $positions = [];
             foreach (($changer['positions'] ?? []) as $positionIndex => $position) {
                 if (!is_array($position)) throw new InvalidArgumentException('Hay una posición TAP con datos inválidos en '.($changer['name'] ?? 'el conmutador').'.');

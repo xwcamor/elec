@@ -149,6 +149,8 @@ Sí se estandarizan. El separador es un elemento de jerarquía y agrupación, no
 - Después de cada título o párrafo.
 - Como línea decorativa repetida sin una función de agrupación.
 
+Regla adicional: no dibujar una línea al final de una tarjeta o bloque si no hay contenido relacionado después. El borde exterior ya cierra la tarjeta y el espacio interior resuelve el remate. En componentes anidados, evitar un `border-bottom` si duplica visualmente el borde de la tarjeta sin separar dos grupos.
+
 ### Variantes permitidas
 
 - `.ui-divider--page`: separador de encabezado, ancho completo del contenido, con margen inferior consistente.
@@ -205,6 +207,8 @@ Reglas:
 
 ## 7. Formularios y tarjetas
 
+Regla para encabezados de tarjeta: el título ocupa la primera línea y el resumen, conteo o ayuda (`small`) ocupa la línea siguiente. No colocar un `small` al lado del título; las acciones pueden permanecer alineadas a la derecha en su propio grupo.
+
 - Cada campo tiene etiqueta persistente; el placeholder no reemplaza la etiqueta.
 - La unidad se coloca en la etiqueta o junto al valor de forma consistente.
 - Campos relacionados se agrupan en una tarjeta o sección con un título claro.
@@ -213,8 +217,36 @@ Reglas:
 - Los errores aparecen junto al campo o sección afectada y explican cómo corregirlos.
 - Mantener alineación de columnas, alturas y espacios de controles.
 - Formularios de Configuración y Pruebas comparten la misma gramática visual aunque sus campos y estructura funcional sean distintos.
+- Cuando un campo recibe foco dentro de una tarjeta o acordeón, el contenedor muestra un realce sutil de borde y halo. No se modifica el padding, el tamaño ni la posición del componente: el foco orienta sin provocar saltos de layout. El campo mantiene además su indicador `:focus-visible` accesible.
+
+### Tarjetas con tablas
+
+- Una tarjeta con tabla se compone de **header, body y ayuda opcional**. El header contiene el nombre del bloque, un resumen o conteo debajo y las acciones a la derecha.
+- La tabla empieza dentro del body con el padding de tarjeta (`--ui-panel-padding`); nunca debe quedar pegada al borde exterior ni debajo de un segundo título redundante.
+- No agregar texto introductorio antes de una tabla cuando el título del header y los encabezados de columnas ya explican su contenido. Agregar una descripción solo si evita una duda operativa concreta.
+- Las instrucciones de pegado, unidades o comportamiento van después de la tabla como ayuda secundaria, con texto breve y tono neutro.
+- Si la tabla necesita filtros, leyenda o acciones de fila, esos controles forman una barra de herramientas propia dentro del body y conservan el mismo gutter; no se mezclan con el título.
+- En móvil se conserva el padding y se permite scroll horizontal dentro del área de tabla, sin expandir la tarjeta ni cortar sus acciones.
+- Las tablas densas deben priorizar el dato técnico que permite decidir: mantener columnas de resultado/estado y errores junto al valor medido, y eliminar la columna «Observación» cuando ya exista una columna «Estado» o «Resultado». Si solo existe una columna narrativa, su encabezado estándar es «Resultado». Las observaciones extensas se registran en el bloque de observaciones del ensayo, fuera de la grilla.
 
 ## 8. Acordeones y acciones destructivas
+
+### Estado del encabezado del acordeón
+
+- Todo encabezado de acordeón mantiene la misma estructura: identificador/título a la izquierda, resumen técnico opcional, estado textual a la derecha y chevron al extremo.
+- Estados textuales consistentes: **Completo**, **En curso** y **Pendiente**. No usar porcentaje como sustituto del estado ni comunicarlo solo con color.
+- Completo usa fondo neutro (`--ui-subtle`) y texto de estado verde; en curso usa ámbar suave; pendiente usa fondo blanco/neutro y texto secundario. El encabezado no debe teñirse entero con ámbar o verde.
+- La tarjeta conserva borde, radio, padding y separador común; el estado no cambia su geometría. En móvil el resumen puede ocultarse solo si es redundante; título, estado y control de apertura permanecen visibles.
+- El resumen de la derecha debe explicar avance útil (por ejemplo, bornes y capacitivos); no repetir el título ni competir visualmente con el estado.
+
+### Conmutadores y posiciones TAP
+
+- El acordeón del conmutador contiene primero sus metadatos: nombre, bobinado asociado y límites mínimo/máximo.
+- La tabla de posiciones TAP vive en una tarjeta interna independiente, con cabecera propia, conteo secundario y acciones «Generar filas» y «+ Fila» alineadas a la derecha.
+- La tarjeta de posiciones usa el borde, radio, padding y separador de una tarjeta secundaria; no se presenta como un acordeón anidado sin necesidad.
+- El contenido expandido del conmutador presenta exactamente dos tarjetas hermanas a ancho completo: «Datos del conmutador» y «Posiciones de TAP». El espacio entre ambas es de 16 px; no se permite comprimir los metadatos en una columna lateral.
+- Nombre, bobinado asociado, posición mínima y posición máxima son obligatorios: llevan asterisco, `required` y fondo ámbar suave mientras estén vacíos o inválidos. Cuando se completan, regresan a fondo blanco y borde neutro; el label y el asterisco no cambian de color.
+- No mostrar «Posición neutra» ni «Posición actual» en el formulario. Si esos valores existen en datos históricos, se conservan en la serialización y persistencia sin exponerlos en esta vista.
 
 Para bobinados, conmutadores u otros elementos repetibles:
 
@@ -228,7 +260,30 @@ Para bobinados, conmutadores u otros elementos repetibles:
 
 La acción debe permanecer visible al final del contenido incluso cuando la sección contenga tablas extensas; no debe ser sticky.
 
+### Eliminar filas
+
+- Todas las acciones de borrar una fila usan el mismo icono SVG `i-trash`, el mismo botón compacto y el mismo estado destructivo discreto; no mezclar papelera con «×».
+- El botón tiene `aria-label` y `title` que identifican la fila/elemento. Cuando la fila sea la última obligatoria, permanece deshabilitado y explica por qué.
+- Eliminar una fila es una acción local y reversible mientras no se guarde; no agregar confirmación por fila. La confirmación se reserva para eliminar entidades completas como bobinados, conmutadores o registros.
+- Usar la clase compartida `.ui-row-delete`; no diseñar variantes visuales por módulo.
+
 ## 9. Encabezados, navegación y comportamiento sticky
+
+### Navegación entre etapas
+
+- La primera etapa no muestra el botón «Anterior», porque no existe una etapa previa.
+- Desde la segunda etapa se muestra «Anterior» habilitado y permite regresar sin perder datos.
+- Nunca mostrar un botón de navegación visible y deshabilitado por estar en la primera etapa; ocultarlo evita una acción falsa y mantiene el foco en «Continuar».
+- Configuración eléctrica y Registro de pruebas usan este mismo patrón. El texto puede variar según el destino («Anterior» o «Volver a resultados»), pero la disponibilidad y la posición del control son comunes.
+
+### Estándar de botones
+
+- **Primario:** una sola acción principal por barra, fondo `--ui-accent`, texto blanco. Se usa para «Continuar», «Guardar configuración» y «Finalizar registro».
+- **Secundario:** regresar, cancelar o modificar una referencia; fondo blanco, borde `--ui-line` y texto `--ui-ink`.
+- **Destructivo:** eliminar entidades o filas; texto/icono `--ui-danger`, sin competir con la acción primaria.
+- Un botón solo se deshabilita durante una operación realmente no disponible, como un guardado en curso o una restricción técnica. La navegación de regreso no se deshabilita: en la primera etapa se oculta.
+- El atributo HTML `hidden` siempre debe ocultar el control (`[hidden]{display:none!important}`); no se debe depender de estilos de cada módulo para resolverlo.
+- Las barras de acciones de los pasos no son sticky por defecto. Mantienen el mismo gutter, altura y orden: regreso a la izquierda, ayuda centrada y acción principal a la derecha.
 
 ### Estado y acción de retorno en barras de herramientas
 - Cuando un encabezado muestre un estado contextual (guardado, autoguardado, error o advertencia) junto a una acción de retorno, el estado se coloca **inmediatamente a la izquierda del botón**.
@@ -245,6 +300,23 @@ La acción debe permanecer visible al final del contenido incluso cuando la secc
 - Evitar barras translúcidas con blur si no aportan una ventaja clara.
 
 ## 10. Validación, mensajes y lógica de formularios
+
+### Tratamiento visual de campos requeridos
+
+- El asterisco y la palabra «requerido/llenado» no cambian de color ni se añaden como etiquetas de estado. El asterisco conserva un estilo neutro de énfasis.
+- Un campo requerido vacío se señala con fondo ámbar muy suave y borde ámbar, acompañado por etiqueta persistente; no colorear su label.
+- Los labels de ambos módulos usan siempre `#506477`, peso 600 y tamaño 11 px; no cambian de color al completar o dejar pendiente el campo. Las variantes de tamaño solo se permiten por densidad del control, manteniendo el mismo color y peso.
+- El asterisco de requerido usa tinta secundaria (`--ui-muted`), peso 700 y separación de 4 px. No usar rojo/ámbar para el asterisco: esos colores pertenecen a errores y al control vacío.
+- Un campo requerido completo vuelve al fondo blanco y borde neutro. No usar verde en cada campo lleno: reservar verde para estados agregados completados.
+- Errores de formato/validación usan rojo y `aria-invalid`; tienen prioridad visual sobre el estado vacío ámbar.
+- Aplicar el mismo patrón a input, select, textarea, radio y checkbox requeridos, sin cambiar valores, reglas de validación ni criterios de obligatoriedad.
+
+### Propiedad y orden de estilos
+
+- `assets/design-system.css` es el único propietario de los tokens y patrones compartidos de estados, labels, controles, acordeones, separadores y acciones destructivas. `assets/app.css` conserva solo composición o necesidades exclusivas de un módulo.
+- Un componente declara una sola clase de estado en su contenedor (`data-state`); sus hijos heredan ese estado. No pintar cada campo completado ni crear clases alternativas para el mismo significado.
+- Taxonomía obligatoria: `complete` usa `--ui-success` (`#43845F`); `partial`/`incomplete` usa `--ui-warning` (`#A16A18`); `empty`/`pending` usa `--ui-muted` (`#718394`); un error validado usa `--ui-danger` (`#B94A48`).
+- El asterisco obligatorio es información de estructura, no un error: usa `--ui-muted`, peso 700 y margen izquierdo de 4 px. Solo un campo que falló validación usa rojo.
 
 La validación se aplica en dos capas coherentes: cliente para guiar al usuario y servidor como autoridad final.
 

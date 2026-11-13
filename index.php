@@ -76,8 +76,8 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.156">
-<link rel="stylesheet" href="./assets/design-system.css?v=1.5.156">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.160">
+<link rel="stylesheet" href="./assets/design-system.css?v=1.5.176">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body>
@@ -360,24 +360,24 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
   <section class="config-page hidden" id="configPage">
     <div class="config-toolbar">
       <div><div class="breadcrumbs">Transformador <span>/</span> Configuración eléctrica</div><h2>Configuración eléctrica</h2><p>Configura los bobinados, bornes y conmutadores del transformador.</p></div>
-      <div class="toolbar-actions"><span class="save-status" id="saveStatus"><i></i>Sin guardar</span><button class="btn" id="backOverview">Volver a detalles</button></div>
+      <div class="toolbar-actions"><span class="save-status" id="saveStatus"><i></i>Sin guardar</span><button class="btn" id="backOverview">Volver al transformador</button></div>
     </div>
     <div class="config-alert <?= $dbMessage === '' ? 'hidden' : '' ?>" id="dbAlert" role="status"><svg><use href="#i-info"/></svg><span><?=h($dbMessage)?></span></div>
     <div class="config-layout">
       <nav class="plan-stepper config-stepper ui-stepper ui-stepper--config" id="configStepper" aria-label="Etapas de configuración eléctrica">
         <button type="button" class="plan-step config-view-tab ui-step" data-tab="windings" data-state="missing" aria-current="step" aria-label="Bobinados y bornes · Agregar bobinados">
           <span class="ui-step-icon" aria-hidden="true"><svg><use href="#i-layers"/></svg></span>
-          <span class="ui-step-copy"><b>Bobinados y bornes</b><small id="windingCount">0 bobinados</small><em class="config-step-status">Agregar bobinados</em></span>
+          <span class="ui-step-copy"><b>Bobinados y bornes</b><em class="config-step-status">Agregar bobinados</em></span>
         </button>
         <span class="plan-step-connector ui-step-connector" aria-hidden="true"></span>
         <button type="button" class="plan-step config-view-tab ui-step" data-tab="taps" data-state="missing" aria-label="Conmutadores y TAP · Agregar conmutador">
           <span class="ui-step-icon" aria-hidden="true"><svg><use href="#i-zap"/></svg></span>
-          <span class="ui-step-copy"><b>Conmutadores y TAP</b><small id="tapCount">0 posiciones</small><em class="config-step-status">Agregar conmutador</em></span>
+          <span class="ui-step-copy"><b>Conmutadores y TAP</b><em class="config-step-status">Agregar conmutador</em></span>
         </button>
         <span class="plan-step-connector ui-step-connector" aria-hidden="true"></span>
-        <button type="button" class="plan-step config-view-tab ui-step" data-tab="review" data-state="missing" aria-label="Revisión y versiones · Pendiente">
+        <button type="button" class="plan-step config-view-tab ui-step" data-tab="review" data-state="missing" aria-label="Revisión · Pendiente">
           <span class="ui-step-icon" aria-hidden="true"><svg><use href="#i-check"/></svg></span>
-          <span class="ui-step-copy"><b>Revisión y versiones</b><small>Validar y guardar</small><em class="config-step-status">Pendiente</em></span>
+          <span class="ui-step-copy"><b>Revisión</b><em class="config-step-status">Pendiente</em></span>
         </button>
       </nav>
       <div class="config-main">
@@ -476,9 +476,9 @@ window.PILOT = <?=json_encode([
   </div>
 </div>
 
-<script src="./assets/app.js?v=1.5.156"></script>
-<script src="./assets/electrical-tests.js?v=1.5.156"></script>
+<script src="./assets/app.js?v=1.5.160"></script>
+<script src="./assets/electrical-tests.js?v=1.5.147"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="./assets/plan.js?v=1.5.156"></script>
+<script src="./assets/plan.js?v=1.5.172"></script>
 </body></html>
 0

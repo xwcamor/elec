@@ -52,6 +52,7 @@
   function toast(message,bad){bridge.notify(message,!!bad);}
   function transformer(){return bridge.getTransformer();}
   function columns(code){return code==='TTR'?[['tap','TAP'],['at','AT (kV)'],['bt','BT (kV)'],['theoretical','Relación teórica'],['U','Medida U-0 / w-u'],['errU','Error U (%)'],['V','Medida V-0 / u-v'],['errV','Error V (%)'],['W','Medida W-0 / v-w'],['errW','Error W (%)'],['result','Resultado'],['notes','Observación']]:(templates[code]?.cols||[]);}
+  function filteredColumns(code){return columns(code);}
   function number(v){const s=String(v??'').trim().replace(',','.');if(!s)return null;const n=Number(s);return Number.isFinite(n)?n:null;}
   function normalize(code,row){
     const r={...(row||{})};
@@ -73,7 +74,7 @@
       const a=number(r.at),b=number(r.bt),theo=a!==null&&b!==null&&b!==0?a/(b*Math.sqrt(3)):number(r.theoretical);
       r.theoretical=theo===null?'':String(theo);
       const errors=['U','V','W'].map(k=>{const m=number(r[k]);const error=theo!==null&&m!==null&&m!==0?(m-theo)*100/m:null;r['err'+k]=error===null?'':String(error);return error;});
-      r.result=errors.every(v=>v!==null)?(errors.every(v=>Math.abs(v)<=0.5)?'CORRECTO':'FUERA DE TOLERANCIA'):'PENDIENTE';
+      r.result=errors.every(v=>v!==null)?(errors.every(v=>Math.abs(v)<=0.5)?'CORRECTO':'OBSERVADO'):'PENDIENTE';
     }
     if(code==='BUSHING'){
       const plate=number(r.capacitance_plate),measured=number(r.capacitance_measured);
@@ -89,6 +90,7 @@
     if(statuses.some(s=>s==='OBSERVADO'))return 'Se encontraron valores observados';
     return 'Pendiente de completar las seis mediciones del ensayo.';
   }
+  function observationSummary(item){return (item.rows||[]).some(row=>Object.keys(row||{}).some(key=>String(row[key]??'').trim().toUpperCase()==='OBSERVADO')?'Se encontraron valores observados':'Todos los valores conforme';}
   const capacitanceUnits={pF:1e3,nF:1,µF:1e-3,mF:1e-6,F:1e-9};
   function capacitanceDisplay(value,unit){const n=number(value);return n===null?'':(n*(capacitanceUnits[unit]||1)).toFixed(6);}
   function refreshPowerFactorLive(card,item){
@@ -163,12 +165,6 @@
     ARRESTER:['output_voltage','output_current','losses_measured','capacitance_measured'],
     CAPACITANCE:['test_voltage_kv','capacitance_nf']
   };
-  const optionalNumericByTest={
-    TTR:['theoretical','errU','errV','errW'],
-    POWER_FACTOR:['capacitance_measured'],
-    INSULATION_RESISTANCE:['absorption_index'],
-    CAPACITANCE:['frequency_hz','temperature_c']
-  };
   const requiredEquipment=['equipment_name','equipment_brand','equipment_model','equipment_serial'];
   const equipmentLabels={equipment_name:'equipo',equipment_brand:'marca del equipo',equipment_model:'modelo',equipment_serial:'serie'};
   const generalLabels={date:'fecha de realización',operator:'responsable / técnico',supervisor:'supervisor'};
@@ -176,35 +172,30 @@
   function requiredValueFilled(key,value,code){
     if(['result','evaluation','status'].includes(key)&&String(value??'').trim().toUpperCase()==='PENDIENTE')return false;
     if((numericByTest[code]||[]).includes(key))return number(value)!==null;
-    if((optionalNumericByTest[code]||[]).includes(key)&&isFilled(value))return number(value)!==null;
     return isFilled(value);
   }
   function missingForRow(code,row){
     const required=requiredByTest[code]||columns(code).map(c=>c[0]).filter(k=>!['notes','absorption_index','theoretical','errU','errV','errW'].includes(k));
     const labels=Object.fromEntries(columns(code).map(c=>[c[0],c[1]]));
     const normalized=normalize(code,row);
-    const missing=required.filter(key=>!requiredValueFilled(key,normalized?.[key],code)).map(key=>labels[key]||key);
-    (optionalNumericByTest[code]||[]).forEach(key=>{
-      if(isFilled(normalized?.[key])&&!requiredValueFilled(key,normalized?.[key],code))missing.push((labels[key]||key)+' (debe ser numérico)');
-    });
-    return missing;
+    return required.filter(key=>!requiredValueFilled(key,normalized?.[key],code)).map(key=>labels[key]||key);
   }
   function itemMetrics(item){
     const rows=Array.isArray(item.rows)?item.rows:[];
     const metaMissing=requiredEquipment.filter(key=>!isFilled(item[key])).map(key=>equipmentLabels[key]);
-    const required=requiredByTest[item.code]||columns(item.code).map(c=>c[0]).filter(k=>!['notes','absorption_index','theoretical','errU','errV','errW'].includes(k));
+    const required=requiredByTest[item.code]||filteredColumns(item.code).map(c=>c[0]).filter(k=>!['notes','absorption_index','theoretical','errU','errV','errW'].includes(k));
     let total=requiredEquipment.length,filled=requiredEquipment.length-metaMissing.length;
     const rowStates=rows.map((row,index)=>{
       const missing=missingForRow(item.code,row),rowFilled=required.length-missing.length;
       total+=required.length;filled+=rowFilled;
-      const any=columns(item.code).some(([key])=>isFilled(row?.[key]));
+      const any=filteredColumns(item.code).some(([key])=>isFilled(row?.[key]));
       return {index,missing,filled:rowFilled,total:required.length,any,state:missing.length===0?'complete':(any?'partial':'empty')};
     });
     const missing=[...metaMissing];
     rowStates.forEach(row=>{if(row.missing.length)missing.push('Fila '+(row.index+1)+': '+row.missing.slice(0,5).join(', ')+(row.missing.length>5?'…':''));});
     if(!rows.length)missing.push('Agrega al menos una fila de medición');
     const complete=rows.length>0&&missing.length===0;
-    const anyData=filled>0||rows.some(r=>columns(item.code).some(([key])=>isFilled(r?.[key])));
+      const anyData=filled>0||rows.some(r=>filteredColumns(item.code).some(([key])=>isFilled(r?.[key])));
     const state=complete?'complete':(anyData?'partial':'empty');
     return {total,filled,percent:total?Math.round(filled/total*100):0,missing,metaMissing,rowStates,complete,anyData,state};
   }
@@ -259,17 +250,15 @@
   function refreshFieldStyles(card,item,metrics){
     card.querySelectorAll('.plan-cell').forEach(input=>{
       const row=Number(input.dataset.row),field=input.dataset.col,required=(requiredByTest[item.code]||[]).includes(field);
-      const optionalNumeric=(optionalNumericByTest[item.code]||[]).includes(field)&&isFilled(input.value);
-      const validationRequired=required||optionalNumeric;
       const valid=requiredValueFilled(field,input.value,item.code);
       input.classList.toggle('is-filled',valid);
-      input.classList.toggle('is-missing',validationRequired&&!valid);
-      if(valid||!validationRequired){input.removeAttribute('aria-invalid');delete input.dataset.validationAttempted;}else if(input.dataset.validationAttempted!=='true'){input.removeAttribute('aria-invalid');}
+      input.classList.toggle('is-missing',required&&!valid);
+      if(valid){input.removeAttribute('aria-invalid');delete input.dataset.validationAttempted;}else if(input.dataset.validationAttempted!=='true'){input.removeAttribute('aria-invalid');}
       if(input.classList.contains('plan-result-select'))input.dataset.state=String(input.value||'PENDIENTE').toLowerCase();
       if(field==='result'){
         const state=String(input.value||'').trim().toUpperCase();
         input.classList.toggle('result-good',['CORRECTO','CONFORME'].includes(state));
-        input.classList.toggle('result-bad',['OBSERVADO','FUERA DE TOLERANCIA'].includes(state));
+        input.classList.toggle('result-bad',state==='OBSERVADO');
         input.classList.toggle('result-pending',!state||state==='PENDIENTE');
       }
     });
@@ -361,10 +350,8 @@
       const rowIndex=metrics.rowStates.findIndex(row=>row.missing.length>0);
       if(rowIndex>=0){
         const row=item.rows[rowIndex]||{};
-        const required=requiredByTest[item.code]||columns(item.code).map(column=>column[0]);
-        const optional=(optionalNumericByTest[item.code]||[]).filter(field=>isFilled(normalize(item.code,row)?.[field]));
-        const candidates=[...required,...optional];
-        const key=candidates.find(field=>!requiredValueFilled(field,normalize(item.code,row)?.[field],item.code));
+        const required=requiredByTest[item.code]||filteredColumns(item.code).map(column=>column[0]);
+        const key=required.find(field=>!requiredValueFilled(field,normalize(item.code,row)?.[field],item.code));
         if(key)target=card?.querySelector('.plan-cell[data-row="'+rowIndex+'"][data-col="'+key+'"]');
       }
     }
@@ -427,7 +414,7 @@
       if(active)button.setAttribute('aria-current','step');else button.removeAttribute('aria-current');
     });
     const index=planStepKeys.indexOf(step),back=$('#planStepBack'),next=$('#planStepNext'),hint=$('#planStepHint');
-    if(back){back.hidden=index===0;back.disabled=index===0;back.textContent=step==='review'?'Volver a resultados':'Anterior';}
+    if(back){back.hidden=index===0;back.disabled=false;back.textContent=step==='review'?'Volver a resultados':'Anterior';}
     if(next)next.textContent=step==='results'?'Revisar registro':(step==='review'?'Finalizar registro':'Continuar');
     if(editingId!==null&&hasUnsavedChanges())scheduleAutoSave(200);
     if(hint)hint.textContent='Paso '+(index+1)+' de 4';
@@ -528,9 +515,10 @@
     if(!items.length){host.innerHTML='<div class="empty-state">Selecciona pruebas para que aparezcan aquí sus formularios.</div>';return;}
     activeTestIndex=Math.max(0,Math.min(activeTestIndex,items.length-1));
     host.innerHTML=items.map((item,idx)=>{
-      const fieldList=columns(item.code),required=requiredByTest[item.code]||[],metrics=itemMetrics(item);
+      const fieldList=filteredColumns(item.code),required=requiredByTest[item.code]||[],metrics=itemMetrics(item);
       const head=item.code==='EXCITATION'?'<tr><th rowspan="2">TAP</th><th rowspan="2">Tensión de prueba (kV)</th><th rowspan="2">Frecuencia (Hz)</th><th colspan="2">U-0</th><th colspan="2">V-0</th><th colspan="2">W-0</th><th rowspan="2">Estado</th><th rowspan="2">Observación</th><th rowspan="2">Acción</th></tr><tr><th>Corriente (mA)</th><th>Pérdidas (W)</th><th>Corriente (mA)</th><th>Pérdidas (W)</th><th>Corriente (mA)</th><th>Pérdidas (W)</th></tr>':'<tr>'+fieldList.map(f=>{let label=esc(f[1]);if(item.code==='POWER_FACTOR'&&f[0]==='power_factor_measured')label='Factor de Potencia medido (%)';if(item.code==='POWER_FACTOR'&&f[0]==='power_factor_corrected_20c')label='Factor de Potencia corregido (%)';if(item.code==='POWER_FACTOR'&&f[0]==='capacitance_measured')label='Capacitancia medida (<select class="plan-unit-select" data-meta="capacitance_unit" aria-label="Unidad de capacitancia">'+['pF','nF','µF','mF','F'].map(u=>'<option value="'+u+'" '+((item.capacitance_unit||'nF')===u?'selected':'')+'>'+u+'</option>').join('')+'</select>)';return '<th>'+label+(required.includes(f[0])?'<i class="required-mark" title="Campo requerido">*</i>':'')+'</th>';}).join('')+'<th class="plan-row-action-head">Acción</th></tr>';
-      if(item.code==='POWER_FACTOR')item.observations=powerFactorObservation(item.rows);
+      const tableHead=head;
+      item.observations=observationSummary(item);
        const body=item.rows.map((raw,ri)=>{
         const row=normalize(item.code,raw),rowMetrics=metrics.rowStates[ri]||{any:false,state:'empty'};if(item.code==='POWER_FACTOR')row.capacitance_measured=capacitanceDisplay(row.capacitance_measured,item.capacitance_unit||'nF');
         return '<tr data-row-state="'+rowMetrics.state+'">'+fieldList.map(([key])=>{
@@ -543,7 +531,7 @@
             return '<td><select class="plan-cell plan-result-select '+(filled?'is-filled':'is-missing')+'" data-row="'+ri+'" data-col="'+key+'" data-state="'+(filled?current.toLowerCase():'pending')+'" '+(must?'data-required="1"':'')+'>'+extra+options.map(option=>'<option value="'+option+'" '+(current===option?'selected':'')+'>'+option+'</option>').join('')+'</select></td>';
           }
           return '<td><input class="plan-cell '+(calc?'calculated':'')+(filled?' is-filled':'')+(missing?' is-missing':'')+'" data-row="'+ri+'" data-col="'+key+'" value="'+esc(value)+'" '+(must?'data-required="1"':'')+(calc?' readonly title="Campo calculado según el protocolo"':'')+(must&&!filled?' aria-label="'+esc(fieldList.find(f=>f[0]===key)?.[1]||key)+' pendiente"':'')+'></td>';
-        }).join('')+'<td class="plan-row-action"><button type="button" class="plan-remove-row" data-remove-row="'+ri+'" data-test-index="'+idx+'" '+(item.rows.length<=1?'disabled':'')+' title="'+(item.rows.length<=1?'Debe conservarse al menos una fila':'Eliminar fila')+'" aria-label="Eliminar fila '+(ri+1)+'">×</button></td></tr>';
+        }).join('')+'<td class="plan-row-action"><button type="button" class="plan-remove-row ui-row-delete" data-remove-row="'+ri+'" data-test-index="'+idx+'" '+(item.rows.length<=1?'disabled':'')+' title="'+(item.rows.length<=1?'Debe conservarse al menos una fila':'Eliminar fila '+(ri+1))+'" aria-label="Eliminar fila '+(ri+1)+'"><svg aria-hidden="true"><use href="#i-trash"/></svg></button></td></tr>';
       }).join('');
       let hint='';
       if(item.code==='POWER_FACTOR')hint='<div class="plan-reference-note"><b>Cálculo y aceptación:</b> capacitancia medida (nF) = capacitancia de fuente (F) × 10⁹. Estado CORRECTO cuando el FP corregido es menor que 1%; en caso contrario, OBSERVADO. Criterio del protocolo: cláusula 7.2.14 de IEEE Std C57.152-2013.</div>';
@@ -566,10 +554,11 @@
         '<label data-meta-wrap="equipment_model"><span>Modelo <i class="required-mark">*</i></span><input required aria-required="true" data-meta="equipment_model" value="'+esc(item.equipment_model)+'" placeholder="Modelo"></label>'+
         '<label data-meta-wrap="equipment_serial"><span>N.º de serie <i class="required-mark">*</i></span><input required aria-required="true" data-meta="equipment_serial" value="'+esc(item.equipment_serial)+'" placeholder="Serie"></label>'+(item.code==='EXCITATION'?'<label data-meta-wrap="core_type">Tipo de núcleo (opcional)<select data-meta="core_type"><option value="NO_ESPECIFICADO" '+(item.core_type==='NO_ESPECIFICADO'?'selected':'')+'>No especificado</option><option value="TRES_COLUMNAS" '+(item.core_type==='TRES_COLUMNAS'?'selected':'')+'>Tres columnas</option><option value="CINCO_COLUMNAS" '+(item.core_type==='CINCO_COLUMNAS'?'selected':'')+'>Cinco columnas</option><option value="ACORAZADO" '+(item.core_type==='ACORAZADO'?'selected':'')+'>Acorazado</option><option value="OTRO" '+(item.core_type==='OTRO'?'selected':'')+'>Otro</option></select></label>':'')+'</div></section>'+hint+
         '<div class="plan-table-toolbar"><div><b>Mediciones del ensayo</b><small><i class="required-mark">*</i> Campo requerido · Puedes pegar desde Excel.</small><small class="plan-row-summary" data-row-summary></small></div><button class="btn small secondary-action" type="button" data-add-row="'+idx+'">+ Fila</button></div>'+
-        '<div class="measurement-sheet-wrap plan-grid-wrap"><table class="measurement-sheet plan-sheet"><thead>'+head+'</thead><tbody>'+body+'</tbody></table></div>'+
+        '<div class="measurement-sheet-wrap plan-grid-wrap"><table class="measurement-sheet plan-sheet"><thead>'+tableHead+'</thead><tbody>'+body+'</tbody></table></div>'+
         '<details class="plan-optional-details plan-observation-details" '+(item.code==='POWER_FACTOR'?'open':'')+'><summary><span>Observaciones del ensayo</span><small>'+(item.code==='POWER_FACTOR'?'Resultado automático según Estado':'Notas e incidencias')+'</small></summary><label class="plan-test-observations"><textarea data-meta="observations" rows="2" placeholder="Resultados, incidencias y comentarios" '+(item.code==='POWER_FACTOR'?'readonly title="Se genera automáticamente según los estados de las mediciones"':'')+'>'+esc(item.observations)+'</textarea></label></details>'+
         '<div class="plan-card-actions"><button type="button" class="text-action" data-remove-test="'+idx+'">Retirar este ensayo</button></div></div></details>';
     }).join('');
+    host.querySelectorAll('.plan-observation-details').forEach(details=>{details.open=true;const summary=details.querySelector('summary');if(summary){summary.setAttribute('aria-disabled','true');summary.addEventListener('click',event=>event.preventDefault());summary.addEventListener('keydown',event=>event.preventDefault());}});
     refreshResultsSummary();
     items.forEach((item,index)=>{const card=host.querySelector('[data-test-index="'+index+'"]');if(card)refreshFieldStyles(card,item,itemMetrics(item));});
   }
@@ -829,18 +818,21 @@
   $('#planTestCards').addEventListener('change',e=>{
     const card=e.target.closest('[data-test-index]');if(!card)return;
     const item=items[Number(card.dataset.testIndex)];if(!item)return;
-    if(e.target.dataset.meta||e.target.classList.contains('plan-cell')){if(item.code==='POWER_FACTOR')refreshPowerFactorLive(card,item);if(e.target.dataset.meta)item[e.target.dataset.meta]=e.target.value;else if(e.target.classList.contains('plan-cell')){const row=Number(e.target.dataset.row),key=e.target.dataset.col;item.rows[row]=item.rows[row]||{};item.rows[row][key]=e.target.value;}refreshCardStatus(card,item);refreshPlanFeedback();markPlanChanged(350);}
+    if(e.target.dataset.meta||e.target.classList.contains('plan-cell')){if(item.code==='POWER_FACTOR')refreshPowerFactorLive(card,item);if(e.target.dataset.meta)item[e.target.dataset.meta]=e.target.value;else if(e.target.classList.contains('plan-cell')){const row=Number(e.target.dataset.row),key=e.target.dataset.col;item.rows[row]=item.rows[row]||{};item.rows[row][key]=e.target.value;}if(!e.target.dataset.meta){item.observations=observationSummary(item);const note=card.querySelector('[data-meta="observations"]');if(note)note.value=item.observations;}refreshCardStatus(card,item);refreshPlanFeedback();markPlanChanged(350);}
   });
     $('#planPage').addEventListener('input',e=>{
     if(['planDate','planOperator','planSupervisor'].includes(e.target.id))refreshPlanFeedback();
     markPlanChanged();
+  });
+  $('#planPage').addEventListener('change',e=>{
+    if(['planDate','planOperator','planSupervisor'].includes(e.target.id))refreshPlanFeedback();
   });
   // Navegación tipo hoja de cálculo en todas las tablas del plan.
   $('#planTestCards').addEventListener('keydown',e=>{
     const cell=e.target.closest('.plan-cell');if(!cell)return;
     const card=cell.closest('[data-test-index]');if(!card)return;
     const item=items[Number(card.dataset.testIndex)];if(!item)return;
-    const fields=columns(item.code),row=Number(cell.dataset.row),col=fields.findIndex(([key])=>key===cell.dataset.col);
+    const fields=filteredColumns(item.code),row=Number(cell.dataset.row),col=fields.findIndex(([key])=>key===cell.dataset.col);
     if(col<0)return;
     let nextRow=row,nextCol=col,handled=true;
     if(e.key==='Enter'||e.key==='ArrowDown')nextRow++;
@@ -866,7 +858,7 @@
   $('#planTestCards').addEventListener('paste',e=>{
     const cell=e.target.closest('.plan-cell');if(!cell||cell.readOnly)return;
     const text=(e.clipboardData||window.clipboardData).getData('text');if(!text.includes('\t')&&!text.includes('\n'))return;
-    e.preventDefault();const card=cell.closest('[data-test-index]'),item=items[Number(card.dataset.testIndex)],fields=columns(item.code),r0=Number(cell.dataset.row),c0=fields.findIndex(c=>c[0]===cell.dataset.col);
+    e.preventDefault();const card=cell.closest('[data-test-index]'),item=items[Number(card.dataset.testIndex)],fields=filteredColumns(item.code),r0=Number(cell.dataset.row),c0=fields.findIndex(c=>c[0]===cell.dataset.col);
     text.replace(/\r/g,'').split('\n').filter((v,i,a)=>!(i===a.length-1&&v==='')).forEach((line,ri)=>{while(item.rows.length<=r0+ri)item.rows.push({});line.split('\t').forEach((v,ci)=>{const f=fields[c0+ci];if(f&&!['absorption_index','theoretical','errU','errV','errW'].includes(f[0])&&!(item.code==='TTR'&&f[0]==='result')&&!(item.code==='BUSHING'&&['variation_percent','result'].includes(f[0])))item.rows[r0+ri][f[0]]=v.trim();});item.rows[r0+ri]=normalize(item.code,item.rows[r0+ri]);});
     renderCards();refreshPlanFeedback();markPlanChanged(350);toast('Bloque pegado desde Excel.');
   });
