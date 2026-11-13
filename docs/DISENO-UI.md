@@ -254,11 +254,13 @@ La validación se aplica en dos capas coherentes: cliente para guiar al usuario 
 - Los campos de posición mínima, máxima, neutra y actual son opcionales; si se informan, deben ser enteros entre 1 y 150. La mínima no puede superar a la máxima y la neutra/actual, cuando hay ambos límites, debe quedar dentro del rango.
 - Las filas TAP vacías y los metadatos de posición no enteros deben producir un mensaje de fila concreto y llevar el foco al campo correspondiente.
 - Las reglas técnicas que no estén definidas por el protocolo no deben convertirse en umbrales inventados.
+- Una fila TAP vacía debe producir un mensaje con su fila y llevar el foco a su celda; un conmutador debe tener al menos una posición.
 - Al bloquear un paso o guardar, mostrar un mensaje que nombre el dato pendiente, abrir el panel correspondiente y llevar el foco al primer campo que requiere corrección.
 
 ### Pruebas eléctricas
 - requiredByTest y numericByTest en el cliente deben mantenerse sincronizados con validateCompletedPlanTest() en PHP.
 - Los campos numéricos deben aceptar coma decimal y validar como número finito; los campos calculados conservan su fórmula actual y son de solo lectura.
+- Los campos numéricos opcionales se validan solo cuando contienen un valor: un valor no numérico bloquea la finalización, pero un campo vacío sigue siendo opcional.
 - Los equipos (nombre, marca, modelo y serie) son obligatorios para completar cada ensayo y deben estar señalados visualmente como tales.
 - Excitación valida los campos reales de su formulario por TAP y por fase (U-0, V-0 y W-0); el servidor no debe usar nombres de campos heredados que ya no existen en la interfaz.
 - Una jornada EN_PROCESO requiere fecha, responsable, supervisor y al menos un ensayo. El autoguardado no puede degradar silenciosamente una jornada iniciada a BORRADOR.
