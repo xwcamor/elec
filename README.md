@@ -152,3 +152,7 @@ Las grillas de configuración y de ensayos permiten desplazarse entre celdas con
 - Registrar la capacitancia fuente en faradios; la aplicación calcula la capacitancia medida en nF con `F × 10^9`, como en la fórmula del libro LAP (`archivo fuente` → `protocolos`).
 - Estado calculado con FP corregido a 20 °C: `|FP corregido| < 1%` = `CORRECTO`; de lo contrario = `OBSERVADO`.
 - Las observaciones se generan automáticamente a partir del estado de los seis modos.
+
+## Pendientes de definición del demo
+
+Las decisiones funcionales que requieren validación con el responsable técnico antes de implementar cambios están registradas en [docs/PENDIENTES-DEMO.md](docs/PENDIENTES-DEMO.md). No deben asumirse como requisitos aprobados ni cambiarse las reglas actuales hasta recibir confirmación.
