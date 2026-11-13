@@ -3,11 +3,11 @@
 Aplicación web independiente para configurar transformadores y registrar pruebas eléctricas. Es un prototipo PHP + MySQL pensado para ejecutarse localmente con Laragon.
 
 ## Versión
-**1.5.145**
+**1.5.152**
 
 ## Estándar de diseño y metodología
 
-La guía obligatoria para cualquier IA o desarrollador que modifique la interfaz está en [docs/DISENO-UI.md](docs/DISENO-UI.md). Define el sistema visual compartido, tokens, tipografía, espaciados, tarjetas, formularios, steps, acordeones, acciones destructivas y el proceso de revisión. Las instrucciones para agentes están en [AGENTS.md](AGENTS.md) y la skill de design engineering en [.agents/skills/emil-design-eng/SKILL.md](.agents/skills/emil-design-eng/SKILL.md).
+La guía obligatoria para cualquier IA o desarrollador que modifique la interfaz está en [docs/DISENO-UI.md](docs/DISENO-UI.md). El CSS compartido vive en `assets/design-system.css`, cargado después de `assets/app.css`; define tokens, tipografía, espaciados, tarjetas, formularios, steps, acordeones, acciones destructivas, validaciones y mensajes. Las instrucciones para agentes están en [AGENTS.md](AGENTS.md) y la skill de design engineering en [.agents/skills/emil-design-eng/SKILL.md](.agents/skills/emil-design-eng/SKILL.md).
 
 ## Arquitectura de procesos
 
@@ -74,7 +74,8 @@ Cada ejecución tiene su propio identificador. Editar una ejecución existente n
 elec/
 ├── app/                  # Acceso a datos y repositorios
 ├── assets/
-│   ├── app.css           # Estilos compartidos
+│   ├── app.css           # Estilos heredados y composición
+│   ├── design-system.css # Tokens y componentes compartidos
 │   ├── app.js            # Configuración eléctrica
 │   ├── electrical-tests.js # Pruebas eléctricas
 │   └── plan.js           # Asistente de registro de pruebas
