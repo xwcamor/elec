@@ -35,6 +35,23 @@ jobs:
           node --check assets/plan.js
       - name: Module boundaries
         run: python tests/check-module-boundaries.py
+      - name: Design system contract
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          html = Path("index.php").read_text(encoding="utf-8")
+          css = Path("assets/design-system.css").read_text(encoding="utf-8")
+          app_css = Path("assets/app.css").read_text(encoding="utf-8")
+          app_link = html.find("assets/app.css?v=")
+          design_link = html.find("assets/design-system.css?v=")
+          assert app_link >= 0 and design_link > app_link, "design-system.css debe cargarse después de app.css"
+          for required in ('id="configStepper"', 'id="planStepper"', 'class="ui-step-icon"', 'data-step-status', 'id="toast"'):
+              assert required in html, f"Falta markup compartido: {required}"
+          for required in ('--ui-line:', '#configStepper>.ui-step', '#planStepper>.ui-step', '.test-view-tab.active', '[aria-invalid="true"]'):
+              assert required in css, f"Falta regla del design system: {required}"
+          assert "--ui-line" in app_css, "app.css debe conservar el token de borde base"
+          print("Design system OK: hoja compartida, steps, separador y validación accesible.")
+          PY
       - name: PHP syntax
         run: |
           find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
