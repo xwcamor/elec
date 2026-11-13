@@ -2023,3 +2023,16 @@ body.config-focus .config-toolbar{position:static!important;top:auto!important;z
 
 /* Los campos calculados también deben mostrar el estado pendiente cuando son obligatorios. */
 .plan-cell.calculated.is-missing{background:#fff0cf!important;color:#94630f!important;box-shadow:inset 0 0 0 1px #e7bd68!important}
+
+
+/* Registro de pruebas: alinear al centro encabezados y contenido de todas las tablas de medición. */
+#planTestCards .plan-sheet th,
+#planTestCards .plan-sheet td{
+  text-align:center!important;
+  vertical-align:middle;
+}
+#planTestCards .plan-sheet .plan-cell,
+#planTestCards .plan-sheet select.plan-cell{
+  text-align:center!important;
+  text-align-last:center;
+}
