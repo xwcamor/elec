@@ -1,3 +1,6 @@
+## v1.5.156
+- Actualiza nuevamente la caché de CSS y JavaScript después de corregir la última validación TAP, evitando que el navegador conserve el script anterior.
+
 ## v1.5.155
 - Actualiza las referencias de caché de CSS y JavaScript para que el navegador descargue los módulos y el sistema visual nuevos.
 - CI verifica que las cinco hojas/scripts operativos tengan la versión de caché del release.
