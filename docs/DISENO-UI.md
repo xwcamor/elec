@@ -219,15 +219,30 @@ Regla para encabezados de tarjeta: el título ocupa la primera línea y el resum
 - Formularios de Configuración y Pruebas comparten la misma gramática visual aunque sus campos y estructura funcional sean distintos.
 - Cuando un campo recibe foco dentro de una tarjeta o acordeón, el contenedor muestra un realce sutil de borde y halo. No se modifica el padding, el tamaño ni la posición del componente: el foco orienta sin provocar saltos de layout. El campo mantiene además su indicador `:focus-visible` accesible.
 
-### Tarjetas con tablas
+### Estándar obligatorio de tablas y distribución de datos
 
-- Una tarjeta con tabla se compone de **header, body y ayuda opcional**. El header contiene el nombre del bloque, un resumen o conteo debajo y las acciones a la derecha.
-- La tabla empieza dentro del body con el padding de tarjeta (`--ui-panel-padding`); nunca debe quedar pegada al borde exterior ni debajo de un segundo título redundante.
-- No agregar texto introductorio antes de una tabla cuando el título del header y los encabezados de columnas ya explican su contenido. Agregar una descripción solo si evita una duda operativa concreta.
-- Las instrucciones de pegado, unidades o comportamiento van después de la tabla como ayuda secundaria, con texto breve y tono neutro.
-- Si la tabla necesita filtros, leyenda o acciones de fila, esos controles forman una barra de herramientas propia dentro del body y conservan el mismo gutter; no se mezclan con el título.
-- En móvil se conserva el padding y se permite scroll horizontal dentro del área de tabla, sin expandir la tarjeta ni cortar sus acciones.
-- Las tablas densas deben priorizar el dato técnico que permite decidir: mantener columnas de resultado/estado y errores junto al valor medido, y eliminar la columna «Observación» cuando ya exista una columna «Estado» o «Resultado». Si solo existe una columna narrativa, su encabezado estándar es «Resultado». Las observaciones extensas se registran en el bloque de observaciones del ensayo, fuera de la grilla.
+Este estándar aplica a **todas** las tablas y grillas de Configuración eléctrica y Pruebas eléctricas: bobinados, bornes, bushings, conmutadores, posiciones TAP, mediciones, historial y resultados.
+
+- **Un solo contenedor visual por bloque funcional.** La tarjeta/sección exterior agrupa el contenido. No envolver la tabla en otra tarjeta, panel con fondo, borde redondeado o sombra.
+- **Tabla integrada al contenedor.** El encabezado de la tabla comienza inmediatamente después del encabezado de sección o barra de herramientas. No agregar una caja interior alrededor de la grilla. El contenedor exterior conserva el borde y el radio; la tabla no repite ese marco.
+- **Gutters coherentes.** El título, resumen y acciones pertenecen al encabezado de sección. La tabla ocupa el ancho disponible del body; no introducir padding lateral adicional solo alrededor de la grilla. Si el contenido requiere aire, aplicarlo de forma consistente al bloque completo, no a un segundo card.
+- **Jerarquía de encabezados.** Título de sección, conteo/estado secundario y acciones en una sola franja. Los encabezados de columna pertenecen exclusivamente a la tabla. No repetir títulos que ya estén expresados en la sección o en las columnas.
+- **Ayuda contextual.** Las instrucciones de pegado, unidades o comportamiento se colocan después de la tabla, con separación breve y texto secundario. No deben convertirse en una tarjeta independiente.
+- **Herramientas.** Filtros, búsqueda, leyendas y acciones globales se colocan en una barra compacta asociada a la tabla. Las acciones de fila permanecen en su última columna.
+- **Bordes y superficies.** Usar una sola línea exterior del contenedor y separadores finos entre encabezado/filas/columnas. Evitar bordes dobles, fondos anidados, sombras y radios repetidos. Encabezados con fondo neutro suave y celdas con superficie limpia.
+- **Densidad y lectura.** Mantener alturas compactas y uniformes; números, unidades, fases y resultados alineados para facilitar comparación. No comprimir tipografía hasta dificultar la lectura. Las columnas técnicas relacionadas pueden agruparse con encabezados `colspan`/ `rowspan`.
+- **Muchas columnas.** Mantener el ancho natural de las columnas y habilitar scroll horizontal únicamente en el viewport de la tabla. El scroll no debe ensanchar la tarjeta ni cortar acciones externas. No ocultar datos importantes para simular que la tabla cabe.
+- **Muchas filas.** En captura técnica se priorizan edición directa, pegado TSV desde Excel y navegación por teclado. En consulta/historial se pueden incorporar búsqueda, filtros, ordenamiento y paginación cuando el volumen lo justifique.
+- **Responsive.** En pantallas estrechas, el scroll horizontal queda contenido en la tabla; título, acciones y ayuda deben seguir visibles y no quedar recortados.
+- **Contenido técnico.** Mantener columnas de resultado/estado y errores junto al valor medido. Eliminar «Observación» cuando ya exista «Estado» o «Resultado»; las observaciones narrativas extensas van en el bloque de observaciones del ensayo.
+
+#### Variantes permitidas
+
+1. **Tabla de captura:** edición en celdas, pegado Excel, filas compactas y acciones de fila.
+2. **Tabla de consulta:** búsqueda/filtros/ordenamiento y paginación según volumen.
+3. **Tabla técnica de ensayo:** unidades, fases, encabezados agrupados, valores calculados y estado.
+
+Las tres variantes comparten la misma gramática visual. La variante cambia por la tarea, no por un diseño independiente. Una tabla que sea el contenido principal de una página puede ir directamente bajo el título y su barra de herramientas, sin tarjeta exterior adicional.
 
 ## 8. Acordeones y acciones destructivas
 
