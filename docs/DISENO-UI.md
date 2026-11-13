@@ -250,6 +250,9 @@ La validación se aplica en dos capas coherentes: cliente para guiar al usuario 
 ### Configuración eléctrica
 - Las reglas del navegador deben corresponder con ElectricalConfigRepository::save().
 - Nombre, código y tensión de bobinado; códigos de bornes únicos y al menos un borne por bobinado; asociación de conmutadores válida; posiciones TAP enteras, únicas y dentro del límite de 1 a 150.
+- La tensión y la frecuencia aceptan coma decimal de forma equivalente en cliente y servidor. Los códigos de borne tienen un máximo de 20 caracteres.
+- Los campos de posición mínima, máxima, neutra y actual son opcionales; si se informan, deben ser enteros entre 1 y 150. La mínima no puede superar a la máxima y la neutra/actual, cuando hay ambos límites, debe quedar dentro del rango.
+- Las filas TAP vacías y los metadatos de posición no enteros deben producir un mensaje de fila concreto y llevar el foco al campo correspondiente.
 - Las reglas técnicas que no estén definidas por el protocolo no deben convertirse en umbrales inventados.
 - Al bloquear un paso o guardar, mostrar un mensaje que nombre el dato pendiente, abrir el panel correspondiente y llevar el foco al primer campo que requiere corrección.
 
