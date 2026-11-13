@@ -163,6 +163,12 @@
     ARRESTER:['output_voltage','output_current','losses_measured','capacitance_measured'],
     CAPACITANCE:['test_voltage_kv','capacitance_nf']
   };
+  const optionalNumericByTest={
+    TTR:['theoretical','errU','errV','errW'],
+    POWER_FACTOR:['capacitance_measured'],
+    INSULATION_RESISTANCE:['absorption_index'],
+    CAPACITANCE:['frequency_hz','temperature_c']
+  };
   const requiredEquipment=['equipment_name','equipment_brand','equipment_model','equipment_serial'];
   const equipmentLabels={equipment_name:'equipo',equipment_brand:'marca del equipo',equipment_model:'modelo',equipment_serial:'serie'};
   const generalLabels={date:'fecha de realización',operator:'responsable / técnico',supervisor:'supervisor'};
@@ -170,13 +176,18 @@
   function requiredValueFilled(key,value,code){
     if(['result','evaluation','status'].includes(key)&&String(value??'').trim().toUpperCase()==='PENDIENTE')return false;
     if((numericByTest[code]||[]).includes(key))return number(value)!==null;
+    if((optionalNumericByTest[code]||[]).includes(key)&&isFilled(value))return number(value)!==null;
     return isFilled(value);
   }
   function missingForRow(code,row){
     const required=requiredByTest[code]||columns(code).map(c=>c[0]).filter(k=>!['notes','absorption_index','theoretical','errU','errV','errW'].includes(k));
     const labels=Object.fromEntries(columns(code).map(c=>[c[0],c[1]]));
     const normalized=normalize(code,row);
-    return required.filter(key=>!requiredValueFilled(key,normalized?.[key],code)).map(key=>labels[key]||key);
+    const missing=required.filter(key=>!requiredValueFilled(key,normalized?.[key],code)).map(key=>labels[key]||key);
+    (optionalNumericByTest[code]||[]).forEach(key=>{
+      if(isFilled(normalized?.[key])&&!requiredValueFilled(key,normalized?.[key],code))missing.push((labels[key]||key)+' (debe ser numérico)');
+    });
+    return missing;
   }
   function itemMetrics(item){
     const rows=Array.isArray(item.rows)?item.rows:[];
@@ -248,10 +259,12 @@
   function refreshFieldStyles(card,item,metrics){
     card.querySelectorAll('.plan-cell').forEach(input=>{
       const row=Number(input.dataset.row),field=input.dataset.col,required=(requiredByTest[item.code]||[]).includes(field);
+      const optionalNumeric=(optionalNumericByTest[item.code]||[]).includes(field)&&isFilled(input.value);
+      const validationRequired=required||optionalNumeric;
       const valid=requiredValueFilled(field,input.value,item.code);
       input.classList.toggle('is-filled',valid);
-      input.classList.toggle('is-missing',required&&!valid);
-      if(valid){input.removeAttribute('aria-invalid');delete input.dataset.validationAttempted;}else if(input.dataset.validationAttempted!=='true'){input.removeAttribute('aria-invalid');}
+      input.classList.toggle('is-missing',validationRequired&&!valid);
+      if(valid||!validationRequired){input.removeAttribute('aria-invalid');delete input.dataset.validationAttempted;}else if(input.dataset.validationAttempted!=='true'){input.removeAttribute('aria-invalid');}
       if(input.classList.contains('plan-result-select'))input.dataset.state=String(input.value||'PENDIENTE').toLowerCase();
       if(field==='result'){
         const state=String(input.value||'').trim().toUpperCase();
@@ -349,7 +362,9 @@
       if(rowIndex>=0){
         const row=item.rows[rowIndex]||{};
         const required=requiredByTest[item.code]||columns(item.code).map(column=>column[0]);
-        const key=required.find(field=>!requiredValueFilled(field,normalize(item.code,row)?.[field],item.code));
+        const optional=(optionalNumericByTest[item.code]||[]).filter(field=>isFilled(normalize(item.code,row)?.[field]));
+        const candidates=[...required,...optional];
+        const key=candidates.find(field=>!requiredValueFilled(field,normalize(item.code,row)?.[field],item.code));
         if(key)target=card?.querySelector('.plan-cell[data-row="'+rowIndex+'"][data-col="'+key+'"]');
       }
     }
