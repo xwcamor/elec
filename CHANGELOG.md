@@ -1,3 +1,7 @@
+## v1.5.154
+- Homologa el comportamiento de las barras inferiores de ambos asistentes: no quedan fijas al viewport; conservan el mismo borde superior, padding y alineación.
+- Las validaciones de min/max/neutral/actual de TAP llevan el foco al campo específico que debe corregirse.
+
 ## v1.5.153
 - Refina los estados de validación: datos pendientes se muestran en ámbar; el rojo se reserva para campos que el usuario intentó corregir y que siguen inválidos.
 - Configuración: enfoca el botón «+ Fila» si falta un borne, valida longitud máxima 20 y detecta filas TAP vacías.
