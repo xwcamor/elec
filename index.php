@@ -77,7 +77,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
 <link rel="stylesheet" href="./assets/app.css?v=1.5.162">
-<link rel="stylesheet" href="./assets/design-system.css?v=1.5.177">
+<link rel="stylesheet" href="./assets/design-system.css?v=1.5.178">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body>
