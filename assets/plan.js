@@ -95,7 +95,29 @@
     if(statuses.some(s=>s==='OBSERVADO'))return 'Se encontraron valores observados';
     return 'Pendiente de completar las seis mediciones del ensayo.';
   }
-  function observationSummary(item){return (item.rows||[]).some(row=>Object.keys(row||{}).some(key=>String(row[key]??'').trim().toUpperCase()==='OBSERVADO'))?'Se encontraron valores observados':'Todos los valores conforme';}
+  function observationSummary(item){
+    const states=(item.rows||[]).map(row=>{
+      const normalized=normalize(item.code,row);
+      return String(normalized.status??normalized.evaluation??normalized.result??'').trim().toUpperCase();
+    });
+    if(!states.length||states.some(state=>!state||state==='PENDIENTE'))return 'Pendiente de completar o evaluar el ensayo.';
+    if(states.some(state=>state==='OBSERVADO'))return 'Se encontraron valores observados.';
+    if(states.some(state=>state==='NO CONCLUYENTE'))return 'El ensayo presenta resultados no concluyentes.';
+    if(states.every(state=>['CORRECTO','CONFORME','NO APLICA'].includes(state)))return 'Todos los valores conforme.';
+    return 'Pendiente de revisar los resultados del ensayo.';
+  }
+  function refreshObservationLive(card,item){
+    const textarea=card?.querySelector('textarea[data-meta="observations"]');
+    if(!textarea)return;
+    const current=textarea.value.trim();
+    const previous=item._autoObservationText||'';
+    const knownAuto=['Todos los valores conforme','Todos los valores conforme.','Se encontraron valores observados','Se encontraron valores observados.','Pendiente de completar o evaluar el ensayo.','El ensayo presenta resultados no concluyentes.','Pendiente de revisar los resultados del ensayo.'];
+    if(current&&current!==previous&&!knownAuto.includes(current))return;
+    const next=observationSummary(item);
+    textarea.value=next;
+    item.observations=next;
+    item._autoObservationText=next;
+  }
   const capacitanceUnits={pF:1e3,nF:1,µF:1e-3,mF:1e-6,F:1e-9};
   function capacitanceDisplay(value,unit){const n=number(value);return n===null?'':(n*(capacitanceUnits[unit]||1)).toFixed(6);}
   function refreshPowerFactorLive(card,item){
@@ -546,6 +568,12 @@
       if(item.code==='WINDING_RESISTANCE')hint='<div class="plan-reference-note"><b>Referencia técnica:</b> el comparativo entre fases debe ser ≤5% (IEEE C57.152-2013, cláusula 7.2.7). El archivo no documenta con claridad la fórmula comparativa; por eso el resultado se registra manualmente y no se calcula con la columna auxiliar defectuosa del Excel.</div>';
       if(item.code==='ARRESTER')hint='<div class="plan-reference-note"><b>Referencia técnica:</b> comparar las mediciones con los valores de fábrica. Si no existen, usar esta ejecución como referencia histórica; no se fija un límite absoluto en este formulario.</div>';
       if(item.code==='SFRA')hint='<div class="plan-reference-note"><b>Referencia técnica:</b> la conclusión se obtiene comparando las gráficas de campo con las de planta. La evaluación es manual; el protocolo no define un umbral numérico.</div>';
+      const generatedObservation=observationSummary(item);
+      const knownAutoObservations=['Todos los valores conforme','Todos los valores conforme.','Se encontraron valores observados','Se encontraron valores observados.','Pendiente de completar o evaluar el ensayo.','El ensayo presenta resultados no concluyentes.','Pendiente de revisar los resultados del ensayo.'];
+      if(!String(item.observations||'').trim()||knownAutoObservations.includes(String(item.observations).trim())){
+        item.observations=generatedObservation;
+        item._autoObservationText=generatedObservation;
+      }else item._autoObservationText='';
       const previousCard=host.querySelector('.plan-test-card[data-test-index="'+idx+'"]');
       const hasPreviousState=!!previousCard;
       const shouldOpen=hasPreviousState?previousCard.open:true;
@@ -817,13 +845,14 @@
     if(item.code==='INSULATION_RESISTANCE'&&['reading_30s','reading_1min'].includes(key)){item.rows[row]=nr;const out=card.querySelector('[data-row="'+row+'"][data-col="absorption_index"]');if(out)out.value=nr.absorption_index;}
     if(item.code==='TTR'&&['at','bt','U','V','W'].includes(key)){item.rows[row]=nr;['theoretical','errU','errV','errW','status'].forEach(k=>{const out=card.querySelector('[data-row="'+row+'"][data-col="'+k+'"]');if(out)out.value=nr[k]||'';});}
     if(item.code==='BUSHING'&&['capacitance_plate_pf','capacitance_measured_pf'].includes(key)){item.rows[row]=nr;['variation_percent','status'].forEach(k=>{const out=card.querySelector('[data-row="'+row+'"][data-col="'+k+'"]');if(out)out.value=nr[k]||'';});}
+    refreshObservationLive(card,item);
     refreshCardStatus(card,item);
     refreshPlanFeedback();
   });
   $('#planTestCards').addEventListener('change',e=>{
     const card=e.target.closest('[data-test-index]');if(!card)return;
     const item=items[Number(card.dataset.testIndex)];if(!item)return;
-    if(e.target.dataset.meta||e.target.classList.contains('plan-cell')){if(item.code==='POWER_FACTOR')refreshPowerFactorLive(card,item);if(e.target.dataset.meta)item[e.target.dataset.meta]=e.target.value;else if(e.target.classList.contains('plan-cell')){const row=Number(e.target.dataset.row),key=e.target.dataset.col;item.rows[row]=item.rows[row]||{};item.rows[row][key]=e.target.value;}if(!e.target.dataset.meta&&item.code==='POWER_FACTOR'){item.autoObservation=powerFactorObservation(item.rows);const note=card.querySelector('[data-auto-observation]');if(note)note.textContent=item.autoObservation;}refreshCardStatus(card,item);refreshPlanFeedback();markPlanChanged(350);}
+    if(e.target.dataset.meta||e.target.classList.contains('plan-cell')){if(item.code==='POWER_FACTOR')refreshPowerFactorLive(card,item);if(e.target.dataset.meta)item[e.target.dataset.meta]=e.target.value;else if(e.target.classList.contains('plan-cell')){const row=Number(e.target.dataset.row),key=e.target.dataset.col;item.rows[row]=item.rows[row]||{};item.rows[row][key]=e.target.value;}if(!e.target.dataset.meta&&item.code==='POWER_FACTOR'){item.autoObservation=powerFactorObservation(item.rows);const note=card.querySelector('[data-auto-observation]');if(note)note.textContent=item.autoObservation;}if(e.target.dataset.meta==='observations'){item._autoObservationText='';}else refreshObservationLive(card,item);refreshCardStatus(card,item);refreshPlanFeedback();markPlanChanged(350);}
   });
     $('#planPage').addEventListener('input',e=>{
     if(['planDate','planOperator','planSupervisor'].includes(e.target.id))refreshPlanFeedback();
