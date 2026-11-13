@@ -66,6 +66,7 @@
     Object.entries(aliases[code]||{}).forEach(([target,legacy])=>{if(!Object.prototype.hasOwnProperty.call(r,target)){const value=legacy.map(key=>r[key]).find(isFilled);if(value!==undefined)r[target]=value;}});
     if(code==='INSULATION_RESISTANCE'){const a=number(r.reading_30s),b=number(r.reading_1min);r.absorption_index=a!==null&&a!==0&&b!==null?String(b/a):'';if(!isFilled(r.status))r.status='PENDIENTE';}
     if(code==='ARRESTER'&&!isFilled(r.status))r.status='PENDIENTE';
+    if(code==='CAPACITANCE'&&!isFilled(r.status))r.status='PENDIENTE';
     if(code==='WINDING_RESISTANCE'&&!isFilled(r.status))r.status='PENDIENTE';
     if(code==='POWER_FACTOR'){
       if(!Object.prototype.hasOwnProperty.call(r,'capacitance_source_f')){const legacy=number(r.capacitance_measured??r.capacitance_nf??r.capacitance);if(legacy!==null)r.capacitance_source_f=String(legacy/1e9);}
@@ -157,7 +158,7 @@
     SFRA:['connection','tap','comparison_result','result'],
     ARRESTER:['section','phase','output_voltage','output_current','test_mode','losses_measured','capacitance_measured','status'],
     PROTECTIONS:['accessory','terminals','contact','condition','result'],
-    CAPACITANCE:['point','connection','test_voltage_kv','capacitance_nf']
+    CAPACITANCE:['point','connection','test_voltage_kv','capacitance_nf','status']
   };
   const numericByTest={
     TTR:['at','bt','U','V','W'],
@@ -259,7 +260,7 @@
       input.classList.toggle('is-missing',required&&!valid);
       if(valid){input.removeAttribute('aria-invalid');delete input.dataset.validationAttempted;}else if(input.dataset.validationAttempted!=='true'){input.removeAttribute('aria-invalid');}
       if(input.classList.contains('plan-result-select'))input.dataset.state=String(input.value||'PENDIENTE').toLowerCase();
-      if(field==='result'||(item.code==='TTR'&&field==='status')||(field==='status'&&['POWER_FACTOR','BUSHING','ARRESTER'].includes(item.code))){
+      if(field==='result'||(item.code==='TTR'&&field==='status')||(field==='status'&&['POWER_FACTOR','BUSHING','ARRESTER','CAPACITANCE'].includes(item.code))){
         const state=String(input.value||'').trim().toUpperCase();
         input.classList.toggle('result-good',['CORRECTO','CONFORME'].includes(state));
         input.classList.toggle('result-bad',state==='OBSERVADO');
