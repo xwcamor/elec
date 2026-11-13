@@ -240,7 +240,7 @@
       const positions=Array.isArray(c.positions)?c.positions:[];
       const numbers=positions.map(p=>Number(p.position_no));
       return !!state.windings[c.winding_index]&&positions.length>0&&
-        positions.every(p=>String(p.position_no??'').trim()!==''&&Number.isInteger(Number(p.position_no))&&Number(p.position_no)>0)&&
+        positions.every(p=>String(p.position_no??'').trim()!==''&&Number.isInteger(Number(p.position_no))&&Number(p.position_no)>0&&Number(p.position_no)<=150)&&
         new Set(numbers).size===numbers.length;
     })&&issues.length===0;
     const expected=String(transformer.tap_type||'').trim()!==''||Number(transformer.num_taps||0)>0;
@@ -249,11 +249,14 @@
   function showPanel(tab) {
     if(!['windings','taps','review'].includes(tab))return;
     const winding=getWindingProgress(),tap=getTapProgress();
+    let issueToFocus='';
     if(tab!=='windings'&&!winding.complete){
-      toast(winding.issues[0]||'Completa los datos obligatorios de bobinados y bornes antes de continuar.',true);
+      issueToFocus=winding.issues[0]||'Completa los datos obligatorios de bobinados y bornes antes de continuar.';
+      toast(issueToFocus,true);
       tab='windings';
     }else if(tab==='review'&&!tap.complete&&!tap.optional){
-      toast(tap.issues[0]||'Completa los conmutadores y sus posiciones de TAP antes de revisar.',true);
+      issueToFocus=tap.issues[0]||'Completa los conmutadores y sus posiciones de TAP antes de revisar.';
+      toast(issueToFocus,true);
       tab='taps';
     }
     selectedTab = tab;
@@ -264,6 +267,7 @@
     });
     queryAll('.config-panel').forEach(p => p.classList.toggle('hidden', p.dataset.panel !== tab));
     if (tab === 'review') renderReview();
+    if(issueToFocus)requestAnimationFrame(()=>focusConfigurationIssue(issueToFocus));
   }
   function syncTransformerNominals(){
     // Los datos nominales pertenecen a la ficha del transformador, no a esta configuración.
@@ -494,11 +498,12 @@
             <label><span>Nombre del conmutador</span><input data-cfield="name" value="${esc(c.name)}" placeholder="Ej. CTC / DETC"></label>
             <label><span>Bobinado asociado</span><select data-cfield="winding_index">${state.windings.map((w,i)=>`<option value="${i}" ${Number(c.winding_index)===i?'selected':''}>${esc(w.name||w.code||'Bobinado '+(i+1))}</option>`).join('')}</select></label>
             <label><span>Posición mínima</span><input data-cfield="min_position" type="number" value="${esc(c.min_position)}"></label><label><span>Posición máxima</span><input data-cfield="max_position" type="number" value="${esc(c.max_position)}"></label><label><span>Posición neutra</span><input data-cfield="neutral_position" type="number" value="${esc(c.neutral_position)}"></label><label><span>Posición actual</span><input data-cfield="current_position" type="number" value="${esc(c.current_position)}"></label>
-          </div><button type="button" class="text-remove" data-remove-changer="${ci}">Quitar conmutador</button></div>
+          </div>
           <details class="tap-positions-accordion" open>
             <summary><span>Posiciones de TAP</span><small>${c.positions.length} posiciones registradas</small><span class="accordion-chevron">⌄</span></summary>
             <div class="tap-card-body"><div class="table-caption"><strong>Posiciones de tap / datos de placa</strong><div class="sheet-tools"><button data-generate-taps="${ci}">Generar filas</button><button data-add-tap-row="${ci}">+ Fila</button></div></div><div class="sheet-wrap" id="tap-grid-${ci}"></div><div class="sheet-hint">Puedes pegar una columna con las posiciones desde Excel.</div></div>
           </details>
+          <div class="winding-card-actions ui-danger-zone"><hr><button type="button" class="text-remove" data-remove-changer="${ci}">Quitar conmutador</button></div>
         </div>
       </details>`).join('');
     host.querySelectorAll('[data-cfield]').forEach(el=>el.addEventListener('change',e=>{const ci=Number(e.target.closest('[data-changer]').dataset.changer),key=e.target.dataset.cfield;state.tap_changers[ci][key]=key==='winding_index'?Number(e.target.value):e.target.value;const card=e.target.closest('.tap-accordion');const summary=card?.querySelector('.tap-summary-main');const changer=state.tap_changers[ci];if(summary)summary.innerHTML='<strong>'+esc(changer.name||'Conmutador sin nombre')+'</strong><small>'+esc(state.windings[Number(changer.winding_index)]?.name||'Bobinado sin asignar')+' · '+esc(changer.type)+' · '+changer.positions.length+' posiciones</small>';markDirty();}));
@@ -637,11 +642,57 @@
       c.positions.forEach((p,pi)=>{
         const n=Number(p.position_no);
         if(p.position_no===null||String(p.position_no).trim()==='')return;
-        if(!Number.isInteger(n)||n<1)errors.push(`Hay una posición sin número entero positivo en ${c.name||'el conmutador '+(ci+1)}.`);
+        if(!Number.isInteger(n)||n<1||n>150)errors.push(`Las posiciones de ${c.name||'el conmutador '+(ci+1)} deben ser enteros entre 1 y 150.`);
         else if(seen.has(n))errors.push(`La posición ${n} está duplicada en ${c.name||'el conmutador '+(ci+1)}.`);else seen.add(n);
       });
     });
     return errors;
+  }
+
+  function focusConfigurationIssue(message){
+    if(!message)return;
+    let target=null;
+    const windingIndexMatch=message.match(/bobinado (\\d+)/i);
+    let windingIndex=windingIndexMatch?Number(windingIndexMatch[1])-1:-1;
+    if(windingIndex<0){
+      windingIndex=state.windings.findIndex(w=>w.name&&message.toLocaleLowerCase().includes(String(w.name).toLocaleLowerCase()));
+    }
+    if(/necesita un nombre|nombre del bobinado/i.test(message)&&windingIndex>=0){
+      target=document.querySelector('[data-winding="'+windingIndex+'"] [data-wfield="name"]');
+    }else if(/tensión nominal|tensión.*bobinado/i.test(message)&&windingIndex>=0){
+      target=document.querySelector('[data-winding="'+windingIndex+'"] [data-wfield="voltage_kv"]');
+    }
+    if(!target&&/borne.*fila/i.test(message)){
+      const rowMatch=message.match(/fila (\\d+)/i);
+      if(rowMatch&&windingIndex>=0)target=document.querySelector('#terminal-grid-'+windingIndex+' .sheet-cell[data-row="'+(Number(rowMatch[1])-1)+'"][data-col="0"]');
+    }
+    if(!target&&/borne .*repetido/i.test(message)){
+      const codeMatch=message.match(/borne (.+?) está repetido/i);
+      if(codeMatch){
+        const cells=[...document.querySelectorAll('#windingsContainer .sheet-cell[data-col="0"]')];
+        target=cells.find(cell=>String(cell.value||'').trim().toUpperCase()===codeMatch[1].trim().toUpperCase())||null;
+      }
+    }
+    if(!target&&/conmutador/i.test(message)){
+      let changerIndex=state.tap_changers.findIndex(c=>c.name&&message.toLocaleLowerCase().includes(String(c.name).toLocaleLowerCase()));
+      if(changerIndex<0){
+        const match=message.match(/conmutador (\\d+)/i);
+        if(match)changerIndex=Number(match[1])-1;
+      }
+      if(changerIndex>=0){
+        target=document.querySelector('[data-changer="'+changerIndex+'"] [data-cfield="winding_index"]');
+        if(!target&&/posición/i.test(message)){
+          const pos=message.match(/posición (\\d+)/i),grid=document.querySelector('#tap-grid-'+changerIndex);
+          if(grid&&pos){const cells=[...grid.querySelectorAll('.sheet-cell[data-col="0"]')];target=cells.find(cell=>String(cell.value||'').trim()===pos[1])||cells[0]||null;}
+        }
+      }
+    }
+    if(!target)target=document.querySelector('.config-panel:not(.hidden) [required]:invalid, .config-panel:not(.hidden) .sheet-cell.is-required-missing');
+    if(target){
+      target.setAttribute('aria-invalid','true');
+      target.scrollIntoView({behavior:'smooth',block:'center'});
+      target.focus({preventScroll:true});
+    }
   }
 
   async function saveConfig(){
@@ -649,7 +700,7 @@
     const windingProgress=getWindingProgress(),tapProgress=getTapProgress();
     if(!windingProgress.complete){toast(windingProgress.issues[0]||'Completa los datos obligatorios de todos los bobinados y bornes.',true);showPanel('windings');return;}
     if(!tapProgress.complete&&!tapProgress.optional){toast(tapProgress.issues[0]||'Completa los conmutadores y sus posiciones de TAP.',true);showPanel('taps');return;}
-    const validationErrors=validateConfiguration();if(validationErrors.length){toast(validationErrors[0],true);showPanel(validationErrors[0].includes('posición')?'taps':'windings');return;}
+    const validationErrors=validateConfiguration();if(validationErrors.length){toast(validationErrors[0],true);showPanel(validationErrors[0].includes('posición')||validationErrors[0].includes('conmutador')?'taps':'windings');requestAnimationFrame(()=>focusConfigurationIssue(validationErrors[0]));return;}
     if(PILOT.demo){toast('Estás en modo demostración. Conecta MySQL y selecciona un registro real de transformers para guardar.',true);return;}
     if(!PILOT.schemaReady){toast('Importa database/schema.sql en la base de datos del sistema.',true);return;}
     const btns=[$('#saveConfig')].filter(Boolean);btns.forEach(b=>{b.disabled=true;b.textContent='Guardando...';});
