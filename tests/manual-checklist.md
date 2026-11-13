@@ -135,3 +135,28 @@
 - [ ] Editar una ejecución histórica y comprobar que solo se actualiza su ID y sus mediciones.
 - [ ] Verificar que el asistente de pruebas no puede modificar el objeto interno de Configuración eléctrica.
 - [ ] Ejecutar `node --check assets/app.js`, `node --check assets/electrical-tests.js` y `node --check assets/plan.js`.
+
+## v1.5.152 — revisión integral de interfaz y validaciones
+
+### Sistema visual compartido
+- [ ] Abrir Configuración eléctrica y Pruebas eléctricas; comprobar encabezado, subtítulo, separador, gutters y alineación de acciones.
+- [ ] Comprobar que ambos asistentes usan icono, nombre de etapa y estado textual; sin números ni check que reemplace el icono.
+- [ ] Verificar estados activo, completo, en curso, pendiente y no aplica, y conectores de progreso.
+- [ ] Comparar padding de paneles, tarjetas, cabeceras, campos, botones y acordeones.
+- [ ] Comprobar que quitar bobinado y quitar conmutador aparece al final del acordeón, tras divisor y confirmación.
+- [ ] Revisar escritorio, móvil, teclado, foco visible y prefers-reduced-motion.
+
+### Validación y persistencia
+- [ ] Configuración: intentar guardar sin nombre, tensión, borne, asociación de conmutador o posición TAP válida; comprobar que se abre la etapa y se enfoca el campo.
+- [ ] Configuración: probar posiciones TAP 0, negativas, decimales, duplicadas, 151 y 150.
+- [ ] Pruebas: introducir texto no numérico en cada campo numérico; comprobar que cliente bloquea y enfoca el campo.
+- [ ] Probar números con coma decimal en mediciones y comprobar persistencia correcta.
+- [ ] Excitación: completar TAP, tensión, frecuencia y mediciones U-0/V-0/W-0; confirmar que PHP acepta el formato actual al finalizar.
+- [ ] Factor de potencia: validar capacitancia de fuente, FP medido/corregido y estado calculado.
+- [ ] Intentar finalizar un ensayo sin nombre, marca, modelo o serie del equipo; el campo debe señalarse y el servidor debe rechazarlo.
+- [ ] Iniciar una jornada, editar responsable/supervisor y comprobar que el autoguardado no la degrade a BORRADOR.
+- [ ] Simular error de validación durante autoguardado; mostrar el motivo concreto y permitir corregir/reintentar.
+- [ ] Editar una ejecución y confirmar que conserva el mismo ID; finalizar actualiza esa ejecución sin duplicarla.
+- [ ] Comprobar que las fórmulas y snapshots históricos no cambian.
+
+**Pendiente de prueba manual en Laragon/MySQL:** completar estos casos antes de cerrar la revisión funcional.
