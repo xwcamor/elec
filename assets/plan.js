@@ -25,12 +25,13 @@
     PROTECTIONS:{prefix:'PROT',cols:[['item','Ítem'],['accessory','Accesorio'],['terminals','Bornes'],['contact','Contacto'],['condition','Condición'],['setpoint','Ajuste'],['result','Resultado'],['notes','Observación']]},
     CAPACITANCE:{prefix:'CAP',cols:[['point','Punto / borne'],['connection','Conexión de prueba'],['test_voltage_kv','Tensión de prueba (kV)'],['capacitance_nf','Capacitancia (nF)'],['frequency_hz','Frecuencia (Hz)'],['temperature_c','Temperatura (°C)'],['result','Resultado'],['notes','Observación']]}
   };
-  let items=[],editingId=null,sessionId=null,activeTestIndex=0,currentPlanStep='shared';
+  let items=[],editingId=null,editingStatus='BORRADOR',sessionId=null,activeTestIndex=0,currentPlanStep='shared';
   let autoSaveTimer=null,savePromise=null,savePending=false,editRevision=0,savedRevision=0;
   function hasUnsavedChanges(){return editingId!==null&&editRevision>savedRevision;}
   function setSaveStatus(message,state){
     const node=$('#planSaveStatus');if(!node)return;
     node.dataset.state=state||'idle';
+    node.title=String(message||'');
     const label=node.querySelector('span');if(label)label.textContent=message;
   }
   function scheduleAutoSave(delay){
@@ -152,19 +153,30 @@
     PROTECTIONS:['accessory','terminals','contact','condition','result'],
     CAPACITANCE:['point','connection','test_voltage_kv','capacitance_nf']
   };
+  const numericByTest={
+    TTR:['at','bt','U','V','W'],
+    POWER_FACTOR:['test_voltage','power_factor_measured','power_factor_corrected_20c','capacitance_source_f'],
+    EXCITATION:['test_voltage_kv','frequency_hz','current_u_ma','losses_u_w','current_v_ma','losses_v_w','current_w_ma','losses_w_w'],
+    WINDING_RESISTANCE:['test_current_a','temperature_c','resistance_measured','resistance_referred_75c'],
+    INSULATION_RESISTANCE:['applied_voltage_kv','reading_15s','reading_30s','reading_45s','reading_1min'],
+    BUSHING:['test_voltage','power_factor_plate','power_factor_measured','capacitance_plate','capacitance_measured','variation_percent'],
+    ARRESTER:['output_voltage','output_current','losses_measured','capacitance_measured'],
+    CAPACITANCE:['test_voltage_kv','capacitance_nf']
+  };
   const requiredEquipment=['equipment_name','equipment_brand','equipment_model','equipment_serial'];
   const equipmentLabels={equipment_name:'equipo',equipment_brand:'marca del equipo',equipment_model:'modelo',equipment_serial:'serie'};
-  const generalLabels={date:'fecha de realización',operator:'responsable / técnico'};
+  const generalLabels={date:'fecha de realización',operator:'responsable / técnico',supervisor:'supervisor'};
   function isFilled(value){return value!==null&&value!==undefined&&String(value).trim()!=='';}
-  function requiredValueFilled(key,value){
+  function requiredValueFilled(key,value,code){
     if(['result','evaluation','status'].includes(key)&&String(value??'').trim().toUpperCase()==='PENDIENTE')return false;
+    if((numericByTest[code]||[]).includes(key))return number(value)!==null;
     return isFilled(value);
   }
   function missingForRow(code,row){
     const required=requiredByTest[code]||columns(code).map(c=>c[0]).filter(k=>!['notes','absorption_index','theoretical','errU','errV','errW'].includes(k));
     const labels=Object.fromEntries(columns(code).map(c=>[c[0],c[1]]));
     const normalized=normalize(code,row);
-    return required.filter(key=>!requiredValueFilled(key,normalized?.[key])).map(key=>labels[key]||key);
+    return required.filter(key=>!requiredValueFilled(key,normalized?.[key],code)).map(key=>labels[key]||key);
   }
   function itemMetrics(item){
     const rows=Array.isArray(item.rows)?item.rows:[];
@@ -189,7 +201,7 @@
     const missing=[];
     if(!isFilled($('#planDate').value))missing.push(generalLabels.date);
     if(!isFilled($('#planOperator').value))missing.push(generalLabels.operator);
-    if(!isFilled($('#planSupervisor').value))missing.push(generalLabels.supervisor||'supervisor');
+    if(!isFilled($('#planSupervisor').value))missing.push(generalLabels.supervisor);
     return missing;
   }
   function planMetrics(){
@@ -236,9 +248,9 @@
   function refreshFieldStyles(card,item,metrics){
     card.querySelectorAll('.plan-cell').forEach(input=>{
       const row=Number(input.dataset.row),field=input.dataset.col,required=(requiredByTest[item.code]||[]).includes(field);
-      const valid=requiredValueFilled(field,input.value);
+      const valid=requiredValueFilled(field,input.value,item.code);
       input.classList.toggle('is-filled',valid);
-      input.classList.toggle('is-missing',required&&!valid);
+      input.classList.toggle('is-missing',required&&!valid);\n      if(required)input.setAttribute('aria-invalid',valid?'false':'true');else input.removeAttribute('aria-invalid');
       if(input.classList.contains('plan-result-select'))input.dataset.state=String(input.value||'PENDIENTE').toLowerCase();
       if(field==='result'){
         const state=String(input.value||'').trim().toUpperCase();
@@ -252,7 +264,7 @@
       input.classList.toggle('is-filled',isFilled(input.value));
       input.classList.toggle('is-missing',!isFilled(input.value));
       input.closest('label')?.classList.toggle('meta-complete',isFilled(input.value));
-      input.closest('label')?.classList.toggle('meta-pending',!isFilled(input.value));
+      input.closest('label')?.classList.toggle('meta-pending',!isFilled(input.value));\n      input.setAttribute('aria-invalid',isFilled(input.value)?'false':'true');
     });
     card.querySelectorAll('tbody tr[data-row-state]').forEach((tr,index)=>{tr.dataset.rowState=metrics.rowStates[index]?.state||'empty';});
     const progress=card.querySelector('[data-card-progress]');
@@ -273,14 +285,23 @@
     const resultsState=!items.length?'missing':(resultMetrics.every(metric=>metric.complete)?'complete':(resultMetrics.some(metric=>metric.anyData)?'partial':'missing'));
     const reviewState=m.complete?'complete':(items.length?'partial':'missing');
     const states={shared:sharedState,selection:selectionState,results:resultsState,review:reviewState};
+    const labels={
+      shared:sharedState==='complete'?'Completo':(sharedState==='partial'?'En curso':'Pendiente'),
+      selection:items.length?items.length+' '+(items.length===1?'seleccionado':'seleccionados'):'Pendiente',
+      results:resultsState==='complete'?'Completo':(resultsState==='partial'?'En curso':'Pendiente'),
+      review:reviewState==='complete'?'Listo':(items.length?'Por revisar':'Pendiente')
+    };
+    const titles={shared:'Datos generales',selection:'Ensayos',results:'Resultados',review:'Revisión'};
     Object.entries(states).forEach(([key,state])=>{
       const step=$('#planStepper [data-plan-step="'+key+'"]');
       if(!step)return;
       step.dataset.state=state;
       step.classList.toggle('active',key===currentPlanStep);
       if(key===currentPlanStep)step.setAttribute('aria-current','step');else step.removeAttribute('aria-current');
-      const number=step.querySelector('.plan-step-number');
-      if(number)number.dataset.state=state;
+      const icon=step.querySelector('.ui-step-icon');if(icon)icon.dataset.state=state;
+      const status=step.querySelector('[data-step-status]');if(status)status.textContent=labels[key];
+      step.setAttribute('aria-label',titles[key]+' · '+labels[key]);
+      step.title=titles[key]+' · '+labels[key];
     });
     const stepKeys=['shared','selection','results','review'];
     document.querySelectorAll('#planStepper .plan-step-connector').forEach((line,index)=>{
@@ -290,7 +311,7 @@
   }
   function renderPlanFeedback(){
     const m=planMetrics();
-    ['planDate','planOperator','planSupervisor'].forEach(id=>{const field=$('#'+id);if(!field)return;const missing=!isFilled(field.value);field.classList.toggle('is-missing',missing);field.classList.remove('is-filled');field.closest('label')?.classList.toggle('meta-pending',missing);field.closest('label')?.classList.remove('meta-complete');});
+    ['planDate','planOperator','planSupervisor'].forEach(id=>{const field=$('#'+id);if(!field)return;const missing=!isFilled(field.value);field.classList.toggle('is-missing',missing);field.setAttribute('aria-invalid',missing?'true':'false');field.closest('label')?.classList.toggle('meta-pending',missing);field.closest('label')?.classList.toggle('meta-complete',!missing);});
     updatePlanStepper(m);
     const next=$('#planStepNext');
     if(next){
@@ -314,6 +335,26 @@
   function firstIncompleteTest(){
     return items.findIndex(item=>!itemMetrics(item).complete);
   }
+  function focusFirstInvalidTest(index){
+    const item=items[index];if(!item)return;
+    const card=$('#planTestCards [data-test-index="'+index+'"]');if(card)card.open=true;
+    const metrics=itemMetrics(item);
+    let target=null;
+    const missingMeta=requiredEquipment.find(key=>!isFilled(item[key]));
+    if(missingMeta)target=card?.querySelector('[data-meta="'+missingMeta+'"]');
+    if(!target){
+      const rowIndex=metrics.rowStates.findIndex(row=>row.missing.length>0);
+      if(rowIndex>=0){
+        const row=item.rows[rowIndex]||{};
+        const required=requiredByTest[item.code]||columns(item.code).map(column=>column[0]);
+        const key=required.find(field=>!requiredValueFilled(field,normalize(item.code,row)?.[field],item.code));
+        if(key)target=card?.querySelector('.plan-cell[data-row="'+rowIndex+'"][data-col="'+key+'"]');
+      }
+    }
+    if(card)card.scrollIntoView({behavior:'smooth',block:'center'});
+    if(target){target.setAttribute('aria-invalid','true');target.focus({preventScroll:true});}
+  }
+
   function validatePlanStep(step){
     if(step==='shared'){
       const missing=generalMissing();
@@ -339,7 +380,7 @@
         const extra=pending.length>3?' y '+(pending.length-3)+' más':'';
         toast('Completa los ensayos pendientes: '+names.join(', ')+extra+'.',true);
         const first=firstIncompleteTest();
-        if(first>=0)$('#planTestCards [data-test-index="'+first+'"]')?.scrollIntoView({behavior:'smooth',block:'center'});
+        if(first>=0)focusFirstInvalidTest(first);
         return false;
       }
     }
@@ -502,10 +543,10 @@
         '<div class="plan-test-body">'+
         '<section class="plan-test-meta-card"><div class="plan-test-meta-card-head"><b>Equipo y referencia</b></div>'+
         '<div class="plan-test-meta-grid">'+
-        '<label data-meta-wrap="equipment_name">Equipo<input data-meta="equipment_name" value="'+esc(item.equipment_name)+'" placeholder="Instrumento"></label>'+
-        '<label data-meta-wrap="equipment_brand">Marca<input data-meta="equipment_brand" value="'+esc(item.equipment_brand)+'" placeholder="Marca"></label>'+
-        '<label data-meta-wrap="equipment_model">Modelo<input data-meta="equipment_model" value="'+esc(item.equipment_model)+'" placeholder="Modelo"></label>'+
-        '<label data-meta-wrap="equipment_serial">N.º de serie<input data-meta="equipment_serial" value="'+esc(item.equipment_serial)+'" placeholder="Serie"></label>'+(item.code==='EXCITATION'?'<label data-meta-wrap="core_type">Tipo de núcleo (opcional)<select data-meta="core_type"><option value="NO_ESPECIFICADO" '+(item.core_type==='NO_ESPECIFICADO'?'selected':'')+'>No especificado</option><option value="TRES_COLUMNAS" '+(item.core_type==='TRES_COLUMNAS'?'selected':'')+'>Tres columnas</option><option value="CINCO_COLUMNAS" '+(item.core_type==='CINCO_COLUMNAS'?'selected':'')+'>Cinco columnas</option><option value="ACORAZADO" '+(item.core_type==='ACORAZADO'?'selected':'')+'>Acorazado</option><option value="OTRO" '+(item.core_type==='OTRO'?'selected':'')+'>Otro</option></select></label>':'')+'</div></section>'+hint+
+        '<label data-meta-wrap="equipment_name"><span>Equipo <i class="required-mark">*</i></span><input required aria-required="true" data-meta="equipment_name" value="'+esc(item.equipment_name)+'" placeholder="Instrumento"></label>'+
+        '<label data-meta-wrap="equipment_brand"><span>Marca <i class="required-mark">*</i></span><input required aria-required="true" data-meta="equipment_brand" value="'+esc(item.equipment_brand)+'" placeholder="Marca"></label>'+
+        '<label data-meta-wrap="equipment_model"><span>Modelo <i class="required-mark">*</i></span><input required aria-required="true" data-meta="equipment_model" value="'+esc(item.equipment_model)+'" placeholder="Modelo"></label>'+
+        '<label data-meta-wrap="equipment_serial"><span>N.º de serie <i class="required-mark">*</i></span><input required aria-required="true" data-meta="equipment_serial" value="'+esc(item.equipment_serial)+'" placeholder="Serie"></label>'+(item.code==='EXCITATION'?'<label data-meta-wrap="core_type">Tipo de núcleo (opcional)<select data-meta="core_type"><option value="NO_ESPECIFICADO" '+(item.core_type==='NO_ESPECIFICADO'?'selected':'')+'>No especificado</option><option value="TRES_COLUMNAS" '+(item.core_type==='TRES_COLUMNAS'?'selected':'')+'>Tres columnas</option><option value="CINCO_COLUMNAS" '+(item.core_type==='CINCO_COLUMNAS'?'selected':'')+'>Cinco columnas</option><option value="ACORAZADO" '+(item.core_type==='ACORAZADO'?'selected':'')+'>Acorazado</option><option value="OTRO" '+(item.core_type==='OTRO'?'selected':'')+'>Otro</option></select></label>':'')+'</div></section>'+hint+
         '<div class="plan-table-toolbar"><div><b>Mediciones del ensayo</b><small><i class="required-mark">*</i> Campo requerido · Puedes pegar desde Excel.</small><small class="plan-row-summary" data-row-summary></small></div><button class="btn small secondary-action" type="button" data-add-row="'+idx+'">+ Fila</button></div>'+
         '<div class="measurement-sheet-wrap plan-grid-wrap"><table class="measurement-sheet plan-sheet"><thead>'+head+'</thead><tbody>'+body+'</tbody></table></div>'+
         '<details class="plan-optional-details plan-observation-details" '+(item.code==='POWER_FACTOR'?'open':'')+'><summary><span>Observaciones del ensayo</span><small>'+(item.code==='POWER_FACTOR'?'Resultado automático según Estado':'Notas e incidencias')+'</small></summary><label class="plan-test-observations"><textarea data-meta="observations" rows="2" placeholder="Resultados, incidencias y comentarios" '+(item.code==='POWER_FACTOR'?'readonly title="Se genera automáticamente según los estados de las mediciones"':'')+'>'+esc(item.observations)+'</textarea></label></details>'+
@@ -517,7 +558,7 @@
   function render(){renderPicker();renderCards();renderPlanFeedback();renderPlanReview();}
   function clear(){
     if(autoSaveTimer)clearTimeout(autoSaveTimer);
-    items=[];editingId=null;sessionId=null;activeTestIndex=0;currentPlanStep='shared';savePending=false;editRevision=0;savedRevision=0;
+    items=[];editingId=null;editingStatus='BORRADOR';sessionId=null;activeTestIndex=0;currentPlanStep='shared';savePending=false;editRevision=0;savedRevision=0;
     const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());$('#planDate').value=d.toISOString().slice(0,16);
     ['planOperator','planSupervisor','planOilTemp','planAmbientTemp','planHumidity','planObservations'].forEach(id=>$('#'+id).value='');
     $('#planTitle').textContent='Nuevo registro de pruebas';
@@ -563,7 +604,7 @@
     if(bridge.demo()){toast('El historial no está disponible en modo demostración.',true);return;}
     try{
       const res=await fetch(api('action=test-get&key='+encodeURIComponent(transformer().key)+'&id='+id)),data=await json(res),x=data.item;
-      clear();editingId=Number(x.id||id);sessionId=x.plan?.session_id||null;
+      clear();editingId=Number(x.id||id);editingStatus=String(x.status||'BORRADOR').toUpperCase();sessionId=x.plan?.session_id||null;
       $('#planDate').value=String(x.executed_at||'').replace(' ','T').slice(0,16);
       $('#planOperator').value=x.operator_name||'';$('#planSupervisor').value=x.supervisor_name||'';
       $('#planOilTemp').value=x.oil_temperature_c??'';$('#planAmbientTemp').value=x.ambient_temperature_c??'';
@@ -629,9 +670,25 @@
     const complete=metrics.complete;
     if(confirmCompletion&&!complete){setSaveStatus('Hay datos pendientes por completar','warning');toast('Completa todos los ensayos antes de confirmar el registro.',true);return false;}
     const hasWork=items.some(item=>itemMetrics(item).anyData||!!(item.standard_reference||item.equipment_name||item.equipment_brand||item.equipment_model||item.equipment_serial||item.observations))||!!($('#planOperator').value.trim()||$('#planSupervisor').value.trim()||$('#planOilTemp').value||$('#planAmbientTemp').value||$('#planHumidity').value||$('#planObservations').value.trim());
+    const targetStatus=confirmCompletion?'COMPLETADA':(startRequested?'EN_PROCESO':(editingId!==null?editingStatus:(hasWork?'EN_PROCESO':'BORRADOR')));
+    if(['EN_PROCESO','COMPLETADA'].includes(targetStatus)){
+      const missingGeneral=generalMissing();
+      if(missingGeneral.length){
+        const message='No se guardaron los cambios. Completa: '+missingGeneral.join(', ')+'.';
+        setSaveStatus(message,'warning');
+        if(!automatic)toast(message,true);
+        return false;
+      }
+      if(!items.length){
+        const message='No se puede mantener una jornada iniciada sin al menos un ensayo seleccionado.';
+        setSaveStatus(message,'warning');
+        if(!automatic)toast(message,true);
+        return false;
+      }
+    }
     const payload={
       id:editingId,transformer_key:transformer().key,test_code:'PLAN',
-      executed_at:date,status:confirmCompletion?'COMPLETADA':(startRequested?'EN_PROCESO':(hasWork?'EN_PROCESO':'BORRADOR')),
+      executed_at:date,status:targetStatus,
       operator_name:$('#planOperator').value,supervisor_name:$('#planSupervisor').value,
       oil_temperature_c:$('#planOilTemp').value,ambient_temperature_c:$('#planAmbientTemp').value,
       relative_humidity_percent:$('#planHumidity').value,observations:$('#planObservations').value,
@@ -656,7 +713,7 @@
         else if(!automatic&&!startRequested){toast('Cambios guardados.');}
         return true;
       }catch(error){
-        setSaveStatus('No se pudo guardar · revisa la conexión y vuelve a intentar','error');
+        setSaveStatus('No se guardó: '+(error.message||'Revisa la conexión y vuelve a intentar.'),'error');
         if(!automatic)toast(error.message,true);
         return false;
       }
