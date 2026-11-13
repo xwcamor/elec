@@ -160,3 +160,11 @@
 - [ ] Comprobar que las fórmulas y snapshots históricos no cambian.
 
 **Pendiente de prueba manual en Laragon/MySQL:** completar estos casos antes de cerrar la revisión funcional.
+
+### v1.5.153 — casos límite de validación
+- [ ] Configuración: agregar una fila TAP vacía e intentar avanzar/guardar; debe enfocar su celda y mostrar la fila exacta.
+- [ ] Configuración: crear un conmutador sin posiciones y comprobar que navegador y servidor rechazan el guardado.
+- [ ] Configuración: probar min/max/neutral/actual vacíos (permitidos), decimales o fuera de 1–150, min mayor que max y neutral/actual fuera del rango.
+- [ ] Configuración: probar tensión/frecuencia con coma decimal y comprobar persistencia como número.
+- [ ] Registro: probar TTR con TAP vacío, no numérico y correcto; cliente y servidor deben tener el mismo criterio.
+- [ ] Registro: probar los campos calculados opcionales con un número válido y con texto; un vacío debe seguir siendo opcional.
