@@ -152,8 +152,9 @@ class ElectricalConfigRepository
         $phaseCountRaw = (string)($payload['phase_count'] ?? '3');
         if (!in_array($phaseCountRaw, ['1', '3'], true)) throw new InvalidArgumentException('La cantidad de fases debe ser 1 o 3.');
         $phaseCount = (int)$phaseCountRaw;
-        $frequency = $payload['frequency_hz'] ?? '';
-        if ($frequency !== '' && (!is_numeric($frequency) || (float)$frequency <= 0)) {
+        $frequencyRaw = trim((string)($payload['frequency_hz'] ?? ''));
+        $frequency = $this->decimalValue($frequencyRaw);
+        if ($frequencyRaw !== '' && ($frequency === null || $frequency <= 0)) {
             throw new InvalidArgumentException('La frecuencia debe ser un valor numérico mayor que cero.');
         }
         $windingCodes = [];
@@ -165,8 +166,8 @@ class ElectricalConfigRepository
             if ($code === '') throw new InvalidArgumentException('El bobinado '.($wIndex + 1).' necesita un código.');
             if (isset($windingCodes[$code])) throw new InvalidArgumentException('El código de bobinado '.$code.' está repetido.');
             $windingCodes[$code] = true;
-            $voltage = $winding['voltage_kv'] ?? null;
-            if (!is_numeric($voltage) || (float)$voltage <= 0) throw new InvalidArgumentException('Indica una tensión nominal válida para el bobinado '.$name.'.');
+            $voltage = $this->decimalValue($winding['voltage_kv'] ?? null);
+            if ($voltage === null || $voltage <= 0) throw new InvalidArgumentException('Indica una tensión nominal válida para el bobinado '.$name.'.');
 
             $terminalCodes = [];
             $terminals = $winding['terminals'] ?? [];
@@ -205,7 +206,7 @@ class ElectricalConfigRepository
         $snapshot = [
             'phase_count' => $phaseCount,
             'vector_group' => trim((string)($payload['vector_group'] ?? '')),
-            'frequency_hz' => (($payload['frequency_hz'] ?? '') !== '' && is_numeric($payload['frequency_hz'] ?? null)) ? (float)$payload['frequency_hz'] : null,
+            'frequency_hz' => $frequency,
             'notes' => trim((string)($payload['notes'] ?? '')),
             'windings' => $windings,
             'tap_changers' => $changers,
@@ -273,6 +274,20 @@ class ElectricalConfigRepository
         }
     }
 
-    private function num($v): ?float { return ($v === '' || $v === null || !is_numeric($v)) ? null : (float)$v; }
-    private function intOrNull($v): ?int { return ($v === '' || $v === null || !is_numeric($v)) ? null : (int)$v; }
+    private function decimalValue($value): ?float
+    {
+        if ($value === null || trim((string)$value) === '') return null;
+        $text = preg_replace('/\\s+/', '', (string)$value);
+        if (str_contains($text, ',') && str_contains($text, '.')) {
+            if (strrpos($text, ',') > strrpos($text, '.')) $text = str_replace(',', '.', str_replace('.', '', $text));
+            else $text = str_replace(',', '', $text);
+        } elseif (str_contains($text, ',')) {
+            $text = str_replace(',', '.', $text);
+        }
+        if (!is_numeric($text)) return null;
+        $number = (float)$text;
+        return is_finite($number) ? $number : null;
+    }
+    private function num($v): ?float { return $this->decimalValue($v); }
+    private function intOrNull($v): ?int { return ($v === '' || $v === null || !is_numeric($v) || !is_finite((float)$v) || floor((float)$v)!==(float)$v) ? null : (int)$v; }
 }
