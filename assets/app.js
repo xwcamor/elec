@@ -695,11 +695,26 @@
     }
   }
 
+  const configValidationRoot=$('#configPage');
+  ['input','change'].forEach(eventName=>configValidationRoot?.addEventListener(eventName,event=>{
+    const field=event.target;
+    if(field instanceof HTMLElement&&field.getAttribute('aria-invalid')==='true'){
+      field.removeAttribute('aria-invalid');
+      delete field.dataset.validationAttempted;
+    }
+  }));
+
   async function saveConfig(){
-    if(!state.windings.length){toast('Debes configurar al menos un bobinado.',true);showPanel('windings');return;}
+    if(!state.windings.length){toast('Debes configurar al menos un bobinado.',true);showPanel('windings');$('#addWinding')?.focus();return;}
     const windingProgress=getWindingProgress(),tapProgress=getTapProgress();
-    if(!windingProgress.complete){toast(windingProgress.issues[0]||'Completa los datos obligatorios de todos los bobinados y bornes.',true);showPanel('windings');return;}
-    if(!tapProgress.complete&&!tapProgress.optional){toast(tapProgress.issues[0]||'Completa los conmutadores y sus posiciones de TAP.',true);showPanel('taps');return;}
+    if(!windingProgress.complete){
+      const issue=windingProgress.issues[0]||'Completa los datos obligatorios de todos los bobinados y bornes.';
+      toast(issue,true);showPanel('windings');requestAnimationFrame(()=>focusConfigurationIssue(issue));return;
+    }
+    if(!tapProgress.complete&&!tapProgress.optional){
+      const issue=tapProgress.issues[0]||'Completa los conmutadores y sus posiciones de TAP.';
+      toast(issue,true);showPanel('taps');requestAnimationFrame(()=>focusConfigurationIssue(issue));return;
+    }
     const validationErrors=validateConfiguration();if(validationErrors.length){toast(validationErrors[0],true);showPanel(validationErrors[0].includes('posición')||validationErrors[0].includes('conmutador')?'taps':'windings');requestAnimationFrame(()=>focusConfigurationIssue(validationErrors[0]));return;}
     if(PILOT.demo){toast('Estás en modo demostración. Conecta MySQL y selecciona un registro real de transformers para guardar.',true);return;}
     if(!PILOT.schemaReady){toast('Importa database/schema.sql en la base de datos del sistema.',true);return;}
