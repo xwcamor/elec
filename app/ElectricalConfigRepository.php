@@ -173,7 +173,7 @@ class ElectricalConfigRepository
             $terminals = $winding['terminals'] ?? [];
             if (!is_array($terminals) || count($terminals) < 1) throw new InvalidArgumentException('El bobinado '.$name.' debe tener al menos un borne.');
             foreach ($terminals as $tIndex => $terminal) {
-                if (!is_array($terminal)) continue;
+                if (!is_array($terminal)) throw new InvalidArgumentException('Hay un borne con datos inválidos en '.$name.'.');
                 $terminalCode = strtoupper(trim((string)($terminal['code'] ?? '')));
                 if ($terminalCode === '') throw new InvalidArgumentException('Falta el código del borne '.($tIndex + 1).' en '.$name.'.');
                 if (mb_strlen($terminalCode) > 20) throw new InvalidArgumentException('El código del borne '.$terminalCode.' supera el máximo de 20 caracteres.');
@@ -193,7 +193,7 @@ class ElectricalConfigRepository
             }
             $positions = [];
             foreach (($changer['positions'] ?? []) as $positionIndex => $position) {
-                if (!is_array($position)) continue;
+                if (!is_array($position)) throw new InvalidArgumentException('Hay una posición TAP con datos inválidos en '.($changer['name'] ?? 'el conmutador').'.');
                 $rawPosition = trim((string)($position['position_no'] ?? ''));
                 if ($rawPosition === '') throw new InvalidArgumentException('Falta el número de posición TAP en la fila '.($positionIndex + 1).' de '.($changer['name'] ?? 'el conmutador').'.');
                 if (!ctype_digit($rawPosition) || strlen($rawPosition)>3 || (int)$rawPosition < 1 || (int)$rawPosition > 150) throw new InvalidArgumentException('Las posiciones de TAP deben ser enteros entre 1 y 150.');
