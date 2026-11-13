@@ -880,3 +880,67 @@ input[type="checkbox"][required]:not(:checked),input[type="radio"][required]:not
   #configPage .terminal-section-content .sheet-hint,
   #configPage .tap-card-body .sheet-hint{padding:8px 12px 10px!important}
 }
+
+
+/* Tablas de configuración: integración real con el bloque, sin cuadrícula de celdas encajonadas. */
+#configPage .terminal-section-content .sheet-table,
+#configPage .tap-card-body .sheet-table{
+  width:100%!important;
+  min-width:100%;
+  border:0!important;
+  border-collapse:separate!important;
+  border-spacing:0!important;
+  table-layout:auto;
+}
+#configPage .terminal-section-content .sheet-table th,
+#configPage .tap-card-body .sheet-table th{
+  height:42px;
+  padding:10px 14px!important;
+  border:0!important;
+  border-bottom:1px solid var(--ui-line)!important;
+  background:#f3f6f8!important;
+  color:#5d7184!important;
+  text-align:left;
+  white-space:nowrap;
+}
+#configPage .terminal-section-content .sheet-table td,
+#configPage .tap-card-body .sheet-table td{
+  height:46px;
+  padding:5px 12px!important;
+  border:0!important;
+  border-bottom:1px solid var(--ui-line)!important;
+  background:var(--ui-surface)!important;
+}
+#configPage .terminal-section-content .sheet-table tbody tr:last-child td,
+#configPage .tap-card-body .sheet-table tbody tr:last-child td{
+  border-bottom:0!important;
+}
+#configPage .terminal-section-content .sheet-table th:first-child,
+#configPage .terminal-section-content .sheet-table td:first-child,
+#configPage .tap-card-body .sheet-table th:first-child,
+#configPage .tap-card-body .sheet-table td:first-child{
+  width:52px;
+  text-align:center!important;
+  color:var(--ui-muted)!important;
+}
+#configPage .terminal-section-content .sheet-table th:last-child,
+#configPage .terminal-section-content .sheet-table td:last-child,
+#configPage .tap-card-body .sheet-table th:last-child,
+#configPage .tap-card-body .sheet-table td:last-child{
+  width:58px;
+  text-align:center!important;
+}
+#configPage .terminal-section-content .sheet-table .sheet-cell,
+#configPage .tap-card-body .sheet-table .sheet-cell{
+  width:100%;
+  min-height:34px;
+  border:1px solid transparent!important;
+  border-radius:4px!important;
+  background:transparent!important;
+}
+#configPage .terminal-section-content .sheet-table .sheet-cell:focus,
+#configPage .tap-card-body .sheet-table .sheet-cell:focus{
+  border-color:var(--ui-accent)!important;
+  background:#fff!important;
+  box-shadow:0 0 0 2px rgba(40,121,181,.10)!important;
+}
