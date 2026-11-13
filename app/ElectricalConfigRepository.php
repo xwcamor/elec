@@ -192,14 +192,31 @@ class ElectricalConfigRepository
                 throw new InvalidArgumentException('El conmutador '.($cIndex + 1).' debe estar asociado a un bobinado válido.');
             }
             $positions = [];
-            foreach (($changer['positions'] ?? []) as $position) {
+            foreach (($changer['positions'] ?? []) as $positionIndex => $position) {
                 if (!is_array($position)) continue;
                 $rawPosition = trim((string)($position['position_no'] ?? ''));
-                if ($rawPosition === '') continue;
+                if ($rawPosition === '') throw new InvalidArgumentException('Falta el número de posición TAP en la fila '.($positionIndex + 1).' de '.($changer['name'] ?? 'el conmutador').'.');
                 if (!ctype_digit($rawPosition) || strlen($rawPosition)>3 || (int)$rawPosition < 1 || (int)$rawPosition > 150) throw new InvalidArgumentException('Las posiciones de TAP deben ser enteros entre 1 y 150.');
                 $positionNo = (int)$rawPosition;
                 if (isset($positions[$positionNo])) throw new InvalidArgumentException('La posición '.$positionNo.' está duplicada en '.($changer['name'] ?? 'el conmutador').'.');
                 $positions[$positionNo] = true;
+            }
+            $optionalPositionMeta = [];
+            foreach (['min_position'=>'mínima','max_position'=>'máxima','neutral_position'=>'neutra','current_position'=>'actual'] as $field=>$label) {
+                $raw = trim((string)($changer[$field] ?? ''));
+                if ($raw === '') {$optionalPositionMeta[$field]=null;continue;}
+                if (!ctype_digit($raw) || strlen($raw)>3 || (int)$raw<1 || (int)$raw>150) {
+                    throw new InvalidArgumentException('La posición '.$label.' de '.($changer['name'] ?? 'el conmutador').' debe ser un entero entre 1 y 150.');
+                }
+                $optionalPositionMeta[$field]=(int)$raw;
+            }
+            $min=$optionalPositionMeta['min_position'];$max=$optionalPositionMeta['max_position'];
+            if ($min!==null && $max!==null && $min>$max) throw new InvalidArgumentException('La posición mínima de '.($changer['name'] ?? 'el conmutador').' no puede superar la posición máxima.');
+            foreach (['neutral_position'=>'neutra','current_position'=>'actual'] as $field=>$label) {
+                $value=$optionalPositionMeta[$field];
+                if ($value!==null && $min!==null && $max!==null && ($value<$min || $value>$max)) {
+                    throw new InvalidArgumentException('La posición '.$label.' de '.($changer['name'] ?? 'el conmutador').' debe estar dentro del rango mínimo y máximo.');
+                }
             }
         }
 
