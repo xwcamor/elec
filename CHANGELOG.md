@@ -1,3 +1,11 @@
+## v1.5.153
+- Refina los estados de validación: datos pendientes se muestran en ámbar; el rojo se reserva para campos que el usuario intentó corregir y que siguen inválidos.
+- Configuración: enfoca el botón «+ Fila» si falta un borne, valida longitud máxima 20 y detecta filas TAP vacías.
+- Configuración: alinea coma decimal para tensión y frecuencia entre navegador y PHP; valida metadatos min/max/neutral/actual TAP con enteros 1–150 y rangos coherentes.
+- Pruebas: exige TAP TTR también en servidor; valida campos numéricos calculados/opcionales solo cuando contienen un valor.
+- Añade `tests/check-validation-contract.py` y lo ejecuta en CI para detectar divergencias en campos obligatorios, numéricos, límites TAP y estado de jornada.
+- Mejora la legibilidad de leyendas de steps en móvil.
+
 
 ## v1.5.152
 - Crea `assets/design-system.css` como fuente compartida de tokens y componentes; retira los overrides acumulados v1.5.148–151 de `app.css`.
