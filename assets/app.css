@@ -2036,3 +2036,16 @@ body.config-focus .config-toolbar{position:static!important;top:auto!important;z
   text-align:center!important;
   text-align-last:center;
 }
+
+
+/* Equipo y referencia: sección plana con la misma jerarquía que Mediciones del ensayo. */
+.plan-test-meta-card{margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;overflow:visible!important}
+.plan-test-meta-card-head{display:none!important}
+.plan-test-meta-section{margin:0 0 12px!important;padding:0!important;border:0!important;background:transparent!important}
+.plan-test-meta-section .plan-meta-toolbar{padding:0 0 8px!important;margin:0!important}
+.plan-test-meta-section .plan-meta-toolbar b{font-size:11px!important;color:#334a61!important}
+.plan-test-meta-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 14px;padding:0 0 12px!important;border:0!important}
+.plan-test-meta-grid label{font-size:10px!important;color:#526579!important;font-weight:650}
+.plan-test-meta-grid input,.plan-test-meta-grid select{height:36px!important;font-size:11px!important}
+@media(max-width:900px){.plan-test-meta-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.plan-test-meta-grid{grid-template-columns:1fr;gap:9px}}
