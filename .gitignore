@@ -1,0 +1,35 @@
+# Secretos y configuración local
+.env
+.env.*
+!.env.example
+
+# Dependencias instaladas
+/vendor/
+/node_modules/
+
+# Cachés, sesiones y logs
+/storage/
+/cache/
+/tmp/
+*.log
+*.tmp
+*.cache
+
+# Archivos generados por herramientas
+.phpunit.cache/
+.phpunit.result.cache
+coverage/
+public/hot
+public/build/
+
+# Entornos de desarrollo
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos temporales de editores
+*.swp
+*.swo
+*~
