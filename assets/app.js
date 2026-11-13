@@ -239,8 +239,8 @@
     const complete=tapData&&state.tap_changers.every(c=>{
       const positions=Array.isArray(c.positions)?c.positions:[];
       const numbers=positions.map(p=>Number(p.position_no));
-      return !!state.windings[c.winding_index]&&positions.length>0&&
-        positions.every(p=>String(p.position_no??'').trim()!==''&&Number.isInteger(Number(p.position_no))&&Number(p.position_no)>0&&Number(p.position_no)<=150)&&
+      return !!state.windings[c.winding_index]&&positions.length>0&&positions.length<=150&&
+        positions.every(p=>/^\d{1,3}$/.test(String(p.position_no??'').trim())&&Number(p.position_no)>0&&Number(p.position_no)<=150)&&
         new Set(numbers).size===numbers.length;
     })&&issues.length===0;
     const expected=String(transformer.tap_type||'').trim()!==''||Number(transformer.num_taps||0)>0;
@@ -642,30 +642,37 @@
       terminals.forEach((t,ti)=>{
         const terminal=(t.code||'').trim().toUpperCase();
         if(!terminal){errors.push(`Completa el nombre del borne en la fila ${ti+1} de ${windingName}.`);return;}
-        if(terminal.length>20)errors.push(`El código del borne en la fila ${ti+1} de ${windingName} supera el máximo de 20 caracteres.`);
+        if(Array.from(terminal).length>20)errors.push(`El código del borne en la fila ${ti+1} de ${windingName} supera el máximo de 20 caracteres.`);
         if(terminalCodes.has(terminal))errors.push(`El borne ${terminal} está repetido en ${windingName}.`);else terminalCodes.add(terminal);
       });
     });
     state.tap_changers.forEach((c,ci)=>{
       const changerName=c.name||'el conmutador '+(ci+1);
       if(!state.windings[c.winding_index])errors.push(`El conmutador ${ci+1} debe estar asociado a un bobinado.`);
+      const positions=Array.isArray(c.positions)?c.positions:[];
+      if(!Array.isArray(c.positions))errors.push(\`El conmutador \${changerName} no contiene una lista válida de posiciones TAP.\`);
+      if(positions.length===0)errors.push(\`Agrega al menos una posición TAP a \${changerName}.\`);
+      if(positions.length>150)errors.push(\`El conmutador \${changerName} supera el máximo de 150 posiciones TAP.\`);
       const seen=new Set();
-      if(!Array.isArray(c.positions)||c.positions.length===0)errors.push(`Agrega al menos una posición TAP a ${changerName}.`);
-      c.positions.forEach((p,pi)=>{
+      positions.forEach((p,pi)=>{
         const raw=String(p.position_no??'').trim();
         if(raw===''){
-          errors.push(`Falta el número de posición TAP en la fila ${pi+1} de ${changerName}.`);
+          errors.push(\`Falta el número de posición TAP en la fila \${pi+1} de \${changerName}.\`);
+          return;
+        }
+        if(!/^\d{1,3}$/.test(raw)){
+          errors.push(\`La posición TAP de la fila \${pi+1} en \${changerName} debe ser un entero entre 1 y 150.\`);
           return;
         }
         const n=Number(raw);
-        if(!Number.isInteger(n)||n<1||n>150)errors.push(`La posición TAP de la fila ${pi+1} en ${changerName} debe ser un entero entre 1 y 150.`);
-        else if(seen.has(n))errors.push(`La posición ${n} está duplicada en ${changerName}.`);else seen.add(n);
+        if(n<1||n>150)errors.push(\`La posición TAP de la fila \${pi+1} en \${changerName} debe ser un entero entre 1 y 150.\`);
+        else if(seen.has(n))errors.push(\`La posición \${n} está duplicada en \${changerName}.\`);else seen.add(n);
       });
       const optionalPositions=['min_position','max_position','neutral_position','current_position'];
       optionalPositions.forEach(key=>{
         const raw=String(c[key]??'').trim();if(raw==='')return;
         const value=Number(raw);
-        if(!Number.isInteger(value)||value<1||value>150)errors.push(`${key==='min_position'?'La posición mínima':key==='max_position'?'La posición máxima':key==='neutral_position'?'La posición neutra':'La posición actual'} de ${changerName} debe ser un entero entre 1 y 150.`);
+        if(!/^\d{1,3}$/.test(raw)||!Number.isInteger(value)||value<1||value>150)errors.push(\`\${key==='min_position'?'La posición mínima':key==='max_position'?'La posición máxima':key==='neutral_position'?'La posición neutra':'La posición actual'} de \${changerName} debe ser un entero entre 1 y 150.\`);
       });
       const min=String(c.min_position??'').trim()===''?null:Number(c.min_position);
       const max=String(c.max_position??'').trim()===''?null:Number(c.max_position);
