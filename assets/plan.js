@@ -604,7 +604,7 @@
     if(bridge.demo()){toast('El historial no está disponible en modo demostración.',true);return;}
     try{
       const res=await fetch(api('action=test-get&key='+encodeURIComponent(transformer().key)+'&id='+id)),data=await json(res),x=data.item;
-      clear();editingId=Number(x.id||id);editingStatus=String(x.status||'BORRADOR').toUpperCase();sessionId=x.plan?.session_id||null;
+      clear();editingId=Number(x.id||id);editingStatus=String(x.status||'BORRADOR').toUpperCase()==='COMPLETADA'?'EN_PROCESO':String(x.status||'BORRADOR').toUpperCase();sessionId=x.plan?.session_id||null;
       $('#planDate').value=String(x.executed_at||'').replace(' ','T').slice(0,16);
       $('#planOperator').value=x.operator_name||'';$('#planSupervisor').value=x.supervisor_name||'';
       $('#planOilTemp').value=x.oil_temperature_c??'';$('#planAmbientTemp').value=x.ambient_temperature_c??'';
@@ -705,6 +705,7 @@
         const data=await json(response);
         if(!data.result?.id)throw new Error('El servidor no confirmó el ID del registro guardado.');
         editingId=Number(data.result.id);
+        editingStatus=String(payload.status||'BORRADOR').toUpperCase();
         savedRevision=revisionAtStart;
         $('#planTitle').textContent='Registro de pruebas #'+editingId;
         if(startRequested){setSaveStatus('Registro creado · autoguardado activo','saved');toast('Registro #'+editingId+' creado. El autoguardado está activo.');}
