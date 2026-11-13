@@ -90,7 +90,7 @@
     if(statuses.some(s=>s==='OBSERVADO'))return 'Se encontraron valores observados';
     return 'Pendiente de completar las seis mediciones del ensayo.';
   }
-  function observationSummary(item){return (item.rows||[]).some(row=>Object.keys(row||{}).some(key=>String(row[key]??'').trim().toUpperCase()==='OBSERVADO')?'Se encontraron valores observados':'Todos los valores conforme';}
+  function observationSummary(item){return (item.rows||[]).some(row=>Object.keys(row||{}).some(key=>String(row[key]??'').trim().toUpperCase()==='OBSERVADO'))?'Se encontraron valores observados':'Todos los valores conforme';}
   const capacitanceUnits={pF:1e3,nF:1,µF:1e-3,mF:1e-6,F:1e-9};
   function capacitanceDisplay(value,unit){const n=number(value);return n===null?'':(n*(capacitanceUnits[unit]||1)).toFixed(6);}
   function refreshPowerFactorLive(card,item){
