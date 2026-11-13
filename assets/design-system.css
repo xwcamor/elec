@@ -602,12 +602,17 @@ input,select,textarea{accent-color:var(--ui-accent)}
   border-color:var(--ui-line)!important;
   border-radius:6px!important;
 }
-.is-missing,.is-required-missing,[aria-invalid="true"]{
+.is-missing,.is-required-missing{
+  border-color:#e8d4a8!important;
+  background:#fffaf0!important;
+  box-shadow:none!important;
+}
+[aria-invalid="true"]{
   border-color:#d99a94!important;
   background:#fff8f7!important;
   box-shadow:inset 0 0 0 1px rgba(185,74,72,.08)!important;
 }
-.is-missing:focus,.is-required-missing:focus,[aria-invalid="true"]:focus{
+[aria-invalid="true"]:focus{
   border-color:var(--ui-danger)!important;
   box-shadow:0 0 0 3px rgba(185,74,72,.10)!important;
 }
