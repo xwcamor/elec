@@ -232,13 +232,13 @@ class ElectricalTestRepository
             'TTR' => ['TTR', ['tap','at','bt','U','V','W','status'], ['at','bt','U','V','W']],
             'POWER_FACTOR' => ['PF', ['measurement','test_voltage','power_factor_measured','power_factor_corrected_20c','capacitance_source_f','status'], ['test_voltage','power_factor_measured','power_factor_corrected_20c','capacitance_source_f']],
             'EXCITATION' => ['EXC', ['tap','test_voltage_kv','frequency_hz','current_u_ma','losses_u_w','current_v_ma','losses_v_w','current_w_ma','losses_w_w','evaluation'], ['test_voltage_kv','frequency_hz','current_u_ma','losses_u_w','current_v_ma','losses_v_w','current_w_ma','losses_w_w']],
-            'WINDING_RESISTANCE' => ['WR', ['section','tap','phase','test_current_a','temperature_c','resistance_measured','resistance_referred_75c'], ['test_current_a','temperature_c','resistance_measured','resistance_referred_75c']],
-            'INSULATION_RESISTANCE' => ['IR', ['point','applied_voltage_kv','reading_15s','reading_30s','reading_45s','reading_1min'], ['applied_voltage_kv','reading_15s','reading_30s','reading_45s','reading_1min']],
-            'BUSHING' => ['BUSH', ['terminal','serial','test_voltage','power_factor_plate','power_factor_measured','capacitance_plate','capacitance_measured','variation_percent'], ['test_voltage','power_factor_plate','power_factor_measured','capacitance_plate','capacitance_measured','variation_percent']],
+            'WINDING_RESISTANCE' => ['WR', ['section','tap','phase','test_current_a','temperature_c','resistance_measured','resistance_referred_75c','status'], ['test_current_a','temperature_c','resistance_measured','resistance_referred_75c']],
+            'INSULATION_RESISTANCE' => ['IR', ['point','applied_voltage_kv','reading_15s','reading_30s','reading_45s','reading_1min','status'], ['applied_voltage_kv','reading_15s','reading_30s','reading_45s','reading_1min']],
+            'BUSHING' => ['BUSH', ['terminal','serial','test_voltage','power_factor_plate','power_factor_measured','capacitance_plate','capacitance_measured','variation_percent','status'], ['test_voltage','power_factor_plate','power_factor_measured','capacitance_plate','capacitance_measured','variation_percent']],
             'SFRA' => ['SFRA', ['connection','tap','comparison_result','result'], []],
-            'ARRESTER' => ['ARR', ['section','phase','output_voltage','output_current','test_mode','losses_measured','capacitance_measured'], ['output_voltage','output_current','losses_measured','capacitance_measured']],
-            'PROTECTIONS' => ['PROT', ['accessory','terminals','contact','condition','result'], []],
-            'CAPACITANCE' => ['CAP', ['point','connection','test_voltage_kv','capacitance_nf'], ['test_voltage_kv','capacitance_nf']],
+            'ARRESTER' => ['ARR', ['section','phase','output_voltage','output_current','test_mode','losses_measured','capacitance_measured','status'], ['output_voltage','output_current','losses_measured','capacitance_measured']],
+            'PROTECTIONS' => ['PROT', ['accessory','terminals','contact','condition','status'], []],
+            'CAPACITANCE' => ['CAP', ['point','connection','test_voltage_kv','capacitance_nf','status'], ['test_voltage_kv','capacitance_nf']],
         ];
         $code = strtoupper((string)($test['code'] ?? ''));
         if (!isset($rules[$code])) throw new InvalidArgumentException('No existe una validación para el ensayo '.$code.'.');
