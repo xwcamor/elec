@@ -807,3 +807,76 @@ input[type="checkbox"][required]:not(:checked),input[type="radio"][required]:not
 #configPage .tap-meta :is(input,select)[required]:invalid{border-color:#e8d4a8!important;background:#fffaf0!important;color:var(--ui-ink)!important;box-shadow:inset 0 0 0 1px #e8d4a8!important}
 #planStepBack[hidden]{display:none!important}
 @media(max-width:600px){#configPage .tap-accordion-body>.tap-card-head .tap-meta{grid-template-columns:1fr}#configPage .tap-positions-card-head{align-items:flex-start;flex-direction:column}#configPage .tap-positions-card-head .sheet-tools{width:100%;justify-content:flex-end}}
+
+
+/* ESTÁNDAR OBLIGATORIO DE TABLAS: una sola envolvente, grilla integrada, sin card interior. */
+#configPage .terminal-section-content,
+#configPage .tap-card-body{
+  padding:0!important;
+  background:var(--ui-surface)!important;
+}
+#configPage .terminal-section-content .sheet-wrap,
+#configPage .tap-card-body .sheet-wrap,
+#planPage .plan-grid-wrap{
+  width:100%;
+  max-width:100%!important;
+  min-width:0;
+  border:0!important;
+  border-top:1px solid var(--ui-line)!important;
+  border-bottom:1px solid var(--ui-line)!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  background:var(--ui-surface)!important;
+  overflow-x:auto;
+  overscroll-behavior-x:contain;
+}
+#configPage .terminal-section-content .sheet-wrap,
+#configPage .tap-card-body .sheet-wrap{
+  margin:0!important;
+}
+#planPage .plan-grid-wrap{
+  margin:0 0 10px!important;
+}
+#configPage .terminal-section-content .sheet-hint,
+#configPage .tap-card-body .sheet-hint{
+  margin:0!important;
+  padding:8px 14px 10px!important;
+  color:var(--ui-muted)!important;
+  font-size:10px!important;
+  line-height:1.45!important;
+}
+#planPage .plan-table-toolbar{
+  margin:12px 0 0!important;
+  padding:0 0 8px!important;
+  border:0!important;
+  background:transparent!important;
+}
+#configPage .terminal-section-heading,
+#configPage .tap-positions-card-head{
+  border-radius:0!important;
+}
+#configPage .sheet-table,
+#planPage .measurement-sheet{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+}
+#configPage .sheet-table th,
+#configPage .sheet-table td,
+#planPage .measurement-sheet th,
+#planPage .measurement-sheet td{
+  border-right:1px solid var(--ui-line);
+  border-bottom:1px solid var(--ui-line);
+}
+#configPage .sheet-table tr>*:first-child,
+#planPage .measurement-sheet tr>*:first-child{
+  border-left:0;
+}
+#configPage .sheet-table thead tr:first-child>*,
+#planPage .measurement-sheet thead tr:first-child>*{
+  border-top:0;
+}
+@media(max-width:650px){
+  #configPage .terminal-section-content .sheet-hint,
+  #configPage .tap-card-body .sheet-hint{padding:8px 12px 10px!important}
+}
