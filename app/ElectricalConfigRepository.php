@@ -184,8 +184,8 @@ class ElectricalConfigRepository
         foreach ($changers as $cIndex => $changer) {
             if (!is_array($changer)) throw new InvalidArgumentException('Hay un conmutador con datos inválidos.');
             $changerPositions = $changer['positions'] ?? [];
-            if (!is_array($changerPositions) || count($changerPositions) > 150) {
-                throw new InvalidArgumentException('Cada conmutador admite como máximo 150 posiciones TAP.');
+            if (!is_array($changerPositions) || count($changerPositions) < 1 || count($changerPositions) > 150) {
+                throw new InvalidArgumentException('Cada conmutador debe tener entre 1 y 150 posiciones TAP.');
             }
             $windingIndex = $changer['winding_index'] ?? null;
             if (!is_numeric($windingIndex) || (int)$windingIndex < 0 || (int)$windingIndex >= count($windings)) {
