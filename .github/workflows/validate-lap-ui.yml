@@ -47,7 +47,7 @@ jobs:
           app_link = html.find("assets/app.css?v=")
           design_link = html.find("assets/design-system.css?v=")
           assert app_link >= 0 and design_link > app_link, "design-system.css debe cargarse después de app.css"
-          for required in ('assets/app.js?v=1.5.155', 'assets/electrical-tests.js?v=1.5.155', 'assets/plan.js?v=1.5.155', 'assets/app.css?v=1.5.155', 'assets/design-system.css?v=1.5.155'):
+          for required in ('assets/app.js?v=1.5.156', 'assets/electrical-tests.js?v=1.5.156', 'assets/plan.js?v=1.5.156', 'assets/app.css?v=1.5.156', 'assets/design-system.css?v=1.5.156'):
               assert required in html, f"Falta invalidación de caché para {required}"
           for required in ('id="configStepper"', 'id="planStepper"', 'class="ui-step-icon"', 'data-step-status', 'id="toast"'):
               assert required in html, f"Falta markup compartido: {required}"
