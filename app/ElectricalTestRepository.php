@@ -266,8 +266,7 @@ class ElectricalTestRepository
 
         foreach ($groups as $rowNumber => $values) {
             foreach ($required as $field) {
-                // En TTR, TAP forma parte del identificador de fila (TTR|n|campo).
-                if ($field === 'tap' && $code === 'TTR') continue;
+                // El TAP también se conserva como campo para validarlo en servidor.
                 $value = trim((string)($values[$field] ?? ''));
                 if ($value === '' || (in_array($field, ['result','evaluation','status'], true) && strtoupper($value) === 'PENDIENTE')) {
                     throw new InvalidArgumentException('El ensayo '.$code.', fila '.$rowNumber.', tiene campos obligatorios pendientes.');
