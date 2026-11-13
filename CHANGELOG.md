@@ -1,3 +1,15 @@
+
+## v1.5.152
+- Crea `assets/design-system.css` como fuente compartida de tokens y componentes; retira los overrides acumulados v1.5.148–151 de `app.css`.
+- Unifica los steppers: icono semántico, nombre breve y estado textual; sin números grandes ni checks que sustituyan al icono.
+- Normaliza encabezados, separadores, gutters, tarjetas, formularios, botones, acordeones, espaciado, estados y notificaciones.
+- Mueve «Quitar conmutador» al final del acordeón, con divisor y confirmación.
+- Configuración enfoca el primer campo relacionado con la validación; el cliente aplica el límite TAP 1–150 como el servidor.
+- Pruebas valida campos numéricos en cliente y servidor; alinea Excitación con U-0/V-0/W-0 y exige equipo completo al finalizar.
+- Una jornada EN_PROCESO requiere fecha, responsable, supervisor y al menos un ensayo; el autoguardado preserva su estado y muestra el motivo concreto si falla.
+- Añade contrato estático del design system al CI y checklist de revisión visual/funcional.
+- La interacción real y persistencia siguen pendientes de verificación manual en Laragon/MySQL.
+
 ## v1.5.151
 - Elimina las etiquetas redundantes «HISTORIAL DE REGISTROS» y «LECTURA VISUAL»; conserva los títulos descriptivos.
 - Refuerza con selector explícito el separador horizontal del encabezado principal de Pruebas eléctricas para igualarlo al de Configuración.
