@@ -64,7 +64,7 @@
       ARRESTER:{output_voltage:['output_voltage_kv','output_voltage_v'],output_current:['output_current_ma','output_current_a'],losses_measured:['losses_w','losses_measured_w'],capacitance_measured:['capacitance_pf','capacitance_measured_pf']}
     };
     Object.entries(aliases[code]||{}).forEach(([target,legacy])=>{if(!Object.prototype.hasOwnProperty.call(r,target)){const value=legacy.map(key=>r[key]).find(isFilled);if(value!==undefined)r[target]=value;}});
-    if(code==='INSULATION_RESISTANCE'){const a=number(r.reading_30s),b=number(r.reading_1min);r.absorption_index=a!==null&&a!==0&&b!==null?String(b/a):'';}
+    if(code==='INSULATION_RESISTANCE'){const a=number(r.reading_30s),b=number(r.reading_1min);r.absorption_index=a!==null&&a!==0&&b!==null?String(b/a):'';if(!isFilled(r.status))r.status='PENDIENTE';}
     if(code==='WINDING_RESISTANCE'&&!isFilled(r.status))r.status='PENDIENTE';
     if(code==='POWER_FACTOR'){
       if(!Object.prototype.hasOwnProperty.call(r,'capacitance_source_f')){const legacy=number(r.capacitance_measured??r.capacitance_nf??r.capacitance);if(legacy!==null)r.capacitance_source_f=String(legacy/1e9);}
@@ -151,7 +151,7 @@
     POWER_FACTOR:['measurement','test_voltage','power_factor_measured','power_factor_corrected_20c','capacitance_source_f','status'],
     EXCITATION:['tap','test_voltage_kv','frequency_hz','current_u_ma','losses_u_w','current_v_ma','losses_v_w','current_w_ma','losses_w_w','evaluation'],
     WINDING_RESISTANCE:['section','tap','phase','test_current_a','temperature_c','resistance_measured','resistance_referred_75c','status'],
-    INSULATION_RESISTANCE:['point','applied_voltage_kv','reading_15s','reading_30s','reading_45s','reading_1min'],
+    INSULATION_RESISTANCE:['point','applied_voltage_kv','reading_15s','reading_30s','reading_45s','reading_1min','status'],
     BUSHING:['terminal','serial','test_voltage','power_factor_plate','power_factor_measured','capacitance_plate','capacitance_measured','variation_percent','status'],
     SFRA:['connection','tap','comparison_result','result'],
     ARRESTER:['section','phase','output_voltage','output_current','test_mode','losses_measured','capacitance_measured'],
