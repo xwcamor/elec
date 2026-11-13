@@ -35,6 +35,8 @@ jobs:
           node --check assets/plan.js
       - name: Module boundaries
         run: python tests/check-module-boundaries.py
+      - name: Validation contract
+        run: python tests/check-validation-contract.py
       - name: Design system contract
         run: |
           python - <<'PY'
