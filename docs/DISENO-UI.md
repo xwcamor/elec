@@ -78,7 +78,7 @@ Usar una escala base de múltiplos de 4 px. Estos valores son tokens del product
 | Padding de tarjeta principal | 20 px |
 | Padding de tarjeta secundaria | 16 px |
 | Cabecera de tarjeta | 12–16 px |
-| Padding de formulario | 16–20 px |
+| Padding de formulario | 20 px en escritorio y 16 px en móvil |
 | Separación entre campos | 12–16 px |
 | Separación entre tarjetas | 16 px |
 | Separación entre secciones principales | 24 px |
@@ -161,7 +161,7 @@ No crear más variantes salvo que exista una necesidad de interacción clarament
 
 Los encabezados de Configuración eléctrica, la vista principal de Pruebas eléctricas y el formulario de Registro de pruebas deben mostrar siempre el mismo separador horizontal inferior.
 
-- Línea de 1 px con el token neutro `var(--ui-border)`.
+- Línea de 1 px con el token neutro `var(--ui-line)`.
 - Mismo ancho que el área de contenido.
 - 16 px entre la línea y el contenido siguiente en escritorio; 12 px en móvil.
 - Se implementa como borde inferior del encabezado compartido, no como un `hr` aislado que pueda faltar en una pantalla.
@@ -171,7 +171,7 @@ Los encabezados de Configuración eléctrica, la vista principal de Pruebas elé
 
 Los formularios de los asistentes de Configuración eléctrica y Registro de pruebas deben compartir el mismo contenedor visual y el mismo ritmo de espaciado.
 
-- Padding interior de cada panel de step: **20 px en escritorio** y **16 px en móvil**.
+- Padding interior de cada panel de step: **20 px en escritorio** y **16 px en móvil**. El token `--ui-panel-padding` define 20 px y el móvil permanece en 16 px.
 - Margen exterior de los paneles: **0**; el contenedor del wizard controla la separación.
 - Separación entre título/encabezado del panel y sus campos: **16 px**.
 - Separación entre campos: **16 px**.
@@ -250,6 +250,9 @@ La validación se aplica en dos capas coherentes: cliente para guiar al usuario 
 
 ### Configuración eléctrica
 - Las reglas del navegador deben corresponder con ElectricalConfigRepository::save().
+- Las posiciones TAP se escriben solo con dígitos ASCII (1–3 caracteres), son enteras, únicas y están entre 1 y 150; cada conmutador debe tener al menos una posición.
+- Las posiciones opcionales mínima, máxima, neutra y actual siguen el mismo formato entero que el detalle TAP.
+- Los códigos de bornes admiten hasta 20 caracteres; el servidor rechaza filas con estructura inválida en lugar de ignorarlas.
 - Nombre, código y tensión de bobinado; códigos de bornes únicos y al menos un borne por bobinado; asociación de conmutadores válida; posiciones TAP enteras, únicas y dentro del límite de 1 a 150.
 - La tensión y la frecuencia aceptan coma decimal de forma equivalente en cliente y servidor. Los códigos de borne tienen un máximo de 20 caracteres.
 - Los campos de posición mínima, máxima, neutra y actual son opcionales; si se informan, deben ser enteros entre 1 y 150. La mínima no puede superar a la máxima y la neutra/actual, cuando hay ambos límites, debe quedar dentro del rango.
