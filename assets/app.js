@@ -652,7 +652,7 @@
   function focusConfigurationIssue(message){
     if(!message)return;
     let target=null;
-    const windingIndexMatch=message.match(/bobinado (\\d+)/i);
+    const windingIndexMatch=message.match(/bobinado (\d+)/i);
     let windingIndex=windingIndexMatch?Number(windingIndexMatch[1])-1:-1;
     if(windingIndex<0){
       windingIndex=state.windings.findIndex(w=>w.name&&message.toLocaleLowerCase().includes(String(w.name).toLocaleLowerCase()));
@@ -663,7 +663,7 @@
       target=document.querySelector('[data-winding="'+windingIndex+'"] [data-wfield="voltage_kv"]');
     }
     if(!target&&/borne.*fila/i.test(message)){
-      const rowMatch=message.match(/fila (\\d+)/i);
+      const rowMatch=message.match(/fila (\d+)/i);
       if(rowMatch&&windingIndex>=0)target=document.querySelector('#terminal-grid-'+windingIndex+' .sheet-cell[data-row="'+(Number(rowMatch[1])-1)+'"][data-col="0"]');
     }
     if(!target&&/borne .*repetido/i.test(message)){
@@ -676,13 +676,13 @@
     if(!target&&/conmutador/i.test(message)){
       let changerIndex=state.tap_changers.findIndex(c=>c.name&&message.toLocaleLowerCase().includes(String(c.name).toLocaleLowerCase()));
       if(changerIndex<0){
-        const match=message.match(/conmutador (\\d+)/i);
+        const match=message.match(/conmutador (\d+)/i);
         if(match)changerIndex=Number(match[1])-1;
       }
       if(changerIndex>=0){
         target=document.querySelector('[data-changer="'+changerIndex+'"] [data-cfield="winding_index"]');
         if(!target&&/posición/i.test(message)){
-          const pos=message.match(/posición (\\d+)/i),grid=document.querySelector('#tap-grid-'+changerIndex);
+          const pos=message.match(/posición (\d+)/i),grid=document.querySelector('#tap-grid-'+changerIndex);
           if(grid&&pos){const cells=[...grid.querySelectorAll('.sheet-cell[data-col="0"]')];target=cells.find(cell=>String(cell.value||'').trim()===pos[1])||cells[0]||null;}
         }
       }
