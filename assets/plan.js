@@ -251,7 +251,7 @@
       const valid=requiredValueFilled(field,input.value,item.code);
       input.classList.toggle('is-filled',valid);
       input.classList.toggle('is-missing',required&&!valid);
-      if(required)input.setAttribute('aria-invalid',valid?'false':'true');else input.removeAttribute('aria-invalid');
+      if(valid){input.removeAttribute('aria-invalid');delete input.dataset.validationAttempted;}else if(input.dataset.validationAttempted!=='true'){input.removeAttribute('aria-invalid');}
       if(input.classList.contains('plan-result-select'))input.dataset.state=String(input.value||'PENDIENTE').toLowerCase();
       if(field==='result'){
         const state=String(input.value||'').trim().toUpperCase();
@@ -266,7 +266,7 @@
       input.classList.toggle('is-missing',!isFilled(input.value));
       input.closest('label')?.classList.toggle('meta-complete',isFilled(input.value));
       input.closest('label')?.classList.toggle('meta-pending',!isFilled(input.value));
-      input.setAttribute('aria-invalid',isFilled(input.value)?'false':'true');
+      if(isFilled(input.value)){input.removeAttribute('aria-invalid');delete input.dataset.validationAttempted;}else if(input.dataset.validationAttempted!=='true'){input.removeAttribute('aria-invalid');}
     });
     card.querySelectorAll('tbody tr[data-row-state]').forEach((tr,index)=>{tr.dataset.rowState=metrics.rowStates[index]?.state||'empty';});
     const progress=card.querySelector('[data-card-progress]');
@@ -313,7 +313,7 @@
   }
   function renderPlanFeedback(){
     const m=planMetrics();
-    ['planDate','planOperator','planSupervisor'].forEach(id=>{const field=$('#'+id);if(!field)return;const missing=!isFilled(field.value);field.classList.toggle('is-missing',missing);field.setAttribute('aria-invalid',missing?'true':'false');field.closest('label')?.classList.toggle('meta-pending',missing);field.closest('label')?.classList.toggle('meta-complete',!missing);});
+    ['planDate','planOperator','planSupervisor'].forEach(id=>{const field=$('#'+id);if(!field)return;const missing=!isFilled(field.value);field.classList.toggle('is-missing',missing);if(!missing){field.removeAttribute('aria-invalid');delete field.dataset.validationAttempted;}else if(field.dataset.validationAttempted!=='true'){field.removeAttribute('aria-invalid');}field.closest('label')?.classList.toggle('meta-pending',missing);field.closest('label')?.classList.toggle('meta-complete',!missing);});
     updatePlanStepper(m);
     const next=$('#planStepNext');
     if(next){
@@ -354,15 +354,16 @@
       }
     }
     if(card)card.scrollIntoView({behavior:'smooth',block:'center'});
-    if(target){target.setAttribute('aria-invalid','true');target.focus({preventScroll:true});}
+    if(target){target.dataset.validationAttempted='true';target.setAttribute('aria-invalid','true');target.focus({preventScroll:true});}
   }
 
   function validatePlanStep(step){
     if(step==='shared'){
       const missing=generalMissing();
       if(missing.length){
-        const ids={ 'fecha de la prueba':'planDate', 'responsable / técnico':'planOperator', 'supervisor':'planSupervisor' };
-        $('#'+(ids[missing[0]]||'planDate'))?.focus();
+        const ids={ 'fecha de realización':'planDate', 'responsable / técnico':'planOperator', 'supervisor':'planSupervisor' };
+        const field=$('#'+(ids[missing[0]]||'planDate'));
+        if(field){field.dataset.validationAttempted='true';field.setAttribute('aria-invalid','true');field.focus();}
         toast('Completa los datos obligatorios: '+missing.join(', ')+'.',true);
         return false;
       }
