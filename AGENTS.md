@@ -8,6 +8,6 @@ Antes de finalizar, verifica los flujos afectados y resume las pruebas realizada
 
 ## Estándar visual obligatorio de ELEC
 
-Antes de cualquier cambio de interfaz, lee y aplica `docs/DISENO-UI.md` además de la skill indicada arriba. Ese documento define los tokens, jerarquía tipográfica, espaciado, componentes compartidos, steps, acordeones, acciones destructivas y metodología de trabajo. No improvises estilos por pantalla ni agregues parches CSS acumulativos.
+Antes de cualquier cambio de interfaz, lee y aplica `docs/DISENO-UI.md` además de la skill indicada arriba. Ese documento define los tokens, jerarquía tipográfica, espaciado, componentes compartidos, steps por iconos/etiquetas/estado, validaciones, mensajes de error, acordeones y acciones destructivas. Implementa los patrones comunes en assets/design-system.css, que se carga después de assets/app.css. No improvises estilos por pantalla ni agregues parches CSS acumulativos.
 
 Trabaja directamente sobre `main`. No crees ramas ni Pull Requests salvo instrucción expresa del usuario.
