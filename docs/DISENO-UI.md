@@ -26,7 +26,7 @@ Usar variables CSS centralizadas. Los valores pueden evolucionar mediante una de
 | `--ui-ink` | `#263B50` | Títulos y texto principal |
 | `--ui-muted` | `#718398` | Texto secundario y ayuda |
 | `--ui-accent` | `#2879B5` | Acción principal, foco y selección |
-| `--ui-border` | `#DFE6ED` | Bordes y separadores |
+| `--ui-line` | `#DCE4EB` | Bordes y separadores (token real del proyecto) |
 | `--ui-surface` | `#FFFFFF` | Tarjetas y superficies |
 | `--ui-subtle` | `#F7F9FB` | Fondos secundarios |
 | `--ui-success` | `#43845F` | Estado correcto/completado |
@@ -129,7 +129,7 @@ Sí se estandarizan. El separador es un elemento de jerarquía y agrupación, no
 ### Estilo base
 
 - Línea de 1 px.
-- Color neutro suave: `var(--ui-border)` (sin azul ni gris oscuro).
+- Color neutro suave: `var(--ui-line)` (sin azul ni gris oscuro).
 - Sin sombra, degradado ni radio.
 - Espaciado vertical controlado por el contexto, no por márgenes predeterminados del navegador.
 - Implementar mediante una clase reutilizable (`.ui-divider`) o el borde del componente contenedor; evitar estilos distintos para cada `hr`.
@@ -182,23 +182,25 @@ Los formularios de los asistentes de Configuración eléctrica y Registro de pru
 
 La implementación debe reutilizar `--ui-step-panel-padding`, `--ui-step-panel-padding-mobile` y `--ui-step-panel-content-gap`. Si se cambia un valor, ambos módulos deben actualizarse juntos.
 
-## 6. Steps: números y checks
+## 6. Steps: icono, nombre y estado
 
-Usar el mismo patrón en todos los flujos secuenciales:
+Usar el mismo patrón en todos los flujos secuenciales: **icono semántico, nombre breve y estado debajo**. No usar números grandes ni sustituir el icono por un check al completar.
 
-- **Pendiente:** número del paso en círculo neutro.
-- **Activo:** número del paso con fondo de acento y foco visual claro.
-- **Completado:** check dentro de círculo verde suave.
-- **Incompleto / requiere corrección:** indicador ámbar acompañado de texto.
-- **Bloqueado:** apariencia neutra y explicación accesible.
+- **Activo:** icono en círculo de acento, nombre oscuro y foco accesible.
+- **Completado:** conservar el icono propio de la etapa; círculo verde suave y texto «Completo».
+- **En curso / requiere corrección:** círculo ámbar y estado textual «En curso» o «Revisar datos».
+- **Pendiente:** círculo neutro y estado «Pendiente».
+- **No aplica:** estado neutro y explicación breve, sin marcarlo como error.
 
 Reglas:
-- No mostrar un check en pasos que solo fueron visitados; solo cuando sus validaciones estén completas.
-- El estado activo tiene prioridad visual sobre pendiente.
+- El icono identifica la función de la etapa; el color y el texto identifican su estado.
+- Debajo del icono debe aparecer un nombre corto y comprensible; debajo, una leyenda breve de estado.
+- Configuración eléctrica usa «Bobinados y bornes», «Conmutadores y TAP» y «Revisión y versiones».
+- Registro de pruebas usa «Datos generales», «Ensayos», «Resultados» y «Revisión».
+- El mismo componente y las mismas dimensiones se usan en ambos asistentes; cambia únicamente el número de etapas y su contenido.
 - No permitir avanzar si el paso actual o sus predecesores obligatorios no validan.
-- El texto del paso debe explicar qué contiene y, cuando sea útil, mostrar su estado.
-- Los conectores entre pasos reflejan progreso completado.
-- No depender exclusivamente del color: usar número, check, icono y/o texto.
+- Los conectores reflejan únicamente las etapas completadas.
+- No depender exclusivamente del color: conservar icono, nombre, estado textual, aria-label y aria-current.
 
 ## 7. Formularios y tarjetas
 
@@ -241,15 +243,49 @@ La acción debe permanecer visible al final del contenido incluso cuando la secc
 - Antes de proponer sticky, demostrar que resuelve un problema de navegación real, comprobar que no tapa contenido y solicitar aprobación si cambia el comportamiento acordado.
 - Evitar barras translúcidas con blur si no aportan una ventaja clara.
 
-## 10. CSS y arquitectura de estilos
+## 10. Validación, mensajes y lógica de formularios
 
-Organización objetivo:
+La validación se aplica en dos capas coherentes: cliente para guiar al usuario y servidor como autoridad final.
 
-- `assets/design-tokens.css`: variables de color, tipografía, espaciado, radios, sombras y alturas.
-- `assets/components.css`: estilos compartidos de botones, campos, tarjetas, tablas, acordeones, steps, estados y alertas.
-- `assets/app.css`: composición y estilos específicos de páginas/módulos.
+### Configuración eléctrica
+- Las reglas del navegador deben corresponder con ElectricalConfigRepository::save().
+- Nombre, código y tensión de bobinado; códigos de bornes únicos y al menos un borne por bobinado; asociación de conmutadores válida; posiciones TAP enteras, únicas y dentro del límite de 1 a 150.
+- Las reglas técnicas que no estén definidas por el protocolo no deben convertirse en umbrales inventados.
+- Al bloquear un paso o guardar, mostrar un mensaje que nombre el dato pendiente, abrir el panel correspondiente y llevar el foco al primer campo que requiere corrección.
 
-Si la estructura actual todavía no está dividida en esos archivos, hacer la transición gradualmente. No duplicar reglas ni mover todo en una tarea pequeña sin necesidad.
+### Pruebas eléctricas
+- requiredByTest y numericByTest en el cliente deben mantenerse sincronizados con validateCompletedPlanTest() en PHP.
+- Los campos numéricos deben aceptar coma decimal y validar como número finito; los campos calculados conservan su fórmula actual y son de solo lectura.
+- Los equipos (nombre, marca, modelo y serie) son obligatorios para completar cada ensayo y deben estar señalados visualmente como tales.
+- Excitación valida los campos reales de su formulario por TAP y por fase (U-0, V-0 y W-0); el servidor no debe usar nombres de campos heredados que ya no existen en la interfaz.
+- Una jornada EN_PROCESO requiere fecha, responsable, supervisor y al menos un ensayo. El autoguardado no puede degradar silenciosamente una jornada iniciada a BORRADOR.
+- Completar exige que todos los ensayos tengan sus campos obligatorios, valores numéricos válidos y resultados distintos de PENDIENTE.
+
+### Presentación y recuperación del error
+- El campo inválido debe recibir aria-invalid="true", estilo de error, foco y desplazamiento visible.
+- Los mensajes deben indicar qué falta o qué valor es inválido y qué acción lo corrige; evitar mensajes genéricos como «revisa la conexión» cuando el servidor devuelve una validación concreta.
+- Los avisos compartidos usan el mismo toast con variantes semánticas (éxito, advertencia y error) y estados de guardado accesibles por aria-live.
+- Una validación bloqueada no debe borrar valores válidos ni crear registros adicionales.
+
+### Regla de paridad
+Al agregar, renombrar o hacer obligatorio un campo técnico, actualizar en el mismo cambio:
+1. renderizado y marca de obligatorio;
+2. validación de cliente y resumen del paso;
+3. serialización de mediciones;
+4. validación del repositorio PHP;
+5. checklist manual de cierre.
+
+## 11. CSS y arquitectura de estilos
+
+Organización actual y responsabilidades:
+
+- `assets/design-system.css`: fuente de verdad para tokens, encabezados, steps, tarjetas, formularios, botones, acordeones, separadores, estados y mensajes compartidos. Se carga después de `app.css`.
+- `assets/app.css`: reglas heredadas y composición específica de módulos. No añadir aquí nuevos estilos que deban compartirse entre Configuración y Pruebas.
+- `assets/app.js`: estado y comportamiento exclusivo de Configuración eléctrica; comunica su progreso al stepper y expone el bridge.
+- `assets/electrical-tests.js`: catálogo, historial y formularios de pruebas.
+- `assets/plan.js`: asistente por etapas del registro de pruebas.
+
+No crear archivos de tokens/componentes paralelos que dupliquen `design-system.css`. Los componentes compartidos se corrigen allí; los estilos exclusivos de un módulo se mantienen locales y no deben contradecir el estándar.
 
 Reglas CSS:
 - Preferir clases de componente y tokens; evitar selectores excesivamente específicos.
@@ -259,7 +295,7 @@ Reglas CSS:
 - Eliminar reglas obsoletas cuando se sustituya un patrón.
 - No añadir dependencias, fuentes remotas ni recursos externos para resolver detalles cosméticos.
 
-## 11. Metodología obligatoria para cada cambio de interfaz
+## 12. Metodología obligatoria para cada cambio de interfaz
 
 1. **Inspeccionar:** leer `AGENTS.md`, esta guía y la skill de design engineering. Revisar HTML/PHP, CSS y JS afectados.
 2. **Inventariar:** identificar componentes compartidos, estados, responsive y dependencias; comprobar si el mismo componente aparece en otros módulos.
@@ -271,7 +307,7 @@ Reglas CSS:
 8. **Comprobar regresiones:** verificar navegación, guardado, autoguardado, validaciones, edición, eliminación y datos existentes cuando la pantalla afectada los utilice.
 9. **Informar:** indicar archivos cambiados, comportamiento preservado, pruebas ejecutadas y pruebas que no pudieron ejecutarse. No afirmar que se probó en Laragon si no se hizo.
 
-## 12. Criterios de aceptación visual
+## 13. Criterios de aceptación visual
 
 Una tarea de diseño no se considera terminada hasta que:
 
@@ -279,13 +315,13 @@ Una tarea de diseño no se considera terminada hasta que:
 - Títulos, etiquetas y ayudas tienen jerarquía clara y colores sobrios.
 - Tarjetas del mismo nivel comparten padding, borde y radio.
 - Formularios tienen campos alineados, unidades visibles y errores comprensibles.
-- Steps muestran correctamente número, activo, check, incompleto y bloqueado.
+- Steps muestran icono semántico, nombre, estado activo/completo/en curso/pendiente y conectores coherentes.
 - Acciones destructivas están al final del acordeón, separadas y confirmadas.
 - No hay sticky no solicitado, scroll horizontal accidental ni controles cortados.
 - Focus visible, navegación por teclado y `prefers-reduced-motion` funcionan.
 - No se introducen errores de consola ni regresiones funcionales conocidas.
 
-## 13. Regla de trabajo del repositorio
+## 14. Regla de trabajo del repositorio
 
 - Trabajar directamente sobre `main`.
 - No crear ramas ni Pull Requests salvo instrucción expresa del usuario.
