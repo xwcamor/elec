@@ -661,18 +661,18 @@
           return;
         }
         if(!/^\d{1,3}$/.test(raw)){
-          errors.push(\`La posición TAP de la fila \${pi+1} en \${changerName} debe ser un entero entre 1 y 150.\`);
+          errors.push(`La posición TAP de la fila ${pi+1} en ${changerName} debe ser un entero entre 1 y 150.`);
           return;
         }
         const n=Number(raw);
         if(n<1||n>150)errors.push(\`La posición TAP de la fila \${pi+1} en \${changerName} debe ser un entero entre 1 y 150.\`);
-        else if(seen.has(n))errors.push(\`La posición \${n} está duplicada en \${changerName}.\`);else seen.add(n);
+        else if(seen.has(n))errors.push(`La posición ${n} está duplicada en ${changerName}.`);else seen.add(n);
       });
       const optionalPositions=['min_position','max_position','neutral_position','current_position'];
       optionalPositions.forEach(key=>{
         const raw=String(c[key]??'').trim();if(raw==='')return;
         const value=Number(raw);
-        if(!/^\d{1,3}$/.test(raw)||!Number.isInteger(value)||value<1||value>150)errors.push(\`\${key==='min_position'?'La posición mínima':key==='max_position'?'La posición máxima':key==='neutral_position'?'La posición neutra':'La posición actual'} de \${changerName} debe ser un entero entre 1 y 150.\`);
+        if(!/^\d{1,3}$/.test(raw)||!Number.isInteger(value)||value<1||value>150)errors.push(`${key==='min_position'?'La posición mínima':key==='max_position'?'La posición máxima':key==='neutral_position'?'La posición neutra':'La posición actual'} de ${changerName} debe ser un entero entre 1 y 150.`);
       });
       const min=String(c.min_position??'').trim()===''?null:Number(c.min_position);
       const max=String(c.max_position??'').trim()===''?null:Number(c.max_position);
