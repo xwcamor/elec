@@ -396,7 +396,7 @@
   function buildGrid(container, rows, columns, onChange, onRowsChanged) {
     if (!rows.length) rows.push({});
     const render = () => {
-      const head = columns.map(c=>`<th>${esc(c.label)}${c.required?'<i class="required-mark" aria-hidden="true">*</i>':''}</th>`).join('');
+      const head = columns.map(c=>`<th>${esc(c.type==='delete'?(c.label||'Acción'):c.label)}${c.required?'<i class="required-mark" aria-hidden="true">*</i>':''}</th>`).join('');
       const body = rows.map((row,ri)=>`<tr data-grid-row="${ri}"><td>${ri+1}</td>${columns.map((col,ci)=>`<td>${renderCell(row,col,ri,ci)}</td>`).join('')}</tr>`).join('');
       container.innerHTML = `<table class="sheet-table"><thead><tr><th>#</th>${head}</tr></thead><tbody>${body}</tbody></table>`;
       container.querySelectorAll('[data-delete-row]').forEach(button=>button.addEventListener('click',()=>{if(rows.length<=1){toast('Debe mantenerse al menos una fila.',true);return;}const removed=rows.splice(Number(button.dataset.deleteRow),1)[0];render();if(typeof onRowsChanged==='function')onRowsChanged(removed);}));
