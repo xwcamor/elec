@@ -212,8 +212,13 @@
     refreshConfigStepIndicators();
   }
   function toast(message, bad = false) {
-    const el = $('#toast'); el.textContent = message; el.style.background = bad ? '#a32b2b' : '#24394e';
-    el.classList.add('show'); window.clearTimeout(toast.timer); toast.timer = window.setTimeout(() => el.classList.remove('show'), 3100);
+    const el = $('#toast'); if(!el)return;
+    el.textContent = String(message||'');
+    el.dataset.kind = bad ? 'error' : 'success';
+    el.setAttribute('role',bad?'alert':'status');
+    el.classList.add('show');
+    window.clearTimeout(toast.timer);
+    toast.timer = window.setTimeout(() => el.classList.remove('show'), 4200);
   }
   function esc(value) { return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   function getWindingProgress(){
@@ -586,11 +591,12 @@
       const button=document.querySelector('.config-view-tab[data-tab="'+key+'"]');
       if(!button)return;
       button.dataset.state=status;
-      button.setAttribute('aria-current',button.dataset.tab===selectedTab?'step':'false');
-      const number=button.querySelector('.plan-step-number');
-      if(number){button.dataset.stepNumber=String(index+1);number.textContent=status==='complete'?'✓':String(index+1);}
+      if(button.dataset.tab===selectedTab)button.setAttribute('aria-current','step');
+      else button.removeAttribute('aria-current');
       const statusText=button.querySelector('.config-step-status');
       if(statusText)statusText.textContent=label;
+      const title=button.querySelector('.ui-step-copy b')?.textContent||key;
+      button.setAttribute('aria-label',title+' · '+label);
       button.title=label;
     });
   }
