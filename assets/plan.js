@@ -250,7 +250,8 @@
       const row=Number(input.dataset.row),field=input.dataset.col,required=(requiredByTest[item.code]||[]).includes(field);
       const valid=requiredValueFilled(field,input.value,item.code);
       input.classList.toggle('is-filled',valid);
-      input.classList.toggle('is-missing',required&&!valid);\n      if(required)input.setAttribute('aria-invalid',valid?'false':'true');else input.removeAttribute('aria-invalid');
+      input.classList.toggle('is-missing',required&&!valid);
+      if(required)input.setAttribute('aria-invalid',valid?'false':'true');else input.removeAttribute('aria-invalid');
       if(input.classList.contains('plan-result-select'))input.dataset.state=String(input.value||'PENDIENTE').toLowerCase();
       if(field==='result'){
         const state=String(input.value||'').trim().toUpperCase();
@@ -264,7 +265,8 @@
       input.classList.toggle('is-filled',isFilled(input.value));
       input.classList.toggle('is-missing',!isFilled(input.value));
       input.closest('label')?.classList.toggle('meta-complete',isFilled(input.value));
-      input.closest('label')?.classList.toggle('meta-pending',!isFilled(input.value));\n      input.setAttribute('aria-invalid',isFilled(input.value)?'false':'true');
+      input.closest('label')?.classList.toggle('meta-pending',!isFilled(input.value));
+      input.setAttribute('aria-invalid',isFilled(input.value)?'false':'true');
     });
     card.querySelectorAll('tbody tr[data-row-state]').forEach((tr,index)=>{tr.dataset.rowState=metrics.rowStates[index]?.state||'empty';});
     const progress=card.querySelector('[data-card-progress]');
