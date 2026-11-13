@@ -229,7 +229,7 @@ class ElectricalTestRepository
     private function validateCompletedPlanTest(array $test): void
     {
         $rules = [
-            'TTR' => ['TTR', ['at','bt','U','V','W','result'], ['at','bt','U','V','W']],
+            'TTR' => ['TTR', ['tap','at','bt','U','V','W','result'], ['at','bt','U','V','W']],
             'POWER_FACTOR' => ['PF', ['measurement','test_voltage','power_factor_measured','power_factor_corrected_20c','capacitance_source_f','status'], ['test_voltage','power_factor_measured','power_factor_corrected_20c','capacitance_source_f']],
             'EXCITATION' => ['EXC', ['tap','test_voltage_kv','frequency_hz','current_u_ma','losses_u_w','current_v_ma','losses_v_w','current_w_ma','losses_w_w','evaluation'], ['test_voltage_kv','frequency_hz','current_u_ma','losses_u_w','current_v_ma','losses_v_w','current_w_ma','losses_w_w']],
             'WINDING_RESISTANCE' => ['WR', ['section','tap','phase','test_current_a','temperature_c','resistance_measured','resistance_referred_75c'], ['test_current_a','temperature_c','resistance_measured','resistance_referred_75c']],
@@ -255,6 +255,12 @@ class ElectricalTestRepository
         }
 
         [$prefix, $required, $numeric] = $rules[$code];
+        $optionalNumeric = [
+            'TTR'=>['theoretical','errU','errV','errW'],
+            'POWER_FACTOR'=>['capacitance_measured'],
+            'INSULATION_RESISTANCE'=>['absorption_index'],
+            'CAPACITANCE'=>['frequency_hz','temperature_c'],
+        ][$code] ?? [];
         $groups = [];
         foreach (($test['measurements'] ?? []) as $measurement) {
             if (!is_array($measurement)) continue;
@@ -276,6 +282,14 @@ class ElectricalTestRepository
                 $value = str_replace(',', '.', trim((string)($values[$field] ?? '')));
                 if ($value === '' || !is_numeric($value)) {
                     throw new InvalidArgumentException('El ensayo '.$code.', fila '.$rowNumber.', contiene una medición numérica inválida en «'.$field.'».');
+                }
+            }
+            foreach ($optionalNumeric as $field) {
+                $raw = trim((string)($values[$field] ?? ''));
+                if ($raw === '') continue;
+                $value = str_replace(',', '.', $raw);
+                if (!is_numeric($value) || !is_finite((float)$value)) {
+                    throw new InvalidArgumentException('El ensayo '.$code.', fila '.$rowNumber.', contiene un valor opcional no numérico en «'.$field.'».');
                 }
             }
         }
