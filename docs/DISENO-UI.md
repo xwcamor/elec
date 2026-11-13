@@ -177,6 +177,7 @@ Los formularios de los asistentes de Configuración eléctrica y Registro de pru
 - Separación entre campos: **16 px**.
 - Padding inferior del contenido: **16 px**; las barras de acciones mantienen el mismo gutter del panel.
 - Los pies de formulario pueden llegar al borde del contenedor solo cuando sean barras de navegación compartidas; no deben crear sangrías laterales distintas.
+- Las barras de navegación de los steps se desplazan con el contenido; no usar `position: sticky` ni `position: fixed` por defecto.
 - No añadir márgenes o paddings específicos a un módulo para corregir una diferencia que debe resolverse en el patrón compartido.
 - En móvil se conservan las mismas reglas con el token de 16 px y sin desbordamiento horizontal.
 
