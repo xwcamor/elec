@@ -168,3 +168,7 @@
 - [ ] Configuración: probar tensión/frecuencia con coma decimal y comprobar persistencia como número.
 - [ ] Registro: probar TTR con TAP vacío, no numérico y correcto; cliente y servidor deben tener el mismo criterio.
 - [ ] Registro: probar los campos calculados opcionales con un número válido y con texto; un vacío debe seguir siendo opcional.
+
+### v1.5.154 — uniformidad de pies de formulario
+- [ ] En ambos asistentes, comprobar que los botones Anterior/Continuar/Guardar se desplazan con el contenido y no quedan fijos al viewport.
+- [ ] Probar errores de posición mínima, máxima, neutra y actual; comprobar que el foco va al campo exacto.
