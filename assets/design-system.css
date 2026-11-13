@@ -688,7 +688,7 @@ input,select,textarea{accent-color:var(--ui-accent)}
   #configStepper,#planStepper{padding:10px 5px!important}
   #planStepper{grid-template-columns:minmax(0,1fr) 7px minmax(0,1fr) 7px minmax(0,1fr) 7px minmax(0,1fr)!important}
   .ui-step-copy b{font-size:8px}
-  .ui-step-copy small,.ui-step-copy em{font-size:7px}
+  .ui-step-copy small,.ui-step-copy em{font-size:8px}
 }
 @media(prefers-reduced-motion:reduce){
   .ui-step-icon,.ui-step,.btn,.toast{transition:none!important}
