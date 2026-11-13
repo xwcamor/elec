@@ -342,6 +342,10 @@ body.test-form-focus .page-shell{
   padding:0 0 16px!important;
 }
 .config-panel .panel-footer{
+  position:static!important;
+  bottom:auto!important;
+  z-index:auto!important;
+  backdrop-filter:none!important;
   margin:0 calc(-1 * var(--ui-panel-padding))!important;
   padding:14px var(--ui-panel-padding)!important;
   border:0!important;
@@ -350,6 +354,10 @@ body.test-form-focus .page-shell{
   min-height:58px!important;
 }
 #planPage .plan-step-actions{
+  position:static!important;
+  bottom:auto!important;
+  z-index:auto!important;
+  backdrop-filter:none!important;
   display:flex;
   align-items:center;
   gap:12px;
