@@ -650,6 +650,7 @@
       const changerName=c.name||'el conmutador '+(ci+1);
       if(!state.windings[c.winding_index])errors.push(`El conmutador ${ci+1} debe estar asociado a un bobinado.`);
       const seen=new Set();
+      if(!Array.isArray(c.positions)||c.positions.length===0)errors.push(`Agrega al menos una posición TAP a ${changerName}.`);
       c.positions.forEach((p,pi)=>{
         const raw=String(p.position_no??'').trim();
         if(raw===''){
@@ -728,7 +729,7 @@
           const cells=[...grid.querySelectorAll('.sheet-cell[data-col="0"]')];
           if(rowMatch)target=grid.querySelector('.sheet-cell[data-col="0"][data-row="'+(Number(rowMatch[1])-1)+'"]');
           if(!target&&positionMatch)target=cells.find(cell=>String(cell.value||'').trim()===positionMatch[1])||null;
-          if(!target)target=cells[0]||null;
+          if(!target)target=cells[0]||grid.querySelector('[data-add-tap-row]')||null;
         }
         if(!target)target=document.querySelector('[data-changer="'+changerIndex+'"] [data-cfield="winding_index"]');
       }
