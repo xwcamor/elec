@@ -172,3 +172,15 @@
 ### v1.5.154 — uniformidad de pies de formulario
 - [ ] En ambos asistentes, comprobar que los botones Anterior/Continuar/Guardar se desplazan con el contenido y no quedan fijos al viewport.
 - [ ] Probar errores de posición mínima, máxima, neutra y actual; comprobar que el foco va al campo exacto.
+
+
+## v1.5.153 — paridad de validaciones y caché
+- [ ] Confirmar que index.php carga app.css, design-system.css, app.js, electrical-tests.js y plan.js con la misma versión indicada en VERSION.
+- [ ] Probar posiciones TAP 1, 10, 100 y 150; deben aceptarse.
+- [ ] Probar posiciones TAP 0, 151, 1.0, 1e2, negativas, vacías o con letras; deben rechazarse.
+- [ ] Probar metadatos min/max/neutral/actual con decimales o notación exponencial; deben rechazarse en cliente y servidor.
+- [ ] Intentar guardar un conmutador sin posiciones o con una fila TAP mal formada; cliente y servidor deben rechazarlo.
+- [ ] Enviar una fila de borne con estructura inválida por API; PHP debe responder con error de validación, no ignorarla.
+- [ ] Ejecutar `python tests/check-validation-parity.py` y confirmar que campos obligatorios y numéricos de cada ensayo coinciden entre JS y PHP.
+- [ ] Comprobar visualmente encabezados, separadores y formularios de steps en Configuración, Resumen de Pruebas y Registro: 20 px escritorio / 16 px móvil.
+
