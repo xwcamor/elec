@@ -157,7 +157,7 @@
     BUSHING:['terminal','serial','test_voltage','power_factor_plate','power_factor_measured','capacitance_plate','capacitance_measured','variation_percent','status'],
     SFRA:['connection','tap','comparison_result','result'],
     ARRESTER:['section','phase','output_voltage','output_current','test_mode','losses_measured','capacitance_measured','status'],
-    PROTECTIONS:['accessory','terminals','contact','condition','result'],
+    PROTECTIONS:['accessory','terminals','contact','condition','status'],
     CAPACITANCE:['point','connection','test_voltage_kv','capacitance_nf','status']
   };
   const numericByTest={
