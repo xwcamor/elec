@@ -76,7 +76,8 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TR Health | Piloto de configuración eléctrica</title>
-<link rel="stylesheet" href="./assets/app.css?v=1.5.151">
+<link rel="stylesheet" href="./assets/app.css?v=1.5.152">
+<link rel="stylesheet" href="./assets/design-system.css?v=1.5.152">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body>
@@ -293,14 +294,22 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
       <div class="toolbar-actions plan-toolbar-actions"><span id="planSaveStatus" class="plan-save-status" data-state="idle" aria-live="polite"><i></i><span>Preparación · todavía no se guarda</span></span><button class="btn" id="cancelPlan">Volver a registros</button></div>
     </div>
     <div class="plan-wizard-shell">
-    <nav class="plan-stepper" id="planStepper" aria-label="Etapas del registro de pruebas">
-      <button type="button" class="plan-step" data-plan-step="shared" data-state="missing" aria-current="step"><span class="plan-step-number">1</span></button>
-      <span class="plan-step-connector" aria-hidden="true"></span>
-      <button type="button" class="plan-step" data-plan-step="selection" data-state="missing"><span class="plan-step-number">2</span></button>
-      <span class="plan-step-connector" aria-hidden="true"></span>
-      <button type="button" class="plan-step" data-plan-step="results" data-state="missing"><span class="plan-step-number">3</span></button>
-      <span class="plan-step-connector" aria-hidden="true"></span>
-      <button type="button" class="plan-step" data-plan-step="review" data-state="missing"><span class="plan-step-number">4</span></button>
+    <nav class="plan-stepper ui-stepper ui-stepper--plan" id="planStepper" aria-label="Etapas del registro de pruebas">
+      <button type="button" class="plan-step ui-step" data-plan-step="shared" data-state="missing" aria-current="step" aria-label="Datos generales · Pendiente">
+        <span class="ui-step-icon" aria-hidden="true"><svg><use href="#i-calendar"/></svg></span><span class="ui-step-copy"><b>Datos generales</b><small data-step-status>Pendiente</small></span>
+      </button>
+      <span class="plan-step-connector ui-step-connector" aria-hidden="true"></span>
+      <button type="button" class="plan-step ui-step" data-plan-step="selection" data-state="missing" aria-label="Ensayos · Pendiente">
+        <span class="ui-step-icon" aria-hidden="true"><svg><use href="#i-flask"/></svg></span><span class="ui-step-copy"><b>Ensayos</b><small data-step-status>Pendiente</small></span>
+      </button>
+      <span class="plan-step-connector ui-step-connector" aria-hidden="true"></span>
+      <button type="button" class="plan-step ui-step" data-plan-step="results" data-state="missing" aria-label="Resultados · Pendiente">
+        <span class="ui-step-icon" aria-hidden="true"><svg><use href="#i-activity"/></svg></span><span class="ui-step-copy"><b>Resultados</b><small data-step-status>Pendiente</small></span>
+      </button>
+      <span class="plan-step-connector ui-step-connector" aria-hidden="true"></span>
+      <button type="button" class="plan-step ui-step" data-plan-step="review" data-state="missing" aria-label="Revisión · Pendiente">
+        <span class="ui-step-icon" aria-hidden="true"><svg><use href="#i-check"/></svg></span><span class="ui-step-copy"><b>Revisión</b><small data-step-status>Pendiente</small></span>
+      </button>
     </nav>
     <section class="execution-card plan-shared-card plan-step-panel" id="planSharedSection" data-plan-panel="shared">
       <div class="execution-card-title"><h3>Datos generales</h3><p>Identifica la jornada y registra las condiciones en las que se realizaron los ensayos.</p></div>
@@ -355,17 +364,20 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
     </div>
     <div class="config-alert <?= $dbMessage === '' ? 'hidden' : '' ?>" id="dbAlert" role="status"><svg><use href="#i-info"/></svg><span><?=h($dbMessage)?></span></div>
     <div class="config-layout">
-      <nav class="plan-stepper config-stepper" id="configStepper" aria-label="Etapas de configuración eléctrica">
-        <button type="button" class="plan-step config-view-tab" data-tab="windings" data-state="missing" aria-current="step">
-          <span class="plan-step-number">1</span><span class="plan-step-copy"><b>Bobinados y bornes</b><small id="windingCount">0 bobinados</small><strong class="config-step-status">Agregar bobinados</strong></span>
+      <nav class="plan-stepper config-stepper ui-stepper ui-stepper--config" id="configStepper" aria-label="Etapas de configuración eléctrica">
+        <button type="button" class="plan-step config-view-tab ui-step" data-tab="windings" data-state="missing" aria-current="step" aria-label="Bobinados y bornes · Agregar bobinados">
+          <span class="ui-step-icon" aria-hidden="true"><svg><use href="#i-layers"/></svg></span>
+          <span class="ui-step-copy"><b>Bobinados y bornes</b><small id="windingCount">0 bobinados</small><em class="config-step-status">Agregar bobinados</em></span>
         </button>
-        <span class="plan-step-connector" aria-hidden="true"></span>
-        <button type="button" class="plan-step config-view-tab" data-tab="taps" data-state="missing">
-          <span class="plan-step-number">2</span><span class="plan-step-copy"><b>Conmutadores y TAP</b><small id="tapCount">0 posiciones</small><strong class="config-step-status">Agregar conmutador</strong></span>
+        <span class="plan-step-connector ui-step-connector" aria-hidden="true"></span>
+        <button type="button" class="plan-step config-view-tab ui-step" data-tab="taps" data-state="missing" aria-label="Conmutadores y TAP · Agregar conmutador">
+          <span class="ui-step-icon" aria-hidden="true"><svg><use href="#i-zap"/></svg></span>
+          <span class="ui-step-copy"><b>Conmutadores y TAP</b><small id="tapCount">0 posiciones</small><em class="config-step-status">Agregar conmutador</em></span>
         </button>
-        <span class="plan-step-connector" aria-hidden="true"></span>
-        <button type="button" class="plan-step config-view-tab" data-tab="review" data-state="missing">
-          <span class="plan-step-number">3</span><span class="plan-step-copy"><b>Revisión y versiones</b><small>Validar y guardar</small><strong class="config-step-status">Pendiente</strong></span>
+        <span class="plan-step-connector ui-step-connector" aria-hidden="true"></span>
+        <button type="button" class="plan-step config-view-tab ui-step" data-tab="review" data-state="missing" aria-label="Revisión y versiones · Pendiente">
+          <span class="ui-step-icon" aria-hidden="true"><svg><use href="#i-check"/></svg></span>
+          <span class="ui-step-copy"><b>Revisión y versiones</b><small>Validar y guardar</small><em class="config-step-status">Pendiente</em></span>
         </button>
       </nav>
       <div class="config-main">
@@ -404,7 +416,7 @@ $canAccessElectricalTests = $testsAccessBlockReason === '';
     <div class="modal-actions"><button class="btn" type="button" id="cancelTapRowsAlt">Cancelar</button><button class="btn primary" type="button" id="confirmTapRows"><svg><use href="#i-check"/></svg>Generar filas</button></div>
   </div>
 </div>
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 <script>
 window.PILOT = <?=json_encode([
   'apiUrl' => rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/')), '/') . '/api.php',
