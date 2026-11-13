@@ -75,13 +75,15 @@ Cuando encuentres defectos, presenta una tabla con columnas Antes, Después y Mo
 
 ## Estándar visual de ELEC
 
-La fuente de verdad para tokens, tipografía, espaciado, componentes compartidos, estados de steps, acordeones, ubicación de acciones destructivas y metodología de cambios es `docs/DISENO-UI.md`. Es obligatorio leerlo y aplicarlo antes de editar estilos o formularios. No dupliques ni contradigas sus reglas; si una regla necesita cambiar, actualiza primero la documentación y luego los componentes.
+La fuente de verdad para reglas está en `docs/DISENO-UI.md` y la implementación CSS compartida está en `assets/design-system.css`. Esta hoja se carga después de `assets/app.css`; no dupliques reglas compartidas en la hoja heredada. El estándar también incluye validaciones y mensajes de error. Es obligatorio leerlo y aplicarlo antes de editar estilos o formularios. No dupliques ni contradigas sus reglas; si una regla necesita cambiar, actualiza primero la documentación y luego los componentes.
 
 En especial:
 - Configuración eléctrica y Pruebas eléctricas deben compartir el mismo lenguaje visual.
 - Los títulos usan tinta oscura; el azul se reserva para acciones y selección.
 - Tarjetas equivalentes comparten padding, borde, radio y cabecera.
-- Steps pendientes muestran número; los completados muestran check; el activo se distingue claramente.
+- Los steps usan icono semántico, nombre corto y estado textual; no números grandes ni checks que reemplacen el icono. Configuración y Registro comparten componente y dimensiones.
 - Las acciones destructivas de acordeones se ubican al final del contenido expandido, tras un divisor y con confirmación.
 - Sticky no es el comportamiento predeterminado; no introducirlo sin necesidad funcional y aprobación.
-- No apilar overrides CSS: corregir tokens o componentes compartidos y retirar reglas obsoletas.
+- No apilar overrides CSS: corregir tokens o componentes compartidos en `assets/design-system.css` y retirar reglas obsoletas de `assets/app.css`.
+- Mantener las reglas numéricas y obligatorias de cada ensayo sincronizadas entre `assets/plan.js` y `app/ElectricalTestRepository.php`.
+- Si se inicia una jornada EN_PROCESO, no permitir que un autoguardado la degrade a BORRADOR; preservar el ID y el estado.
