@@ -479,6 +479,6 @@ window.PILOT = <?=json_encode([
 <script src="./assets/app.js?v=1.5.160"></script>
 <script src="./assets/electrical-tests.js?v=1.5.147"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="./assets/plan.js?v=1.5.183"></script>
+<script src="./assets/plan.js?v=1.5.184"></script>
 </body></html>
 0
