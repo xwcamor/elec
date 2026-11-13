@@ -3,7 +3,7 @@
 Aplicación web independiente para configurar transformadores y registrar pruebas eléctricas. Es un prototipo PHP + MySQL pensado para ejecutarse localmente con Laragon.
 
 ## Versión
-**1.5.152**
+**1.5.153**
 
 ## Estándar de diseño y metodología
 
