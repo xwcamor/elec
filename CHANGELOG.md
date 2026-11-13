@@ -1,3 +1,7 @@
+## v1.5.155
+- Actualiza las referencias de caché de CSS y JavaScript para que el navegador descargue los módulos y el sistema visual nuevos.
+- CI verifica que las cinco hojas/scripts operativos tengan la versión de caché del release.
+
 ## v1.5.154
 - Homologa el comportamiento de las barras inferiores de ambos asistentes: no quedan fijas al viewport; conservan el mismo borde superior, padding y alineación.
 - Las validaciones de min/max/neutral/actual de TAP llevan el foco al campo específico que debe corregirse.
